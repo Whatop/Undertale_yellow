@@ -171,10 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -907,10 +907,10 @@ RectTransform:
   m_Father: {fileID: 1924066114}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 39.85623, y: -136.51437}
-  m_SizeDelta: {x: 914.858, y: 237.3281}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 91.249, y: -290.6933}
+  m_SizeDelta: {x: 112.021, y: -573.183}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1673541343
 MonoBehaviour:
@@ -959,8 +959,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 120
+  m_fontSizeBase: 120
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -995,7 +995,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 11.29541, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1163,10 +1163,10 @@ RectTransform:
   m_Father: {fileID: 134231179}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00047684, y: -0.000011444}
-  m_SizeDelta: {x: 866, y: 487}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1924066115
 MonoBehaviour:
@@ -1233,8 +1233,8 @@ MonoBehaviour:
   - {fileID: 6453866792533747048, guid: bd8cf6302dc29174a97d425caf306451, type: 3}
   - {fileID: 6453866792533747048, guid: bd8cf6302dc29174a97d425caf306451, type: 3}
   - {fileID: 2461916166259995434, guid: bd8cf6302dc29174a97d425caf306451, type: 3}
-  CurIntro: {fileID: 1924066115}
-  texts:
+  curIntro: {fileID: 1924066115}
+  textPiles:
   - {fileID: 4900000, guid: 85785a71eeae83c40927a786814e7dde, type: 3}
   - {fileID: 4900000, guid: a71fc8a0cd2f4b4438ef4afd89022a51, type: 3}
   - {fileID: 4900000, guid: f230d694d0e206c498469e34a55cdd48, type: 3}
@@ -1243,6 +1243,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 69bd2f0dc87a4ab4e889ecedd4d99f11, type: 3}
   - {fileID: 4900000, guid: f12be66563295e341b745eac0a659dbb, type: 3}
   CurText: {fileID: 1673541343}
+  soundManager: {fileID: 0}
   readSpeed: 9
   skip: 3.5
   IntroCast: {fileID: 1635337808}

@@ -14,27 +14,21 @@ using UnityEngine.Audio;
 //또한 오디오 믹서를 활용하여 볼륨을 조절합니다.
 //효과음은 동적으로 생성된 GameObject에 AudioSource를 추가하여 재생하고 일정 시간 후에 파괴됩니다.
 
-
-
-
-
-
-public class SoundManager: MonoBehaviour
+public class SoundManager : MonoBehaviour
 {
     public AudioSource bgSound;
     public AudioMixer mixer;
     public AudioClip[] bglist;
     public AudioClip[] sfxlist;
     public AudioClip[] txtlist;
-
     private static SoundManager instance;
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(instance);
+            DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
@@ -42,7 +36,7 @@ public class SoundManager: MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     public static SoundManager Instance
     {
         get
@@ -58,28 +52,34 @@ public class SoundManager: MonoBehaviour
     // 언더테일은 방마다 하니 안됨!
     // 그래서 스테이지에서 게임 매니저로 방있으면 저거하는..ㅋㅋ..
     // 아마 방 번호를 따로 지정해줘야겠지! 음 음..
-    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
         for(int i = 0; i < bglist.Length; i++)
         {
-            if (arg0.name == bglist[i].name)
+            if (scene.name == bglist[i].name)
             {
                 BGSoundSave(bglist[i]);
             }
             //방코드로 else if()  
         }
     }
+    private float CalculateVolume(float val)
+    {
+        return Mathf.Log10(val) * 20;
+    }
 
     public void BGSoundVolume(float val)
     {
-        mixer.SetFloat("BGSound", Mathf.Log10(val)*20);
-    }
-    public void SFXSoundVolume(float val)
-    {
-        mixer.SetFloat("SFXSound", Mathf.Log10(val) * 20);
+        mixer.SetFloat("BGSound", CalculateVolume(val));
     }
 
-    // SoundManager.instance.SFXPlay(string,int);
+    public void SFXSoundVolume(float val)
+    {
+        mixer.SetFloat("SFXSound", CalculateVolume(val));
+    }
+
+
+    // soundManager.SFXPlay(string,int);
     public void SFXPlay(string sfxName, int sfxNum)
     {
         GameObject go = new GameObject(sfxName + "Sound");

@@ -12,13 +12,16 @@ public class IntroMaker : MonoBehaviour
     public Sprite[] sprites;
 
     [SerializeField]
-    private Image CurIntro;
+    private Image curIntro;
 
-    //IntroTexts
-    public TextAsset[] texts;
+    //IntrotextPiles
+    public TextAsset[] textPiles;
     
     [SerializeField]
     private TextMeshProUGUI CurText;
+
+    [SerializeField]
+    private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
 
     public int readSpeed;
     
@@ -26,6 +29,8 @@ public class IntroMaker : MonoBehaviour
     int index;
     public float skip = 3.5f;
 
+    int EndTextPage = 11;
+    int EngImagePage = 13;
     //Color A
     float alpha;
     bool isUp = false, isDown = false;
@@ -49,18 +54,19 @@ public class IntroMaker : MonoBehaviour
         isIntroStart = false;
         CurText.text = "";
         IntroCast.gameObject.SetActive(false);
+        soundManager = SoundManager.Instance;
     }
 
     //다음 장면으로
     void NextSprite()
     {
-        CurIntro.sprite = sprites[count];
+        curIntro.sprite = sprites[count];
         
-        if (texts.Length > count)
+        if (textPiles.Length > count)
             NextText();
         else
         {
-            if (count != 11)
+            if (count != EndTextPage)
             {
                 index = 0;
                 CurText.text = "";
@@ -80,18 +86,18 @@ public class IntroMaker : MonoBehaviour
         if (index == 0)
             Invoke("EndText", skip);
 
-        if (count != 13)
+        if (count != EngImagePage)
         {
-            if (CurText.text != texts[count].text)
+            if (CurText.text != textPiles[count].text)
             {
-                if (texts[count].text[index] == '.' && count == 4)
+                if (textPiles[count].text[index] == '.' && count == 4)
                     Invoke("LastText", 0.4f);
                 else
                 {
-                    CurText.text += texts[count].text[index];
-                    if (texts[count].text[index] != ' ' && texts[count].text[index] != ','
-                        && texts[count].text[index] != '.' && texts[count].text[index] != '\n')
-                            SoundManager.Instance.SFXTextPlay("SND_TXT2", 1);
+                    CurText.text += textPiles[count].text[index];
+                    if (textPiles[count].text[index] != ' ' && textPiles[count].text[index] != ','
+                        && textPiles[count].text[index] != '.' && textPiles[count].text[index] != '\n')
+                            soundManager.SFXTextPlay("SND_TXT2", 1);
 
                     index++;
 
@@ -104,8 +110,8 @@ public class IntroMaker : MonoBehaviour
     // 특정 .일때 시작되는 이벤트
     void LastText()
     {
-        CurText.text += texts[count].text[index];
-        SoundManager.Instance.SFXTextPlay("SND_TXT2", 1);
+        CurText.text += textPiles[count].text[index];
+        soundManager.SFXTextPlay("SND_TXT2", 1);
 
         index++;
 
@@ -123,7 +129,7 @@ public class IntroMaker : MonoBehaviour
             isUp = true;
             alpha = 0;
             count++;
-            CurIntro.sprite = sprites[count];
+            curIntro.sprite = sprites[count];
         }
     }
 
@@ -145,7 +151,7 @@ public class IntroMaker : MonoBehaviour
             }
             IntroCast.gameObject.SetActive(true);
         }
-        else if (count == 11)
+        else if (count == EndTextPage)
         {
             if (transform.localPosition.y > -120)
             {
@@ -178,20 +184,20 @@ public class IntroMaker : MonoBehaviour
                 if (alpha > 0)
                 {
                     alpha -= Time.deltaTime * 0.8f;
-                    Color c = CurIntro.color;
+                    Color c = curIntro.color;
                     c.a = alpha;
-                    CurIntro.color = c;
+                    curIntro.color = c;
                     if (count == 12) //마지막 스프라이트일때.
                     {
                         isIntroStart = false;
                         count++;
                         SoundCheck = true;
-                        SoundManager.Instance.StopBGSound();
-                        SoundManager.Instance.SFXPlay("IntroSFX", 215);
+                        soundManager.StopBGSound();
+                        soundManager.SFXPlay("IntroSFX", 215);
                         alpha = 1;
                         CurText.text = "";
                         index = 0;
-                        CurIntro.sprite = sprites[count];
+                        curIntro.sprite = sprites[count];
                         IntroCast.gameObject.SetActive(false);
                         transform.localPosition = Vector3.zero;
                     }
@@ -202,7 +208,7 @@ public class IntroMaker : MonoBehaviour
                     isUp = true;
                     alpha = 0;
                     count++;
-                    CurIntro.sprite = sprites[count];
+                    curIntro.sprite = sprites[count];
                     IntroCast.gameObject.SetActive(false);
                     transform.localPosition = Vector3.zero;
                 }
@@ -214,15 +220,15 @@ public class IntroMaker : MonoBehaviour
                 {
                     alpha += Time.deltaTime * 0.8f;
 
-                    Color c = CurIntro.color;
+                    Color c = curIntro.color;
                     c.a = alpha;
-                    CurIntro.color = c;
+                    curIntro.color = c;
                 }
                 else
                 {
                     isUp = false;
                     alpha = 1;
-                    if (count != 13)
+                    if (count != EngImagePage)
                         NextSprite();
                     else
                         isIntroStart = false;
@@ -239,26 +245,26 @@ public class IntroMaker : MonoBehaviour
         {
             if (!isIntroStart)
             {
-                if (count != 13)
+                if (count != EngImagePage)
                 {
                     isIntroStart = true;
-                    SoundManager.Instance.BGSoundPlay();
+                    soundManager.BGSoundPlay();
                     NextSprite();
                 }
                 else
                 {
-                    count = 13;
+                    count = EngImagePage;
                     if (!SoundCheck)
                     {
-                        SoundManager.Instance.StopBGSound();
-                        SoundManager.Instance.SFXPlay("IntroSFX", 215);
+                        soundManager.StopBGSound();
+                        soundManager.SFXPlay("IntroSFX", 215);
                     }
                     SoundCheck = true;
                     alpha = 1;
                     CurText.text = "";
                     index = 0;
                     Invoke("NextScene", 3f);
-                    CurIntro.sprite = sprites[count];
+                    curIntro.sprite = sprites[count];
                     IntroCast.gameObject.SetActive(false);
                     transform.localPosition = Vector3.zero;
                 }
@@ -266,18 +272,18 @@ public class IntroMaker : MonoBehaviour
             else
             {
                 isIntroStart = false;
-                count = 13;
+                count = EngImagePage;
                 if (!SoundCheck)
                 {
-                    SoundManager.Instance.StopBGSound();
-                    SoundManager.Instance.SFXPlay("IntroSFX", 215);
+                    soundManager.StopBGSound();
+                    soundManager.SFXPlay("IntroSFX", 215);
                 }
                 SoundCheck = true;
                 alpha = 1;
                 CurText.text = "";
                 index = 0;
                 Invoke("NextScene", 3f);
-                CurIntro.sprite = sprites[count];
+                curIntro.sprite = sprites[count];
                 IntroCast.gameObject.SetActive(false);
                 transform.localPosition = Vector3.zero;
             }

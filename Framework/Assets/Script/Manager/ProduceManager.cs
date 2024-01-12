@@ -47,24 +47,39 @@ public class ProduceManager : MonoBehaviour
 
     [SerializeField] [Range(0.01f, 1f)] float shakeRange = 0.05f;
     [SerializeField] [Range(0.1f, 1f)] float duration = 0.5f;
+    private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
 
     public int index = 0;
     float alpha = 0;
-    public RectTransform[] Temp = new RectTransform[55];
+    public RectTransform[] Temp = new RectTransform[TotalCharacters];
     public RectTransform NameTemp;
+
+    //이스터 에그 아무것도 입력 안한체 결정을 누르면 decide
+    //TotalCharacters -> 공백 포함 알파벳 총량
+    //choiceAlphabets -> 선택지 단어
+    //refusal 아니요 
+    //decide 네 
+
+    const int TotalCharacters = 55;
+    const int choiceAlphabets = 3;
+
+    const int refusal = 59;
+    const int decide = 60;
+
 
     private float scaleText = 1;
     private bool isfadeOut = false;
     void Start()
     {
-        SoundManager.Instance.BGSoundPlay();
+        soundManager = SoundManager.Instance;
+        soundManager.BGSoundPlay();
         CurName.text = "";
         CurDecudeName.text = "";
         index = 0;
         isfadeOut = false;
         NameTemp.localPosition = CurDecudeName.rectTransform.localPosition;
         CurIndexYellow();
-        for (int i = 0; i <= 55; i++)
+        for (int i = 0; i <= TotalCharacters; i++)
         {
             Temp[i].localPosition = Alphabet[i].rectTransform.localPosition;
         }
@@ -122,7 +137,7 @@ public class ProduceManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 PrevIndexWhile();
-                if (index != 59)
+                if (index != refusal)
                     index--;
                 else
                     index++;
@@ -132,12 +147,12 @@ public class ProduceManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 PrevIndexWhile();
-                if (curScene == CurScene.ProduceName && index < 58)
+                if (curScene == CurScene.ProduceName && index < TotalCharacters + choiceAlphabets)
                     index++;
 
-                if (index == 60)
+                if (index == decide)
                     index--;
-                else if (index == 59)
+                else if (index == refusal)
                     index++;
 
                 CurIndexYellow();
@@ -190,8 +205,8 @@ public class ProduceManager : MonoBehaviour
         GameManager.Instance.player_Name = CurName.text;
         if (!isfadeOut)
         {
-            SoundManager.Instance.StopBGSound();
-            SoundManager.Instance.SFXPlay("Flower_Lalf", 216);
+            soundManager.StopBGSound();
+            soundManager.SFXPlay("Flower_Lalf", 216);
             isfadeOut = true;
         }
     }
@@ -202,15 +217,15 @@ public class ProduceManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                if (index == 56)
+                if (index == TotalCharacters + choiceAlphabets - 2)// Nopt
                 {
                     Exit();
                 }
-                else if (index == 57)
+                else if (index == TotalCharacters + choiceAlphabets - 1)// Nopt
                 {
                     Erase();
                 }
-                else if (index == 58 && CurName.text.Length > 0)
+                else if (index == TotalCharacters + choiceAlphabets && CurName.text.Length > 0)
                 {
                     ChangeScene(CurScene.DecideName);
                 }
@@ -242,13 +257,13 @@ public class ProduceManager : MonoBehaviour
             CurDecudeName.gameObject.transform.localScale = new Vector3(scaleText, scaleText, 1);
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                if (index == 59)
+                if (index == refusal)
                 {
                     ChangeScene(CurScene.ProduceName);
                     scaleText = 1;
                     CurDecudeName.gameObject.transform.localScale = new Vector3(1, 1, 1);
                     NameTemp.gameObject.transform.localPosition = new Vector3(115, 106, 0);
-                    index = 58;
+                    index = TotalCharacters + choiceAlphabets;
                 }
                 else
                 {
@@ -339,6 +354,7 @@ public class ProduceManager : MonoBehaviour
                 NopeText.text = "진짜 이름.";
                 CurDecudeName.text = CurName.text;
             }
+            
             else if (CurName.text == "Frisk")
             {
                 YesText.gameObject.SetActive(true);
@@ -358,10 +374,14 @@ public class ProduceManager : MonoBehaviour
                 {
                     TitleText.text = "내 허락하노라!!!";
                 }
+                if (CurName.text == "Decide")
+                {
+                    TitleText.text = "완벽한 결정.";
+                }
                 NoText.text = "아니요";
             }
             CurDecudeName.text = CurName.text;
-            index = 59;
+            index = refusal;
             CurIndexYellow();
             NoneIndex(true);
         }
@@ -376,7 +396,7 @@ public class ProduceManager : MonoBehaviour
 
     void StartShake()
     {
-        for (int i = 0; i <= 55; i++)
+        for (int i = 0; i <= TotalCharacters; i++)
         {
             float alphabeShakeX = Random.value * shakeRange * 2 - shakeRange;
             float alphabeShakeY = Random.value * shakeRange * 2 - shakeRange;
@@ -391,7 +411,7 @@ public class ProduceManager : MonoBehaviour
     void StopShake()
     {
         CancelInvoke("StartShake");
-        for (int i = 0; i <= 55; i++)
+        for (int i = 0; i <= TotalCharacters; i++)
         {
             Alphabet[i].rectTransform.localPosition = Temp[i].localPosition;
         }
