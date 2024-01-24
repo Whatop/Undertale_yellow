@@ -17,12 +17,12 @@ public class CameraController : MonoBehaviour
     }
     private void LateUpdate()
     {
-        if(isCameraMove)
+        if (isCameraMove)
             Move();
     }
     void Move()
     {
-        target = new Vector3(player.transform.localPosition.x , player.transform.localPosition.y, -10);
+        target = new Vector3(player.transform.localPosition.x, player.transform.localPosition.y, -10);
         transform.localPosition = target;
     }
 
