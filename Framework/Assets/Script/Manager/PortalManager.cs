@@ -1,14 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PortalManager : MonoBehaviour
 {
-    public static PortalManager Instance; // 싱글톤 인스턴스
-
-    public GameObject[] portalPoints; // 포탈 이동포인트 GameObject 배열
-    private int currentPortalPointIndex = 0; // 현재 포탈 포인트의 인덱스
-    private GameObject Player; // 포탈 포인트 GameObject 배열
+    public static PortalManager Instance;
+    public GameObject[] portalPoints;
+    private int currentPortalPointIndex = 0;
+    private GameObject Player;
     public GameObject defaultPoint;
 
+    public Image fadeImage;
+    public float fadeDuration = 1.0f;
+    private bool isFading = false;
 
     private void Awake()
     {
@@ -34,23 +39,75 @@ public class PortalManager : MonoBehaviour
 
     public void OnPortalEnter(PortalGate portal)
     {
-        // 포탈 번호에 따라 이동 방향 결정
-        int direction = (portal.portalNumber % 2 == 0) ? 1 : -1;
+        // 이미 페이드 중이라면 더 이상 진입 이벤트를 처리하지 않음
+        if (isFading)
+            return;
 
-        // 다음 포인트 인덱스 계산
+        // 페이드 아웃 시작
+        StartCoroutine(FadeOut());
+
+        int direction = (portal.portalNumber % 2 == 0) ? 1 : -1;
         currentPortalPointIndex += direction;
-        Debug.Log(currentPortalPointIndex + "번 포탈로 이동");
-        // 포인트 배열 범위 체크
+
         if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
-            // 플레이어를 해당 포인트로 이동
-            Player.transform.position = portalPoints[currentPortalPointIndex].transform.position;
+            // 페이드 아웃이 완료된 후에 플레이어 이동
+            StartCoroutine(MovePlayerAfterFade(portalPoints[currentPortalPointIndex].transform.position));
         }
         else
         {
             // 범위를 벗어난 경우 기본 포인트로 이동
-            Player.transform.position = defaultPoint.transform.position;
+            StartCoroutine(MovePlayerAfterFade(defaultPoint.transform.position));
             currentPortalPointIndex = 0;
         }
+    }
+
+    IEnumerator MovePlayerAfterFade(Vector3 targetPosition)
+    {
+        yield return new WaitForSeconds(fadeDuration);
+
+        // 플레이어 이동
+        Player.transform.position = targetPosition;
+
+        // 페이드 인 시작
+        StartCoroutine(FadeIn());
+    }
+
+    IEnumerator FadeOut()
+    {
+        isFading = true;
+
+        float elapsedTime = 0f;
+        Color color = fadeImage.color;
+
+        while (elapsedTime < fadeDuration)
+        {
+            color.a = Mathf.Lerp(0f, 1f, elapsedTime / fadeDuration);
+            fadeImage.color = color;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        isFading = false;
+    }
+
+    IEnumerator FadeIn()
+    {
+        isFading = true;
+
+        float elapsedTime = 0f;
+        Color color = fadeImage.color;
+
+        while (elapsedTime < fadeDuration)
+        {
+            color.a = Mathf.Lerp(1f, 0f, elapsedTime / fadeDuration);
+            fadeImage.color = color;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        isFading = false;
     }
 }
