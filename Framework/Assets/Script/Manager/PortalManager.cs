@@ -8,6 +8,7 @@ public class PortalManager : MonoBehaviour
     public static PortalManager Instance;
     public GameObject[] portalPoints;
     private int currentPortalPointIndex = 0;
+    public int test = 0;
     private GameObject Player;
     public GameObject defaultPoint;
 
@@ -35,6 +36,11 @@ public class PortalManager : MonoBehaviour
         {
             Debug.LogError("Portal points are not assigned. Please assign portal points in the inspector.");
         }
+        else
+        {
+            OnPortalTeleport(test); // 꼭 없엥 
+        }
+
     }
 
     public void OnPortalEnter(PortalGate portal)
@@ -44,6 +50,7 @@ public class PortalManager : MonoBehaviour
             return;
 
         // 페이드 아웃 시작
+        GameManager.Instance.ChangeGameState(GameState.Event);
         StartCoroutine(FadeOut());
 
         int direction = (portal.portalNumber % 2 == 0) ? 1 : -1;
@@ -61,7 +68,30 @@ public class PortalManager : MonoBehaviour
             currentPortalPointIndex = 0;
         }
     }
+    public void OnPortalTeleport(int point)
+    {
+        // 이미 페이드 중이라면 더 이상 진입 이벤트를 처리하지 않음
+        if (isFading)
+            return;
 
+        // 페이드 아웃 시작
+        GameManager.Instance.ChangeGameState(GameState.Event);
+        StartCoroutine(FadeOut());
+
+        currentPortalPointIndex = point;
+
+        if (currentPortalPointIndex < portalPoints.Length)
+        {
+            // 페이드 아웃이 완료된 후에 플레이어 이동
+            StartCoroutine(MovePlayerAfterFade(portalPoints[currentPortalPointIndex].transform.position));
+        }
+        else
+        {
+            // 범위를 벗어난 경우 기본 포인트로 이동
+            StartCoroutine(MovePlayerAfterFade(defaultPoint.transform.position));
+            currentPortalPointIndex = 0;
+        }
+    }
     IEnumerator MovePlayerAfterFade(Vector3 targetPosition)
     {
         yield return new WaitForSeconds(fadeDuration);
@@ -107,6 +137,7 @@ public class PortalManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        GameManager.Instance.ChangeGameState(GameState.None);
 
         isFading = false;
     }

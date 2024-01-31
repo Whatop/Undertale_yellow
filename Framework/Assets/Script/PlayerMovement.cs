@@ -20,14 +20,13 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         Move();
-
         if (Input.GetKey(KeyCode.LeftShift))
         {
             MoveSpeed = 6f;
@@ -36,6 +35,13 @@ public class PlayerMovement : MonoBehaviour
         {
             MoveSpeed = 4f;
         }
+        if (GameManager.Instance.GetPlayerData().currentState == GameState.Event)
+        {
+            animator.SetBool("isChange", false);
+            MoveSpeed = 0f;
+        }
+
+
     }
     void Move()
     {

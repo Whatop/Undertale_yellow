@@ -202,7 +202,7 @@ public class ProduceManager : MonoBehaviour
     }
     void Decide()
     {
-        GameManager.Instance.player_Name = CurName.text;
+        GameManager.Instance.GetPlayerData().player_Name = CurName.text;
         if (!isfadeOut)
         {
             soundManager.StopBGSound();
