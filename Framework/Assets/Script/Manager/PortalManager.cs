@@ -7,6 +7,7 @@ public class PortalManager : MonoBehaviour
 {
     public static PortalManager Instance;
     public GameObject[] portalPoints;
+    [SerializeField]
     private int currentPortalPointIndex = 0;
     public int test = 0;
     private GameObject Player;
@@ -38,7 +39,7 @@ public class PortalManager : MonoBehaviour
         }
         else
         {
-            OnPortalTeleport(test); // 꼭 없엥 
+           // OnPortalTeleport(test); // 꼭 없엥 
         }
 
     }
@@ -78,8 +79,7 @@ public class PortalManager : MonoBehaviour
         GameManager.Instance.ChangeGameState(GameState.Event);
         StartCoroutine(FadeOut());
 
-        currentPortalPointIndex = point;
-
+        currentPortalPointIndex = test;
         if (currentPortalPointIndex < portalPoints.Length)
         {
             // 페이드 아웃이 완료된 후에 플레이어 이동

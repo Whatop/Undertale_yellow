@@ -37,7 +37,8 @@ public class PlayerMovement : MonoBehaviour
         }
         if (GameManager.Instance.GetPlayerData().currentState == GameState.Event)
         {
-            animator.SetBool("isChange", false);
+            animator.SetInteger("v", 0);
+            animator.SetInteger("h", 0);
             MoveSpeed = 0f;
         }
 
