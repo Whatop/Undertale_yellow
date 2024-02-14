@@ -308,7 +308,7 @@ GameObject:
   m_Component:
   - component: {fileID: 99118345}
   m_Layer: 0
-  m_Name: -1
+  m_Name: ErrorPoint
   m_TagString: Untagged
   m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -451,8 +451,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portalPoints:
-  - {fileID: 1433607591}
   - {fileID: 92184756}
+  - {fileID: 1433607591}
   - {fileID: 1013656421}
   - {fileID: 1497479633}
   currentPortalPointIndex: 0
@@ -4526,15 +4526,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -5533194034300358874, guid: 29fb19ccbe2e6b4468c2c087c2a8aa68, type: 3}
+  m_Sprite: {fileID: 8513216925233994977, guid: 29cec254475757f4185f36f8f2a389c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.2, y: 0.19}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &1239929337
@@ -4555,7 +4555,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 0.2, y: 0.19}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 0.2, y: 0.19}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -4608,7 +4608,7 @@ RectTransform:
   m_GameObject: {fileID: 1239929335}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_LocalScale: {x: 7, y: 7, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6

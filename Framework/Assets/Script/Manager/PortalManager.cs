@@ -54,8 +54,7 @@ public class PortalManager : MonoBehaviour
         GameManager.Instance.ChangeGameState(GameState.Event);
         StartCoroutine(FadeOut());
 
-        int direction = (portal.portalNumber % 2 == 0) ? 1 : -1;
-        currentPortalPointIndex += direction;
+        currentPortalPointIndex += portal.portalNumber;
 
         if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
@@ -67,6 +66,7 @@ public class PortalManager : MonoBehaviour
             // 범위를 벗어난 경우 기본 포인트로 이동
             StartCoroutine(MovePlayerAfterFade(defaultPoint.transform.position));
             currentPortalPointIndex = 0;
+            Debug.Log("잘못된 이동");
         }
     }
     public void OnPortalTeleport(int point)
