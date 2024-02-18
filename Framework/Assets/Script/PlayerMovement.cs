@@ -106,16 +106,20 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetInteger("h", (int)h);
 
-            animator.SetBool("isChange", true);
+            animator.SetBool("isMove", true);
         }
         else if (v != animator.GetInteger("v"))
         {
             animator.SetInteger("v", (int)v);
 
-            animator.SetBool("isChange", true);
+            animator.SetBool("isMove", true);
         }
-        else
-            animator.SetBool("isChange", false);
+
+        if (v == 0 && h == 0)
+        {
+            animator.SetBool("isMove", false);
+        }
+
         rigid.velocity = new Vector2(h, v) * MoveSpeed;
     }
     void UpdateAnimation(Vector2 moveInput)
