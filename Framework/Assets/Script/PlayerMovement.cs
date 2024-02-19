@@ -4,8 +4,10 @@ using UnityEngine;
 
 public enum PlayerState
 {
-    Walk,
-    Idle,
+    Down,
+    Up,
+    Side,
+    Angle,
     Roll,
     None
 }
@@ -19,83 +21,109 @@ public class PlayerMovement : MonoBehaviour
     Vector3 dirVec;
 
     GameObject scanObject;
+    public PlayerState playerState;
+    GameManager gameManager;
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        gameManager = GameManager.Instance;
     }
-    // Start is called before the first frame update
+
+    
     void Update()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = Camera.main.transform.position.z; // 마우스의 z 좌표를 조정
-        Vector3 targetPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        Vector3 direction = targetPosition - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float angle = CalculateMouseAngle();
 
-        //Vector3 currentScale = transform.localScale;
-        //currentScale.x = Mathf.Abs(currentScale.x) * -1;
-        //transform.localScale = currentScale;
 
-        bool isUp = false;
-        bool isSide = false;
-        bool isDown = false;
-        bool isAngle = false;
+        Debug.Log("현재 각도: " + angle);
 
-        if (angle > -35f && angle <= 35f)
+
+        animator.SetBool("IsUp", false);
+        animator.SetBool("IsSide", false);
+        animator.SetBool("IsDown", false);
+        animator.SetBool("IsAngle", false);
+
+        if (angle > -45f && angle <= 15f)
         {
-            // 오른쪽 방향
-            isSide = true;
+            Vector3 currentScale = transform.localScale;
+            currentScale.x = Mathf.Abs(currentScale.x) * 1;
+            transform.localScale = currentScale;
+
+            SetPlayerState(PlayerState.Side);
         }
-        else if (angle > 35f && angle <= 125f)
+        else if (angle > 45f && angle <= 135f)
         {
-            // 위쪽 방향
-            isUp = true;
+            SetPlayerState(PlayerState.Up);
         }
-        else if (angle > 125f || angle <= -215f)
+        else if ((angle > 165f && angle <= 180f) || (angle >= -180f && angle < -135f))
         {
-            // 왼쪽과 오른쪽 방향을 Side로 통일
-            isSide = true;
+            Vector3 currentScale = transform.localScale;
+            currentScale.x = Mathf.Abs(currentScale.x) * -1;
+            transform.localScale = currentScale;
+
+            SetPlayerState(PlayerState.Side);
         }
-        else if (angle > -215f && angle <= -35f)
+        else if (angle >= -135f && angle < -45f)
         {
-            // 아래쪽 방향
-            isDown = true;
+            SetPlayerState(PlayerState.Down);
+        }
+        else if(angle < 45f && angle >= 15f)
+        {
+            Vector3 currentScale = transform.localScale;
+            currentScale.x = Mathf.Abs(currentScale.x) * 1;
+            transform.localScale = currentScale;
+
+            SetPlayerState(PlayerState.Angle);
         }
         else
         {
-            // 측면 방향
-            isAngle = true;
+            Vector3 currentScale = transform.localScale;
+            currentScale.x = Mathf.Abs(currentScale.x) * -1;
+            transform.localScale = currentScale;
+
+            SetPlayerState(PlayerState.Angle);
         }
 
-        // 애니메이터에 bool 변수 설정
-        animator.SetBool("IsUp", isUp);
-        animator.SetBool("IsSide", isSide);
-        animator.SetBool("IsDown", isDown);
-        animator.SetBool("IsAngle", isAngle);
+    }
+    void SetPlayerState(PlayerState newState)
+    {
 
+        // 각 상태에 따른 초기화 등의 로직을 추가할 수 있습니다.
+        switch (newState)
+        {
+            case PlayerState.Angle:
+                // Walk 상태에 대한 초기화 로직
+                animator.SetBool("IsAngle", true);
+                break;
+            case PlayerState.Down:
+                // Idle 상태에 대한 초기화 로직
+                animator.SetBool("IsDown", true);
+                break;
+            case PlayerState.Side:
+                // Roll 상태에 대한 초기화 로직
+                animator.SetBool("IsSide", true);
+                break;
+            case PlayerState.Up:
+                // None 상태에 대한 초기화 로직
+                animator.SetBool("IsUp", true);
+                break;
+            default:
+                break;
+        }
     }
 
-    // Update is called once per frame
+    float CalculateMouseAngle()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        mousePosition.z = Camera.main.transform.position.z;
+        Vector3 targetPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector3 direction = targetPosition - transform.position;
+        return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    }
     void FixedUpdate()
     {
         Move();
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            MoveSpeed = 6f;
-        }
-        else
-        {
-            MoveSpeed = 4f;
-        }
-        if (GameManager.Instance.GetPlayerData().currentState == GameState.Event)
-        {
-            animator.SetInteger("v", 0);
-            animator.SetInteger("h", 0);
-            MoveSpeed = 0f;
-        }
-
-
     }
     void Move()
     {
@@ -119,7 +147,20 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("isMove", false);
         }
-
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            MoveSpeed = 6f;
+        }
+        else
+        {
+            MoveSpeed = 4f;
+        }
+        if (gameManager.GetPlayerData().currentState == GameState.Event)
+        {
+            animator.SetInteger("v", 0);
+            animator.SetInteger("h", 0);
+            MoveSpeed = 0f;
+        }
         rigid.velocity = new Vector2(h, v) * MoveSpeed;
     }
     void UpdateAnimation(Vector2 moveInput)
