@@ -41,30 +41,30 @@ public class PlayerMovement : MonoBehaviour
         float angle = CalculateMouseAngle();
 
 
-        Debug.Log("ÇöÀç °¢µµ: " + angle);
+        Debug.Log("í˜„ì¬ ê°ë„: " + angle);
         if (Input.GetMouseButtonDown(1) && !isCooldown && isMove)
         {
-            // ¿ìÅ¬¸¯ ÀÔ·ÂÀÌ °¨ÁöµÇ¸é Ã³¸®ÇÏ°í ÄğÅ¸ÀÓ ½ÃÀÛ
+            // ìš°í´ë¦­ ì…ë ¥ì´ ê°ì§€ë˜ë©´ ì²˜ë¦¬í•˜ê³  ì¿¨íƒ€ì„ ì‹œì‘
             playerState = PlayerState.Roll;
-            StartRoll();
+            StartRoll(v,h);
             StartCooldown();
         }
 
-        // ÄğÅ¸ÀÓ °¨¼Ò
+        // ì¿¨íƒ€ì„ ê°ì†Œ
         if (isCooldown)
         {
             cooldownTime -= Time.deltaTime;
 
-            // ÄğÅ¸ÀÓÀÌ ³¡³ª¸é »óÅÂ ÃÊ±âÈ­
+            // ì¿¨íƒ€ì„ì´ ëë‚˜ë©´ ìƒíƒœ ì´ˆê¸°í™”
             if (cooldownTime <= 0)
             {
                 isCooldown = false;
-                cooldownTime = 0.5f; // ¿øÇÏ´Â ÄğÅ¸ÀÓ °ªÀ¸·Î ¼³Á¤
+                cooldownTime = 0.5f; // ì›í•˜ëŠ” ì¿¨íƒ€ì„ ê°’ìœ¼ë¡œ ì„¤ì •
                 playerState = PlayerState.None;
             }
         }
 
-        if (playerState != PlayerState.Roll)//±¸¸£±â´Â °¢µµÃ³¸®¸¦ µû·ÎÇØ¼­
+        if (playerState != PlayerState.Roll)//êµ¬ë¥´ê¸°ëŠ” ê°ë„ì²˜ë¦¬ë¥¼ ë”°ë¡œí•´ì„œ
         {
             animator.SetBool("IsUp", false);
             animator.SetBool("IsSide", false);
@@ -113,53 +113,53 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void StartRoll() //RollÀº °¢µµÃ³¸® µû·Î ÇÔ ÀÌµ¿°ªÀ¸·Î ÆÇº°ÇØ¼­ 
+    private void StartRoll(int vir, int hir) //Rollì€ ê°ë„ì²˜ë¦¬ ë”°ë¡œ í•¨ ì´ë™ê°’ìœ¼ë¡œ íŒë³„í•´ì„œ 
     {
-        if (v != 0 && h == 0) // ¿ŞÂÊ ¶Ç´Â ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿ÇÒ ¶§
+        if (vir != 0 && hir == 0) // ì™¼ìª½ ë˜ëŠ” ì˜¤ë¥¸ìª½ìœ¼ë¡œ ì´ë™í•  ë•Œ
         {
             Vector3 currentScale = transform.localScale;
-            if (h < 0) // ¿ŞÂÊ ÀÌµ¿
+            if (hir < 0) // ì™¼ìª½ ì´ë™
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ½ºÄÉÀÏ ¹İ´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ìŠ¤ì¼€ì¼ ë°˜ëŒ€ë¡œ ì„¤ì •
             }
-            else // ¿À¸¥ÂÊ ÀÌµ¿
+            else // ì˜¤ë¥¸ìª½ ì´ë™
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ½ºÄÉÀÏ ±×´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ìŠ¤ì¼€ì¼ ê·¸ëŒ€ë¡œ ì„¤ì •
             }
             transform.localScale = currentScale;
             animator.SetBool("IsSide", true);
         }
-        else if (v == 0 && h != 0) // À§ ¶Ç´Â ¾Æ·¡·Î ÀÌµ¿ÇÒ ¶§
+        else if (vir == 0 && hir != 0) // ìœ„ ë˜ëŠ” ì•„ë˜ë¡œ ì´ë™í•  ë•Œ
         {
             animator.SetBool("IsUp", v > 0);
             animator.SetBool("IsDown", v < 0);
         }
-        else // ´ë°¢¼± ÀÌµ¿ÀÏ ¶§
+        else // ëŒ€ê°ì„  ì´ë™ì¼ ë•Œ
         {
             Vector3 currentScale = transform.localScale;
-            if (h < 0 && v > 0) // ¿ŞÂÊ À§ ´ë°¢¼±
+            if (hir < 0 && vir > 0) // ì™¼ìª½ ìœ„ ëŒ€ê°ì„ 
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ½ºÄÉÀÏ ¹İ´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ìŠ¤ì¼€ì¼ ë°˜ëŒ€ë¡œ ì„¤ì •
                 animator.SetBool("IsAngle", true);
             }
-            else if (h > 0 && v > 0) // ¿À¸¥ÂÊ À§ ´ë°¢¼±
+            else if (hir > 0 && vir > 0) // ì˜¤ë¥¸ìª½ ìœ„ ëŒ€ê°ì„ 
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ½ºÄÉÀÏ ±×´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ìŠ¤ì¼€ì¼ ê·¸ëŒ€ë¡œ ì„¤ì •
                 animator.SetBool("IsAngle", true);
             }
-            else if (h < 0 && v < 0) // ¿ŞÂÊ ¾Æ·¡ ´ë°¢¼±
+            else if (hir < 0 && vir < 0) // ì™¼ìª½ ì•„ë˜ ëŒ€ê°ì„ 
             {
                 animator.SetBool("IsSide", true);
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ½ºÄÉÀÏ ¹İ´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * -1;// ìŠ¤ì¼€ì¼ ë°˜ëŒ€ë¡œ ì„¤ì •
             }
-            else if (h > 0 && v < 0) // ¿À¸¥ÂÊ ¾Æ·¡ ´ë°¢¼±
+            else if (hir > 0 && vir < 0) // ì˜¤ë¥¸ìª½ ì•„ë˜ ëŒ€ê°ì„ 
             {
                 animator.SetBool("IsSide", true);
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ½ºÄÉÀÏ ±×´ë·Î ¼³Á¤
+                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  ìŠ¤ì¼€ì¼ ê·¸ëŒ€ë¡œ ì„¤ì •
             }
             transform.localScale = currentScale;
 
-            //¿ŞÂÊ ´ë°¢¼± ¾Æ·¡¸é ½ºÄÉÀÏ¹İ´ë·Î, ¿À¸¥ÂÊ ¾Æ·¡ ´ë°¢¼±ÀÌ¸é ±×´ë·Î 
+            //ì™¼ìª½ ëŒ€ê°ì„  ì•„ë˜ë©´ ìŠ¤ì¼€ì¼ë°˜ëŒ€ë¡œ, ì˜¤ë¥¸ìª½ ì•„ë˜ ëŒ€ê°ì„ ì´ë©´ ê·¸ëŒ€ë¡œ 
         }
             animator.SetTrigger("IsRoll");
     }
@@ -209,29 +209,29 @@ public class PlayerMovement : MonoBehaviour
     }
     void StartCooldown()
     {
-        // ÄğÅ¸ÀÓ ½ÃÀÛ
+        // ì¿¨íƒ€ì„ ì‹œì‘
         isCooldown = true;
     }
     void SetPlayerState(PlayerState newState)
     {
 
-        // °¢ »óÅÂ¿¡ µû¸¥ ÃÊ±âÈ­ µîÀÇ ·ÎÁ÷À» Ãß°¡ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+        // ê° ìƒíƒœì— ë”°ë¥¸ ì´ˆê¸°í™” ë“±ì˜ ë¡œì§ì„ ì¶”ê°€í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
         switch (newState)
         {
             case PlayerState.Angle:
-                // Walk »óÅÂ¿¡ ´ëÇÑ ÃÊ±âÈ­ ·ÎÁ÷
+                // Walk ìƒíƒœì— ëŒ€í•œ ì´ˆê¸°í™” ë¡œì§
                 animator.SetBool("IsAngle", true);
                 break;
             case PlayerState.Down:
-                // Idle »óÅÂ¿¡ ´ëÇÑ ÃÊ±âÈ­ ·ÎÁ÷
+                // Idle ìƒíƒœì— ëŒ€í•œ ì´ˆê¸°í™” ë¡œì§
                 animator.SetBool("IsDown", true);
                 break;
             case PlayerState.Side:
-                // Roll »óÅÂ¿¡ ´ëÇÑ ÃÊ±âÈ­ ·ÎÁ÷
+                // Roll ìƒíƒœì— ëŒ€í•œ ì´ˆê¸°í™” ë¡œì§
                 animator.SetBool("IsSide", true);
                 break;
             case PlayerState.Up:
-                // None »óÅÂ¿¡ ´ëÇÑ ÃÊ±âÈ­ ·ÎÁ÷
+                // None ìƒíƒœì— ëŒ€í•œ ì´ˆê¸°í™” ë¡œì§
                 animator.SetBool("IsUp", true);
                 break;
             default:
@@ -248,7 +248,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void UpdateAnimation(Vector2 moveInput)
     {
-        // moveInput¿¡ µû¶ó ¾Ö´Ï¸ŞÀÌ¼ÇÀ» º¯°æÇÕ´Ï´Ù.
+        // moveInputì— ë”°ë¼ ì• ë‹ˆë©”ì´ì…˜ì„ ë³€ê²½í•©ë‹ˆë‹¤.
         if (moveInput.magnitude > 0)
         {
             animator.SetFloat("Horizontal", moveInput.x);
