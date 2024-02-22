@@ -115,6 +115,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void StartRoll(int vir, int hir) //Roll은 각도처리 따로 함 이동값으로 판별해서 
     {
+        animator.SetBool("IsUp", false);
+        animator.SetBool("IsSide", false);
+        animator.SetBool("IsDown", false);
+        animator.SetBool("IsAngle", false);
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
             Vector3 currentScale = transform.localScale;
