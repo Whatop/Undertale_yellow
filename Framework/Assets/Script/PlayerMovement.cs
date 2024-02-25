@@ -41,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
         float angle = CalculateMouseAngle();
 
 
-        Debug.Log("현재 각도: " + angle);
+        //Debug.Log("현재 각도: " + angle);
         if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)
         {
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
@@ -121,10 +121,10 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsAngle", false);
 
         // 현재 플레이어의 위치와 방향
-        Vector3 playerPosition = transform.position;
+        Vector2 playerPosition = transform.position;
 
         // 키 입력에 따른 이동 방향
-        Vector3 rollDirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+        Vector2 rollDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
 
         // 구르기 애니메이션 재생 등의 초기화
         // Your animation or other initialization code here
@@ -142,7 +142,9 @@ public class PlayerMovement : MonoBehaviour
 
         float vir = rollDirection.normalized.x;
         float hir = rollDirection.normalized.y;
-        
+
+        Debug.Log("가로 : " + vir);
+        Debug.Log("세로 : " + hir);
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
             Vector3 currentScale = transform.localScale;
@@ -159,8 +161,9 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (vir == 0 && hir != 0) // 위 또는 아래로 이동할 때
         {
-            animator.SetBool("IsUp", v > 0);
-            animator.SetBool("IsDown", v < 0);
+            Debug.Log("작동됨?");
+            animator.SetBool("IsUp", hir > 0);
+            animator.SetBool("IsDown", hir < 0);
         }
         else // 대각선 이동일 때
         {
