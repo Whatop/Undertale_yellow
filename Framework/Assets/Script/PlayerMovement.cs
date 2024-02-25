@@ -42,12 +42,11 @@ public class PlayerMovement : MonoBehaviour
 
 
         Debug.Log("현재 각도: " + angle);
-        if (Input.GetMouseButtonDown(1) && !isCooldown && isMove)
+        if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)
         {
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
-            playerState = PlayerState.Roll;
-            StartRoll(v,h);
             StartCooldown();
+            StartCoroutine(Roll());
         }
 
         // 쿨타임 감소
@@ -60,7 +59,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 isCooldown = false;
                 cooldownTime = 0.5f; // 원하는 쿨타임 값으로 설정
-                playerState = PlayerState.None;
             }
         }
 
@@ -113,12 +111,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void StartRoll(int vir, int hir) //Roll은 각도처리 따로 함 이동값으로 판별해서 
+    IEnumerator Roll()
     {
+        playerState = PlayerState.Roll;
+
         animator.SetBool("IsUp", false);
         animator.SetBool("IsSide", false);
         animator.SetBool("IsDown", false);
         animator.SetBool("IsAngle", false);
+
+        // 현재 플레이어의 위치와 방향
+        Vector3 playerPosition = transform.position;
+
+        // 키 입력에 따른 이동 방향
+        Vector3 rollDirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+
+        // 구르기 애니메이션 재생 등의 초기화
+        // Your animation or other initialization code here
+
+        while (Vector3.Distance(playerPosition, transform.position) < 1f) // 이동이 완료될 때까지 반복
+        {
+            // 플레이어를 빠르게 이동시킴
+            transform.Translate(rollDirection * 8f * Time.deltaTime, Space.World);
+
+            yield return null;
+        }
+
+        // 구르기 완료 후 초기화
+        // Your post-roll initialization code here
+
+        float vir = rollDirection.normalized.x;
+        float hir = rollDirection.normalized.y;
+        
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
             Vector3 currentScale = transform.localScale;
@@ -166,8 +190,8 @@ public class PlayerMovement : MonoBehaviour
             //왼쪽 대각선 아래면 스케일반대로, 오른쪽 아래 대각선이면 그대로 
         }
             animator.SetTrigger("IsRoll");
+        playerState = PlayerState.None;
     }
-
     void FixedUpdate()
     {
         Move();
