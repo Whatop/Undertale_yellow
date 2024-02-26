@@ -148,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
             Vector3 currentScale = transform.localScale;
-            if (hir < 0) // 왼쪽 이동
+            if (vir < 0) // 왼쪽 이동
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
             }
@@ -161,14 +161,13 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (vir == 0 && hir != 0) // 위 또는 아래로 이동할 때
         {
-            Debug.Log("작동됨?");
             animator.SetBool("IsUp", hir > 0);
             animator.SetBool("IsDown", hir < 0);
         }
         else // 대각선 이동일 때
         {
             Vector3 currentScale = transform.localScale;
-            if (hir < 0 && vir > 0) // 왼쪽 위 대각선
+            if (hir > 0 && vir < 0) // 왼쪽 위 대각선
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
                 animator.SetBool("IsAngle", true);
@@ -183,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsSide", true);
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
             }
-            else if (hir > 0 && vir < 0) // 오른쪽 아래 대각선
+            else if (hir < 0 && vir > 0) // 오른쪽 아래 대각선
             {
                 animator.SetBool("IsSide", true);
                 currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
@@ -193,6 +192,7 @@ public class PlayerMovement : MonoBehaviour
             //왼쪽 대각선 아래면 스케일반대로, 오른쪽 아래 대각선이면 그대로 
         }
             animator.SetTrigger("IsRoll");
+        rigid.velocity = new Vector2(hir, vir) * 15;
         playerState = PlayerState.None;
     }
     void FixedUpdate()
