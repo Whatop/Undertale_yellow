@@ -58,7 +58,8 @@ public class PlayerMovement : MonoBehaviour
             if (cooldownTime <= 0)
             {
                 isCooldown = false;
-                cooldownTime = 0.5f; // 원하는 쿨타임 값으로 설정
+                cooldownTime = 0.75f; // 원하는 쿨타임 값으로 설정
+                playerState = PlayerState.None;
             }
         }
 
@@ -129,34 +130,24 @@ public class PlayerMovement : MonoBehaviour
         // 구르기 애니메이션 재생 등의 초기화
         // Your animation or other initialization code here
 
-        while (Vector3.Distance(playerPosition, transform.position) < 1f) // 이동이 완료될 때까지 반복
-        {
-            // 플레이어를 빠르게 이동시킴
-            transform.Translate(rollDirection * 8f * Time.deltaTime, Space.World);
-
-            yield return null;
-        }
-
-        // 구르기 완료 후 초기화
-        // Your post-roll initialization code here
 
         float vir = rollDirection.normalized.x;
         float hir = rollDirection.normalized.y;
 
         Debug.Log("가로 : " + vir);
         Debug.Log("세로 : " + hir);
+        Vector3 currentScale = transform.localScale;
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
-            Vector3 currentScale = transform.localScale;
             if (vir < 0) // 왼쪽 이동
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
+                Debug.Log("d");
             }
             else // 오른쪽 이동
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
             }
-            transform.localScale = currentScale;
             animator.SetBool("IsSide", true);
         }
         else if (vir == 0 && hir != 0) // 위 또는 아래로 이동할 때
@@ -166,7 +157,6 @@ public class PlayerMovement : MonoBehaviour
         }
         else // 대각선 이동일 때
         {
-            Vector3 currentScale = transform.localScale;
             if (hir > 0 && vir < 0) // 왼쪽 위 대각선
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
@@ -187,17 +177,20 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsSide", true);
                 currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
             }
-            transform.localScale = currentScale;
 
             //왼쪽 대각선 아래면 스케일반대로, 오른쪽 아래 대각선이면 그대로 
         }
-            animator.SetTrigger("IsRoll");
-        rigid.velocity = new Vector2(hir, vir) * 15;
-        playerState = PlayerState.None;
+            transform.localScale = currentScale;
+        animator.SetTrigger("IsRoll");
+            yield return null;
     }
     void FixedUpdate()
     {
-        Move();
+        if (playerState != PlayerState.Roll)
+            Move();
+        else
+            rigid.velocity = new Vector2(h, v) * MoveSpeed * 1.5f;
+
     }
     void Move()
     {
