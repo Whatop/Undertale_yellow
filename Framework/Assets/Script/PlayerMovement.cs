@@ -35,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
         gameManager = GameManager.Instance;
     }
 
-    
+
     void Update()
     {
         float angle = CalculateMouseAngle();
@@ -180,9 +180,9 @@ public class PlayerMovement : MonoBehaviour
 
             //왼쪽 대각선 아래면 스케일반대로, 오른쪽 아래 대각선이면 그대로 
         }
-            transform.localScale = currentScale;
+        transform.localScale = currentScale;
         animator.SetTrigger("IsRoll");
-            yield return null;
+        yield return null;
     }
     void FixedUpdate()
     {
