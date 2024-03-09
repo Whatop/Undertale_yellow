@@ -20,10 +20,12 @@ public class PlayerMovement : MonoBehaviour
     public float h;
     public float v;
 
+    // Hands Left 0, Right 1
     bool isMove = false;
 
     public float cooldownTime = 0.5f;
     private bool isCooldown = false;
+    public GameObject Hands;
 
     GameObject scanObject;
     public PlayerState playerState;
@@ -39,9 +41,10 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         float angle = CalculateMouseAngle();
+        Hands.gameObject.SetActive(true);
 
 
-        //Debug.Log("현재 각도: " + angle);
+        Debug.Log("현재 각도: " + angle);
         if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)
         {
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
@@ -109,6 +112,12 @@ public class PlayerMovement : MonoBehaviour
 
                 SetPlayerState(PlayerState.Angle);
             }
+
+         
+        }
+        else
+        {
+                Hands.gameObject.SetActive(false);
         }
     }
 
@@ -268,6 +277,8 @@ public class PlayerMovement : MonoBehaviour
         mousePosition.z = Camera.main.transform.position.z;
         Vector3 targetPosition = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 direction = targetPosition - transform.position;
+
+
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
     void UpdateAnimation(Vector2 moveInput)
