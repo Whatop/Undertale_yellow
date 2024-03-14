@@ -16,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public float MoveSpeed;
     Animator animator;
+    Animator gunsAnimator;
+
     Rigidbody2D rigid;
     public float h;
     public float v;
@@ -27,6 +29,10 @@ public class PlayerMovement : MonoBehaviour
     private bool isCooldown = false;
     public GameObject Hands;
 
+    public GameObject Guns;
+
+    
+
     GameObject scanObject;
     public PlayerState playerState;
     GameManager gameManager;
@@ -34,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        gunsAnimator = Guns.GetComponent<Animator>();
         gameManager = GameManager.Instance;
     }
 
@@ -43,6 +50,10 @@ public class PlayerMovement : MonoBehaviour
         float angle = CalculateMouseAngle();
         Hands.gameObject.SetActive(true);
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            gunsAnimator.SetTrigger("Reload");
+        }
 
         Debug.Log("현재 각도: " + angle);
         if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)

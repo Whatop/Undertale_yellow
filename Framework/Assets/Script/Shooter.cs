@@ -11,6 +11,8 @@ public class Shooter : MonoBehaviour
     void Update()
     {
         // 마우스 위치를 기준으로 총의 방향을 설정합니다.
+
+
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePosition - gunTransform.position).normalized;
         gunTransform.up = direction;
@@ -31,4 +33,8 @@ public class Shooter : MonoBehaviour
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         bulletRb.velocity = gunTransform.up * bulletSpeed;
     }
+    void Reload()
+    {
+    }
 }
+
