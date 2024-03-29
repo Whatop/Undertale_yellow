@@ -12,7 +12,8 @@ public enum GameState
 [System.Serializable]
 public class PlayerData
 {
-    public float health;
+    public int Maxhealth;
+    public int health;
     public Vector3 position;
     public string player_Name;
     public string[] inventory;
@@ -21,7 +22,8 @@ public class PlayerData
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
-        health = 100f;
+        Maxhealth = 6;
+        health = 6;
         position = Vector3.zero;
         player_Name = "";
         inventory = new string[10];

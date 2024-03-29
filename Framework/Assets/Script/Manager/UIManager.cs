@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    
     private static UIManager instance;
-
+    public GameObject[] Hps;
 
     public static UIManager Instance
     {
