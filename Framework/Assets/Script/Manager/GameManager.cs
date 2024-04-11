@@ -22,7 +22,7 @@ public class PlayerData
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
-        Maxhealth = 6;
+        Maxhealth = 10;
         health = 6;
         position = Vector3.zero;
         player_Name = "";
@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour
     private static GameManager instance;
 
     private PlayerData playerData;
+    private Weapon weaponData;
+
+    
 
     public static GameManager Instance
     {
@@ -69,6 +72,7 @@ public class GameManager : MonoBehaviour
 
         // 플레이어 데이터 초기화
         playerData = new PlayerData();
+        weaponData = new Weapon();
     }
 
     public PlayerData GetPlayerData()
@@ -80,6 +84,18 @@ public class GameManager : MonoBehaviour
     {
         // 플레이어 데이터 저장
         playerData = newData;
+    }
+    
+    public Weapon GetWeaponData()
+    {
+        Debug.Log(weaponData);
+        return weaponData;
+    }
+
+    public void SaveWeaponData(Weapon newData)
+    {
+        // 무기 데이터 저장, 일부 무기는 사용할수도?
+        weaponData = newData;
     }
 
     public void ChangeGameState(GameState newState)

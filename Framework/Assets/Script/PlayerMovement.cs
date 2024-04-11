@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public float MoveSpeed;
     Animator animator;
-    Animator gunsAnimator;
+    Animator WeaponsAnimator;
 
     Rigidbody2D rigid;
     public float h;
@@ -29,21 +29,27 @@ public class PlayerMovement : MonoBehaviour
     private bool isCooldown = false;
     public GameObject Hands;
 
-    public GameObject Guns;
-
-    
+    public GameObject Weapons;
 
     GameObject scanObject;
+    PlayerData playerData;
     public PlayerState playerState;
     GameManager gameManager;
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        gunsAnimator = Guns.GetComponent<Animator>();
+        WeaponsAnimator = Weapons.GetComponent<Animator>();
         gameManager = GameManager.Instance;
     }
-
+    private void Start()
+    {
+        Init();
+    }
+    void Init()
+    {
+         playerData = gameManager.GetPlayerData();
+    }
 
     void Update()
     {
@@ -52,15 +58,17 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            gunsAnimator.SetTrigger("Reload");
+            WeaponsAnimator.SetTrigger("Reload");
         }
 
-        Debug.Log("현재 각도: " + angle);
+        //Debug.Log("현재 각도: " + angle);
         if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)
         {
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
             StartCooldown();
             StartCoroutine(Roll());
+            playerData.health -= 1;
+            gameManager.SavePlayerData(playerData);
         }
 
         // 쿨타임 감소
