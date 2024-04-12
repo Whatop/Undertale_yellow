@@ -88,7 +88,6 @@ public class GameManager : MonoBehaviour
     
     public Weapon GetWeaponData()
     {
-        Debug.Log(weaponData);
         return weaponData;
     }
 
