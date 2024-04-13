@@ -17,9 +17,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] ui_ammo;
+    public GameObject[] pedestal;
     public Image ui_weaponImage;
     public TextMeshProUGUI ui_ammoText;
-    float screenRatio;
 
     public static UIManager Instance
     {
@@ -68,9 +68,6 @@ public class UIManager : MonoBehaviour
         int heart_count = player.Maxhealth / 2;
         ui_healths = new GameObject[heart_count];
 
-        float screenWidth = Screen.width;
-        float screenHeight = Screen.height;
-
         for (int i = 0; i < heart_count; i++)
         {
             GameObject heartPrefab = Resources.Load<GameObject>("Prefabs/Heart");
@@ -88,12 +85,9 @@ public class UIManager : MonoBehaviour
     {
         Weapon weapon = gameManager.GetWeaponData();
 
-        int ammo_count = weapon.currentAmmo;
+        int ammo_count = weapon.magazine;
         ui_ammo = new GameObject[ammo_count];
 
-        float screenWidth = Screen.width;
-        float screenHeight = Screen.height;
-         screenRatio = screenWidth / screenHeight;
 
         for (int i = 0; i < ammo_count; i++)
         {
@@ -103,7 +97,7 @@ public class UIManager : MonoBehaviour
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
             Debug.Log(sizeY);
             Vector3 newPosition = instance.transform.position;
-            newPosition.y = ui_positions[1].transform.position.y + i * sizeY; // 세로 방향으로 위치 설정
+            newPosition.y = ui_positions[1].transform.position.y + i * sizeY  * 1.25f; // 세로 방향으로 위치 설정
             instance.transform.position = newPosition;
             ui_ammo[i] = instance;
         }
@@ -117,23 +111,19 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < ui_healths.Length; i++)
         {
             int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2); // 체력에 따른 스프라이트 인덱스 계산
-            ui_healths[i].GetComponent<HeartScript>().SetImage(spriteIndex);
+            ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
         Weapon weapon = gameManager.GetWeaponData();
         int currentAmmo = weapon.currentAmmo;
+        int MaxAmmo = weapon.magazine;
 
         // 총알 이미지 업데이트
         for (int i = 0; i < ui_ammo.Length; i++)
         {
-            // 총알이 남아있는 경우
-            if (i < currentAmmo)
-            {
-                ui_ammo[i].SetActive(true); // 총알 UI 활성화
-            }
-            else
-            {
-                ui_ammo[i].SetActive(false); //y 총알 UI 비활성화
-            }
+            int spriteIndex = (i < currentAmmo) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
+
+            // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
+            ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
     }
 }
