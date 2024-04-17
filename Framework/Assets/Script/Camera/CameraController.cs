@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float smoth = 5.0f;
+    public float smoth = 8.0f;
 
     public GameObject player;
     public bool isCameraMove = true;
