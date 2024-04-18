@@ -114,16 +114,16 @@ public class UIManager : MonoBehaviour
             ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
         Weapon weapon = gameManager.GetWeaponData();
-        int currentAmmo = weapon.currentAmmo;
-        int MaxAmmo = weapon.magazine;
+        int current_magazine = weapon.current_magazine;
 
         // 총알 이미지 업데이트
         for (int i = 0; i < ui_ammo.Length; i++)
         {
-            int spriteIndex = (i < currentAmmo) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
+            int spriteIndex = (i < current_magazine) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
 
             // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
             ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
+        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
     }
 }

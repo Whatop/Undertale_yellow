@@ -7,8 +7,9 @@ public class Weapon
     public int id;             // 총의 고유한 ID
     public string WeaponName;     // 총의 이름
     public int damage;         // 총의 공격력
-    public int currentAmmo;    // 현재 탄알집에 남아있는 총알 수
-    public int magazine; //탄창 최대 총알수
+    public int current_Ammo;    // 현재 탄알집에 남아있는 총알 수
+    public int magazine;       //탄창 최대 총알수  
+    public int current_magazine;    // 현재 남아있는 총알 수
     public int maxAmmo;        // 최대 총알 수
     public int maxRange;        //사거리
     public float bulletSpeed;  // 총알 속도
@@ -21,8 +22,9 @@ public class Weapon
         WeaponName = "None";
         damage = 1;
         maxAmmo = 200;
+        current_Ammo = maxAmmo;
         magazine = 10;
-        currentAmmo = magazine;
+        current_magazine = magazine;
         bulletSpeed = 1;
         accuracy = 1;
         // 추가 데이터 초기화
@@ -73,7 +75,7 @@ public class WeaponController : MonoBehaviour
     void ShootBullet(Vector3 direction)
     {
         // 총알이 남아 있을 경우 발사
-        if (currentWeapon.currentAmmo > 0)
+        if (currentWeapon.current_magazine > 0)
         {
             // 총알 생성 및 초기화
             GameObject bullet = Instantiate(bulletPrefab, currentWeapon.firePoint.position, Quaternion.identity);
@@ -81,10 +83,10 @@ public class WeaponController : MonoBehaviour
             bulletController.InitializeBullet(direction, currentWeapon.bulletSpeed, currentWeapon.accuracy, currentWeapon.damage, currentWeapon.maxRange);
 
             // 현재 탄알집에서 총알 감소
-            currentWeapon.currentAmmo--;
+            currentWeapon.current_magazine--;
 
             // 로그 출력
-            Debug.Log($"Shot {currentWeapon.WeaponName}! Ammo: {currentWeapon.currentAmmo}/{currentWeapon.maxAmmo}");
+            Debug.Log($"Shot {currentWeapon.WeaponName}! Ammo: {currentWeapon.current_magazine}/{currentWeapon.maxAmmo}");
         }
         else
         {

@@ -21,24 +21,25 @@ public class Shooter : MonoBehaviour
         // 마우스 위치를 기준으로 총의 방향을 설정합니다.
 
         Weapon weapon = gameManager.GetWeaponData();
-        int currentAmmo= weapon.currentAmmo;
+        int current_magazine= weapon.current_magazine;
 
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
         WeaponTransform.up = direction;
 
         // 마우스 왼쪽 버튼을 클릭하면 총알을 발사합니다.
-        if (Input.GetMouseButtonDown(0) && currentAmmo > 0)
+        if (Input.GetMouseButtonDown(0) && current_magazine > 0)
         {
             Shoot();
-            weapon.currentAmmo -= 1;
+            weapon.current_magazine -= 1;
+            weapon.current_Ammo -= 1;
             gameManager.SaveWeaponData(weapon);
         }
 
-        if(weapon.currentAmmo < weapon.maxAmmo &&Input.GetKeyDown(KeyCode.R))
+        if(weapon.current_Ammo < weapon.maxAmmo &&Input.GetKeyDown(KeyCode.R) && weapon.current_magazine < weapon.magazine)
         {
 
-            weapon.currentAmmo = weapon.magazine;
+            weapon.current_magazine = weapon.magazine;
             gameManager.SaveWeaponData(weapon);
         }
     }
