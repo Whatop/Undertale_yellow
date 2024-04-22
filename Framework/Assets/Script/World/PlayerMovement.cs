@@ -139,7 +139,24 @@ public class PlayerMovement : MonoBehaviour
                 Hands.gameObject.SetActive(false);
         }
     }
+    public void TakeDamage(int damage)
+    {
 
+        Debug.Log("작도잉");
+        // 적이 데미지를 받았을 때 호출되는 함수
+        
+        playerData.health -= damage;
+        gameManager.SavePlayerData(playerData);
+
+        if (playerData.health <= 0)
+        {
+            Die();
+        }
+    }
+    void Die()
+    {
+
+    }
     IEnumerator Roll()
     {
         playerState = PlayerState.Roll;
