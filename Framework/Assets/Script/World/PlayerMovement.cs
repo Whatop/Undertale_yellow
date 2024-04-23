@@ -55,7 +55,8 @@ public class PlayerMovement : MonoBehaviour
     {
         float angle = CalculateMouseAngle();
         Hands.gameObject.SetActive(true);
-
+        //따로 게임매니저에 넘길 함수 만들기
+        playerData.position = transform.position;
         if (Input.GetKeyDown(KeyCode.R))
         {
             WeaponsAnimator.SetTrigger("Reload");
@@ -138,6 +139,7 @@ public class PlayerMovement : MonoBehaviour
         {
                 Hands.gameObject.SetActive(false);
         }
+        gameManager.SavePlayerData(playerData);
     }
     public void TakeDamage(int damage)
     {
