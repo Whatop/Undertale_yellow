@@ -68,8 +68,6 @@ public class PlayerMovement : MonoBehaviour
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
             StartCooldown();
             StartCoroutine(Roll());
-            playerData.health -= 1;
-            gameManager.SavePlayerData(playerData);
         }
 
         // 쿨타임 감소
