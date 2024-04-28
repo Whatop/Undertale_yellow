@@ -12,43 +12,29 @@ public enum PlayerState
     Roll,
     None
 }
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : LivingObject
 {
-    public float MoveSpeed;
-    Animator animator;
-    Animator WeaponsAnimator;
-
-    Rigidbody2D rigid;
     public float h;
     public float v;
 
     // Hands Left 0, Right 1
     bool isMove = false;
-
     public float cooldownTime = 0.5f;
     private bool isCooldown = false;
+    
     public GameObject Hands;
-
     public GameObject Weapons;
+    public PlayerState playerState;
 
     GameObject scanObject;
-    PlayerData playerData;
-    public PlayerState playerState;
-    GameManager gameManager;
-    private void Awake()
+    Animator WeaponsAnimator;
+
+
+    protected override void Awake()
     {
-        rigid = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        base.Awake(); // LivingObject의 Awake 메서드 호출
         WeaponsAnimator = Weapons.GetComponent<Animator>();
-        gameManager = GameManager.Instance;
-    }
-    private void Start()
-    {
-        Init();
-    }
-    void Init()
-    {
-         playerData = gameManager.GetPlayerData();
+
     }
 
     void Update()
@@ -56,8 +42,6 @@ public class PlayerMovement : MonoBehaviour
         float angle = CalculateMouseAngle();
         Hands.gameObject.SetActive(true);
 
-        //따로 게임매니저에 넘길 함수 만들기
-        playerData.position = transform.position;
         if (Input.GetKeyDown(KeyCode.R))
         {
             WeaponsAnimator.SetTrigger("Reload");
@@ -138,25 +122,6 @@ public class PlayerMovement : MonoBehaviour
         {
                 Hands.gameObject.SetActive(false);
         }
-        gameManager.SavePlayerData(playerData);
-    }
-    public void TakeDamage(int damage)
-    {
-
-        Debug.Log("작도잉");
-        // 적이 데미지를 받았을 때 호출되는 함수
-        
-        playerData.health -= damage;
-        gameManager.SavePlayerData(playerData);
-
-        if (playerData.health <= 0)
-        {
-            Die();
-        }
-    }
-    void Die()
-    {
-
     }
     IEnumerator Roll()
     {
@@ -234,7 +199,7 @@ public class PlayerMovement : MonoBehaviour
         if (playerState != PlayerState.Roll)
             Move();
         else
-            rigid.velocity = new Vector2(h, v) * MoveSpeed * 1.5f;
+            rigid.velocity = new Vector2(h, v) * speed * 1.5f;
 
     }
     void Move()
@@ -262,19 +227,19 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            MoveSpeed = 6f;
+            speed = 6f;
         }
         else
         {
-            MoveSpeed = 4f;
+            speed = 4f;
         }
         if (gameManager.GetPlayerData().currentState == GameState.Event)
         {
             animator.SetInteger("v", 0);
             animator.SetInteger("h", 0);
-            MoveSpeed = 0f;
+            speed = 0f;
         }
-        rigid.velocity = new Vector2(h, v) * MoveSpeed;
+        rigid.velocity = new Vector2(h, v) * speed;
     }
     void StartCooldown()
     {
