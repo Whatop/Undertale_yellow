@@ -240,6 +240,8 @@ public class PlayerMovement : LivingObject
             speed = 0f;
         }
         rigid.velocity = new Vector2(h, v) * speed;
+        playerData.position = transform.position;
+        playerData.health = health;
     }
     void StartCooldown()
     {
