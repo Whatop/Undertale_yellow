@@ -1,12 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum ObjectState
+{
+    Down,
+    Up,
+    Side,
+    Angle,
+    Roll,
+    None
+}
 public class LivingObject : MonoBehaviour
 {
     protected int health;
     protected float speed;
     protected bool isnpc; // 비전투!
+
+    protected bool isInvincible = false; // 무적 상태인지 여부
+    protected float invincibleDuration = 1.5f; // 무적 지속 시간
+    protected float invincibleTimer = 0f; // 무적 타이머
+
 
     protected GameManager gameManager;
 
@@ -36,10 +49,14 @@ public class LivingObject : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
-        health -= damageAmount;
-        if (health <= 0)
+        if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
         {
-            Die();
+            UIManager.Instance.ShowDamageText(transform.position, damageAmount);
+            health -= damageAmount;
+            if (health <= 0)
+            {
+                Die();
+            }
         }
     }
     public void Move(Vector3 direction)

@@ -3,15 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState
-{
-    Down,
-    Up,
-    Side,
-    Angle,
-    Roll,
-    None
-}
+
 public class PlayerMovement : LivingObject
 {
     public float h;
@@ -24,7 +16,7 @@ public class PlayerMovement : LivingObject
     
     public GameObject Hands;
     public GameObject Weapons;
-    public PlayerState playerState;
+    public ObjectState objectState;
 
     GameObject scanObject;
     Animator WeaponsAnimator;
@@ -48,7 +40,7 @@ public class PlayerMovement : LivingObject
         }
 
         //Debug.Log("현재 각도: " + angle);
-        if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && playerState != PlayerState.Roll)
+        if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
         {
             // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
             StartCooldown();
@@ -65,11 +57,11 @@ public class PlayerMovement : LivingObject
             {
                 isCooldown = false;
                 cooldownTime = 0.75f; // 원하는 쿨타임 값으로 설정
-                playerState = PlayerState.None;
+                objectState = ObjectState.None;
             }
         }
 
-        if (playerState != PlayerState.Roll)//구르기는 각도처리를 따로해서
+        if (objectState != ObjectState.Roll)//구르기는 각도처리를 따로해서
         {
             animator.SetBool("IsUp", false);
             animator.SetBool("IsSide", false);
@@ -82,22 +74,22 @@ public class PlayerMovement : LivingObject
                 currentScale.x = Mathf.Abs(currentScale.x) * 1;
                 transform.localScale = currentScale;
 
-                SetPlayerState(PlayerState.Side);
+                SetObjectState(ObjectState.Side);
             }
             else if (angle > 45f && angle <= 135f)
             {
-                SetPlayerState(PlayerState.Up);
+                SetObjectState(ObjectState.Up);
             }
             else if ((angle > 165f && angle <= 180f) || (angle >= -180f && angle < -135f))
             {
                 Vector3 currentScale = transform.localScale;
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;
                 transform.localScale = currentScale;
-                SetPlayerState(PlayerState.Side);
+                SetObjectState(ObjectState.Side);
             }
             else if (angle >= -135f && angle < -45f)
             {
-                SetPlayerState(PlayerState.Down);
+                SetObjectState(ObjectState.Down);
             }
             else if (angle < 45f && angle >= 15f)
             {
@@ -105,7 +97,7 @@ public class PlayerMovement : LivingObject
                 currentScale.x = Mathf.Abs(currentScale.x) * 1;
                 transform.localScale = currentScale;
 
-                SetPlayerState(PlayerState.Angle);
+                SetObjectState(ObjectState.Angle);
             }
             else
             {
@@ -113,7 +105,7 @@ public class PlayerMovement : LivingObject
                 currentScale.x = Mathf.Abs(currentScale.x) * -1;
                 transform.localScale = currentScale;
 
-                SetPlayerState(PlayerState.Angle);
+                SetObjectState(ObjectState.Angle);
             }
 
          
@@ -125,28 +117,21 @@ public class PlayerMovement : LivingObject
     }
     IEnumerator Roll()
     {
-        playerState = PlayerState.Roll;
+        objectState = ObjectState.Roll;
 
         animator.SetBool("IsUp", false);
         animator.SetBool("IsSide", false);
         animator.SetBool("IsDown", false);
         animator.SetBool("IsAngle", false);
 
-        // 현재 플레이어의 위치와 방향
-        Vector2 playerPosition = transform.position;
-
         // 키 입력에 따른 이동 방향
         Vector2 rollDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
 
         // 구르기 애니메이션 재생 등의 초기화
         // Your animation or other initialization code here
-
-
         float vir = rollDirection.normalized.x;
         float hir = rollDirection.normalized.y;
 
-        // Debug.Log("가로 : " + vir);
-        // Debug.Log("세로 : " + hir);
         Vector3 currentScale = transform.localScale;
         if (vir != 0 && hir == 0) // 왼쪽 또는 오른쪽으로 이동할 때
         {
@@ -196,7 +181,7 @@ public class PlayerMovement : LivingObject
     }
     void FixedUpdate()
     {
-        if (playerState != PlayerState.Roll)
+        if (objectState != ObjectState.Roll)
             Move();
         else
             rigid.velocity = new Vector2(h, v) * speed * 1.5f;
@@ -248,25 +233,25 @@ public class PlayerMovement : LivingObject
         // 쿨타임 시작
         isCooldown = true;
     }
-    void SetPlayerState(PlayerState newState)
+    void SetObjectState(ObjectState newState)
     {
 
         // 각 상태에 따른 초기화 등의 로직을 추가할 수 있습니다.
         switch (newState)
         {
-            case PlayerState.Angle:
+            case ObjectState.Angle:
                 // Walk 상태에 대한 초기화 로직
                 animator.SetBool("IsAngle", true);
                 break;
-            case PlayerState.Down:
+            case ObjectState.Down:
                 // Idle 상태에 대한 초기화 로직
                 animator.SetBool("IsDown", true);
                 break;
-            case PlayerState.Side:
+            case ObjectState.Side:
                 // Roll 상태에 대한 초기화 로직
                 animator.SetBool("IsSide", true);
                 break;
-            case PlayerState.Up:
+            case ObjectState.Up:
                 // None 상태에 대한 초기화 로직
                 animator.SetBool("IsUp", true);
                 break;

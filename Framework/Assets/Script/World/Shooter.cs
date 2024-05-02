@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shooter : MonoBehaviour
 {
     public Transform WeaponTransform; // 총의 Transform 컴포넌트
+    public Transform shotpoint; // 총의 Transform 컴포넌트
     public GameObject bulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f; // 총알 발사 속도
     Weapon weaponData;
@@ -48,7 +49,7 @@ public class Shooter : MonoBehaviour
     void Shoot()
     {
         // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.
-        GameObject bullet = Instantiate(bulletPrefab, WeaponTransform.position, WeaponTransform.rotation);
+        GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
         
         
         // 총알에 속도를 적용하여 발사합니다.

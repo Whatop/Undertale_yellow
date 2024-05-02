@@ -7,6 +7,9 @@ public class EnemyController : LivingObject
     public float bulletSpeed = 10f; // 총알 발사 속도
     public Weapon weaponData;          // 현재 사용 중인 총의 정보
     public Transform WeaponTransform;  // 총 모델의 Transform
+    public Transform hand;  // 총 모델의 Transform 
+    public ObjectState objectState;
+
     float shootCoolTime = 4;
     float curTime = 0;
 
@@ -28,7 +31,7 @@ public class EnemyController : LivingObject
 
         Vector3 playerPosition = gameManager.GetPlayerData().position;
         Vector2 direction = (playerPosition - WeaponTransform.position).normalized;
-        WeaponTransform.up = direction;
+        hand.up = direction;
         curTime += Time.deltaTime;
 
         if (curTime > shootCoolTime && bulletPrefab != null && curmagazine > 0)
@@ -64,6 +67,6 @@ public class EnemyController : LivingObject
 
         // 총알에 속도를 적용하여 발사합니다.
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        bulletRb.velocity = WeaponTransform.up * bulletSpeed;
+        bulletRb.velocity = hand.up * bulletSpeed;
     }
 }

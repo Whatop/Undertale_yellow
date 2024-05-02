@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
 
     private static UIManager instance;
     public GameObject[] ui_positions; //health : 0, Weapon : 1
-    
+
     [SerializeField]
     private GameObject[] ui_healths;
 
@@ -20,6 +20,9 @@ public class UIManager : MonoBehaviour
     public GameObject[] pedestal;
     public Image ui_weaponImage;
     public TextMeshProUGUI ui_ammoText;
+    public Canvas uicanvas;
+    public Camera mainCamera;
+    public TextMeshProUGUI damageTextPrefab; // DamageText 프리팹
 
     public static UIManager Instance
     {
@@ -101,6 +104,19 @@ public class UIManager : MonoBehaviour
             instance.transform.position = newPosition;
             ui_ammo[i] = instance;
         }
+    }
+
+    public void ShowDamageText(Vector3 worldPosition, int damageAmount)
+    { // 월드 좌표를 스크린 좌표로 변환
+        Vector2 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
+
+        // 스크린 좌표를 Canvas 안에서 사용 가능한 위치로 변환
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(uicanvas.transform as RectTransform, screenPosition, uicanvas.worldCamera, out Vector2 canvasPosition);
+        
+        // 텍스트 생성
+        TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
+        damageText.rectTransform.localPosition = canvasPosition;
+        damageText.text = damageAmount.ToString();
     }
     private void Update()
     {

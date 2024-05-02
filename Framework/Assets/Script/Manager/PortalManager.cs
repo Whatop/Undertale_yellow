@@ -54,7 +54,7 @@ public class PortalManager : MonoBehaviour
         GameManager.Instance.ChangeGameState(GameState.Event);
         StartCoroutine(FadeOut());
 
-        currentPortalPointIndex += portal.portalNumber;
+        currentPortalPointIndex = portal.portalNumber;
 
         if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
@@ -79,7 +79,6 @@ public class PortalManager : MonoBehaviour
         GameManager.Instance.ChangeGameState(GameState.Event);
         StartCoroutine(FadeOut());
 
-        currentPortalPointIndex = test;
         if (currentPortalPointIndex < portalPoints.Length)
         {
             // 페이드 아웃이 완료된 후에 플레이어 이동

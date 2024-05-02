@@ -54,7 +54,7 @@ public class BulletController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         // 다른 오브젝트와 충돌 시 처리할 로직을 추가합니다.
-        if (other.CompareTag("Enemy") && isFreind)
+        if (other.CompareTag("Enemy") && isFreind && other.GetComponent<EnemyController>().objectState != ObjectState.Roll)
         {
             // 예: 적에게 데미지를 입힙니다.
             other.GetComponent<EnemyController>().TakeDamage(damage);
@@ -62,7 +62,7 @@ public class BulletController : MonoBehaviour
            // 총알 소멸 또는 효과 추가 등을 수행합니다.
             DestroyBullet();
         }
-        if (other.CompareTag("Player") && !isFreind)
+        if (other.CompareTag("Player") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
         {
             // 예: 적에게 데미지를 입힙니다.
             other.GetComponent<PlayerMovement>().TakeDamage(damage);
