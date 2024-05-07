@@ -29,7 +29,7 @@ public class Shooter : MonoBehaviour
         WeaponTransform.up = direction;
 
         // 마우스 왼쪽 버튼을 클릭하면 총알을 발사합니다.
-        if (Input.GetMouseButtonDown(0) && current_magazine > 0)
+        if (Input.GetMouseButtonDown(0) && current_magazine > 0  && weaponData.current_Ammo > 0)
         {
             Shoot();
             weaponData.current_magazine -= 1;
