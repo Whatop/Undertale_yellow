@@ -58,7 +58,7 @@ public class BulletController : MonoBehaviour
         {
             // 예: 적에게 데미지를 입힙니다.
             other.GetComponent<EnemyController>().TakeDamage(damage);
-            Debug.Log("데미지 : " + damage);
+           // Debug.Log("데미지 : " + damage);
            // 총알 소멸 또는 효과 추가 등을 수행합니다.
             DestroyBullet();
         }
@@ -66,7 +66,7 @@ public class BulletController : MonoBehaviour
         {
             // 예: 적에게 데미지를 입힙니다.
             other.GetComponent<PlayerMovement>().TakeDamage(damage);
-            Debug.Log("데미지 : " + damage);
+            //Debug.Log("데미지 : " + damage);
             // 총알 소멸 또는 효과 추가 등을 수행합니다.
             DestroyBullet();
         }

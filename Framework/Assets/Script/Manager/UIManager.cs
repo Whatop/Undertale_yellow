@@ -117,6 +117,7 @@ public class UIManager : MonoBehaviour
         TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
         damageText.rectTransform.localPosition = canvasPosition;
         damageText.text = damageAmount.ToString();
+        damageText.GetComponent<DamageText>().Initialize(damageAmount);
     }
     private void Update()
     {

@@ -68,7 +68,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 10
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: edae648a84dae9f4cbc09d4f8495bbc9, type: 2}
   m_sharedMaterial: {fileID: -1651241253263036495, guid: edae648a84dae9f4cbc09d4f8495bbc9, type: 2}
@@ -150,13 +150,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateMode: 0
-  triggerAnimPlayerOnChange: 0
+  triggerAnimPlayerOnChange: 1
   effectIntensityMultiplier: 50
   appearancesContainer:
-    tagsFallback_Appearances:
-    - size
+    tagsFallback_Appearances: []
     tagsFallback_Disappearances:
-    - size
+    - fade
     values:
       defaults:
         sizeDuration: 0.3
@@ -215,7 +214,7 @@ MonoBehaviour:
   scriptable_globalBehaviorsValues: {fileID: 0}
   scriptable_globalAppearancesValues: {fileID: 0}
   useDynamicScaling: 0
-  referenceFontSize: -1
+  referenceFontSize: 0.75
   isResettingEffectsOnNewText: 1
   timeScale: 0
 --- !u!114 &2302593734966217482
@@ -230,7 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57a6945b90dcd0c4b81619c0d8b5c283, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useTypeWriter: 1
+  useTypeWriter: 0
   startTypewriterMode: 3
   canSkipTypewriter: 1
   hideAppearancesOnSkip: 0
@@ -255,7 +254,7 @@ MonoBehaviour:
   avoidMultiplePunctuactionWait: 0
   waitForNewLines: 1
   waitForLastCharacter: 1
-  useTypewriterWaitForDisappearances: 1
+  useTypewriterWaitForDisappearances: 0
   disappearanceWaitTime: 0.015
   disappearanceSpeedMultiplier: 1
 --- !u!114 &6335943178265941174
@@ -270,5 +269,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67fc8e36b640ece4280667c2d6c526af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
-  destroyTime: 1.5
+  isObject: 1
