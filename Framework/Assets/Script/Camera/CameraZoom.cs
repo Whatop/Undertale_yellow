@@ -4,7 +4,7 @@ public class CameraZoom : MonoBehaviour
 {
     public float zoomSpeed = 6f; // 조절할 확대 속도
     public float minZoom = 2f;   // 최소 크기
-    public float maxZoom = 8f;  // 최대 크기
+    public float maxZoom = 10f;  // 최대 크기
 
     void Update()
     {
