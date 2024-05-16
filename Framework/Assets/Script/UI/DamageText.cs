@@ -44,10 +44,8 @@ public class DamageText : MonoBehaviour
         transform.Translate(moveDirection * speed * Time.deltaTime);
         else
         {
-            if (moveDirection.y > 0)
                 moveDirection -= Vector3.up * Time.deltaTime;
-            else
-                moveDirection.y = 0;
+            transform.localScale = new Vector3(moveDirection.y + 0.5f, moveDirection.y+ 0.5f, 1);
         transform.Translate(moveDirection * speed * Time.deltaTime);
         }
     }

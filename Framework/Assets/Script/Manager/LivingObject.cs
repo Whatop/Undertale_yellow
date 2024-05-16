@@ -47,11 +47,23 @@ public class LivingObject : MonoBehaviour
         // 여기에 죽을 때의 동작을 구현합니다.
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(int damageAmount) //가만히 ?
     {
         if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
         {
             UIManager.Instance.ShowDamageText(transform.position, damageAmount);
+            health -= damageAmount;
+            if (health <= 0)
+            {
+                Die();
+            }
+        }
+    }
+    public void TakeDamage(int damageAmount, Vector3 position)// 움직이는?
+    {
+        if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
+        {
+            UIManager.Instance.ShowDamageText(position, damageAmount);
             health -= damageAmount;
             if (health <= 0)
             {

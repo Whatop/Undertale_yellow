@@ -57,7 +57,7 @@ public class BulletController : MonoBehaviour
         if (other.CompareTag("Enemy") && isFreind && other.GetComponent<EnemyController>().objectState != ObjectState.Roll)
         {
             // 예: 적에게 데미지를 입힙니다.
-            other.GetComponent<EnemyController>().TakeDamage(damage);
+            other.GetComponent<EnemyController>().TakeDamage(damage, other.transform.position);
            // Debug.Log("데미지 : " + damage);
            // 총알 소멸 또는 효과 추가 등을 수행합니다.
             DestroyBullet();
@@ -65,7 +65,7 @@ public class BulletController : MonoBehaviour
         if (other.CompareTag("Player") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
         {
             // 예: 적에게 데미지를 입힙니다.
-            other.GetComponent<PlayerMovement>().TakeDamage(damage);
+            other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
             //Debug.Log("데미지 : " + damage);
             // 총알 소멸 또는 효과 추가 등을 수행합니다.
             DestroyBullet();
