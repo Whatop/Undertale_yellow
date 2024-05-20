@@ -300,6 +300,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portalNumber: 1
+--- !u!1 &43477923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 43477924}
+  m_Layer: 0
+  m_Name: Head
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &43477924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43477923}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.155, z: 0}
+  m_LocalScale: {x: 5.3747177, y: 5.446758, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1424239339}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &80146885
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,6 +510,41 @@ Transform:
   m_Father: {fileID: 743936360}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &98879095
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 98879096}
+  m_Layer: 0
+  m_Name: Head
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &98879096
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98879095}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1239929340}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.155}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &99118344
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,6 +1194,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 566414711}
   m_CullTransparentMesh: 1
+--- !u!1 &570970939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 570970940}
+  m_Layer: 0
+  m_Name: Head
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &570970940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 570970939}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.155, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1167668283}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &666677584
 GameObject:
   m_ObjectHideFlags: 0
@@ -5464,7 +5559,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 033dc374c67d5be41b231cfad51eae23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
+  worldCanvas: {fileID: 99301205}
+  hpBarTransfrom: {fileID: 570970939}
   bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
   bulletSpeed: 10
   weaponData:
@@ -5592,6 +5689,7 @@ Transform:
   m_LocalScale: {x: 7, y: 7, z: 1}
   m_Children:
   - {fileID: 848881821}
+  - {fileID: 570970940}
   m_Father: {fileID: 846469861}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5918,6 +6016,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b7859f7d2afb04c889f2db8f0b0dbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
+  worldCanvas: {fileID: 99301205}
+  hpBarTransfrom: {fileID: 98879095}
   h: 0
   v: 0
   cooldownTime: 0.5
@@ -5936,6 +6037,7 @@ RectTransform:
   m_LocalScale: {x: 7, y: 7, z: 0}
   m_Children:
   - {fileID: 553473656}
+  - {fileID: 98879096}
   m_Father: {fileID: 846469861}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6271,7 +6373,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 033dc374c67d5be41b231cfad51eae23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
+  worldCanvas: {fileID: 99301205}
+  hpBarTransfrom: {fileID: 43477923}
   bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
   bulletSpeed: 10
   weaponData:
@@ -6399,6 +6503,7 @@ Transform:
   m_LocalScale: {x: 1.3023939, y: 1.2851683, z: 1}
   m_Children:
   - {fileID: 1504719796}
+  - {fileID: 43477924}
   m_Father: {fileID: 846469861}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

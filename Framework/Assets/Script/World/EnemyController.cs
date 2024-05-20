@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class EnemyController : LivingObject
 {
-    public int maxHealth = 100;
     public GameObject bulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f; // 총알 발사 속도
     public Weapon weaponData;          // 현재 사용 중인 총의 정보
@@ -22,6 +21,7 @@ public class EnemyController : LivingObject
     }
     void Start()
     {
+        maxHealth = 100;
         health = maxHealth;
     }
 
