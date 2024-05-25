@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 public enum ObjectState
 {
     Down,
@@ -19,7 +19,8 @@ public class LivingObject : MonoBehaviour
     protected int maxHealth;
     protected float speed;
     protected bool isnpc; // 비전투!
-
+    protected bool isDie = false;
+ 
     protected bool isInvincible = false; // 무적 상태인지 여부
     protected float invincibleDuration = 1.5f; // 무적 지속 시간
     protected float invincibleTimer = 0f; // 무적 타이머
@@ -28,6 +29,7 @@ public class LivingObject : MonoBehaviour
     public GameObject healthBarPrefab; // 체력바 프리팹
     protected GameObject healthBar; // 인스턴스화된 체력바
     protected Slider healthSlider; // 체력바 슬라이더
+    protected TextMeshProUGUI healthText; // 체력바 텍스트
 
     protected GameManager gameManager;
     protected PlayerData playerData;
@@ -36,15 +38,13 @@ public class LivingObject : MonoBehaviour
 
     public Canvas worldCanvas; // 월드 캔버스
     private Camera mainCamera;
-    public GameObject hpBarTransfrom;
+    public GameObject hpBarPoint;
     protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
         playerData = gameManager.GetPlayerData();
-        maxHealth = playerData.health; // 최대 체력 설정
-        health = maxHealth; // 현재 체력을 최대 체력으로 초기화
         GameObject cameraObject = GameObject.FindGameObjectWithTag("MainCamera");
         mainCamera = cameraObject.GetComponent<Camera>();
 
@@ -59,32 +59,50 @@ public class LivingObject : MonoBehaviour
             healthBar = Instantiate(healthBarPrefab, worldCanvas.transform);
             healthBarTransform = healthBar.transform;
             healthSlider = healthBar.GetComponentInChildren<Slider>();
+            healthText = healthBar.GetComponentInChildren<TextMeshProUGUI>();
 
             if (healthSlider != null)
             {
                 healthSlider.maxValue = maxHealth;
                 healthSlider.value = health;
             }
+            if (healthText != null)
+            {
+                healthText.text = maxHealth + "/" + health;
+            }
 
-        healthBarTransform.position = hpBarTransfrom.transform.position;
+
+            healthBarTransform.position = hpBarPoint.transform.position;
         }
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         // 체력바 위치 업데이트
         if (healthBar != null)
         {
-            healthBarTransform.position = hpBarTransfrom.transform.position;
+            if (healthSlider != null)
+            {
+                healthSlider.maxValue = maxHealth;
+                healthSlider.value = health;
+            }
+            if (healthText != null)
+            {
+                healthText.text = maxHealth + "/" + health;
+            }
+            healthBarTransform.position = hpBarPoint.transform.position;
         }
 
-        gameManager.SavePlayerData(playerData);
+        if(transform.tag == "Pleyer")
+            gameManager.SavePlayerData(playerData);
     }
 
     public virtual void Die()
     {
+        isDie = true;
         Debug.Log("Object died!");
         Destroy(healthBar); // 체력바 제거
+
     }
 
     public void TakeDamage(int damageAmount)

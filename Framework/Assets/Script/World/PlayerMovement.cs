@@ -26,11 +26,14 @@ public class PlayerMovement : LivingObject
     {
         base.Awake(); // LivingObject의 Awake 메서드 호출
         WeaponsAnimator = Weapons.GetComponent<Animator>();
+        maxHealth = playerData.health; // 최대 체력 설정
+        health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         float angle = CalculateMouseAngle();
         Hands.gameObject.SetActive(true);
 

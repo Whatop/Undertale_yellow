@@ -5561,7 +5561,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
-  hpBarTransfrom: {fileID: 570970939}
+  hpBarPoint: {fileID: 570970939}
   bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
   bulletSpeed: 10
   weaponData:
@@ -5579,6 +5579,9 @@ MonoBehaviour:
   WeaponTransform: {fileID: 80146886}
   hand: {fileID: 848881821}
   objectState: 0
+  minDistance: 3
+  maxDistance: 6
+  isMove: 1
 --- !u!61 &1167668280
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6018,7 +6021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
-  hpBarTransfrom: {fileID: 98879095}
+  hpBarPoint: {fileID: 98879095}
   h: 0
   v: 0
   cooldownTime: 0.5
@@ -6360,7 +6363,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1424239335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6375,7 +6378,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
-  hpBarTransfrom: {fileID: 43477923}
+  hpBarPoint: {fileID: 1504719794}
   bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
   bulletSpeed: 10
   weaponData:
@@ -6393,6 +6396,9 @@ MonoBehaviour:
   WeaponTransform: {fileID: 1504719796}
   hand: {fileID: 1424239339}
   objectState: 0
+  minDistance: 3
+  maxDistance: 6
+  isMove: 0
 --- !u!61 &1424239336
 BoxCollider2D:
   m_ObjectHideFlags: 0

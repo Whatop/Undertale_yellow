@@ -24,6 +24,10 @@ public class UIManager : MonoBehaviour
     public Camera mainCamera;
     public TextMeshProUGUI damageTextPrefab; // DamageText 프리팹
 
+    //Option
+    
+    
+
     public static UIManager Instance
     {
         get
@@ -98,7 +102,6 @@ public class UIManager : MonoBehaviour
             GameObject instance = Instantiate(weaponPrefab, ui_positions[1].transform);
 
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
-            Debug.Log(sizeY);
             Vector3 newPosition = instance.transform.position;
             newPosition.y = ui_positions[1].transform.position.y + i * sizeY  * 1.25f; // 세로 방향으로 위치 설정
             instance.transform.position = newPosition;
