@@ -21,6 +21,11 @@ public class PlayerMovement : LivingObject
     GameObject scanObject;
     Animator WeaponsAnimator;
 
+    public Transform WeaponTransform; // 총의 Transform 컴포넌트
+    public Transform shotpoint; // 총의 Transform 컴포넌트
+    public GameObject bulletPrefab; // 총알 프리팹
+    public float bulletSpeed = 10f; // 총알 발사 속도
+    Weapon weaponData;
 
     protected override void Awake()
     {
@@ -29,6 +34,7 @@ public class PlayerMovement : LivingObject
         maxHealth = playerData.health; // 최대 체력 설정
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
+        weaponData = new Weapon();
     }
 
     protected override void Update()
@@ -36,7 +42,7 @@ public class PlayerMovement : LivingObject
         base.Update();
         float angle = CalculateMouseAngle();
         Hands.gameObject.SetActive(true);
-
+        ShootInput();
         if (Input.GetKeyDown(KeyCode.R))
         {
             WeaponsAnimator.SetTrigger("Reload");
@@ -117,6 +123,42 @@ public class PlayerMovement : LivingObject
         {
                 Hands.gameObject.SetActive(false);
         }
+    }
+    void ShootInput()
+    {
+        weaponData = gameManager.GetWeaponData();
+        int current_magazine = weaponData.current_magazine;
+
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
+        WeaponTransform.up = direction;
+
+        // 마우스 왼쪽 버튼을 클릭하면 총알을 발사합니다.
+        if (Input.GetMouseButtonDown(0) && current_magazine > 0 && weaponData.current_Ammo > 0)
+        {
+            Shoot();
+            weaponData.current_magazine -= 1;
+            weaponData.current_Ammo -= 1;
+            gameManager.SaveWeaponData(weaponData);
+        }
+
+        if (weaponData.current_Ammo < weaponData.maxAmmo &&
+            Input.GetKeyDown(KeyCode.R) &&
+            weaponData.current_magazine < weaponData.magazine)
+        {
+            weaponData.current_magazine = weaponData.magazine;
+            gameManager.SaveWeaponData(weaponData);
+        }
+    }
+    void Shoot()
+    {
+        // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.
+        GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
+
+
+        // 총알에 속도를 적용하여 발사합니다.
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        bulletRb.velocity = WeaponTransform.up * bulletSpeed;
     }
     IEnumerator Roll()
     {

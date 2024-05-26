@@ -74,6 +74,9 @@ public class EnemyController : LivingObject
                 gameManager.SaveWeaponData(weaponData);
             }
         }
+        else
+            StopMoving();
+
     }
 
     void ChasePlayer()

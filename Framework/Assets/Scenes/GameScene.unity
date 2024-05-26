@@ -5901,7 +5901,6 @@ GameObject:
   - component: {fileID: 1239929337}
   - component: {fileID: 1239929341}
   - component: {fileID: 1239929339}
-  - component: {fileID: 1239929342}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -6028,6 +6027,10 @@ MonoBehaviour:
   Hands: {fileID: 553473655}
   Weapons: {fileID: 1051695537}
   objectState: 0
+  WeaponTransform: {fileID: 553473656}
+  shotpoint: {fileID: 1630593728}
+  bulletPrefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
+  bulletSpeed: 10
 --- !u!224 &1239929340
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6068,22 +6071,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1239929342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1239929335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 985270164121c7c4d83c0ecc474e1602, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WeaponTransform: {fileID: 553473656}
-  shotpoint: {fileID: 1630593728}
-  bulletPrefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
-  bulletSpeed: 10
 --- !u!1 &1266416293
 GameObject:
   m_ObjectHideFlags: 0
