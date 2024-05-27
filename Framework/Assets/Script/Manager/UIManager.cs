@@ -25,7 +25,9 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI damageTextPrefab; // DamageText 프리팹
 
     //Option
-    
+    public GameObject optionPanel;
+    public GameObject puasePanel;
+
     
 
     public static UIManager Instance
@@ -67,6 +69,10 @@ public class UIManager : MonoBehaviour
 
         InitHeart();
         InitWeapon();
+    }
+    public void upButton()
+    {
+        Debug.Log("아");
     }
     void InitHeart() // 체력 새팅
     {
