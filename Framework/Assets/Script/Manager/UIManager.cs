@@ -28,7 +28,17 @@ public class UIManager : MonoBehaviour
     public GameObject optionPanel;
     public GameObject puasePanel;
 
-    
+    public Button[] buttons;
+    public Toggle fullScreenToggle;
+    public Scrollbar brightnessScrollbar;
+    public Toggle vSyncToggle;
+    public Scrollbar bgmScrollbar;
+    public Scrollbar sfxScrollbar;
+    public Scrollbar cameraShakeScrollbar;
+    public Scrollbar miniMapSizeScrollbar;
+
+    private int currentIndex = 0;
+
 
     public static UIManager Instance
     {
@@ -69,6 +79,7 @@ public class UIManager : MonoBehaviour
 
         InitHeart();
         InitWeapon();
+        UpdateSelection();
     }
     public void upButton()
     {
@@ -128,7 +139,7 @@ public class UIManager : MonoBehaviour
         damageText.text = damageAmount.ToString();
         damageText.GetComponent<DamageText>().Initialize(damageAmount);
     }
-    private void Update()
+    public void UpdateUI()
     {
         PlayerData player = gameManager.GetPlayerData();
         int currentHealth = player.health;
@@ -151,5 +162,96 @@ public class UIManager : MonoBehaviour
             ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
         ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
+
     }
+    private void Update()
+    {
+        UpdateUI();
+        OptionInput();
+    }
+    #region option
+
+    void OptionInput()
+    {
+        //Option 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            currentIndex = 0;// 이전 씬으로 돌아가기
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            Navigate(-1);
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        {
+            Navigate(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            AdjustValue(-0.1f);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            AdjustValue(0.1f);
+        }
+        else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            ToggleValue();
+        }
+    }
+    void Navigate(int direction)
+    {
+        currentIndex = Mathf.Clamp(currentIndex + direction, 0, buttons.Length - 1);
+        UpdateSelection();
+        //selectSound.Play(); 이동 소리SoundManager로 대체
+    }
+
+    void AdjustValue(float value)
+    {
+        if (currentIndex == 4) // 밝기 조절
+        {
+            brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + value, 0, 1);
+        }
+        else if (currentIndex == 8) // BGM 볼륨 조절
+        {
+            bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + value, 0, 1);
+        }
+        else if (currentIndex == 9) // SFX 볼륨 조절
+        {
+            sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + value, 0, 1);
+        }
+        else if (currentIndex == 10) // 카메라 흔들림 조절
+        {
+            cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + value, 0, 1);
+        }
+        else if (currentIndex == 11) // 미니맵 크기 조절
+        {
+            miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + value, 0, 1);
+        }
+
+        //selectSound.Play(); SoundManager로 대체
+    }
+
+    void ToggleValue()
+    {
+        if (currentIndex == 4) // 전체 화면 토글
+        {
+            fullScreenToggle.isOn = !fullScreenToggle.isOn;
+        }
+        else if (currentIndex == 6) // 수직 동기화 토글
+        {
+            vSyncToggle.isOn = !vSyncToggle.isOn;
+        }
+        //selectSound.Play(); SoundManager로 대체
+    }
+
+    void UpdateSelection()
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            buttons[i].interactable = (i == currentIndex);
+        }
+    }
+    #endregion
 }
