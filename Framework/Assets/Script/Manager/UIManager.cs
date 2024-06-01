@@ -76,7 +76,11 @@ public class UIManager : MonoBehaviour
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
         float screenRatio = screenWidth / screenHeight;
-
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int index = i;  // Local copy for the closure
+            buttons[i].onClick.AddListener(() => OnButtonClick(index));
+        }
         InitHeart();
         InitWeapon();
         UpdateSelection();
@@ -209,25 +213,23 @@ public class UIManager : MonoBehaviour
 
     void AdjustValue(float value)
     {
-        if (currentIndex == 4) // 밝기 조절
+        switch (currentIndex)
         {
-            brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + value, 0, 1);
-        }
-        else if (currentIndex == 8) // BGM 볼륨 조절
-        {
-            bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + value, 0, 1);
-        }
-        else if (currentIndex == 9) // SFX 볼륨 조절
-        {
-            sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + value, 0, 1);
-        }
-        else if (currentIndex == 10) // 카메라 흔들림 조절
-        {
-            cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + value, 0, 1);
-        }
-        else if (currentIndex == 11) // 미니맵 크기 조절
-        {
-            miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + value, 0, 1);
+            case 4: // 밝기 조절
+                brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + value, 0, 1);
+                break;
+            case 8: // BGM 볼륨 조절
+                bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + value, 0, 1);
+                break;
+            case 9: // SFX 볼륨 조절
+                sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + value, 0, 1);
+                break;
+            case 10: // 카메라 흔들림 조절
+                cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + value, 0, 1);
+                break;
+            case 11: // 미니맵 크기 조절
+                miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + value, 0, 1);
+                break;
         }
 
         //selectSound.Play(); SoundManager로 대체
@@ -235,13 +237,14 @@ public class UIManager : MonoBehaviour
 
     void ToggleValue()
     {
-        if (currentIndex == 4) // 전체 화면 토글
+        switch (currentIndex)
         {
-            fullScreenToggle.isOn = !fullScreenToggle.isOn;
-        }
-        else if (currentIndex == 6) // 수직 동기화 토글
-        {
-            vSyncToggle.isOn = !vSyncToggle.isOn;
+            case 5: // 전체 화면 토글
+                fullScreenToggle.isOn = !fullScreenToggle.isOn;
+                break;
+            case 7: // 수직 동기화 토글
+                vSyncToggle.isOn = !vSyncToggle.isOn;
+                break;
         }
         //selectSound.Play(); SoundManager로 대체
     }
@@ -250,8 +253,26 @@ public class UIManager : MonoBehaviour
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].interactable = (i == currentIndex);
+            ColorBlock colors = buttons[i].colors;
+            colors.normalColor = Color.white; // 기본 색상
+            colors.highlightedColor = Color.white; // 강조 색상
+            colors.pressedColor = Color.gray; // 클릭 시 색상
+            colors.selectedColor = (i == currentIndex) ? Color.white : Color.white; // 선택된 색상
+            buttons[i].colors = colors;
+
+            // 텍스트 색상 변경
+            TextMeshProUGUI buttonText = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.color = (i == currentIndex) ? Color.white : Color.gray; // 강조 색상
+            }
         }
+    }
+    public void OnButtonClick(int index)
+    {
+        currentIndex = index;
+        UpdateSelection();
+        //navigateSound.Play(); 사운드 추가
     }
     #endregion
 }
