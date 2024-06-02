@@ -39,6 +39,8 @@ public class UIManager : MonoBehaviour
 
     private int currentIndex = 0;
 
+    public GameObject[] Interface;
+    public bool isUserInterface = false;
 
     public static UIManager Instance
     {
@@ -170,6 +172,15 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
+        if (isUserInterface)
+        {
+            Time.timeScale = 0f;
+            Interface[0].SetActive(true);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
         UpdateUI();
         OptionInput();
     }
