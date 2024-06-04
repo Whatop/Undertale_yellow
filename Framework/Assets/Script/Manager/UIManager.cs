@@ -87,10 +87,22 @@ public class UIManager : MonoBehaviour
         InitWeapon();
         UpdateSelection();
     }
-    public void upButton()
+    private void Update()
     {
-        Debug.Log("아");
+        if (isUserInterface)
+        {
+            Time.timeScale = 0f;
+            Interface[0].SetActive(true);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+        UpdateUI();
+        OptionInput();
     }
+
+    #region playerUi
     void InitHeart() // 체력 새팅
     {
         PlayerData player = gameManager.GetPlayerData();
@@ -170,20 +182,7 @@ public class UIManager : MonoBehaviour
         ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
 
     }
-    private void Update()
-    {
-        if (isUserInterface)
-        {
-            Time.timeScale = 0f;
-            Interface[0].SetActive(true);
-        }
-        else
-        {
-            Time.timeScale = 1f;
-        }
-        UpdateUI();
-        OptionInput();
-    }
+    #endregion
     #region option
 
     void OptionInput()
@@ -285,5 +284,6 @@ public class UIManager : MonoBehaviour
         UpdateSelection();
         //navigateSound.Play(); 사운드 추가
     }
+
     #endregion
 }
