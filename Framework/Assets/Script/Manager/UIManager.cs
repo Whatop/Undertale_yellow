@@ -39,8 +39,13 @@ public class UIManager : MonoBehaviour
 
     private int currentIndex = 0;
 
+    [SerializeField]
+    private int curRIndex = 6; //curResolutionsIndex
+    private List<Resolution> predefinedResolutions;
+
     public GameObject[] Interface;
     public bool isUserInterface = false;
+    public TextMeshProUGUI currentResolutionText;
 
     public static UIManager Instance
     {
@@ -75,9 +80,23 @@ public class UIManager : MonoBehaviour
     }
     private void Start()
     {
-        float screenWidth = Screen.width;
-        float screenHeight = Screen.height;
+        predefinedResolutions = new List<Resolution>
+        {
+            new Resolution { width = 640, height = 480 },
+            new Resolution { width = 720, height = 480 },
+            new Resolution { width = 800, height = 600 },
+            new Resolution { width = 1024, height = 768 },
+            new Resolution { width = 1280, height = 720 },
+            new Resolution { width = 1440, height = 1080 },
+            new Resolution { width = 1920, height = 1080 },
+            new Resolution { width = 2560, height = 1440 }
+        };
+
+        int screenWidth = 1920;
+        int screenHeight = 1080;
         float screenRatio = screenWidth / screenHeight;
+
+        Screen.SetResolution(screenWidth, screenHeight, Screen.fullScreen);
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;  // Local copy for the closure
@@ -100,6 +119,7 @@ public class UIManager : MonoBehaviour
         }
         UpdateUI();
         OptionInput();
+
     }
 
     #region playerUi
@@ -285,5 +305,19 @@ public class UIManager : MonoBehaviour
         //navigateSound.Play(); 사운드 추가
     }
 
+    public void ChangeResolution(int direction)
+    {
+        curRIndex = (curRIndex + direction + predefinedResolutions.Count) % predefinedResolutions.Count;
+        Resolution selectedResolution = predefinedResolutions[curRIndex];
+        Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen);
+
+        // 현재 해상도 텍스트 업데이트
+        UpdateCurrentResolutionText();
+    }
+
+    void UpdateCurrentResolutionText()
+    {
+        currentResolutionText.text = Screen.width + " x " + Screen.height;
+    }
     #endregion
 }

@@ -3274,11 +3274,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2136939649}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 200, y: 158.5}
+  m_AnchoredPosition: {x: 200, y: 213}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &614315258
@@ -8246,11 +8246,11 @@ RectTransform:
   m_Children:
   - {fileID: 931106084}
   m_Father: {fileID: 2136939649}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 200, y: 216}
+  m_AnchoredPosition: {x: 200, y: 152}
   m_SizeDelta: {x: 250, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &840556337
@@ -10656,6 +10656,7 @@ MonoBehaviour:
   sfxScrollbar: {fileID: 0}
   cameraShakeScrollbar: {fileID: 0}
   miniMapSizeScrollbar: {fileID: 0}
+  curRIndex: 6
   Interface:
   - {fileID: 681350678}
   isUserInterface: 1
@@ -15147,8 +15148,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1224697688}
-  - {fileID: 840556336}
   - {fileID: 614315257}
+  - {fileID: 840556336}
   - {fileID: 1671437320}
   - {fileID: 1511696320}
   - {fileID: 21152722}
