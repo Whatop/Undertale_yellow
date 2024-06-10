@@ -956,7 +956,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 103189296}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1307026763}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: ChangeResolution
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: -1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &103189296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2085,7 +2097,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 410664995}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1307026763}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: ChangeResolution
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &410664995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10656,10 +10680,11 @@ MonoBehaviour:
   sfxScrollbar: {fileID: 0}
   cameraShakeScrollbar: {fileID: 0}
   miniMapSizeScrollbar: {fileID: 0}
-  curRIndex: 6
+  curRIndex: 0
   Interface:
   - {fileID: 681350678}
   isUserInterface: 1
+  currentResolutionText: {fileID: 352040873}
 --- !u!4 &1307026764
 Transform:
   m_ObjectHideFlags: 0

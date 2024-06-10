@@ -310,6 +310,7 @@ public class UIManager : MonoBehaviour
         curRIndex = (curRIndex + direction + predefinedResolutions.Count) % predefinedResolutions.Count;
         Resolution selectedResolution = predefinedResolutions[curRIndex];
         Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen);
+        Debug.Log("Resolution changed to: " + selectedResolution.width + " x " + selectedResolution.height);
 
         // 현재 해상도 텍스트 업데이트
         UpdateCurrentResolutionText();
@@ -321,3 +322,4 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 }
+ 
