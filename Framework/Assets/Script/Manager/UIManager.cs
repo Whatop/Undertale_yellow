@@ -27,25 +27,37 @@ public class UIManager : MonoBehaviour
     //Option
     public GameObject optionPanel;
     public GameObject puasePanel;
+    public GameObject keyChangePanel;
 
-    public Button[] buttons;
+    public Button[] mainButtons;
+    public Button[] optionButtons;
+    public Button[] keyChangeButtons;
+
+
+
+    private Button[] currentButtons;
     public Toggle fullScreenToggle;
     public Scrollbar brightnessScrollbar;
     public Toggle vSyncToggle;
+    public Toggle cusorToggle;
     public Scrollbar bgmScrollbar;
     public Scrollbar sfxScrollbar;
     public Scrollbar cameraShakeScrollbar;
     public Scrollbar miniMapSizeScrollbar;
 
     private int currentIndex = 0;
+    private int optionIndex = 0;
+    private int keyChangeIndex = 0;
 
     [SerializeField]
-    private int curRIndex = 6; //curResolutionsIndex
+    private int curRIndex = 6; // curResolutionsIndex
     private List<Resolution> predefinedResolutions;
 
     public GameObject[] Interface;
     public bool isUserInterface = false;
+     
     public TextMeshProUGUI currentResolutionText;
+    private string currentPanel = "Default"; // 현재 패널을 추적
 
     public static UIManager Instance
     {
@@ -97,10 +109,10 @@ public class UIManager : MonoBehaviour
         float screenRatio = screenWidth / screenHeight;
 
         Screen.SetResolution(screenWidth, screenHeight, Screen.fullScreen);
-        for (int i = 0; i < buttons.Length; i++)
+        for (int i = 0; i < mainButtons.Length; i++)
         {
             int index = i;  // Local copy for the closure
-            buttons[i].onClick.AddListener(() => OnButtonClick(index));
+            mainButtons[i].onClick.AddListener(() => OnButtonClick(index));
         }
         InitHeart();
         InitWeapon();
@@ -204,13 +216,44 @@ public class UIManager : MonoBehaviour
     }
     #endregion
     #region option
+    void ShowPanel(string panelName)
+    {
+        switch (panelName)
+        {
+            case "Main":
+                currentPanel = "Main";
+                currentButtons = mainButtons;
+                optionPanel.SetActive(false);
+                keyChangePanel.SetActive(false);
+                break;
+            case "Option":
+                currentPanel = "Option";
+                currentButtons = optionButtons;
+                optionPanel.SetActive(true);
+                keyChangePanel.SetActive(false);
+                break;
+            case "KeyChange":
+                currentPanel = "KeyChange";
+                currentButtons = keyChangeButtons;
+                optionPanel.SetActive(false);
+                keyChangePanel.SetActive(true);
+                break;
+            default:
+                currentPanel = "Main";
+                currentButtons = mainButtons;
+                optionPanel.SetActive(false);
+                keyChangePanel.SetActive(false);
+                break;
+        }
+        currentIndex = 0; // 패널 변경 시 인덱스 초기화
+        UpdateSelection();
+    }
 
     void OptionInput()
     {
-        //Option 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            currentIndex = 0;// 이전 씬으로 돌아가기
+            ShowPanel("Main");
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -234,12 +277,15 @@ public class UIManager : MonoBehaviour
             ToggleValue();
         }
     }
+
+
     void Navigate(int direction)
     {
-        currentIndex = Mathf.Clamp(currentIndex + direction, 0, buttons.Length - 1);
+        currentIndex = Mathf.Clamp(currentIndex + direction, 0, currentButtons.Length - 1);
         UpdateSelection();
-        //selectSound.Play(); 이동 소리SoundManager로 대체
     }
+
+
 
     void AdjustValue(float value)
     {
@@ -278,32 +324,33 @@ public class UIManager : MonoBehaviour
         }
         //selectSound.Play(); SoundManager로 대체
     }
-
     void UpdateSelection()
     {
-        for (int i = 0; i < buttons.Length; i++)
+        for (int i = 0; i < currentButtons.Length; i++)
         {
-            ColorBlock colors = buttons[i].colors;
+            ColorBlock colors = currentButtons[i].colors;
             colors.normalColor = Color.white; // 기본 색상
             colors.highlightedColor = Color.white; // 강조 색상
             colors.pressedColor = Color.gray; // 클릭 시 색상
             colors.selectedColor = (i == currentIndex) ? Color.white : Color.white; // 선택된 색상
-            buttons[i].colors = colors;
+            currentButtons[i].colors = colors;
 
             // 텍스트 색상 변경
-            TextMeshProUGUI buttonText = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI buttonText = currentButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
                 buttonText.color = (i == currentIndex) ? Color.white : Color.gray; // 강조 색상
             }
         }
     }
+
     public void OnButtonClick(int index)
     {
         currentIndex = index;
         UpdateSelection();
-        //navigateSound.Play(); 사운드 추가
+        // navigateSound.Play(); 사운드 추가
     }
+
 
     public void ChangeResolution(int direction)
     {
