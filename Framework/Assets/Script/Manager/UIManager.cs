@@ -116,7 +116,8 @@ public class UIManager : MonoBehaviour
         }
         InitHeart();
         InitWeapon();
-        UpdateSelection();
+        ShowPanel("Main");
+        OptionInput();
     }
     private void Update()
     {
@@ -216,7 +217,7 @@ public class UIManager : MonoBehaviour
     }
     #endregion
     #region option
-    void ShowPanel(string panelName)
+    public void ShowPanel(string panelName)
     {
         switch (panelName)
         {
