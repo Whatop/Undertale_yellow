@@ -34,7 +34,6 @@ public class UIManager : MonoBehaviour
     public Button[] keyChangeButtons;
 
 
-
     private Button[] currentButtons;
     public Toggle fullScreenToggle;
     public Scrollbar brightnessScrollbar;
@@ -116,7 +115,7 @@ public class UIManager : MonoBehaviour
         }
         InitHeart();
         InitWeapon();
-        ShowPanel("Main");
+        ShowPanel("Game");
         OptionInput();
     }
     private void Update()
@@ -124,12 +123,14 @@ public class UIManager : MonoBehaviour
         if (isUserInterface)
         {
             Time.timeScale = 0f;
-            Interface[0].SetActive(true);
+            ShowPanel("Main");
         }
         else
         {
-            Time.timeScale = 1f;
+            gameManager.ResumeGame();
         }
+
+
         UpdateUI();
         OptionInput();
 
@@ -223,25 +224,33 @@ public class UIManager : MonoBehaviour
         {
             case "Main":
                 currentPanel = "Main";
+                isUserInterface = true;
                 currentButtons = mainButtons;
+                puasePanel.SetActive(true);
                 optionPanel.SetActive(false);
                 keyChangePanel.SetActive(false);
                 break;
             case "Option":
                 currentPanel = "Option";
                 currentButtons = optionButtons;
+                isUserInterface = true;
+                puasePanel.SetActive(false);
                 optionPanel.SetActive(true);
                 keyChangePanel.SetActive(false);
                 break;
             case "KeyChange":
                 currentPanel = "KeyChange";
                 currentButtons = keyChangeButtons;
+                isUserInterface = true;
+                puasePanel.SetActive(false);
                 optionPanel.SetActive(false);
                 keyChangePanel.SetActive(true);
                 break;
             default:
-                currentPanel = "Main";
+                currentPanel = "Game";
+                isUserInterface = false;
                 currentButtons = mainButtons;
+                puasePanel.SetActive(false);
                 optionPanel.SetActive(false);
                 keyChangePanel.SetActive(false);
                 break;
@@ -254,7 +263,14 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ShowPanel("Main");
+            if (isUserInterface)
+            {
+                ShowPanel("Game");
+            }
+            else
+            {
+                ShowPanel("Main");
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))

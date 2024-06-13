@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
     private PlayerData playerData;
     private Weapon weaponData;
 
-    
+
 
     public static GameManager Instance
     {
@@ -115,5 +115,13 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
+    }
+    public void ResumeGame()
+    {
+        Time.timeScale = 1f;
+    }
+    public void OpenUI()
+    {
+        UIManager.Instance.isUserInterface = true;
     }
 }

@@ -39,89 +39,94 @@ public class PlayerMovement : LivingObject
 
     protected override void Update()
     {
+        
         base.Update();
-        float angle = CalculateMouseAngle();
-        Hands.gameObject.SetActive(true);
-        ShootInput();
-        if (Input.GetKeyDown(KeyCode.R))
+
+        if (!UIManager.Instance.isUserInterface)
         {
-            WeaponsAnimator.SetTrigger("Reload");
-        }
-
-        //Debug.Log("현재 각도: " + angle);
-        if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
-        {
-            // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
-            StartCooldown();
-            StartCoroutine(Roll());
-        }
-
-        // 쿨타임 감소
-        if (isCooldown)
-        {
-            cooldownTime -= Time.deltaTime;
-
-            // 쿨타임이 끝나면 상태 초기화
-            if (cooldownTime <= 0)
+            float angle = CalculateMouseAngle();
+            Hands.gameObject.SetActive(true);
+            ShootInput();
+            if (Input.GetKeyDown(KeyCode.R))
             {
-                isCooldown = false;
-                cooldownTime = 0.75f; // 원하는 쿨타임 값으로 설정
-                objectState = ObjectState.None;
+                WeaponsAnimator.SetTrigger("Reload");
             }
-        }
 
-        if (objectState != ObjectState.Roll)//구르기는 각도처리를 따로해서
-        {
-            animator.SetBool("IsUp", false);
-            animator.SetBool("IsSide", false);
-            animator.SetBool("IsDown", false);
-            animator.SetBool("IsAngle", false);
+            //Debug.Log("현재 각도: " + angle);
+            if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
+            {
+                // 우클릭 입력이 감지되면 처리하고 쿨타임 시작
+                StartCooldown();
+                StartCoroutine(Roll());
+            }
 
-            if (angle > -45f && angle <= 15f)
+            // 쿨타임 감소
+            if (isCooldown)
             {
-                Vector3 currentScale = transform.localScale;
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;
-                transform.localScale = currentScale;
+                cooldownTime -= Time.deltaTime;
 
-                SetObjectState(ObjectState.Side);
+                // 쿨타임이 끝나면 상태 초기화
+                if (cooldownTime <= 0)
+                {
+                    isCooldown = false;
+                    cooldownTime = 0.75f; // 원하는 쿨타임 값으로 설정
+                    objectState = ObjectState.None;
+                }
             }
-            else if (angle > 45f && angle <= 135f)
-            {
-                SetObjectState(ObjectState.Up);
-            }
-            else if ((angle > 165f && angle <= 180f) || (angle >= -180f && angle < -135f))
-            {
-                Vector3 currentScale = transform.localScale;
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;
-                transform.localScale = currentScale;
-                SetObjectState(ObjectState.Side);
-            }
-            else if (angle >= -135f && angle < -45f)
-            {
-                SetObjectState(ObjectState.Down);
-            }
-            else if (angle < 45f && angle >= 15f)
-            {
-                Vector3 currentScale = transform.localScale;
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;
-                transform.localScale = currentScale;
 
-                SetObjectState(ObjectState.Angle);
+            if (objectState != ObjectState.Roll)//구르기는 각도처리를 따로해서
+            {
+                animator.SetBool("IsUp", false);
+                animator.SetBool("IsSide", false);
+                animator.SetBool("IsDown", false);
+                animator.SetBool("IsAngle", false);
+
+                if (angle > -45f && angle <= 15f)
+                {
+                    Vector3 currentScale = transform.localScale;
+                    currentScale.x = Mathf.Abs(currentScale.x) * 1;
+                    transform.localScale = currentScale;
+
+                    SetObjectState(ObjectState.Side);
+                }
+                else if (angle > 45f && angle <= 135f)
+                {
+                    SetObjectState(ObjectState.Up);
+                }
+                else if ((angle > 165f && angle <= 180f) || (angle >= -180f && angle < -135f))
+                {
+                    Vector3 currentScale = transform.localScale;
+                    currentScale.x = Mathf.Abs(currentScale.x) * -1;
+                    transform.localScale = currentScale;
+                    SetObjectState(ObjectState.Side);
+                }
+                else if (angle >= -135f && angle < -45f)
+                {
+                    SetObjectState(ObjectState.Down);
+                }
+                else if (angle < 45f && angle >= 15f)
+                {
+                    Vector3 currentScale = transform.localScale;
+                    currentScale.x = Mathf.Abs(currentScale.x) * 1;
+                    transform.localScale = currentScale;
+
+                    SetObjectState(ObjectState.Angle);
+                }
+                else
+                {
+                    Vector3 currentScale = transform.localScale;
+                    currentScale.x = Mathf.Abs(currentScale.x) * -1;
+                    transform.localScale = currentScale;
+
+                    SetObjectState(ObjectState.Angle);
+                }
+
+
             }
             else
             {
-                Vector3 currentScale = transform.localScale;
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;
-                transform.localScale = currentScale;
-
-                SetObjectState(ObjectState.Angle);
-            }
-
-         
-        }
-        else
-        {
                 Hands.gameObject.SetActive(false);
+            }
         }
     }
     void ShootInput()

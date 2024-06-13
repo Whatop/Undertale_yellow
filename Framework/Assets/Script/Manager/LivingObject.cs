@@ -78,23 +78,23 @@ public class LivingObject : MonoBehaviour
 
     protected virtual void Update()
     {
-        // 체력바 위치 업데이트
-        if (healthBar != null)
-        {
-            if (healthSlider != null)
+            // 체력바 위치 업데이트
+            if (healthBar != null)
             {
-                healthSlider.maxValue = maxHealth;
-                healthSlider.value = health;
+                if (healthSlider != null)
+                {
+                    healthSlider.maxValue = maxHealth;
+                    healthSlider.value = health;
+                }
+                if (healthText != null)
+                {
+                    healthText.text = maxHealth + "/" + health;
+                }
+                healthBarTransform.position = hpBarPoint.transform.position;
             }
-            if (healthText != null)
-            {
-                healthText.text = maxHealth + "/" + health;
-            }
-            healthBarTransform.position = hpBarPoint.transform.position;
-        }
 
-        if(transform.tag == "Pleyer")
-            gameManager.SavePlayerData(playerData);
+            if (transform.tag == "Pleyer")
+                gameManager.SavePlayerData(playerData);
     }
 
     public virtual void Die()
