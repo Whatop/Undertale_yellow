@@ -23,7 +23,7 @@ public class EnemyController : LivingObject
         weaponData = new Weapon();
     }
 
-    void Start()
+     void Start()
     {
         maxHealth = 10;
         health = maxHealth;

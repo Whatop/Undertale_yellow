@@ -44,14 +44,12 @@ public class LivingObject : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
-        playerData = gameManager.GetPlayerData();
         GameObject cameraObject = GameObject.FindGameObjectWithTag("MainCamera");
         mainCamera = cameraObject.GetComponent<Camera>();
 
         // 체력바 초기화
         InitializeHealthBar();
     }
-
     protected void InitializeHealthBar()
     {
         if (healthBarPrefab != null && worldCanvas != null)

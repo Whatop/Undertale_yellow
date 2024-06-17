@@ -31,10 +31,14 @@ public class PlayerMovement : LivingObject
     {
         base.Awake(); // LivingObject의 Awake 메서드 호출
         WeaponsAnimator = Weapons.GetComponent<Animator>();
-        maxHealth = playerData.health; // 최대 체력 설정
-        health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
         weaponData = new Weapon();
+    }
+     void Start()
+    {
+        playerData = gameManager.GetPlayerData();
+        maxHealth = playerData.health; // 최대 체력 설정
+        health = maxHealth; // 현재 체력을 최대 체력으로 초기화
     }
 
     protected override void Update()
@@ -231,10 +235,11 @@ public class PlayerMovement : LivingObject
     }
     void FixedUpdate()
     {
-        if (objectState != ObjectState.Roll)
+        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface)
             Move();
-        else
-            rigid.velocity = new Vector2(h, v) * speed * 1.5f;
+        else if(objectState == ObjectState.Roll && !UIManager.Instance.isUserInterface)
+        
+                    rigid.velocity = new Vector2(h, v) * speed * 1.5f;
 
     }
     void Move()
