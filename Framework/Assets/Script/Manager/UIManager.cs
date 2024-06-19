@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
 public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
@@ -24,7 +23,7 @@ public class UIManager : MonoBehaviour
     public Camera mainCamera;
     public TextMeshProUGUI damageTextPrefab; // DamageText 프리팹
 
-    //Option
+    // Option
     public GameObject optionPanel;
     public GameObject puasePanel;
     public GameObject keyChangePanel;
@@ -32,7 +31,6 @@ public class UIManager : MonoBehaviour
     public Button[] mainButtons;
     public Button[] optionButtons;
     public Button[] keyChangeButtons;
-
 
     private Button[] currentButtons;
     public Toggle fullScreenToggle;
@@ -44,9 +42,8 @@ public class UIManager : MonoBehaviour
     public Scrollbar cameraShakeScrollbar;
     public Scrollbar miniMapSizeScrollbar;
 
+    [SerializeField]
     private int currentIndex = 0;
-    private int optionIndex = 0;
-    private int keyChangeIndex = 0;
 
     [SerializeField]
     private int curRIndex = 6; // curResolutionsIndex
@@ -54,7 +51,7 @@ public class UIManager : MonoBehaviour
 
     public GameObject[] Interface;
     public bool isUserInterface = false;
-     
+
     public TextMeshProUGUI currentResolutionText;
     private string currentPanel = "Default"; // 현재 패널을 추적
 
@@ -89,6 +86,7 @@ public class UIManager : MonoBehaviour
 
         gameManager = GameManager.Instance;
     }
+
     private void Start()
     {
         predefinedResolutions = new List<Resolution>
@@ -105,38 +103,39 @@ public class UIManager : MonoBehaviour
 
         int screenWidth = 1920;
         int screenHeight = 1080;
-        float screenRatio = screenWidth / screenHeight;
+        float screenRatio = (float)screenWidth / screenHeight;
 
         Screen.SetResolution(screenWidth, screenHeight, Screen.fullScreen);
+
         for (int i = 0; i < mainButtons.Length; i++)
         {
             int index = i;  // Local copy for the closure
             mainButtons[i].onClick.AddListener(() => OnButtonClick(index));
         }
+
         InitHeart();
         InitWeapon();
         ShowPanel("Game");
         OptionInput();
     }
+
     private void Update()
     {
         if (isUserInterface)
         {
             Time.timeScale = 0f;
-            ShowPanel("Main");
         }
         else
         {
             gameManager.ResumeGame();
         }
 
-
         UpdateUI();
         OptionInput();
-
     }
 
     #region playerUi
+
     void InitHeart() // 체력 새팅
     {
         PlayerData player = gameManager.GetPlayerData();
@@ -157,13 +156,13 @@ public class UIManager : MonoBehaviour
             ui_healths[i] = instance;
         }
     }
+
     void InitWeapon() // 총 새팅
     {
         Weapon weapon = gameManager.GetWeaponData();
 
         int ammo_count = weapon.magazine;
         ui_ammo = new GameObject[ammo_count];
-
 
         for (int i = 0; i < ammo_count; i++)
         {
@@ -172,7 +171,7 @@ public class UIManager : MonoBehaviour
 
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
             Vector3 newPosition = instance.transform.position;
-            newPosition.y = ui_positions[1].transform.position.y + i * sizeY  * 1.25f; // 세로 방향으로 위치 설정
+            newPosition.y = ui_positions[1].transform.position.y + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
             instance.transform.position = newPosition;
             ui_ammo[i] = instance;
         }
@@ -184,13 +183,14 @@ public class UIManager : MonoBehaviour
 
         // 스크린 좌표를 Canvas 안에서 사용 가능한 위치로 변환
         RectTransformUtility.ScreenPointToLocalPointInRectangle(uicanvas.transform as RectTransform, screenPosition, uicanvas.worldCamera, out Vector2 canvasPosition);
-        
+
         // 텍스트 생성
         TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
         damageText.rectTransform.localPosition = canvasPosition;
         damageText.text = damageAmount.ToString();
         damageText.GetComponent<DamageText>().Initialize(damageAmount);
     }
+
     public void UpdateUI()
     {
         PlayerData player = gameManager.GetPlayerData();
@@ -202,6 +202,7 @@ public class UIManager : MonoBehaviour
             int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2); // 체력에 따른 스프라이트 인덱스 계산
             ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
+
         Weapon weapon = gameManager.GetWeaponData();
         int current_magazine = weapon.current_magazine;
 
@@ -213,11 +214,14 @@ public class UIManager : MonoBehaviour
             // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
             ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
-        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
 
+        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
     }
+
     #endregion
+
     #region option
+
     public void ShowPanel(string panelName)
     {
         switch (panelName)
@@ -266,43 +270,46 @@ public class UIManager : MonoBehaviour
             if (isUserInterface)
             {
                 ShowPanel("Game");
+                gameManager.ResumeGame();
+                Time.timeScale = 1f;
             }
             else
             {
                 ShowPanel("Main");
+                Time.timeScale = 0f;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        if (isUserInterface)
         {
-            Navigate(-1);
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-        {
-            Navigate(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-        {
-            AdjustValue(-0.1f);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-        {
-            AdjustValue(0.1f);
-        }
-        else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
-        {
-            ToggleValue();
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                Navigate(-1);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                Navigate(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                AdjustValue(-0.1f);
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                AdjustValue(0.1f);
+            }
+            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            {
+                ToggleValue();
+            }
         }
     }
-
 
     void Navigate(int direction)
     {
         currentIndex = Mathf.Clamp(currentIndex + direction, 0, currentButtons.Length - 1);
         UpdateSelection();
     }
-
-
 
     void AdjustValue(float value)
     {
@@ -325,7 +332,7 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
-        //selectSound.Play(); SoundManager로 대체
+        // selectSound.Play(); SoundManager로 대체
     }
 
     void ToggleValue()
@@ -339,8 +346,9 @@ public class UIManager : MonoBehaviour
                 vSyncToggle.isOn = !vSyncToggle.isOn;
                 break;
         }
-        //selectSound.Play(); SoundManager로 대체
+        // selectSound.Play(); SoundManager로 대체
     }
+
     void UpdateSelection()
     {
         for (int i = 0; i < currentButtons.Length; i++)
@@ -368,7 +376,6 @@ public class UIManager : MonoBehaviour
         // navigateSound.Play(); 사운드 추가
     }
 
-
     public void ChangeResolution(int direction)
     {
         curRIndex = (curRIndex + direction + predefinedResolutions.Count) % predefinedResolutions.Count;
@@ -384,6 +391,6 @@ public class UIManager : MonoBehaviour
     {
         currentResolutionText.text = Screen.width + " x " + Screen.height;
     }
+
     #endregion
 }
- 
