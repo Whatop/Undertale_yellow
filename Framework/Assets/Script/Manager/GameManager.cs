@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-
 public enum GameState
 {
     Fight,
@@ -26,7 +25,7 @@ public class PlayerData
         health = 6;
         position = Vector3.zero;
         player_Name = "";
-        inventory = new string[10];
+        inventory = new string[10]; // 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         // 추가 데이터 초기화
     }
@@ -38,8 +37,6 @@ public class GameManager : MonoBehaviour
 
     private PlayerData playerData;
     private Weapon weaponData;
-
-
 
     public static GameManager Instance
     {
@@ -85,7 +82,7 @@ public class GameManager : MonoBehaviour
         // 플레이어 데이터 저장
         playerData = newData;
     }
-    
+
     public Weapon GetWeaponData()
     {
         return weaponData;
@@ -96,6 +93,7 @@ public class GameManager : MonoBehaviour
         // 무기 데이터 저장, 일부 무기는 사용할수도?
         weaponData = newData;
     }
+
 
     public void ChangeGameState(GameState newState)
     {
@@ -116,12 +114,15 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
     public void ResumeGame()
     {
         Time.timeScale = 1f;
     }
+
     public void OpenUI()
     {
         UIManager.Instance.isUserInterface = true;
     }
 }
+

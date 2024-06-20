@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using UnityEngine.SceneManagement;
+
 public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
@@ -133,7 +135,10 @@ public class UIManager : MonoBehaviour
         UpdateUI();
         OptionInput();
     }
-
+    public void LoadIntro()
+    {
+        SceneManager.LoadScene("IntroScene");
+    }
     #region playerUi
 
     void InitHeart() // 체력 새팅
@@ -267,13 +272,21 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isUserInterface)
+            if (currentPanel == "KeyChange")
+            {
+                ShowPanel("Option");
+            }
+            else if (currentPanel == "Option")
+            {
+                ShowPanel("Main");
+            }
+            else if (currentPanel == "Main")
             {
                 ShowPanel("Game");
                 gameManager.ResumeGame();
                 Time.timeScale = 1f;
             }
-            else
+            else if (currentPanel == "Game")
             {
                 ShowPanel("Main");
                 Time.timeScale = 0f;
@@ -300,7 +313,10 @@ public class UIManager : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
             {
-                ToggleValue();
+                if (currentButtons != null && currentButtons.Length > 0)
+                {
+                    currentButtons[currentIndex].onClick.Invoke();
+                }
             }
         }
     }
