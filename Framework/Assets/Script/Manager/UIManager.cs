@@ -121,6 +121,11 @@ public class UIManager : MonoBehaviour
         OptionInput();
     }
 
+    public void exitGame()
+    {
+        Debug.Log("Game is exiting...");
+        Application.Quit();
+    }
     private void Update()
     {
         if (isUserInterface)
