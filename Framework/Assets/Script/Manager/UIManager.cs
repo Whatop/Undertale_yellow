@@ -230,7 +230,7 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-    #region option
+    #region optionUI
 
     public void ShowPanel(string panelName)
     {
@@ -273,6 +273,11 @@ public class UIManager : MonoBehaviour
         UpdateSelection();
     }
 
+    void Navigate(int direction)
+    {
+        currentIndex = Mathf.Clamp(currentIndex + direction, 0, currentButtons.Length - 1);
+        UpdateSelection();
+    }
     void OptionInput()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -291,7 +296,7 @@ public class UIManager : MonoBehaviour
                 gameManager.ResumeGame();
                 Time.timeScale = 1f;
             }
-            else if (currentPanel == "Game")
+            else
             {
                 ShowPanel("Main");
                 Time.timeScale = 0f;
@@ -310,50 +315,52 @@ public class UIManager : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-                AdjustValue(-0.1f);
+                AdjustValue(-1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
-                AdjustValue(0.1f);
+                AdjustValue(1);
             }
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
             {
                 if (currentButtons != null && currentButtons.Length > 0)
                 {
-                    currentButtons[currentIndex].onClick.Invoke();
+                    if (currentIndex == 5 || currentIndex == 7)
+                    {
+                        ToggleValue();  // ToggleValue 호출
+                    }
+                    else
+                    {
+                        currentButtons[currentIndex].onClick.Invoke();
+                    }
                 }
             }
         }
     }
 
-    void Navigate(int direction)
-    {
-        currentIndex = Mathf.Clamp(currentIndex + direction, 0, currentButtons.Length - 1);
-        UpdateSelection();
-    }
-
-    void AdjustValue(float value)
+    void AdjustValue(int direction)
     {
         switch (currentIndex)
         {
             case 4: // 밝기 조절
-                brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + value, 0, 1);
+                brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + direction * 0.1f, 0, 1);
                 break;
             case 8: // BGM 볼륨 조절
-                bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + value, 0, 1);
+                bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + direction * 0.1f, 0, 1);
                 break;
             case 9: // SFX 볼륨 조절
-                sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + value, 0, 1);
+                sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + direction * 0.1f, 0, 1);
                 break;
             case 10: // 카메라 흔들림 조절
-                cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + value, 0, 1);
+                cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + direction * 0.1f, 0, 1);
                 break;
             case 11: // 미니맵 크기 조절
-                miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + value, 0, 1);
+                miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + direction * 0.1f, 0, 1);
+                break;
+            case 12: // 해상도 변경
+                ChangeResolution(direction);
                 break;
         }
-
-        // selectSound.Play(); SoundManager로 대체
     }
 
     void ToggleValue()
@@ -362,14 +369,14 @@ public class UIManager : MonoBehaviour
         {
             case 5: // 전체 화면 토글
                 fullScreenToggle.isOn = !fullScreenToggle.isOn;
+                Screen.fullScreen = fullScreenToggle.isOn;
                 break;
             case 7: // 수직 동기화 토글
                 vSyncToggle.isOn = !vSyncToggle.isOn;
+                QualitySettings.vSyncCount = vSyncToggle.isOn ? 1 : 0;
                 break;
         }
-        // selectSound.Play(); SoundManager로 대체
     }
-
     void UpdateSelection()
     {
         for (int i = 0; i < currentButtons.Length; i++)
@@ -396,7 +403,6 @@ public class UIManager : MonoBehaviour
         UpdateSelection();
         // navigateSound.Play(); 사운드 추가
     }
-
     public void ChangeResolution(int direction)
     {
         curRIndex = (curRIndex + direction + predefinedResolutions.Count) % predefinedResolutions.Count;
@@ -407,7 +413,6 @@ public class UIManager : MonoBehaviour
         // 현재 해상도 텍스트 업데이트
         UpdateCurrentResolutionText();
     }
-
     void UpdateCurrentResolutionText()
     {
         currentResolutionText.text = Screen.width + " x " + Screen.height;
