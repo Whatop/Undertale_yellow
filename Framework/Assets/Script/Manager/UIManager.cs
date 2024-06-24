@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
@@ -35,14 +36,21 @@ public class UIManager : MonoBehaviour
     public Button[] keyChangeButtons;
 
     private Button[] currentButtons;
-    public Toggle fullScreenToggle;
+    public Button fullScreenToggle;
     public Scrollbar brightnessScrollbar;
-    public Toggle vSyncToggle;
-    public Toggle cusorToggle;
+    public Button vSyncToggle;
+    public Button cusorToggle;
     public Scrollbar bgmScrollbar;
     public Scrollbar sfxScrollbar;
     public Scrollbar cameraShakeScrollbar;
     public Scrollbar miniMapSizeScrollbar;
+
+    public Sprite onSprite;
+    public Sprite offSprite;
+
+    public bool isFullScreen = false;
+    public bool isVSyncOn = false;
+    public bool isCursorVisible = true;
 
     [SerializeField]
     private int currentIndex = 0;
@@ -325,7 +333,7 @@ public class UIManager : MonoBehaviour
             {
                 if (currentButtons != null && currentButtons.Length > 0)
                 {
-                    if (currentIndex == 5 || currentIndex == 7)
+                    if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
                     {
                         ToggleValue();  // ToggleValue 호출
                     }
@@ -342,22 +350,22 @@ public class UIManager : MonoBehaviour
     {
         switch (currentIndex)
         {
-            case 4: // 밝기 조절
+            case 2: // 밝기 조절
                 brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 8: // BGM 볼륨 조절
+            case 5: // BGM 볼륨 조절
                 bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 9: // SFX 볼륨 조절
+            case 6: // SFX 볼륨 조절
                 sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 10: // 카메라 흔들림 조절
+            case 7: // 카메라 흔들림 조절
                 cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 11: // 미니맵 크기 조절
+            case 8: // 미니맵 크기 조절
                 miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 12: // 해상도 변경
+            case 0: // 해상도 변경
                 ChangeResolution(direction);
                 break;
         }
@@ -367,15 +375,68 @@ public class UIManager : MonoBehaviour
     {
         switch (currentIndex)
         {
-            case 5: // 전체 화면 토글
-                fullScreenToggle.isOn = !fullScreenToggle.isOn;
-                Screen.fullScreen = fullScreenToggle.isOn;
+            case 1: // 전체 화면 토글
+                ToggleFullScreen();
                 break;
-            case 7: // 수직 동기화 토글
-                vSyncToggle.isOn = !vSyncToggle.isOn;
-                QualitySettings.vSyncCount = vSyncToggle.isOn ? 1 : 0;
+            case 3: // 수직 동기화 토글
+                ToggleVSync();
+                break;
+            case 4: // 커서 토글
+                ToggleCursorVisibility();
                 break;
         }
+        StartCoroutine(ForceToggleUpdate());
+    }
+    void UpdateButtonState(Button button, bool state)
+    {
+        SpriteState spriteState = button.spriteState;
+
+        if (state)
+        {
+            button.image.sprite = onSprite;
+            spriteState.highlightedSprite = onSprite;
+            spriteState.pressedSprite = onSprite;
+            spriteState.selectedSprite = onSprite;
+            spriteState.disabledSprite = onSprite;
+        }
+        else
+        {
+            button.image.sprite = offSprite;
+            spriteState.highlightedSprite = offSprite;
+            spriteState.pressedSprite = offSprite;
+            spriteState.selectedSprite = offSprite;
+            spriteState.disabledSprite = offSprite;
+        }
+
+        button.spriteState = spriteState;
+    }
+
+    void ToggleFullScreen()
+    {
+        isFullScreen = !isFullScreen;
+        Screen.fullScreen = isFullScreen;
+        UpdateButtonState(fullScreenToggle, isFullScreen);
+    }
+
+    void ToggleVSync()
+    {
+        isVSyncOn = !isVSyncOn;
+        QualitySettings.vSyncCount = isVSyncOn ? 1 : 0;
+        UpdateButtonState(vSyncToggle, isVSyncOn);
+    }
+
+    void ToggleCursorVisibility()
+    {
+        isCursorVisible = !isCursorVisible;
+        Cursor.visible = isCursorVisible;
+        UpdateButtonState(cusorToggle, isCursorVisible);
+    }
+
+    IEnumerator ForceToggleUpdate()
+    {
+        yield return null; // Wait for one frame
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(currentButtons[currentIndex].gameObject);
     }
     void UpdateSelection()
     {
