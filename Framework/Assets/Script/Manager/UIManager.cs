@@ -65,6 +65,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI currentResolutionText;
     private string currentPanel = "Default"; // 현재 패널을 추적
 
+    private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
     {
         get
@@ -95,6 +96,7 @@ public class UIManager : MonoBehaviour
         }
 
         gameManager = GameManager.Instance;
+        soundManager = SoundManager.Instance;
     }
 
     private void Start()
@@ -309,6 +311,7 @@ public class UIManager : MonoBehaviour
                 ShowPanel("Main");
                 Time.timeScale = 0f;
             }
+            soundManager.SFXPlay("mus_piano1", 32);
         }
 
         if (isUserInterface)
@@ -316,17 +319,21 @@ public class UIManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 Navigate(-1);
+                soundManager.SFXPlay("snd_piano3", 34);
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 Navigate(1);
+                soundManager.SFXPlay("snd_piano4", 35);
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
+                soundManager.SFXPlay("snd_piano5", 36);
                 AdjustValue(-1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
+                soundManager.SFXPlay("snd_piano5", 36);
                 AdjustValue(1);
             }
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
@@ -340,6 +347,7 @@ public class UIManager : MonoBehaviour
                     else
                     {
                         currentButtons[currentIndex].onClick.Invoke();
+                    soundManager.SFXPlay("snd_piano6", 37);
                     }
                 }
             }
@@ -355,9 +363,11 @@ public class UIManager : MonoBehaviour
                 break;
             case 5: // BGM 볼륨 조절
                 bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + direction * 0.1f, 0, 1);
+                soundManager.BGSoundVolume(bgmScrollbar.value);
                 break;
             case 6: // SFX 볼륨 조절
                 sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + direction * 0.1f, 0, 1);
+                soundManager.SFXSoundVolume(sfxScrollbar.value);
                 break;
             case 7: // 카메라 흔들림 조절
                 cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + direction * 0.1f, 0, 1);
@@ -370,6 +380,7 @@ public class UIManager : MonoBehaviour
                 break;
         }
     }
+
 
     void ToggleValue()
     {
@@ -461,8 +472,9 @@ public class UIManager : MonoBehaviour
     public void OnButtonClick(int index)
     {
         currentIndex = index;
-        UpdateSelection();
-        // navigateSound.Play(); 사운드 추가
+        UpdateSelection(); 
+        soundManager.SFXPlay("snd_piano2", 33);
+
     }
     public void ChangeResolution(int direction)
     {

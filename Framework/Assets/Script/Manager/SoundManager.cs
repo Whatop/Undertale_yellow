@@ -63,21 +63,29 @@ public class SoundManager : MonoBehaviour
             //방코드로 else if()  
         }
     }
-    private float CalculateVolume(float val)
+    private float LinearToDecibel(float linearValue)
     {
-        return Mathf.Log10(val) * 20;
+        if (linearValue == 0)
+        {
+            return -80f; // -80 dB is usually considered as silent
+        }
+        else
+        {
+            return 20f * Mathf.Log10(linearValue);
+        }
     }
 
     public void BGSoundVolume(float val)
     {
-        mixer.SetFloat("BGSound", CalculateVolume(val));
+        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
+        mixer.SetFloat("BGSound", LinearToDecibel(val));
     }
 
     public void SFXSoundVolume(float val)
     {
-        mixer.SetFloat("SFXSound", CalculateVolume(val));
+        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
+        mixer.SetFloat("SFXSound", LinearToDecibel(val));
     }
-
 
     // soundManager.SFXPlay(string,int);
     public void SFXPlay(string sfxName, int sfxNum)
