@@ -39,6 +39,9 @@ public class PlayerMovement : LivingObject
         playerData = gameManager.GetPlayerData();
         maxHealth = playerData.health; // 최대 체력 설정
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
+
+        //Test
+        SoundManager.Instance.BGSoundPlay();
     }
 
     protected override void Update()
@@ -54,6 +57,8 @@ public class PlayerMovement : LivingObject
             if (Input.GetKeyDown(KeyCode.R))
             {
                 WeaponsAnimator.SetTrigger("Reload");
+                SoundManager.Instance.SFXPlay("mus_piano1", 32); // 재장전 사운드 변경
+
             }
 
             //Debug.Log("현재 각도: " + angle);
@@ -168,6 +173,8 @@ public class PlayerMovement : LivingObject
         // 총알에 속도를 적용하여 발사합니다.
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         bulletRb.velocity = WeaponTransform.up * bulletSpeed;
+        SoundManager.Instance.SFXPlay("mus_piano1", 32); // 총 사운드 변경
+         
     }
     IEnumerator Roll()
     {
@@ -231,6 +238,7 @@ public class PlayerMovement : LivingObject
         }
         transform.localScale = currentScale;
         animator.SetTrigger("IsRoll");
+        SoundManager.Instance.SFXPlay("mus_piano1", 32); // 구르기 사운드 변경
         yield return null;
     }
     void FixedUpdate()

@@ -11,7 +11,7 @@ public class EnemyController : LivingObject
     public float minDistance = 3f;  // 플레이어와의 최소 유지 거리
     public float maxDistance = 6f;  // 플레이어와의 최대 유지 거리
 
-    float shootCoolTime = 4;
+    public float shootCoolTime = 4;
     float curTime = 0;
     public bool isMove;
 
@@ -64,6 +64,8 @@ public class EnemyController : LivingObject
                 weaponData.current_Ammo -= 1;
                 gameManager.SaveWeaponData(weaponData);
                 curTime = 0;
+                SoundManager.Instance.SFXPlay("mus_piano7", 38); // 총 사운드 변경
+
             }
 
             // 총알이 없으면 재장전
