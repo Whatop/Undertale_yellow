@@ -920,7 +920,7 @@ GameObject:
   - component: {fileID: 76070292}
   - component: {fileID: 76070291}
   m_Layer: 5
-  m_Name: Text (1)
+  m_Name: down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2357,7 +2357,7 @@ GameObject:
   - component: {fileID: 273091976}
   - component: {fileID: 273091975}
   m_Layer: 5
-  m_Name: Text (3)
+  m_Name: right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10061,7 +10061,7 @@ GameObject:
   - component: {fileID: 748338755}
   - component: {fileID: 748338754}
   m_Layer: 5
-  m_Name: Text (2)
+  m_Name: left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11912,7 +11912,7 @@ GameObject:
   - component: {fileID: 916992170}
   - component: {fileID: 916992169}
   m_Layer: 5
-  m_Name: Text
+  m_Name: up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12885,7 +12885,7 @@ GameObject:
   - component: {fileID: 968146991}
   - component: {fileID: 968146990}
   m_Layer: 5
-  m_Name: Text (7)
+  m_Name: roll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14848,7 +14848,7 @@ GameObject:
   - component: {fileID: 1247730088}
   - component: {fileID: 1247730087}
   m_Layer: 5
-  m_Name: Text (8)
+  m_Name: map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15346,7 +15346,20 @@ MonoBehaviour:
   - {fileID: 1528557224}
   - {fileID: 405706838}
   - {fileID: 503906632}
-  keyChangeButtons: []
+  keyChangeButtons:
+  - {fileID: 1218674911}
+  - {fileID: 1335697827}
+  - {fileID: 210847222}
+  - {fileID: 54382143}
+  - {fileID: 857744243}
+  - {fileID: 577917964}
+  - {fileID: 297021690}
+  - {fileID: 654288043}
+  - {fileID: 1739642018}
+  - {fileID: 1680171642}
+  - {fileID: 1548184384}
+  - {fileID: 1372499758}
+  - {fileID: 419015172}
   fullScreenToggle: {fileID: 784057392}
   brightnessScrollbar: {fileID: 840556337}
   vSyncToggle: {fileID: 274898837}
@@ -18113,7 +18126,7 @@ GameObject:
   - component: {fileID: 1574478937}
   - component: {fileID: 1574478936}
   m_Layer: 5
-  m_Name: Text (6)
+  m_Name: inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20127,7 +20140,7 @@ GameObject:
   - component: {fileID: 1891078810}
   - component: {fileID: 1891078809}
   m_Layer: 5
-  m_Name: Text (5)
+  m_Name: Interaction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20249,7 +20262,7 @@ GameObject:
   - component: {fileID: 1916700421}
   - component: {fileID: 1916700420}
   m_Layer: 5
-  m_Name: Text (4)
+  m_Name: shot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
