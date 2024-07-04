@@ -305,11 +305,13 @@ public class UIManager : MonoBehaviour
                 ShowPanel("Game");
                 gameManager.ResumeGame();
                 Time.timeScale = 1f;
+                soundManager.ResumeBGSound();
             }
             else
             {
                 ShowPanel("Main");
                 Time.timeScale = 0f;
+                soundManager.PauseBGSound();
             }
             soundManager.SFXPlay("mus_piano1", 32);
         }
