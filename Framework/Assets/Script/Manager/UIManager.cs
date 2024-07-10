@@ -356,7 +356,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void AdjustValue(int direction)
+     void AdjustValue(int direction)
     {
         switch (currentIndex)
         {
@@ -383,8 +383,24 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // 5
+    public void SetBGVolume()
+    {
+        if (soundManager!= null)
+        {
+            soundManager.BGSoundVolume(bgmScrollbar.value);
+        }
+    }
 
-    void ToggleValue()
+    public void SetSFXVolume()
+    {
+        if (soundManager!= null)
+        {
+             soundManager.SFXSoundVolume(sfxScrollbar.value);
+        }
+    }
+    //
+void ToggleValue()
     {
         switch (currentIndex)
         {
