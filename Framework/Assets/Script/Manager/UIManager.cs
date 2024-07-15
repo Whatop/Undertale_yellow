@@ -102,16 +102,16 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         predefinedResolutions = new List<Resolution>
-        {
-            new Resolution { width = 640, height = 480 },
-            new Resolution { width = 720, height = 480 },
-            new Resolution { width = 800, height = 600 },
-            new Resolution { width = 1024, height = 768 },
-            new Resolution { width = 1280, height = 720 },
-            new Resolution { width = 1440, height = 1080 },
-            new Resolution { width = 1920, height = 1080 },
-            new Resolution { width = 2560, height = 1440 }
-        };
+    {
+        new Resolution { width = 640, height = 480 },
+        new Resolution { width = 720, height = 480 },
+        new Resolution { width = 800, height = 600 },
+        new Resolution { width = 1024, height = 768 },
+        new Resolution { width = 1280, height = 720 },
+        new Resolution { width = 1440, height = 1080 },
+        new Resolution { width = 1920, height = 1080 },
+        new Resolution { width = 2560, height = 1440 }
+    };
 
         int screenWidth = 1920;
         int screenHeight = 1080;
@@ -121,10 +121,22 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < mainButtons.Length; i++)
         {
-            int index = i;  // Local copy for the closure
+            int index = i;  // 클로저를 위한 로컬 복사본
             mainButtons[i].onClick.AddListener(() => OnButtonClick(index));
+            AddEventTriggerListener(mainButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
-
+        for (int i = 0; i < optionButtons.Length; i++)
+        {
+            int index = i;  // 클로저를 위한 로컬 복사본
+            optionButtons[i].onClick.AddListener(() => OnButtonClick(index));
+            AddEventTriggerListener(optionButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
+        }
+        for (int i = 0; i < keyChangeButtons.Length; i++)
+        {
+            int index = i;  // 클로저를 위한 로컬 복사본
+            keyChangeButtons[i].onClick.AddListener(() => OnButtonClick(index));
+            AddEventTriggerListener(keyChangeButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
+        }
         InitHeart();
         InitWeapon();
         ShowPanel("Game");
@@ -282,12 +294,12 @@ public class UIManager : MonoBehaviour
         currentIndex = 0; // 패널 변경 시 인덱스 초기화
         UpdateSelection();
     }
-
     void Navigate(int direction)
     {
-        currentIndex = Mathf.Clamp(currentIndex + direction, 0, currentButtons.Length - 1);
+        currentIndex = (currentIndex + direction + currentButtons.Length) % currentButtons.Length;
         UpdateSelection();
     }
+
     void OptionInput()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -492,7 +504,6 @@ void ToggleValue()
         currentIndex = index;
         UpdateSelection(); 
         soundManager.SFXPlay("snd_piano2", 33);
-
     }
     public void ChangeResolution(int direction)
     {
@@ -504,10 +515,34 @@ void ToggleValue()
         // 현재 해상도 텍스트 업데이트
         UpdateCurrentResolutionText();
     }
+
     void UpdateCurrentResolutionText()
     {
         currentResolutionText.text = Screen.width + " x " + Screen.height;
     }
 
+    //마우스 호버 이벤트 리스너
+    void AddEventTriggerListener(GameObject target, EventTriggerType eventType, System.Action action)
+    {
+        EventTrigger trigger = target.GetComponent<EventTrigger>();
+        if (trigger == null)
+        {
+            trigger = target.AddComponent<EventTrigger>();
+        }
+
+        EventTrigger.Entry entry = new EventTrigger.Entry { eventID = eventType };
+        entry.callback.AddListener((eventData) => action());
+        trigger.triggers.Add(entry);
+    }
+    ///<summary>
+    /// OnClickEvnet와 똑같은 코드지만 , 이친구는 마우스가 위에 올려졌을때 작동됨
+    ///</summary>
+
+    void OnButtonHover(int index) 
+    {
+        currentIndex = index;
+        UpdateSelection();
+        soundManager.SFXPlay("snd_piano2", 33);
+    }
     #endregion
 }
