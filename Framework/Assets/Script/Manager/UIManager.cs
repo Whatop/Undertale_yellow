@@ -30,6 +30,8 @@ public class UIManager : MonoBehaviour
     public GameObject optionPanel;
     public GameObject puasePanel;
     public GameObject keyChangePanel;
+    public GameObject YN_ResetPanel;
+    public GameObject YN_SavePanel;
 
     public Button[] mainButtons;
     public Button[] optionButtons;
@@ -101,6 +103,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        LoadSettings();
         predefinedResolutions = new List<Resolution>
     {
         new Resolution { width = 640, height = 480 },
@@ -143,6 +146,137 @@ public class UIManager : MonoBehaviour
         OptionInput();
     }
 
+    public void OpenYNSave()
+    {
+        YN_SavePanel.SetActive(true);
+    }
+    public void CloseYNSave()
+    {
+        YN_SavePanel.SetActive(false);
+    }
+
+    public void OpenYNReset()
+    {
+        YN_ResetPanel.SetActive(true);
+    }
+    public void CloseYNReset()
+    {
+        YN_ResetPanel.SetActive(false);
+    }
+
+    public void SaveSettings()
+    {
+        // 볼륨 설정 저장
+        PlayerPrefs.SetFloat("BGMVolume", bgmScrollbar.value);
+        PlayerPrefs.SetFloat("SFXVolume", sfxScrollbar.value);
+
+        // 전체화면 설정 저장
+        PlayerPrefs.SetInt("IsFullScreen", isFullScreen ? 1 : 0);
+
+        // VSync 설정 저장
+        PlayerPrefs.SetInt("IsVSyncOn", isVSyncOn ? 1 : 0);
+
+        // 커서 설정 저장
+        PlayerPrefs.SetInt("IsCursorVisible", isCursorVisible ? 1 : 0);
+
+        // 밝기 설정 저장
+        PlayerPrefs.SetFloat("Brightness", brightnessScrollbar.value);
+
+        // 기타 설정 저장
+        PlayerPrefs.SetFloat("CameraShake", cameraShakeScrollbar.value);
+        PlayerPrefs.SetFloat("MiniMapSize", miniMapSizeScrollbar.value);
+
+        // 해상도 인덱스 저장
+        PlayerPrefs.SetInt("ResolutionIndex", curRIndex);
+
+        PlayerPrefs.Save();
+    }
+    public void LoadSettings()
+    {
+        // 볼륨 설정 불러오기
+        if (PlayerPrefs.HasKey("BGMVolume"))
+        {
+            bgmScrollbar.value = PlayerPrefs.GetFloat("BGMVolume");
+        }
+
+        if (PlayerPrefs.HasKey("SFXVolume"))
+        {
+            sfxScrollbar.value = PlayerPrefs.GetFloat("SFXVolume");
+        }
+
+        // 전체화면 설정 불러오기
+        if (PlayerPrefs.HasKey("IsFullScreen"))
+        {
+            isFullScreen = PlayerPrefs.GetInt("IsFullScreen") == 1;
+            Screen.fullScreen = isFullScreen;
+            fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
+        }
+
+        // VSync 설정 불러오기
+        if (PlayerPrefs.HasKey("IsVSyncOn"))
+        {
+            isVSyncOn = PlayerPrefs.GetInt("IsVSyncOn") == 1;
+            QualitySettings.vSyncCount = isVSyncOn ? 1 : 0;
+            vSyncToggle.image.sprite = isVSyncOn ? onSprite : offSprite;
+        }
+
+        // 커서 설정 불러오기
+        if (PlayerPrefs.HasKey("IsCursorVisible"))
+        {
+            isCursorVisible = PlayerPrefs.GetInt("IsCursorVisible") == 1;
+            Cursor.visible = isCursorVisible;
+            cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
+        }
+
+        // 밝기 설정 불러오기
+        if (PlayerPrefs.HasKey("Brightness"))
+        {
+            brightnessScrollbar.value = PlayerPrefs.GetFloat("Brightness");
+            // 여기서 밝기 조정 코드를 추가하세요
+        }
+
+        // 기타 설정 불러오기
+        if (PlayerPrefs.HasKey("CameraShake"))
+        {
+            cameraShakeScrollbar.value = PlayerPrefs.GetFloat("CameraShake");
+        }
+
+        if (PlayerPrefs.HasKey("MiniMapSize"))
+        {
+            miniMapSizeScrollbar.value = PlayerPrefs.GetFloat("MiniMapSize");
+        }
+
+        // 해상도 인덱스 불러오기
+        if (PlayerPrefs.HasKey("ResolutionIndex"))
+        {
+            curRIndex = PlayerPrefs.GetInt("ResolutionIndex");
+            // 해상도 설정 변경 코드 추가
+        }
+    }
+    public void ResetSettings()
+    {
+        // 기본값 설정
+        bgmScrollbar.value = 1.0f; // 기본 볼륨 값
+        sfxScrollbar.value = 1.0f; // 기본 볼륨 값
+        isFullScreen = true;
+        isVSyncOn = true;
+        isCursorVisible = true;
+        brightnessScrollbar.value = 1.0f; // 기본 밝기 값
+        cameraShakeScrollbar.value = 1.0f; // 기본 카메라 흔들림 값
+        miniMapSizeScrollbar.value = 1.0f; // 기본 미니맵 크기 값
+        curRIndex = 0; // 기본 해상도 인덱스
+
+        // UI 업데이트
+        Screen.fullScreen = isFullScreen;
+        fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
+        QualitySettings.vSyncCount = isVSyncOn ? 1 : 0;
+        vSyncToggle.image.sprite = isVSyncOn ? onSprite : offSprite;
+        Cursor.visible = isCursorVisible;
+        cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
+
+        // 저장
+        SaveSettings();
+    }
     public void exitGame()
     {
         Debug.Log("Game is exiting...");
