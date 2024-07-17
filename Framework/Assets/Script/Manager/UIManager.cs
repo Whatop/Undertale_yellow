@@ -64,6 +64,11 @@ public class UIManager : MonoBehaviour
     public GameObject[] Interface;
     public bool isUserInterface = false;
 
+    private KeyCode[] keyBindings = new KeyCode[9]; // 9개의 키 설정을 위한 배열
+    private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
+    private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
+
+
     public TextMeshProUGUI currentResolutionText;
     private string currentPanel = "Default"; // 현재 패널을 추적
 
@@ -256,14 +261,14 @@ public class UIManager : MonoBehaviour
     public void ResetSettings()
     {
         // 기본값 설정
-        bgmScrollbar.value = 1.0f; // 기본 볼륨 값
-        sfxScrollbar.value = 1.0f; // 기본 볼륨 값
+        bgmScrollbar.value = 0.5f; // 기본 볼륨 값
+        sfxScrollbar.value = 0.5f;  // 기본 볼륨 값
         isFullScreen = true;
         isVSyncOn = true;
         isCursorVisible = true;
-        brightnessScrollbar.value = 1.0f; // 기본 밝기 값
-        cameraShakeScrollbar.value = 1.0f; // 기본 카메라 흔들림 값
-        miniMapSizeScrollbar.value = 1.0f; // 기본 미니맵 크기 값
+        brightnessScrollbar.value = 0.5f; // 기본 밝기 값
+        cameraShakeScrollbar.value = 0.5f;  // 기본 카메라 흔들림 값
+        miniMapSizeScrollbar.value = 0.5f;  // 기본 미니맵 크기 값
         curRIndex = 0; // 기본 해상도 인덱스
 
         // UI 업데이트
@@ -676,7 +681,6 @@ void ToggleValue()
     {
         currentIndex = index;
         UpdateSelection();
-        soundManager.SFXPlay("snd_piano2", 33);
     }
     #endregion
 }
