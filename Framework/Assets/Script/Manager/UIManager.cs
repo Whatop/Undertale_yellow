@@ -31,11 +31,11 @@ public class UIManager : MonoBehaviour
     public GameObject puasePanel;
     public GameObject keyChangePanel;
     public GameObject YN_ResetPanel;
-    public GameObject YN_SavePanel;
 
     public Button[] mainButtons;
     public Button[] optionButtons;
     public Button[] keyChangeButtons;
+    public Button[] YNButtons;
 
     private Button[] currentButtons;
     public Button fullScreenToggle;
@@ -70,7 +70,10 @@ public class UIManager : MonoBehaviour
 
 
     public TextMeshProUGUI currentResolutionText;
+
+    [SerializeField]
     private string currentPanel = "Default"; // 현재 패널을 추적
+    private string prevPanel = "Default"; // 이전 패널을 추적
 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
@@ -145,24 +148,23 @@ public class UIManager : MonoBehaviour
             keyChangeButtons[i].onClick.AddListener(() => OnButtonClick(index));
             AddEventTriggerListener(keyChangeButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
+        for (int i = 0; i < YNButtons.Length; i++)
+        {
+            int index = i;  // 클로저를 위한 로컬 복사본
+            YNButtons[i].onClick.AddListener(() => OnButtonClick(index));
+            AddEventTriggerListener(YNButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
+        }
         InitHeart();
         InitWeapon();
         ShowPanel("Game");
         OptionInput();
     }
 
-    public void OpenYNSave()
-    {
-        YN_SavePanel.SetActive(true);
-    }
-    public void CloseYNSave()
-    {
-        YN_SavePanel.SetActive(false);
-    }
-
     public void OpenYNReset()
     {
         YN_ResetPanel.SetActive(true);
+        ShowPanel("YNCheck");
+
     }
     public void CloseYNReset()
     {
@@ -298,6 +300,10 @@ public class UIManager : MonoBehaviour
             gameManager.ResumeGame();
         }
 
+        if(currentIndex > currentButtons.Length)
+        {
+            OnButtonHover(0 );
+        }
         UpdateUI();
         OptionInput();
     }
@@ -412,6 +418,7 @@ public class UIManager : MonoBehaviour
                 puasePanel.SetActive(false);
                 optionPanel.SetActive(true);
                 keyChangePanel.SetActive(false);
+                prevPanel = currentPanel;
                 break;
             case "KeyChange":
                 currentPanel = "KeyChange";
@@ -420,6 +427,14 @@ public class UIManager : MonoBehaviour
                 puasePanel.SetActive(false);
                 optionPanel.SetActive(false);
                 keyChangePanel.SetActive(true);
+                prevPanel = currentPanel;
+                break;
+            case "YNCheck":
+                currentPanel = "YNCheck";
+                currentButtons = YNButtons; 
+                break;
+            case "Return":
+                ShowPanel(prevPanel);
                 break;
             default:
                 currentPanel = "Game";
@@ -446,10 +461,14 @@ public class UIManager : MonoBehaviour
             if (currentPanel == "KeyChange")
             {
                 ShowPanel("Option");
+                CloseYNReset();
+                SaveSettings();
             }
             else if (currentPanel == "Option")
             {
                 ShowPanel("Main");
+                CloseYNReset();
+                SaveSettings();
             }
             else if (currentPanel == "Main")
             {
@@ -457,6 +476,12 @@ public class UIManager : MonoBehaviour
                 gameManager.ResumeGame();
                 Time.timeScale = 1f;
                 soundManager.ResumeBGSound();
+                CloseYNReset();
+            }
+            else if (currentPanel == "YNCheck")
+            {
+                CloseYNReset();
+                ShowPanel("Return");
             }
             else
             {
@@ -495,12 +520,13 @@ public class UIManager : MonoBehaviour
                 {
                     if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
                     {
+                        if(currentPanel == "Option")
                         ToggleValue();  // ToggleValue 호출
                     }
                     else
                     {
                         currentButtons[currentIndex].onClick.Invoke();
-                    soundManager.SFXPlay("snd_piano6", 37);
+                        soundManager.SFXPlay("snd_piano6", 37);
                     }
                 }
             }

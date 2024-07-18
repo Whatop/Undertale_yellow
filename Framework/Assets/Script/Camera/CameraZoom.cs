@@ -11,7 +11,7 @@ public class CameraZoom : MonoBehaviour
         float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
 
         // 마우스 휠 입력이 감지되면
-        if (scrollWheelInput != 0)
+        if (scrollWheelInput != 0 && !UIManager.Instance.isUserInterface)
         {
             // 카메라 확대/축소를 위한 새로운 카메라 크기 계산
             float newCameraSize = Camera.main.orthographicSize - scrollWheelInput * zoomSpeed;
