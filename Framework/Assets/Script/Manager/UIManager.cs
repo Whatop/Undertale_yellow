@@ -31,12 +31,16 @@ public class UIManager : MonoBehaviour
     public GameObject puasePanel;
     public GameObject keyChangePanel;
     public GameObject YN_ResetPanel;
+    public GameObject KeyCheckPanel;
 
     public Button[] mainButtons;
     public Button[] optionButtons;
     public Button[] keyChangeButtons;
     public Button[] YNButtons;
 
+    public Button[] keyChangefunctions;
+
+    [SerializeField]
     private Button[] currentButtons;
     public Button fullScreenToggle;
     public Scrollbar brightnessScrollbar;
@@ -64,6 +68,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] Interface;
     public bool isUserInterface = false;
 
+    
     private KeyCode[] keyBindings = new KeyCode[9]; // 9개의 키 설정을 위한 배열
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
@@ -159,6 +164,196 @@ public class UIManager : MonoBehaviour
         ShowPanel("Game");
         OptionInput();
     }
+
+    private void Update()
+    {
+        if (isUserInterface)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            gameManager.ResumeGame();
+        }
+
+        if(currentIndex > currentButtons.Length)
+        {
+            OnButtonHover(0);
+        }
+        if (isWaitingForKey)
+        {
+            DetectKeyInput();
+        }
+        UpdateUI();
+        OptionInput();
+    }
+    public void LoadIntro()
+    {
+        SceneManager.LoadScene("IntroScene");
+    }
+    #region KeyBoardUi
+    private void DetectKeyInput()
+    {
+        foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(keyCode))
+            {
+                if (keyCode == KeyCode.Escape)
+                {
+                    // ESC를 눌렀을 때 입력 취소
+                    isWaitingForKey = false;
+                    Debug.Log("Key binding cancelled.");
+                }
+                else
+                {
+                    // 다른 키를 눌렀을 때 해당 키로 저장
+                    keyBindings[currentKeyIndex] = keyCode;
+                    isWaitingForKey = false;
+                    SaveKeyBindings();
+                    Debug.Log("Key binding set to: " + keyCode);
+                }
+                    CloseKeyCheck();
+                UpdateKeyBindingUI();
+                break;
+            }
+        }
+    }
+    public void StartKeyBinding(int index)
+    {
+        currentKeyIndex = index;
+        isWaitingForKey = true;
+        Debug.Log("Press any key to bind to action " + index);
+    }
+
+    private void SaveKeyBindings()
+    {
+        for (int i = 0; i < keyBindings.Length; i++)
+        {
+            PlayerPrefs.SetString("KeyBinding" + i, keyBindings[i].ToString());
+        }
+        PlayerPrefs.Save();
+    }
+
+    private void LoadKeyBindings()
+    {
+        for (int i = 0; i < keyBindings.Length; i++)
+        {
+            string keyString = PlayerPrefs.GetString("KeyBinding" + i, KeyCode.None.ToString());
+            keyBindings[i] = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+        UpdateKeyBindingUI();
+    }
+
+    private void UpdateKeyBindingUI()
+    {
+        for (int i = 0; i < keyChangefunctions.Length; i++)
+        {
+            TextMeshProUGUI buttonText = keyChangefunctions[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.text = keyBindings[i].ToString();
+            }
+        }
+    }
+
+    public void OpenKeyCheck()
+    {
+        KeyCheckPanel.SetActive(true);
+    }
+    public void CloseKeyCheck()
+    {
+        KeyCheckPanel.SetActive(false);
+    }
+
+    #endregion
+
+    #region playerUi
+
+    void InitHeart() // 체력 새팅
+    {
+        PlayerData player = gameManager.GetPlayerData();
+
+        int heart_count = player.Maxhealth / 2;
+        ui_healths = new GameObject[heart_count];
+
+        for (int i = 0; i < heart_count; i++)
+        {
+            GameObject heartPrefab = Resources.Load<GameObject>("Prefabs/Heart");
+            GameObject instance = Instantiate(heartPrefab, ui_positions[0].transform);
+
+            float sizeX = instance.GetComponent<RectTransform>().sizeDelta.x;
+
+            Vector3 newPosition = instance.transform.position;
+            newPosition.x = ui_positions[0].transform.position.x + i * sizeX; // 가로 방향으로 위치 설정
+            instance.transform.position = newPosition;
+            ui_healths[i] = instance;
+        }
+    }
+
+    void InitWeapon() // 총 새팅
+    {
+        Weapon weapon = gameManager.GetWeaponData();
+
+        int ammo_count = weapon.magazine;
+        ui_ammo = new GameObject[ammo_count];
+
+        for (int i = 0; i < ammo_count; i++)
+        {
+            GameObject weaponPrefab = Resources.Load<GameObject>("Prefabs/Ammo");
+            GameObject instance = Instantiate(weaponPrefab, ui_positions[1].transform);
+
+            float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
+            Vector3 newPosition = instance.transform.position;
+            newPosition.y = ui_positions[1].transform.position.y + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
+            instance.transform.position = newPosition;
+            ui_ammo[i] = instance;
+        }
+    }
+
+    public void ShowDamageText(Vector3 worldPosition, int damageAmount)
+    { // 월드 좌표를 스크린 좌표로 변환
+        Vector2 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
+
+        // 스크린 좌표를 Canvas 안에서 사용 가능한 위치로 변환
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(uicanvas.transform as RectTransform, screenPosition, uicanvas.worldCamera, out Vector2 canvasPosition);
+
+        // 텍스트 생성
+        TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
+        damageText.rectTransform.localPosition = canvasPosition;
+        damageText.text = damageAmount.ToString();
+        damageText.GetComponent<DamageText>().Initialize(damageAmount);
+    }
+
+    public void UpdateUI()
+    {
+        PlayerData player = gameManager.GetPlayerData();
+        int currentHealth = player.health;
+
+        // 체력 이미지 업데이트
+        for (int i = 0; i < ui_healths.Length; i++)
+        {
+            int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2); // 체력에 따른 스프라이트 인덱스 계산
+            ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
+        }
+
+        Weapon weapon = gameManager.GetWeaponData();
+        int current_magazine = weapon.current_magazine;
+
+        // 총알 이미지 업데이트
+        for (int i = 0; i < ui_ammo.Length; i++)
+        {
+            int spriteIndex = (i < current_magazine) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
+
+            // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
+            ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
+        }
+
+        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
+    }
+
+    #endregion
+
+    #region optionUI
 
     public void OpenYNReset()
     {
@@ -262,6 +457,7 @@ public class UIManager : MonoBehaviour
     }
     public void ResetSettings()
     {
+        PlayerPrefs.DeleteAll();
         // 기본값 설정
         bgmScrollbar.value = 0.5f; // 기본 볼륨 값
         sfxScrollbar.value = 0.5f;  // 기본 볼륨 값
@@ -289,116 +485,6 @@ public class UIManager : MonoBehaviour
         Debug.Log("Game is exiting...");
         Application.Quit();
     }
-    private void Update()
-    {
-        if (isUserInterface)
-        {
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            gameManager.ResumeGame();
-        }
-
-        if(currentIndex > currentButtons.Length)
-        {
-            OnButtonHover(0 );
-        }
-        UpdateUI();
-        OptionInput();
-    }
-    public void LoadIntro()
-    {
-        SceneManager.LoadScene("IntroScene");
-    }
-    #region playerUi
-
-    void InitHeart() // 체력 새팅
-    {
-        PlayerData player = gameManager.GetPlayerData();
-
-        int heart_count = player.Maxhealth / 2;
-        ui_healths = new GameObject[heart_count];
-
-        for (int i = 0; i < heart_count; i++)
-        {
-            GameObject heartPrefab = Resources.Load<GameObject>("Prefabs/Heart");
-            GameObject instance = Instantiate(heartPrefab, ui_positions[0].transform);
-
-            float sizeX = instance.GetComponent<RectTransform>().sizeDelta.x;
-
-            Vector3 newPosition = instance.transform.position;
-            newPosition.x = ui_positions[0].transform.position.x + i * sizeX; // 가로 방향으로 위치 설정
-            instance.transform.position = newPosition;
-            ui_healths[i] = instance;
-        }
-    }
-
-    void InitWeapon() // 총 새팅
-    {
-        Weapon weapon = gameManager.GetWeaponData();
-
-        int ammo_count = weapon.magazine;
-        ui_ammo = new GameObject[ammo_count];
-
-        for (int i = 0; i < ammo_count; i++)
-        {
-            GameObject weaponPrefab = Resources.Load<GameObject>("Prefabs/Ammo");
-            GameObject instance = Instantiate(weaponPrefab, ui_positions[1].transform);
-
-            float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
-            Vector3 newPosition = instance.transform.position;
-            newPosition.y = ui_positions[1].transform.position.y + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
-            instance.transform.position = newPosition;
-            ui_ammo[i] = instance;
-        }
-    }
-
-    public void ShowDamageText(Vector3 worldPosition, int damageAmount)
-    { // 월드 좌표를 스크린 좌표로 변환
-        Vector2 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-
-        // 스크린 좌표를 Canvas 안에서 사용 가능한 위치로 변환
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(uicanvas.transform as RectTransform, screenPosition, uicanvas.worldCamera, out Vector2 canvasPosition);
-
-        // 텍스트 생성
-        TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
-        damageText.rectTransform.localPosition = canvasPosition;
-        damageText.text = damageAmount.ToString();
-        damageText.GetComponent<DamageText>().Initialize(damageAmount);
-    }
-
-    public void UpdateUI()
-    {
-        PlayerData player = gameManager.GetPlayerData();
-        int currentHealth = player.health;
-
-        // 체력 이미지 업데이트
-        for (int i = 0; i < ui_healths.Length; i++)
-        {
-            int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2); // 체력에 따른 스프라이트 인덱스 계산
-            ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
-        }
-
-        Weapon weapon = gameManager.GetWeaponData();
-        int current_magazine = weapon.current_magazine;
-
-        // 총알 이미지 업데이트
-        for (int i = 0; i < ui_ammo.Length; i++)
-        {
-            int spriteIndex = (i < current_magazine) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
-
-            // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
-            ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
-        }
-
-        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
-    }
-
-    #endregion
-
-    #region optionUI
-
     public void ShowPanel(string panelName)
     {
         switch (panelName)
@@ -518,10 +604,15 @@ public class UIManager : MonoBehaviour
             {
                 if (currentButtons != null && currentButtons.Length > 0)
                 {
-                    if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
+                    if (currentPanel == "Option")
                     {
-                        if(currentPanel == "Option")
-                        ToggleValue();  // ToggleValue 호출
+                        if(currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
+                            ToggleValue();  // ToggleValue 호출
+                        else
+                        {
+                            currentButtons[currentIndex].onClick.Invoke();
+                            soundManager.SFXPlay("snd_piano6", 37);
+                        }
                     }
                     else
                     {
