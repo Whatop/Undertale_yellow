@@ -10,6 +10,7 @@ public class PortalManager : MonoBehaviour
     [SerializeField]
     private int currentPortalPointIndex = 0;
     private GameObject Player;
+    private PlayerMovement playerMovement;
     public GameObject defaultPoint;
 
     public Image fadeImage;
@@ -31,10 +32,11 @@ public class PortalManager : MonoBehaviour
     private void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
+        playerMovement = Player.GetComponent<PlayerMovement>();
 
         if (portalPoints.Length == 0)
         {
-            Debug.LogError("Portal points are not assigned. Please assign portal points in the inspector.");
+            Debug.LogError("포탈 지점이 설정되지 않았습니다. 인스펙터에서 포탈 지점을 설정해주세요.");
         }
     }
 
@@ -60,8 +62,12 @@ public class PortalManager : MonoBehaviour
     {
         isFading = true;
 
+        // 시간 정지 및 플레이어 애니메이터 비활성화
+        Time.timeScale = 0f;
+        playerMovement.SetAnimatorEnabled(false);
+
         // 페이드 아웃
-        yield return Fade(1f);
+        yield return StartCoroutine(Fade(1f));
 
         // 플레이어 이동
         if (point >= 0 && point < portalPoints.Length)
@@ -72,11 +78,15 @@ public class PortalManager : MonoBehaviour
         {
             Player.transform.position = defaultPoint.transform.position;
             currentPortalPointIndex = 0;
-            Debug.Log("Invalid teleport point. Moving to default point.");
+            Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
 
         // 페이드 인
-        yield return Fade(0f);
+        yield return StartCoroutine(Fade(0f));
+
+        // 시간 재개 및 플레이어 애니메이터 활성화
+        Time.timeScale = 1f;
+        playerMovement.SetAnimatorEnabled(true);
 
         GameManager.Instance.ChangeGameState(GameState.None);
         isFading = false;
@@ -93,7 +103,7 @@ public class PortalManager : MonoBehaviour
             color.a = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
             fadeImage.color = color;
 
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime; // 시간 정지 상태에서 페이드가 올바르게 진행되도록 unscaledDeltaTime 사용
             yield return null;
         }
 

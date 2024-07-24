@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class PlayerMovement : LivingObject
 {
     public float h;
@@ -13,7 +12,7 @@ public class PlayerMovement : LivingObject
     bool isMove = false;
     public float cooldownTime = 0.5f;
     private bool isCooldown = false;
-    
+
     public GameObject Hands;
     public GameObject Weapons;
     public ObjectState objectState;
@@ -34,7 +33,8 @@ public class PlayerMovement : LivingObject
 
         weaponData = new Weapon();
     }
-     void Start()
+
+    void Start()
     {
         playerData = gameManager.GetPlayerData();
         maxHealth = playerData.health; // 최대 체력 설정
@@ -46,7 +46,6 @@ public class PlayerMovement : LivingObject
 
     protected override void Update()
     {
-        
         base.Update();
 
         if (!UIManager.Instance.isUserInterface)
@@ -83,7 +82,7 @@ public class PlayerMovement : LivingObject
                 }
             }
 
-            if (objectState != ObjectState.Roll)//구르기는 각도처리를 따로해서
+            if (objectState != ObjectState.Roll) // 구르기는 각도처리를 따로해서
             {
                 animator.SetBool("IsUp", false);
                 animator.SetBool("IsSide", false);
@@ -130,7 +129,6 @@ public class PlayerMovement : LivingObject
                     SetObjectState(ObjectState.Angle);
                 }
 
-
             }
             else
             {
@@ -138,6 +136,12 @@ public class PlayerMovement : LivingObject
             }
         }
     }
+
+    public void SetAnimatorEnabled(bool isEnabled)
+    {
+        animator.enabled = isEnabled;
+    }
+
     void ShootInput()
     {
         weaponData = gameManager.GetWeaponData();
@@ -164,18 +168,18 @@ public class PlayerMovement : LivingObject
             gameManager.SaveWeaponData(weaponData);
         }
     }
+
     void Shoot()
     {
         // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.
         GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
 
-
         // 총알에 속도를 적용하여 발사합니다.
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         bulletRb.velocity = WeaponTransform.up * bulletSpeed;
         SoundManager.Instance.SFXPlay("mus_piano1", 32); // 총 사운드 변경
-         
     }
+
     IEnumerator Roll()
     {
         objectState = ObjectState.Roll;
@@ -198,11 +202,11 @@ public class PlayerMovement : LivingObject
         {
             if (vir < 0) // 왼쪽 이동
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
             }
             else // 오른쪽 이동
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
             }
             animator.SetBool("IsSide", true);
         }
@@ -215,41 +219,41 @@ public class PlayerMovement : LivingObject
         {
             if (hir > 0 && vir < 0) // 왼쪽 위 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
                 animator.SetBool("IsAngle", true);
             }
             else if (hir > 0 && vir > 0) // 오른쪽 위 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
                 animator.SetBool("IsAngle", true);
             }
             else if (hir < 0 && vir < 0) // 왼쪽 아래 대각선
             {
                 animator.SetBool("IsSide", true);
-                currentScale.x = Mathf.Abs(currentScale.x) * -1;// 스케일 반대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
             }
             else if (hir < 0 && vir > 0) // 오른쪽 아래 대각선
             {
                 animator.SetBool("IsSide", true);
-                currentScale.x = Mathf.Abs(currentScale.x) * 1;//  스케일 그대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
             }
-
-            //왼쪽 대각선 아래면 스케일반대로, 오른쪽 아래 대각선이면 그대로 
         }
         transform.localScale = currentScale;
         animator.SetTrigger("IsRoll");
         SoundManager.Instance.SFXPlay("mus_piano1", 32); // 구르기 사운드 변경
         yield return null;
     }
+
     void FixedUpdate()
     {
         if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface)
             Move();
-        else if(objectState == ObjectState.Roll && !UIManager.Instance.isUserInterface)
-        
-                    rigid.velocity = new Vector2(h, v) * speed * 1.5f;
-
+        else if (objectState == ObjectState.Roll && !UIManager.Instance.isUserInterface)
+            rigid.velocity = new Vector2(h, v) * speed * 1.75f;
+        else
+            rigid.velocity = Vector2.zero;
     }
+
     void Move()
     {
         h = Input.GetAxisRaw("Horizontal");
@@ -259,7 +263,6 @@ public class PlayerMovement : LivingObject
         {
             isMove = true;
             animator.SetInteger("h", (int)h);
-
         }
         else if (v != animator.GetInteger("v"))
         {
@@ -291,37 +294,35 @@ public class PlayerMovement : LivingObject
         playerData.position = transform.position;
         playerData.health = health;
     }
+
     void StartCooldown()
     {
         // 쿨타임 시작
         isCooldown = true;
     }
+
     void SetObjectState(ObjectState newState)
     {
-
         // 각 상태에 따른 초기화 등의 로직을 추가할 수 있습니다.
         switch (newState)
         {
             case ObjectState.Angle:
-                // Walk 상태에 대한 초기화 로직
                 animator.SetBool("IsAngle", true);
                 break;
             case ObjectState.Down:
-                // Idle 상태에 대한 초기화 로직
                 animator.SetBool("IsDown", true);
                 break;
             case ObjectState.Side:
-                // Roll 상태에 대한 초기화 로직
                 animator.SetBool("IsSide", true);
                 break;
             case ObjectState.Up:
-                // None 상태에 대한 초기화 로직
                 animator.SetBool("IsUp", true);
                 break;
             default:
                 break;
         }
     }
+
     float CalculateMouseAngle()
     {
         Vector3 mousePosition = Input.mousePosition;
@@ -329,12 +330,11 @@ public class PlayerMovement : LivingObject
         Vector3 targetPosition = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 direction = targetPosition - transform.position;
 
-
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
+
     void UpdateAnimation(Vector2 moveInput)
     {
-        // moveInput에 따라 애니메이션을 변경합니다.
         if (moveInput.magnitude > 0)
         {
             animator.SetFloat("Horizontal", moveInput.x);

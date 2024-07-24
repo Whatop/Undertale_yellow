@@ -68,7 +68,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] Interface;
     public bool isUserInterface = false;
 
-    
+
     private KeyCode[] keyBindings = new KeyCode[9]; // 9개의 키 설정을 위한 배열
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
@@ -128,7 +128,15 @@ public class UIManager : MonoBehaviour
         new Resolution { width = 1920, height = 1080 },
         new Resolution { width = 2560, height = 1440 }
     };
-
+        keyBindings[0] = KeyCode.W;
+        keyBindings[1] = KeyCode.S;
+        keyBindings[2] = KeyCode.A;
+        keyBindings[3] = KeyCode.D;
+        keyBindings[4] = KeyCode.Mouse0;
+        keyBindings[5] = KeyCode.Mouse1;
+        keyBindings[6] = KeyCode.F;
+        keyBindings[7] = KeyCode.E;
+        keyBindings[8] = KeyCode.Tab;
         int screenWidth = 1920;
         int screenHeight = 1080;
         float screenRatio = (float)screenWidth / screenHeight;
@@ -176,7 +184,7 @@ public class UIManager : MonoBehaviour
             gameManager.ResumeGame();
         }
 
-        if(currentIndex > currentButtons.Length)
+        if (currentIndex > currentButtons.Length)
         {
             OnButtonHover(0);
         }
@@ -207,12 +215,22 @@ public class UIManager : MonoBehaviour
                 else
                 {
                     // 다른 키를 눌렀을 때 해당 키로 저장
+                    // 동일한 키가 있는지 확인
+                    for (int i = 0; i < keyBindings.Length; i++)
+                    {
+                        if (keyBindings[i] == keyCode)
+                        {
+                            keyBindings[i] = KeyCode.None; // 기존 키를 None으로 설정
+                            break;
+                        }
+                    }
+
                     keyBindings[currentKeyIndex] = keyCode;
                     isWaitingForKey = false;
                     SaveKeyBindings();
                     Debug.Log("Key binding set to: " + keyCode);
                 }
-                    CloseKeyCheck();
+                CloseKeyCheck();
                 UpdateKeyBindingUI();
                 break;
             }
@@ -251,7 +269,12 @@ public class UIManager : MonoBehaviour
             TextMeshProUGUI buttonText = keyChangefunctions[i].GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.text = keyBindings[i].ToString();
+                if (keyBindings[i].ToString() == "Mouse0")
+                    buttonText.text = "Left Mouse Button";
+                else if (keyBindings[i].ToString() == "Mouse1")
+                    buttonText.text = "Right Mouse Button";
+                else
+                    buttonText.text = keyBindings[i].ToString();
             }
         }
     }
@@ -469,6 +492,15 @@ public class UIManager : MonoBehaviour
         miniMapSizeScrollbar.value = 0.5f;  // 기본 미니맵 크기 값
         curRIndex = 0; // 기본 해상도 인덱스
 
+        keyBindings[0] = KeyCode.W;
+        keyBindings[1] = KeyCode.S;
+        keyBindings[2] = KeyCode.A;
+        keyBindings[3] = KeyCode.D;
+        keyBindings[4] = KeyCode.Mouse0;
+        keyBindings[5] = KeyCode.Mouse1;
+        keyBindings[6] = KeyCode.F;
+        keyBindings[7] = KeyCode.E;
+        keyBindings[8] = KeyCode.Tab;
         // UI 업데이트
         Screen.fullScreen = isFullScreen;
         fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
@@ -517,7 +549,7 @@ public class UIManager : MonoBehaviour
                 break;
             case "YNCheck":
                 currentPanel = "YNCheck";
-                currentButtons = YNButtons; 
+                currentButtons = YNButtons;
                 break;
             case "Return":
                 ShowPanel(prevPanel);
@@ -606,7 +638,7 @@ public class UIManager : MonoBehaviour
                 {
                     if (currentPanel == "Option")
                     {
-                        if(currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
+                        if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
                             ToggleValue();  // ToggleValue 호출
                         else
                         {
@@ -624,7 +656,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-     void AdjustValue(int direction)
+    void AdjustValue(int direction)
     {
         switch (currentIndex)
         {
@@ -654,7 +686,7 @@ public class UIManager : MonoBehaviour
     // 5
     public void SetBGVolume()
     {
-        if (soundManager!= null)
+        if (soundManager != null)
         {
             soundManager.BGSoundVolume(bgmScrollbar.value);
         }
@@ -662,13 +694,13 @@ public class UIManager : MonoBehaviour
 
     public void SetSFXVolume()
     {
-        if (soundManager!= null)
+        if (soundManager != null)
         {
-             soundManager.SFXSoundVolume(sfxScrollbar.value);
+            soundManager.SFXSoundVolume(sfxScrollbar.value);
         }
     }
     //
-void ToggleValue()
+    void ToggleValue()
     {
         switch (currentIndex)
         {
@@ -758,7 +790,7 @@ void ToggleValue()
     public void OnButtonClick(int index)
     {
         currentIndex = index;
-        UpdateSelection(); 
+        UpdateSelection();
         soundManager.SFXPlay("snd_piano2", 33);
     }
     public void ChangeResolution(int direction)
@@ -794,7 +826,7 @@ void ToggleValue()
     /// OnClickEvnet와 똑같은 코드지만 , 이친구는 마우스가 위에 올려졌을때 작동됨
     ///</summary>
 
-    void OnButtonHover(int index) 
+    void OnButtonHover(int index)
     {
         currentIndex = index;
         UpdateSelection();

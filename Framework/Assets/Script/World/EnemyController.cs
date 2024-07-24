@@ -62,7 +62,6 @@ public class EnemyController : LivingObject
                 Shoot();
                 weaponData.current_magazine -= 1;
                 weaponData.current_Ammo -= 1;
-                gameManager.SaveWeaponData(weaponData);
                 curTime = 0;
                 SoundManager.Instance.SFXPlay("mus_piano7", 38); // 총 사운드 변경
 
@@ -73,7 +72,6 @@ public class EnemyController : LivingObject
                 weaponData.current_magazine < weaponData.magazine)
             {
                 weaponData.current_magazine = weaponData.magazine;
-                gameManager.SaveWeaponData(weaponData);
             }
         }
         else
@@ -100,9 +98,7 @@ public class EnemyController : LivingObject
 
     void Shoot()
     {
-        weaponData = gameManager.GetWeaponData();
         weaponData.current_magazine = weaponData.magazine;
-        gameManager.SaveWeaponData(weaponData);
 
         // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.
         GameObject bullet = Instantiate(bulletPrefab, WeaponTransform.position, WeaponTransform.rotation);
