@@ -16646,7 +16646,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5.534439, y: -1.4623082}
+  m_AnchoredPosition: {x: 1.96, y: -1.52}
   m_SizeDelta: {x: 0.2, y: 0.31}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1239929341
@@ -20462,7 +20462,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -20504,9 +20504,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09ba41c49392686419c2c5628e8ffa0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoth: 5
+  smooth: 8
   player: {fileID: 1239929335}
   isCameraMove: 1
+  defaultCameraSize: 6
+  battleCameraSize: 10
 --- !u!114 &1575677072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20514,7 +20516,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575677067}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce996980b292dcd43bd2a6057f38d9bf, type: 3}
   m_Name: 

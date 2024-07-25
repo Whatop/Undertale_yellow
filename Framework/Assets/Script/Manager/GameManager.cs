@@ -7,7 +7,13 @@ public enum GameState
     NpcTalk,
     None
 }
-
+public enum CameraType
+{
+    Hor,
+    Ver,
+    All,
+    None
+}
 [System.Serializable]
 public class PlayerData
 {
@@ -37,6 +43,12 @@ public class GameManager : MonoBehaviour
 
     private PlayerData playerData;
     private Weapon weaponData;
+
+    /// <summary>
+    /// 전투 확인용
+    /// </summary>
+    public bool isBattle;
+    public CameraType cameraType; // 카메라의 고정 시점 
 
     public static GameManager Instance
     {
@@ -114,7 +126,25 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-
+    public void ChangeCameraState(CameraType newState)
+    {
+        cameraType = newState;
+        // 상태에 따른 추가적인 동작 수행
+        switch (newState)
+        {
+            case CameraType.Hor:
+                // Fight 상태에 따른 동작 수행
+                break;
+            case CameraType.Ver:
+                // Event 상태에 따른 동작 수행
+                break;
+            case CameraType.All:
+                // NpcTalk 상태에 따른 동작 수행
+                break;
+            default:
+                break;
+        }
+    }
     public void ResumeGame()
     {
         Time.timeScale = 1f;
