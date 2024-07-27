@@ -12,6 +12,7 @@ public class CameraController : MonoBehaviour
 
     public float defaultCameraSize = 6;
     public float battleCameraSize = 10;
+    GameObject[] datum_point;
 
     Vector3 target;
 
@@ -49,10 +50,10 @@ public class CameraController : MonoBehaviour
         switch (gameManager.cameraType)
         {
             case CameraType.Hor:
-                target = new Vector3(playerPos.x, transform.localPosition.y, -10);
+                target = new Vector3(playerPos.x, datum_point[gameManager.curportalNumber].transform.localPosition.y, -10);
                 break;
             case CameraType.Ver:
-                target = new Vector3(transform.localPosition.x, playerPos.y, -10);
+                target = new Vector3(datum_point[gameManager.curportalNumber].transform.localPosition.x, playerPos.y, -10);
                 break;
             case CameraType.All:
                 target = new Vector3(playerPos.x, playerPos.y, -10);

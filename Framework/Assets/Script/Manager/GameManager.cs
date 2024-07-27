@@ -24,6 +24,7 @@ public class PlayerData
     public string[] inventory;
     public GameState currentState; // 플레이어의 현재 게임 상태 추가
 
+
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
@@ -49,6 +50,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public bool isBattle;
     public CameraType cameraType; // 카메라의 고정 시점 
+    public int curportalNumber = 0;
 
     public static GameManager Instance
     {
@@ -129,21 +131,12 @@ public class GameManager : MonoBehaviour
     public void ChangeCameraState(CameraType newState)
     {
         cameraType = newState;
-        // 상태에 따른 추가적인 동작 수행
-        switch (newState)
-        {
-            case CameraType.Hor:
-                // Fight 상태에 따른 동작 수행
-                break;
-            case CameraType.Ver:
-                // Event 상태에 따른 동작 수행
-                break;
-            case CameraType.All:
-                // NpcTalk 상태에 따른 동작 수행
-                break;
-            default:
-                break;
-        }
+    }
+    public void ChangeCameraState(CameraType newState, int point)
+    {
+        cameraType = newState;
+        curportalNumber = point;
+        
     }
     public void ResumeGame()
     {

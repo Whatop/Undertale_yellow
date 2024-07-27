@@ -17,6 +17,7 @@ public class PortalManager : MonoBehaviour
     public float fadeDuration = 1.0f;
     private bool isFading = false;
 
+    private GameManager gameManager;
     private void Awake()
     {
         if (Instance == null)
@@ -27,6 +28,7 @@ public class PortalManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        gameManager = GameManager.Instance;
     }
 
     private void Start()
@@ -45,7 +47,22 @@ public class PortalManager : MonoBehaviour
         if (isFading)
             return;
 
-        GameManager.Instance.ChangeGameState(GameState.Event);
+        gameManager.ChangeGameState(GameState.Event);
+        switch (portal.portalNumber)
+        {
+            case 0:
+                gameManager.ChangeCameraState(CameraType.All);
+                break;
+            case 1:
+                gameManager.ChangeCameraState(CameraType.Hor, portal.portalNumber);
+                break;
+           // case 2:
+           //     gameManager.ChangeCameraState(CameraType.All);
+           //     break;
+           // case 3:
+           //     gameManager.ChangeCameraState(CameraType.All);
+           //     break;
+        }
         StartCoroutine(FadeAndMove(portal.portalNumber));
     }
 
@@ -54,7 +71,7 @@ public class PortalManager : MonoBehaviour
         if (isFading)
             return;
 
-        GameManager.Instance.ChangeGameState(GameState.Event);
+        gameManager.ChangeGameState(GameState.Event);
         StartCoroutine(FadeAndMove(point));
     }
 
@@ -88,7 +105,7 @@ public class PortalManager : MonoBehaviour
         Time.timeScale = 1f;
         playerMovement.SetAnimatorEnabled(true);
 
-        GameManager.Instance.ChangeGameState(GameState.None);
+        gameManager.ChangeGameState(GameState.None);
         isFading = false;
     }
 
