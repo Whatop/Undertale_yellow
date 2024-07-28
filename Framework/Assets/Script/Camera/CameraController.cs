@@ -12,7 +12,7 @@ public class CameraController : MonoBehaviour
 
     public float defaultCameraSize = 6;
     public float battleCameraSize = 10;
-    GameObject[] datum_point;
+    public Transform[] datum_point;
 
     Vector3 target;
 

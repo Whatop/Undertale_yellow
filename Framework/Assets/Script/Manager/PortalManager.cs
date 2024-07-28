@@ -48,20 +48,21 @@ public class PortalManager : MonoBehaviour
             return;
 
         gameManager.ChangeGameState(GameState.Event);
+        Debug.Log(portal.portalNumber);
         switch (portal.portalNumber)
         {
             case 0:
-                gameManager.ChangeCameraState(CameraType.All);
+                gameManager.ChangeCameraState(CameraType.Ver, 1);
                 break;
             case 1:
-                gameManager.ChangeCameraState(CameraType.Hor, portal.portalNumber);
+                gameManager.ChangeCameraState(CameraType.Hor, 0);
                 break;
-           // case 2:
-           //     gameManager.ChangeCameraState(CameraType.All);
-           //     break;
-           // case 3:
-           //     gameManager.ChangeCameraState(CameraType.All);
-           //     break;
+            case 2:
+                gameManager.ChangeCameraState(CameraType.All);
+                break;
+            case 3:
+                gameManager.ChangeCameraState(CameraType.Ver, 1);
+                break;
         }
         StartCoroutine(FadeAndMove(portal.portalNumber));
     }
