@@ -73,6 +73,9 @@ public class UIManager : MonoBehaviour
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
 
+    //PlayerUI
+    public Slider reloadSlider; // 재장전 슬라이더 UI
+
 
     public TextMeshProUGUI currentResolutionText;
 
@@ -832,4 +835,20 @@ public class UIManager : MonoBehaviour
         UpdateSelection();
     }
     #endregion
+    //player UI
+    public void ShowReloadSlider(bool show)
+    {
+        reloadSlider.gameObject.SetActive(show);
+    }
+
+    public void SetReloadSliderMaxValue(float maxValue)
+    {
+        reloadSlider.maxValue = maxValue;
+    }
+
+    public void SetReloadSliderValue(float value)
+    {
+        reloadSlider.value = value;
+    }
+
 }

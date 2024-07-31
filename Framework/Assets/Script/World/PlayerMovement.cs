@@ -31,12 +31,16 @@ public class PlayerMovement : LivingObject
     private float rollDuration = 0.5f; // 구르기 지속 시간
     private float rollTime; // 구르기 시간
 
+    private bool isReloading = false;
+    private float reloadTime = 1.5f; // 재장전 시간 (초)
+
     // Awake 메서드: 초기 설정
     protected override void Awake()
     {
-        base.Awake(); // LivingObject의 Awake 메서드 호출
+        base.Awake();
         WeaponsAnimator = Weapons.GetComponent<Animator>();
         weaponData = new Weapon();
+      // reloadSlider.ManagerreloadSlider.gameObject.SetActive(false); // 슬라이더 비활성화
     }
 
     // Start 메서드: 게임 시작 시 초기화
@@ -59,11 +63,10 @@ public class PlayerMovement : LivingObject
             float angle = CalculateMouseAngle();
             Hands.gameObject.SetActive(true);
 
-            // R키 입력 시 재장전 
-            if (Input.GetKeyDown(KeyCode.R))
+            // R키 입력 시 재장전
+            if (Input.GetKeyDown(KeyCode.R) && !isReloading)
             {
-                WeaponsAnimator.SetTrigger("Reload");
-                SoundManager.Instance.SFXPlay("mus_piano1", 32); // 재장전 사운드
+                StartCoroutine(Reload());
             }
 
             // 우클릭 입력 시 구르기 시작
@@ -98,6 +101,30 @@ public class PlayerMovement : LivingObject
             }
         }
     }
+    IEnumerator Reload()
+    {
+        isReloading = true;
+        WeaponsAnimator.SetTrigger("Reload");
+        UIManager.Instance.ShowReloadSlider(true); // 슬라이더 활성화
+        UIManager.Instance.SetReloadSliderMaxValue(reloadTime);
+        UIManager.Instance.SetReloadSliderValue(0);
+
+
+        float reloadProgress = 0f;
+        while (reloadProgress < reloadTime)
+        {
+            reloadProgress += Time.deltaTime;
+            UIManager.Instance.SetReloadSliderValue(reloadProgress);
+            yield return null;
+        }
+
+        // 재장전 완료
+        weaponData.current_magazine = weaponData.magazine;
+        gameManager.SaveWeaponData(weaponData);
+        UIManager.Instance.ShowReloadSlider(false); // 슬라이더 비활성화
+        isReloading = false;
+    }
+
 
     // 애니메이터 활성화/비활성화
     public void SetAnimatorEnabled(bool isEnabled)
