@@ -15,6 +15,7 @@ public class PlayerMovement : LivingObject
 
     public GameObject Hands;
     public GameObject Weapons;
+    public GameObject reloadPoint;
     public ObjectState objectState;
 
     GameObject scanObject;
@@ -60,6 +61,11 @@ public class PlayerMovement : LivingObject
 
         if (!UIManager.Instance.isUserInterface)
         {
+            if (UIManager.Instance.reloadSlider != null)
+            {
+                UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
+            }
+
             float angle = CalculateMouseAngle();
             Hands.gameObject.SetActive(true);
 
