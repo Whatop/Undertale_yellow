@@ -1,26 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 
 public class DialogueManager : MonoBehaviour
 {
-    private string dialogueFolderPath = "Assets/Dialogues/"; // 대화 내용이 저장된 폴더 경로
+    private Queue<string> sentences; // 대사 큐
+    private NPC currentNPC; // 현재 대화 중인 NPC
+
+    void Start()
+    {
+        sentences = new Queue<string>();
+    }
 
     public void StartDialogue(int npcID)
     {
-        string filePath = dialogueFolderPath + "NPC_" + npcID + ".txt"; // NPC의 대화 파일 경로
-        if (File.Exists(filePath))
+        // 대사를 초기화하고, 대사를 큐에 추가하는 코드
+        // 예시:
+        sentences.Clear();
+        sentences.Enqueue("Hello, I am NPC " + npcID);
+        sentences.Enqueue("How are you today?");
+        sentences.Enqueue("Goodbye!");
+
+        DisplayNextSentence();
+    }
+
+    public void DisplayNextSentence()
+    {
+        if (sentences.Count == 0)
         {
-            string[] lines = File.ReadAllLines(filePath);
-            foreach (string line in lines)
-            {
-                Debug.Log(line); // 대화 내용 출력
-            }
+            EndDialogue();
+            return;
         }
-        else
+
+        string sentence = sentences.Dequeue();
+        Debug.Log(sentence); // 실제 게임에서는 대사를 UI에 표시하는 코드가 필요합니다.
+    }
+
+    void EndDialogue()
+    {
+        if (currentNPC != null)
         {
-            Debug.LogWarning("NPC_" + npcID + ".txt 파일을 찾을 수 없습니다.");
+            currentNPC.EndDialogue(); // NPC에게 대화 종료를 알림
         }
+    }
+
+    public void SetCurrentNPC(NPC npc)
+    {
+        currentNPC = npc;
     }
 }
