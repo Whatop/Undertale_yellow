@@ -7,13 +7,17 @@ public class NPC : MonoBehaviour
     public int npcID; // NPC의 ID
     public DialogueManager dialogueManager;
     private bool isTalking = false; // 대화가 진행 중인지 여부
-    private Renderer npcRenderer; // NPC의 Renderer
-    private Color originalColor; // NPC의 원래 색상
+
+    private GameObject outlineObject; // 외곽선 효과를 위한 오브젝트
+    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer outlineSpriteRenderer;
+
+    public Material outlineMaterial; // 외곽선 Material
 
     void Start()
     {
-        npcRenderer = GetComponent<Renderer>();
-        originalColor = npcRenderer.material.color;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        CreateOutline();
     }
 
     void Update()
@@ -69,18 +73,26 @@ public class NPC : MonoBehaviour
         }
     }
 
+    // 외곽선 오브젝트 생성
+    void CreateOutline()
+    {
+        outlineObject = new GameObject("Outline");
+        outlineObject.transform.SetParent(transform);
+        outlineObject.transform.localPosition = Vector3.zero;
+        outlineObject.transform.localScale = Vector3.one * 1.1f; // 원래 크기보다 약간 크게 설정
+
+        outlineSpriteRenderer = outlineObject.AddComponent<SpriteRenderer>();
+        outlineSpriteRenderer.sprite = spriteRenderer.sprite;
+        outlineSpriteRenderer.material = outlineMaterial; // Material을 외곽선 Material로 설정
+        outlineSpriteRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
+        outlineSpriteRenderer.sortingOrder = 2; // 정렬 순서 2로 설정
+
+        outlineObject.SetActive(false);
+    }
+
     // 하이라이트 효과 관리
     void Highlight(bool isHighlighted)
     {
-        if (isHighlighted)
-        {
-            npcRenderer.material.color = Color.white; // 하이라이트 색상으로 변경
-            npcRenderer.material.SetColor("_OutlineColor", Color.white); // 흰색 테두리 추가
-        }
-        else
-        {
-            npcRenderer.material.color = originalColor; // 원래 색상으로 복원
-            npcRenderer.material.SetColor("_OutlineColor", Color.clear); // 테두리 제거
-        }
+        outlineObject.SetActive(isHighlighted);
     }
 }
