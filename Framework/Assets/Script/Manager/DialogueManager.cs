@@ -33,6 +33,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         string sentence = sentences.Dequeue();
+        UIManager.Instance.TextUpdate(sentence);
         Debug.Log(sentence); // 실제 게임에서는 대사를 UI에 표시하는 코드가 필요합니다.
     }
 

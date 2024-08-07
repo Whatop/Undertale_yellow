@@ -83,6 +83,10 @@ public class UIManager : MonoBehaviour
     private string currentPanel = "Default"; // 현재 패널을 추적
     private string prevPanel = "Default"; // 이전 패널을 추적
 
+    //panel
+    public GameObject textbar;
+    public TextMeshProUGUI text;
+
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
     {
@@ -176,6 +180,11 @@ public class UIManager : MonoBehaviour
         OptionInput();
     }
 
+    public void TextUpdate(string ar)
+    {
+        textbar.SetActive(true);
+        text.text = ar; 
+    }
     private void Update()
     {
         if (isUserInterface)
