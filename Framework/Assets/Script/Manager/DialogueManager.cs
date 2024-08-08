@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class DialogueManager : MonoBehaviour
 {
-    private Queue<string> sentences; // 대사 큐
-    private NPC currentNPC; // 현재 대화 중인 NPC
-
+    private Queue<string> sentences;
+    private NPC currentNPC;
+    public TypeEffect typeEffect;
     void Start()
     {
         sentences = new Queue<string>();
@@ -14,12 +14,16 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(int npcID)
     {
-        // 대사를 초기화하고, 대사를 큐에 추가하는 코드
-        // 예시:
         sentences.Clear();
-        sentences.Enqueue("Hello, I am NPC " + npcID);
-        sentences.Enqueue("How are you today?");
-        sentences.Enqueue("Goodbye!");
+        switch (npcID)
+        {
+            case 0:
+            Debug.Log("작동됨?");
+                sentences.Enqueue("안녕, 나는 테스트 NPC " + npcID);
+                sentences.Enqueue("오늘 하루는 어때?");
+                sentences.Enqueue("잘가~");
+                break;
+        }
 
         DisplayNextSentence();
     }
@@ -31,17 +35,21 @@ public class DialogueManager : MonoBehaviour
             EndDialogue();
             return;
         }
-
         string sentence = sentences.Dequeue();
-        UIManager.Instance.TextUpdate(sentence);
-        Debug.Log(sentence); // 실제 게임에서는 대사를 UI에 표시하는 코드가 필요합니다.
+        typeEffect.SetMsg(sentence, OnSentenceComplete);
+    }
+
+    private void OnSentenceComplete()
+    {
+        // 문장이 완전히 표시된 후 추가로 실행할 로직을 여기에 추가할 수 있습니다.
+        Debug.Log("문장이 완료되었습니다.");
     }
 
     void EndDialogue()
     {
         if (currentNPC != null)
         {
-            currentNPC.EndDialogue(); // NPC에게 대화 종료를 알림
+            currentNPC.EndDialogue();
         }
     }
 

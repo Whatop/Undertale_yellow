@@ -1403,6 +1403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02869bd0fe348e34992407190974c972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeEffect: {fileID: 352131537}
 --- !u!1 &92184756
 GameObject:
   m_ObjectHideFlags: 0
@@ -3547,6 +3548,7 @@ GameObject:
   - component: {fileID: 352131533}
   - component: {fileID: 352131536}
   - component: {fileID: 352131535}
+  - component: {fileID: 352131537}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -3593,7 +3595,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD589\uBCF5\uD560 \uC218 \uC788\uC5B4\uC694"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: edae648a84dae9f4cbc09d4f8495bbc9, type: 2}
   m_sharedMaterial: {fileID: -1651241253263036495, guid: edae648a84dae9f4cbc09d4f8495bbc9, type: 2}
@@ -3790,6 +3792,21 @@ MonoBehaviour:
   referenceFontSize: -1
   isResettingEffectsOnNewText: 1
   timeScale: 0
+--- !u!114 &352131537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352131531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f9ef27be2b1df1458adaafc9ef50644, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CharPerSeconds: 10
+  msgText: {fileID: 352131533}
+  txtId: 0
 --- !u!1 &355735670
 GameObject:
   m_ObjectHideFlags: 0
@@ -17981,6 +17998,7 @@ MonoBehaviour:
   npcID: 0
   dialogueManager: {fileID: 84828285}
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
+  TextBar: {fileID: 1572136695}
 --- !u!1 &1307026762
 GameObject:
   m_ObjectHideFlags: 0

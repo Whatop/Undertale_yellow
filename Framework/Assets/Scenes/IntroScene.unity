@@ -770,7 +770,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1089314785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,7 +783,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dfc4aea1c1842d4eb5856f5d4396f05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player_Name: Frisk
+  isBattle: 0
+  cameraType: 0
+  curportalNumber: 0
 --- !u!4 &1089314786
 Transform:
   m_ObjectHideFlags: 0
@@ -1243,7 +1245,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 69bd2f0dc87a4ab4e889ecedd4d99f11, type: 3}
   - {fileID: 4900000, guid: f12be66563295e341b745eac0a659dbb, type: 3}
   CurText: {fileID: 1673541343}
-  soundManager: {fileID: 0}
+  soundManager: {fileID: 890355754}
   readSpeed: 9
   skip: 3.5
   IntroCast: {fileID: 1635337808}

@@ -13,6 +13,7 @@ public class NPC : MonoBehaviour
     private SpriteRenderer outlineSpriteRenderer;
 
     public Material outlineMaterial; // 외곽선 Material
+    public GameObject TextBar; //아마두 여러개로 할듯 나중에 배열
 
     void Start()
     {
@@ -38,6 +39,7 @@ public class NPC : MonoBehaviour
     void StartDialogue()
     {
         isTalking = true;
+        TextBar.SetActive(true);
         dialogueManager.SetCurrentNPC(this); // NPC 자신을 DialogueManager에 알림
         dialogueManager.StartDialogue(npcID); // NPC의 대화 시작
     }
