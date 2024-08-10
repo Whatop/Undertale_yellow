@@ -41,7 +41,7 @@ public class PlayerMovement : LivingObject
         base.Awake();
         WeaponsAnimator = Weapons.GetComponent<Animator>();
         weaponData = new Weapon();
-      // reloadSlider.ManagerreloadSlider.gameObject.SetActive(false); // 슬라이더 비활성화
+        // reloadSlider.ManagerreloadSlider.gameObject.SetActive(false); // 슬라이더 비활성화
     }
 
     // Start 메서드: 게임 시작 시 초기화
@@ -59,7 +59,7 @@ public class PlayerMovement : LivingObject
     {
         base.Update();
 
-        if (!UIManager.Instance.isUserInterface)
+        if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
         {
             if (UIManager.Instance.reloadSlider != null)
             {
@@ -198,7 +198,7 @@ public class PlayerMovement : LivingObject
     // 물리 업데이트
     void FixedUpdate()
     {
-        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface)
+        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
         {
             Move();
         }

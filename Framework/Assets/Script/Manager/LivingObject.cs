@@ -20,7 +20,7 @@ public class LivingObject : MonoBehaviour
     protected float speed;
     protected bool isnpc; // 비전투!
     protected bool isDie = false;
- 
+
     protected bool isInvincible = false; // 무적 상태인지 여부
     protected float invincibleDuration = 1.5f; // 무적 지속 시간
     protected float invincibleTimer = 0f; // 무적 타이머

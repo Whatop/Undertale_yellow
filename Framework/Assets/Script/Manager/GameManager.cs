@@ -23,6 +23,7 @@ public class PlayerData
     public string player_Name;
     public string[] inventory;
     public GameState currentState; // 플레이어의 현재 게임 상태 추가
+    public bool isStop = false;
 
 
     public PlayerData()

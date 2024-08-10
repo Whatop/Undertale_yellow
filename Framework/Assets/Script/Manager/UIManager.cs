@@ -84,6 +84,11 @@ public class UIManager : MonoBehaviour
     private string prevPanel = "Default"; // 이전 패널을 추적
 
     //panel
+    /// <summary>
+    /// 0 : Up
+    /// 1 : Down
+    /// </summary>
+    public GameObject[] textbarPos;
     public GameObject textbar;
     public TextMeshProUGUI text;
 
@@ -180,10 +185,28 @@ public class UIManager : MonoBehaviour
         OptionInput();
     }
 
-    public void TextUpdate(string ar)
+    public void TextUpdate()
     {
+        // 플레이어 위치 가져오기
+        Vector3 playerPosition = gameManager.GetPlayerData().position;
+
+        // 카메라 위치 가져오기
+        Vector3 cameraPosition = Camera.main.transform.position;
+        if (playerPosition.y > cameraPosition.y)
+        {
+            // 플레이어가 카메라보다 높이 있는 경우
+            textbar.transform.position = textbarPos[1].transform.position;
+        }
+        else 
+        {
+            // 플레이어가 카메라보다 낮게 있는 경우
+            textbar.transform.position = textbarPos[0].transform.position;
+        }
         textbar.SetActive(true);
-        text.text = ar; 
+    }
+    public void CloseTextbar()
+    {
+        textbar.SetActive(false);
     }
     private void Update()
     {

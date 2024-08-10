@@ -18,7 +18,6 @@ public class DialogueManager : MonoBehaviour
         switch (npcID)
         {
             case 0:
-            Debug.Log("작동됨?");
                 sentences.Enqueue("안녕, 나는 테스트 NPC " + npcID);
                 sentences.Enqueue("오늘 하루는 어때?");
                 sentences.Enqueue("잘가~");
@@ -50,6 +49,9 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             currentNPC.EndDialogue();
+            UIManager.Instance.CloseTextbar();
+            GameManager.Instance.GetPlayerData().isStop = false;
+
         }
     }
 
