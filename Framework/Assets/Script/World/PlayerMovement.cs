@@ -28,7 +28,7 @@ public class PlayerMovement : LivingObject
     Weapon weaponData;
 
     private Vector2 rollDirection;
-    private float rollSpeed = 8f; // 구르기 속도
+    private float rollSpeed = 16f; // 구르기 속도
     private float rollDuration = 0.5f; // 구르기 지속 시간
     private float rollTime; // 구르기 시간
 
@@ -177,7 +177,45 @@ public class PlayerMovement : LivingObject
     {
         objectState = ObjectState.Roll;
         SetAnimatorBooleansFalse();
-        rollDirection = new Vector2(Mathf.Sign(Input.GetAxis("Horizontal")), Mathf.Sign(Input.GetAxis("Vertical"))).normalized;
+        // UIManager의 GetKeyCode를 통해 방향키 입력 감지
+        if (Input.GetKey(UIManager.Instance.GetKeyCode(0)) && Input.GetKey(UIManager.Instance.GetKeyCode(3)))
+        {
+            rollDirection = new Vector2(1, 1).normalized; // 오른쪽 위 대각선
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(0)) && Input.GetKey(UIManager.Instance.GetKeyCode(2)))
+        {
+            rollDirection = new Vector2(-1, 1).normalized; // 왼쪽 위 대각선
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(1)) && Input.GetKey(UIManager.Instance.GetKeyCode(3)))
+        {
+            rollDirection = new Vector2(1, -1).normalized; // 오른쪽 아래 대각선
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(1)) && Input.GetKey(UIManager.Instance.GetKeyCode(2)))
+        {
+            rollDirection = new Vector2(-1, -1).normalized; // 왼쪽 아래 대각선
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(0)))
+        {
+            rollDirection = Vector2.up; // 위쪽
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(1)))
+        {
+            rollDirection = Vector2.down; // 아래쪽
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(3)))
+        {
+            rollDirection = Vector2.right; // 오른쪽
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(2)))
+        {
+            rollDirection = Vector2.left; // 왼쪽
+        }
+        else
+        {
+            yield break; // 입력값이 없으면 구르기를 시작하지 않음
+        }
+
+
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
@@ -187,7 +225,8 @@ public class PlayerMovement : LivingObject
         {
             rollTime += Time.deltaTime;
             float t = rollTime / rollDuration;
-            rigid.velocity = rollDirection * rollSpeed * (1f - t); // 점점 속도가 줄어듦
+            // 자연스러운 구르기 동작을 위해 속도를 일정하게 유지
+            rigid.velocity = rollDirection * rollSpeed * Mathf.Lerp(1f, 0f, t);
             yield return null;
         }
 
@@ -202,9 +241,9 @@ public class PlayerMovement : LivingObject
         {
             Move();
         }
-        else if (objectState == ObjectState.Roll && !UIManager.Instance.isUserInterface)
+        else if (objectState == ObjectState.Roll)
         {
-            rigid.velocity = rollDirection * rollSpeed;
+            Debug.Log("구른다");
         }
         else
         {
@@ -262,22 +301,39 @@ public class PlayerMovement : LivingObject
     }
     // 플레이어 이동 처리
     void Move()
-    {
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
+    { 
+        // UIManager의 GetKeyCode를 통해 방향키 입력 감지
+        h = 0f;
+        v = 0f;
 
+        if (Input.GetKey(UIManager.Instance.GetKeyCode(2))) // Left
+        {
+            h = -1f;
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(3))) // Right
+        {
+            h = 1f;
+        }
+
+        if (Input.GetKey(UIManager.Instance.GetKeyCode(0))) // Up
+        {
+            v = 1f;
+        }
+        else if (Input.GetKey(UIManager.Instance.GetKeyCode(1))) // Down
+        {
+            v = -1f;
+        }
         UpdateAnimatorMovement();
-
-        if (Input.GetKey(KeyCode.LeftShift))
-            speed = 6f;
-        else
-            speed = 4f;
 
         if (gameManager.GetPlayerData().currentState == GameState.Event)
         {
             animator.SetInteger("v", 0);
             animator.SetInteger("h", 0);
             speed = 0f;
+        }
+        else
+        {
+            speed = 4f;
         }
 
         rigid.velocity = new Vector2(h, v) * speed;

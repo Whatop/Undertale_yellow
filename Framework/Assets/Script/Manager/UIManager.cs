@@ -68,7 +68,17 @@ public class UIManager : MonoBehaviour
     public GameObject[] Interface;
     public bool isUserInterface = false;
 
-
+    /// <summary>
+    /// 0 : Up
+    /// 1 : Down
+    /// 2 : Left
+    /// 3 : Right
+    /// 4 : Shot
+    /// 5 : Roll
+    /// 6 : Check
+    /// 7 : Inventroy
+    /// 8 : Map
+    /// </summary>
     private KeyCode[] keyBindings = new KeyCode[9]; // 9개의 키 설정을 위한 배열
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
@@ -881,6 +891,29 @@ public class UIManager : MonoBehaviour
     public void SetReloadSliderValue(float value)
     {
         reloadSlider.value = value;
+    }
+
+    /// <summary>
+    /// 0 : Up
+    /// 1 : Down
+    /// 2 : Left
+    /// 3 : Right
+    /// 4 : Shot
+    /// 5 : Roll
+    /// 6 : Check
+    /// 7 : Inventory
+    /// 8 : Map
+    /// </summary>
+    public KeyCode GetKeyCode(int i)
+    {
+        // 인덱스 범위를 확인하여 유효한 경우에만 반환
+        if (i >= 0 && i < keyBindings.Length)
+        {
+            return keyBindings[i];
+        }
+
+        // 유효하지 않은 인덱스일 경우 기본값(KeyCode.None) 반환
+        return KeyCode.None;
     }
 
 }
