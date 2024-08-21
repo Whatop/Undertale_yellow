@@ -70,8 +70,9 @@ public class PlayerMovement : LivingObject
             Hands.gameObject.SetActive(true);
 
             // R키 입력 시 재장전
-            if (Input.GetKeyDown(KeyCode.R) && !isReloading)
+            if (Input.GetKeyDown(KeyCode.R) && !isReloading && weaponData.current_magazine != weaponData.magazine)
             {
+                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
                 StartCoroutine(Reload());
             }
 
@@ -148,7 +149,7 @@ public class PlayerMovement : LivingObject
         Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
         WeaponTransform.up = direction;
 
-        if (Input.GetMouseButtonDown(0) && current_magazine > 0 && weaponData.current_Ammo > 0)
+        if (Input.GetMouseButtonDown(0) && current_magazine > 0 && weaponData.current_Ammo > 0 && !isReloading)
         {
             Shoot();
             weaponData.current_magazine -= 1;
@@ -156,11 +157,11 @@ public class PlayerMovement : LivingObject
             gameManager.SaveWeaponData(weaponData);
         }
 
-        if (weaponData.current_Ammo < weaponData.maxAmmo && Input.GetKeyDown(KeyCode.R) && weaponData.current_magazine < weaponData.magazine)
-        {
-            weaponData.current_magazine = weaponData.magazine;
-            gameManager.SaveWeaponData(weaponData);
-        }
+        //if (weaponData.current_Ammo < weaponData.maxAmmo && Input.GetKeyDown(KeyCode.R) && weaponData.current_magazine < weaponData.magazine)
+        //{
+        //    weaponData.current_magazine = weaponData.magazine;
+        //    gameManager.SaveWeaponData(weaponData);
+        //}
     }
 
     // 총알 발사
@@ -169,7 +170,7 @@ public class PlayerMovement : LivingObject
         GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-        SoundManager.Instance.SFXPlay("mus_piano1", 32); // 총 사운드
+        SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
     }
 
     // 구르기 코루틴
@@ -219,7 +220,7 @@ public class PlayerMovement : LivingObject
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
-        SoundManager.Instance.SFXPlay("mus_piano1", 32); // 구르기 사운드
+        SoundManager.Instance.SFXPlay("dodge_roll_01", 219); // 구르기 사운드
 
         while (rollTime < rollDuration)
         {
@@ -403,6 +404,7 @@ public class PlayerMovement : LivingObject
     // 오브젝트 상태 처리
     void HandleObjectState(float angle)
     {
+        Debug.Log(angle);
         SetAnimatorBooleansFalse();
         if (angle > -45f && angle <= 15f)
         {
@@ -424,7 +426,7 @@ public class PlayerMovement : LivingObject
         }
         else
         {
-            FlipCharacter(angle >= 15f ? 1 : -1);
+            FlipCharacter(angle < 90f ? 1 : -1);
             SetObjectState(ObjectState.Angle);
         }
     }

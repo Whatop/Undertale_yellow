@@ -89,6 +89,7 @@ public class SoundManager : MonoBehaviour
         sfxSources.Add(audioSource); // Add to the list of SFX sources
     }
 
+
     public void SFXTextPlay(string textName, int textNum)
     {
         GameObject go = new GameObject(textName + "Sound");
