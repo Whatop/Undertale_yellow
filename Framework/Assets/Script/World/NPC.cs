@@ -7,13 +7,12 @@ public class NPC : MonoBehaviour
     public int npcID; // NPC의 ID
     public DialogueManager dialogueManager;
     private bool isTalking = false; // 대화가 진행 중인지 여부
-
     private GameObject outlineObject; // 외곽선 효과를 위한 오브젝트
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer outlineSpriteRenderer;
-
     public Material outlineMaterial; // 외곽선 Material
 
+    bool isFirst = true;
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -22,16 +21,40 @@ public class NPC : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && IsPlayerNearby())
+        if (IsPlayerNearby() && !EventManager.Instance.isEvent) // 이벤트 중이 아닐 때만 상호작용 가능
         {
-            if (isTalking)
+            Highlight(true);
+
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                dialogueManager.DisplayNextSentence(); // 대화 진행
+                if (isTalking)
+                {
+                    dialogueManager.DisplayNextSentence(); // 대화 진행
+                }
+                else
+                {
+                    StartDialogue(); // 대화 시작
+                }
             }
-            else
+        }
+        else
+        {
+            Highlight(false);
+        }
+        if (EventManager.Instance.isEvent) // 강제 이벤트
+        {
+            if (isFirst)
             {
                 StartDialogue(); // 대화 시작
-                GameManager.Instance.GetPlayerData().isStop = true;
+                isFirst = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                if (isTalking)
+                {
+                    dialogueManager.DisplayNextSentence(); // 대화 진행
+                }
+                
             }
         }
     }
@@ -47,32 +70,15 @@ public class NPC : MonoBehaviour
     public void EndDialogue()
     {
         isTalking = false; // 대화 종료
+        isFirst = false; // 처음
     }
 
     // 플레이어가 가까이 있는지 확인
     bool IsPlayerNearby()
     {
-        // 플레이어와의 거리 계산 (예시: 2유닛 이내)
+        // 플레이어와의 거리 계산 (예시: 3유닛 이내)
         float distance = Vector3.Distance(transform.position, GameManager.Instance.GetPlayerData().position);
-        return distance <= 2.0f;
-    }
-
-    // 트리거 엔터 이벤트
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Highlight(true);
-        }
-    }
-
-    // 트리거 엑시트 이벤트
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Highlight(false);
-        }
+        return distance <= 3f;
     }
 
     // 외곽선 오브젝트 생성

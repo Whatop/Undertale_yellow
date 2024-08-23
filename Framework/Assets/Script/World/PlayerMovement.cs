@@ -156,6 +156,11 @@ public class PlayerMovement : LivingObject
             weaponData.current_Ammo -= 1;
             gameManager.SaveWeaponData(weaponData);
         }
+        else if(current_magazine == 0 && !isReloading)
+        {
+            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
+            StartCoroutine(Reload());
+        }
 
         //if (weaponData.current_Ammo < weaponData.maxAmmo && Input.GetKeyDown(KeyCode.R) && weaponData.current_magazine < weaponData.magazine)
         //{
