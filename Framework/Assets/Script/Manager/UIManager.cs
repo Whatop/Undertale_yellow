@@ -195,7 +195,7 @@ public class UIManager : MonoBehaviour
         OptionInput();
     }
 
-    public void TextUpdate()
+    public void TextBarOpen()
     {
         // 플레이어 위치 가져오기
         Vector3 playerPosition = gameManager.GetPlayerData().position;

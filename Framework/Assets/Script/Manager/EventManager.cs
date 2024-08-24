@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class EventManager : MonoBehaviour
 {
-    public static EventManager instance; // 싱글톤 인스턴스
-    public bool isEvent = false;
+    public static EventManager instance;
 
     public static EventManager Instance
     {
@@ -23,6 +22,7 @@ public class EventManager : MonoBehaviour
             return instance;
         }
     }
+
     private void Awake()
     {
         if (instance == null)
@@ -34,14 +34,10 @@ public class EventManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     public void TriggerEvent(int eventNumber)
     {
-        isEvent = true;
-        DialogueManager.Instance.StartDialogue(eventNumber); // NPC 0번과의 대화 시작
+        DialogueManager.Instance.StartEventDialogue(eventNumber);
+    }
 
-    }
-    public void OnEventEnter(EventObject eventObject)
-    {
-      
-    }
 }

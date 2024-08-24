@@ -6,79 +6,76 @@ public class NPC : MonoBehaviour
 {
     public int npcID; // NPC의 ID
     public DialogueManager dialogueManager;
-    private bool isTalking = false; // 대화가 진행 중인지 여부
+    [SerializeField]
+    private bool isTalking = false;
+    [SerializeField]
+    private bool isFirstInteraction = true; // 처음 대화인지 확인
     private GameObject outlineObject; // 외곽선 효과를 위한 오브젝트
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer outlineSpriteRenderer;
     public Material outlineMaterial; // 외곽선 Material
 
-    bool isFirst = true;
+    public bool isEvent = false;
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        CreateOutline();
+        CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
     }
 
     void Update()
     {
-        if (IsPlayerNearby() && !EventManager.Instance.isEvent) // 이벤트 중이 아닐 때만 상호작용 가능
+        if (IsPlayerNearby() && !isEvent) // 이벤트 중이 아닐 때 상호작용 가능
         {
-            Highlight(true);
+            Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 if (isTalking)
                 {
-                    dialogueManager.DisplayNextSentence(); // 대화 진행
+                    dialogueManager.DisplayNextSentence();
                 }
                 else
                 {
-                    StartDialogue(); // 대화 시작
+                    StartDialogue();
                 }
             }
         }
         else
         {
-            Highlight(false);
+            Highlight(false); // 플레이어가 멀어지면 하이라이트 해제
         }
-        if (EventManager.Instance.isEvent) // 강제 이벤트
+
+        // 강제 이벤트 중일 때 대화 처리
+        if (isEvent && isFirstInteraction)
         {
-            if (isFirst)
-            {
-                StartDialogue(); // 대화 시작
-                isFirst = false;
-            }
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                if (isTalking)
-                {
-                    dialogueManager.DisplayNextSentence(); // 대화 진행
-                }
-                
-            }
+            StartDialogue();
+            isFirstInteraction = false;
+        }
+
+        if (isEvent && Input.GetKeyDown(KeyCode.Space) && isTalking)
+        {
+            dialogueManager.DisplayNextSentence();
         }
     }
 
     void StartDialogue()
     {
         isTalking = true;
-        UIManager.Instance.TextUpdate();
-        dialogueManager.SetCurrentNPC(this); // NPC 자신을 DialogueManager에 알림
-        dialogueManager.StartDialogue(npcID); // NPC의 대화 시작
+        dialogueManager.SetCurrentNPC(this);
+        dialogueManager.StartDialogue(npcID);
     }
 
     public void EndDialogue()
     {
-        isTalking = false; // 대화 종료
-        isFirst = false; // 처음
+        isTalking = false;
+        isEvent = false;
+        isFirstInteraction = true;
     }
 
-    // 플레이어가 가까이 있는지 확인
     bool IsPlayerNearby()
     {
-        // 플레이어와의 거리 계산 (예시: 3유닛 이내)
         float distance = Vector3.Distance(transform.position, GameManager.Instance.GetPlayerData().position);
-        return distance <= 3f;
+        return distance <= 3f; // 원하는 거리로 조정
     }
 
     // 외곽선 오브젝트 생성
@@ -93,14 +90,17 @@ public class NPC : MonoBehaviour
         outlineSpriteRenderer.sprite = spriteRenderer.sprite;
         outlineSpriteRenderer.material = outlineMaterial; // Material을 외곽선 Material로 설정
         outlineSpriteRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
-        outlineSpriteRenderer.sortingOrder = 2; // 정렬 순서 2로 설정
+        outlineSpriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 1; // NPC보다 뒤에 표시되도록 정렬 순서 조정
 
-        outlineObject.SetActive(false);
+        outlineObject.SetActive(false); // 처음에는 비활성화
     }
 
     // 하이라이트 효과 관리
     void Highlight(bool isHighlighted)
     {
-        outlineObject.SetActive(isHighlighted);
+        if (outlineObject != null)
+        {
+            outlineObject.SetActive(isHighlighted);
+        }
     }
 }

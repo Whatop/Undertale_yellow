@@ -249,7 +249,7 @@ public class PlayerMovement : LivingObject
         }
         else if (objectState == ObjectState.Roll)
         {
-            Debug.Log("구른다");
+           // Debug.Log("구른다");
         }
         else
         {
@@ -409,7 +409,6 @@ public class PlayerMovement : LivingObject
     // 오브젝트 상태 처리
     void HandleObjectState(float angle)
     {
-        Debug.Log(angle);
         SetAnimatorBooleansFalse();
         if (angle > -45f && angle <= 15f)
         {
