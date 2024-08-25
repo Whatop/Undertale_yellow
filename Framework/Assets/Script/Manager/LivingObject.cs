@@ -73,7 +73,7 @@ public class LivingObject : MonoBehaviour
             healthBarTransform.position = hpBarPoint.transform.position;
         }
     }
-
+    
     protected virtual void Update()
     {
             // 체력바 위치 업데이트
@@ -103,6 +103,10 @@ public class LivingObject : MonoBehaviour
 
     }
 
+    public virtual void OffHpbar()
+    {
+        healthBar.SetActive(false);
+    }
     public void TakeDamage(int damageAmount)
     {
         if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음

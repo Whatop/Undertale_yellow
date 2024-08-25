@@ -52,6 +52,7 @@ public class PlayerMovement : LivingObject
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
         SoundManager.Instance.BGSoundPlay(); // 배경음악 재생
+        OffHpbar();
     }
 
     // Update 메서드: 매 프레임마다 호출
