@@ -47,23 +47,6 @@ public class PortalManager : MonoBehaviour
         if (isFading)
             return;
 
-        gameManager.ChangeGameState(GameState.Event);
-        Debug.Log(portal.portalNumber);
-        switch (portal.portalNumber)
-        {
-            case 0:
-                gameManager.ChangeCameraState(CameraType.Ver, 1);
-                break;
-            case 1:
-                gameManager.ChangeCameraState(CameraType.Hor, 0);
-                break;
-            case 2:
-                gameManager.ChangeCameraState(CameraType.All);
-                break;
-            case 3:
-                gameManager.ChangeCameraState(CameraType.Ver, 1);
-                break;
-        }
         StartCoroutine(FadeAndMove(portal.portalNumber));
     }
 
@@ -101,7 +84,24 @@ public class PortalManager : MonoBehaviour
 
         // 페이드 인
         yield return StartCoroutine(Fade(0f));
-
+        
+        gameManager.ChangeGameState(GameState.Event);
+        Debug.Log(point);
+        switch (point)
+        {
+            case 0:
+                gameManager.ChangeCameraState(CameraType.Ver, 1);
+                break;
+            case 1:
+                gameManager.ChangeCameraState(CameraType.Hor, 0);
+                break;
+            case 2:
+                gameManager.ChangeCameraState(CameraType.All);
+                break;
+            case 3:
+                gameManager.ChangeCameraState(CameraType.Ver, 1);
+                break;
+        }
         // 시간 재개 및 플레이어 애니메이터 활성화
         Time.timeScale = 1f;
         playerMovement.SetAnimatorEnabled(true);
