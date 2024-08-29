@@ -7,13 +7,6 @@ public enum GameState
     NpcTalk,
     None
 }
-public enum CameraType
-{
-    Hor,
-    Ver,
-    All,
-    None
-}
 [System.Serializable]
 public class PlayerData
 {
@@ -50,7 +43,6 @@ public class GameManager : MonoBehaviour
     /// 전투 확인용
     /// </summary>
     public bool isBattle;
-    public CameraType cameraType; // 카메라의 고정 시점 
     public int curportalNumber = 0;
 
     public static GameManager Instance
@@ -128,16 +120,6 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
-    }
-    public void ChangeCameraState(CameraType newState)
-    {
-        cameraType = newState;
-    }
-    public void ChangeCameraState(CameraType newState, int point)
-    {
-        cameraType = newState;
-        curportalNumber = point;
-        
     }
     public void ResumeGame()
     {

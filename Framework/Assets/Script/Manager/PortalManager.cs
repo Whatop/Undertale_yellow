@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using Cinemachine; // Cinemachine 네임스페이스 추가
+using UnityEngine.UI; // Cinemachine 네임스페이스 추가
 
 public class PortalManager : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class PortalManager : MonoBehaviour
     private bool isFading = false;
 
     private GameManager gameManager;
+
+    public CinemachineVirtualCamera[] virtualCameras;  // 각 포탈 지점에 대응하는 가상 카메라 배열
+
     private void Awake()
     {
         if (Instance == null)
@@ -82,32 +86,33 @@ public class PortalManager : MonoBehaviour
             Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
 
+        // 카메라 이동
+        SwitchCamera(point);
         // 페이드 인
         yield return StartCoroutine(Fade(0f));
-        
-        gameManager.ChangeGameState(GameState.Event);
-        Debug.Log(point);
-        switch (point)
-        {
-            case 0:
-                gameManager.ChangeCameraState(CameraType.Ver, 1);
-                break;
-            case 1:
-                gameManager.ChangeCameraState(CameraType.Hor, 0);
-                break;
-            case 2:
-                gameManager.ChangeCameraState(CameraType.All);
-                break;
-            case 3:
-                gameManager.ChangeCameraState(CameraType.Ver, 1);
-                break;
-        }
+
+        gameManager.ChangeGameState(GameState.None);
+
         // 시간 재개 및 플레이어 애니메이터 활성화
         Time.timeScale = 1f;
         playerMovement.SetAnimatorEnabled(true);
 
-        gameManager.ChangeGameState(GameState.None);
         isFading = false;
+    }
+
+    void SwitchCamera(int point)
+    {
+        // 모든 가상 카메라 비활성화
+        foreach (var cam in virtualCameras)
+        {
+            cam.gameObject.SetActive(false);
+        }
+
+        // 포인트에 해당하는 가상 카메라 활성화
+        if (point >= 0 && point < virtualCameras.Length)
+        {
+            virtualCameras[point].gameObject.SetActive(true);
+        }
     }
 
     IEnumerator Fade(float targetAlpha)

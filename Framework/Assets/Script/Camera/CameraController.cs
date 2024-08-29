@@ -1,75 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class CameraController : MonoBehaviour
 {
     private GameManager gameManager;
+
+    // 여러 가상 카메라를 배열로 관리하지만, 직접 제어하지 않음
+    public CinemachineVirtualCamera[] virtualCameras;
     public float smooth = 8.0f;
-
-    public GameObject player;
-    public bool isCameraMove = true;
-
-    public float defaultCameraSize = 6;
-    public float battleCameraSize = 10;
-    public Transform[] datum_point;
-
-    Vector3 target;
 
     private void Awake()
     {
         gameManager = GameManager.Instance;
     }
 
-    private void OnEnable()
-    {
-        isCameraMove = true;
-    }
-
     private void Update()
     {
-        CameraSizeCheck();
+        UpdateCameraSize();
     }
 
-    private void LateUpdate()
+    void UpdateCameraSize()
     {
-        if (isCameraMove)
-            CameraMove();
-    }
-
-    void CameraMove()
-    {
-        if (player == null)
+        foreach (var virtualCamera in virtualCameras)
         {
-            Debug.LogWarning("Player가 CameraController에 할당되지 않았습니다.");
-            return;
-        }
+            if (virtualCamera == null)
+            {
+                Debug.LogWarning("CinemachineVirtualCamera가 CameraController에 할당되지 않았습니다.");
+                continue;
+            }
 
-        Vector3 playerPos = player.transform.localPosition;
-
-        switch (gameManager.cameraType)
-        {
-            case CameraType.Hor:
-                target = new Vector3(playerPos.x, datum_point[gameManager.curportalNumber].transform.localPosition.y, -10);
-                break;
-            case CameraType.Ver:
-                target = new Vector3(datum_point[gameManager.curportalNumber].transform.localPosition.x, playerPos.y, -10);
-                break;
-            case CameraType.All:
-                target = new Vector3(playerPos.x, playerPos.y, -10);
-                break;
-        }
-
-        transform.localPosition = target;
-    }
-
-    void CameraSizeCheck()
-    {
-        float targetCameraSize = gameManager.isBattle ? battleCameraSize : defaultCameraSize;
-
-        if (Camera.main.orthographicSize != targetCameraSize)
-        {
-            Camera.main.orthographicSize = Mathf.Lerp(Camera.main.orthographicSize, targetCameraSize, smooth * Time.deltaTime);
+            // 2D 카메라의 OrthographicSize를 조정
+            float targetCameraSize = gameManager.isBattle ? 10 : 6; // 전투 중일 때와 기본 상태의 카메라 크기
+            if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
+            {
+                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, smooth * Time.deltaTime);
+            }
         }
     }
 }
