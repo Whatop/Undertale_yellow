@@ -8,11 +8,11 @@ public class PortalManager : MonoBehaviour
 {
     public static PortalManager Instance;
     public GameObject[] portalPoints;
-    [SerializeField]
     private int currentPortalPointIndex = 0;
     private GameObject Player;
     private PlayerMovement playerMovement;
     public GameObject defaultPoint;
+    public CinemachineVirtualCamera defaultvirtualCamera;  // 각 포탈 지점에 대응하는 가상 카메라 배열
 
     public Image fadeImage;
     public float fadeDuration = 1.0f;
@@ -74,15 +74,17 @@ public class PortalManager : MonoBehaviour
         // 페이드 아웃
         yield return StartCoroutine(Fade(1f));
 
+        currentPortalPointIndex = point;
         // 플레이어 이동
-        if (point >= 0 && point < portalPoints.Length)
+        if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
-            Player.transform.position = portalPoints[point].transform.position;
+            Player.transform.position = portalPoints[currentPortalPointIndex].transform.position;
         }
         else
         {
             Player.transform.position = defaultPoint.transform.position;
             currentPortalPointIndex = 0;
+            SwitchCamera(-1);
             Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
 
