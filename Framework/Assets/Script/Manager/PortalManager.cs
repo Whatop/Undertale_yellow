@@ -66,7 +66,7 @@ public class PortalManager : MonoBehaviour
     IEnumerator FadeAndMove(int point)
     {
         isFading = true;
-
+        gameManager.isPortalTransition = true;
         // 시간 정지 및 플레이어 애니메이터 비활성화
         Time.timeScale = 0f;
         playerMovement.SetAnimatorEnabled(false);
@@ -98,7 +98,7 @@ public class PortalManager : MonoBehaviour
         // 시간 재개 및 플레이어 애니메이터 활성화
         Time.timeScale = 1f;
         playerMovement.SetAnimatorEnabled(true);
-
+        gameManager.isPortalTransition = false;
         isFading = false;
     }
 
@@ -108,12 +108,19 @@ public class PortalManager : MonoBehaviour
         foreach (var cam in virtualCameras)
         {
             cam.gameObject.SetActive(false);
+            defaultvirtualCamera.gameObject.SetActive(false);
         }
 
         // 포인트에 해당하는 가상 카메라 활성화
         if (point >= 0 && point < virtualCameras.Length)
         {
+            virtualCameras[point].transform.position = portalPoints[point].transform.position;
             virtualCameras[point].gameObject.SetActive(true);
+        }
+        else
+        {
+            defaultvirtualCamera.transform.position = defaultPoint.transform.position;
+            defaultvirtualCamera.gameObject.SetActive(true);
         }
     }
 

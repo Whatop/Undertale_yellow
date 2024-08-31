@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour
 
     // 여러 가상 카메라를 배열로 관리하지만, 직접 제어하지 않음
     public CinemachineVirtualCamera[] virtualCameras;
-    public float smooth = 8.0f;
 
     private void Awake()
     {
@@ -35,7 +34,7 @@ public class CameraController : MonoBehaviour
             float targetCameraSize = gameManager.isBattle ? 10 : 6; // 전투 중일 때와 기본 상태의 카메라 크기
             if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
             {
-                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, smooth * Time.deltaTime);
+                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, gameManager.GetCurrentSmooth() * Time.deltaTime);
             }
         }
     }
