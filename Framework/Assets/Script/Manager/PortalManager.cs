@@ -21,6 +21,7 @@ public class PortalManager : MonoBehaviour
     private GameManager gameManager;
 
     public CinemachineVirtualCamera[] virtualCameras;  // 각 포탈 지점에 대응하는 가상 카메라 배열
+    public Camera mainsCamera;
 
     private void Awake()
     {
@@ -87,9 +88,9 @@ public class PortalManager : MonoBehaviour
             SwitchCamera(-1);
             Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
+        SwitchCamera(point);
 
         // 카메라 이동
-        SwitchCamera(point);
         // 페이드 인
         yield return StartCoroutine(Fade(0f));
 
@@ -115,11 +116,13 @@ public class PortalManager : MonoBehaviour
         if (point >= 0 && point < virtualCameras.Length)
         {
             virtualCameras[point].transform.position = portalPoints[point].transform.position;
+            mainsCamera.transform.position = virtualCameras[point].transform.position;
             virtualCameras[point].gameObject.SetActive(true);
         }
         else
         {
             defaultvirtualCamera.transform.position = defaultPoint.transform.position;
+            mainsCamera.transform.position = defaultvirtualCamera.transform.position;
             defaultvirtualCamera.gameObject.SetActive(true);
         }
     }

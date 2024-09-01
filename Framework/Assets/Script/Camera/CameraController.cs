@@ -32,8 +32,9 @@ public class CameraController : MonoBehaviour
 
             // 2D 카메라의 OrthographicSize를 조정
             float targetCameraSize = gameManager.isBattle ? 10 : 6; // 전투 중일 때와 기본 상태의 카메라 크기
-            if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
+            if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f )
             {
+                
                 virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, gameManager.GetCurrentSmooth() * Time.deltaTime);
             }
         }
