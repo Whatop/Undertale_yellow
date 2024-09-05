@@ -80,6 +80,7 @@ public class PortalManager : MonoBehaviour
         if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
             Player.transform.position = portalPoints[currentPortalPointIndex].transform.position;
+            SwitchCamera(point);
         }
         else
         {
@@ -88,7 +89,6 @@ public class PortalManager : MonoBehaviour
             SwitchCamera(-1);
             Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
-        SwitchCamera(point);
 
         // 카메라 이동
         // 페이드 인
