@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour
             if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f )
             {
                 
-                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, gameManager.GetCurrentSmooth() * Time.deltaTime);
+                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, 8f * Time.deltaTime);
             }
         }
     }

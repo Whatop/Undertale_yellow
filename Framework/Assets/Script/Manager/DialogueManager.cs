@@ -9,6 +9,7 @@ public class DialogueManager : MonoBehaviour
     public TypeEffect typeEffect;
 
     public static DialogueManager instance;
+    public Sprite[] npcFaces;
 
     void Awake()
     {
@@ -58,11 +59,11 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case 1001:
-                sentences.Enqueue("안녕, 내 이름은 플라위");
-                sentences.Enqueue("이런, 길을 잃은 것 같네");
-                sentences.Enqueue("내가 조금 도와줄게.");
+                sentences.Enqueue("어라?");
+                sentences.Enqueue("Don't say that.");
                 break;
         }
+
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }
@@ -79,15 +80,19 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case 1001:
+                UIManager.Instance.npcFaceImage.sprite = npcFaces[0];
+                sentences.Enqueue(".  .  .");
                 sentences.Enqueue("안녕, 내 이름은 플라위");
                 sentences.Enqueue("이런, 길을 잃은 것 같네");
                 sentences.Enqueue("내가 조금 도와줄게.");
+                SoundManager.Instance.StopBGSound();
+                SoundManager.Instance.BGSoundPlay("toby fox - UNDERTALE Soundtrack - 03 Your Best Friend", 3);
                 break;
-        
         }
         currentNPC.isEvent = true;
         UIManager.Instance.TextBarOpen();
-        DisplayNextSentence();
+        UIManager.Instance.OffPlayerUI();
+        DisplayNextSentence(npcID);
     }
 
     public void DisplayNextSentence()
@@ -97,11 +102,21 @@ public class DialogueManager : MonoBehaviour
             EndDialogue();
             return;
         }
-        
+
         string sentence = sentences.Dequeue();
         typeEffect.SetMsg(sentence, OnSentenceComplete);
     }
+    public void DisplayNextSentence(int eventNumber)
+    {
+        if (sentences.Count == 0)
+        {
+            EndDialogue(eventNumber);
+            return;
+        }
 
+        string sentence = sentences.Dequeue();
+        typeEffect.SetMsg(sentence, OnSentenceComplete, eventNumber);
+    }
     private void OnSentenceComplete()
     {
         Debug.Log("문장이 완료되었습니다.");
@@ -114,9 +129,25 @@ public class DialogueManager : MonoBehaviour
             currentNPC.EndDialogue();
             UIManager.Instance.CloseTextbar();
             GameManager.Instance.GetPlayerData().isStop = false;
+            UIManager.Instance.OnPlayerUI();
         }
     }
-
+    void EndDialogue(int eventNumber)
+    {
+        if (currentNPC != null)
+        {
+            currentNPC.EndDialogue();
+            UIManager.Instance.CloseTextbar();
+            GameManager.Instance.GetPlayerData().isStop = false;
+            UIManager.Instance.OnPlayerUI();
+            switch (eventNumber)
+            {
+                case 1001:
+                    BattleManager.Instance.BattleStart(eventNumber);
+                    break;
+            }
+        }
+    }
     public void SetCurrentNPC(NPC npc)
     {
         currentNPC = npc;

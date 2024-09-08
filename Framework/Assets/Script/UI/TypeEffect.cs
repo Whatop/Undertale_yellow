@@ -12,6 +12,7 @@ public class TypeEffect : MonoBehaviour
     private int index;
     public int txtId = 0;
     private System.Action onEffectEndCallback;
+    private string txtsound = "SND_TXT1";
 
     private void Awake()
     {
@@ -24,7 +25,21 @@ public class TypeEffect : MonoBehaviour
         onEffectEndCallback = onEffectEnd;
         EffectStart();
     }
+    public void SetMsg(string msg, System.Action onEffectEnd, int eventNumber)
+    {
+        targetMsg = msg;
+        onEffectEndCallback = onEffectEnd;
+        switch (eventNumber)
+        {
+            case 1001:
+                txtsound = "voice_flowey_1";
+                txtId = 17;
+                break;
+                
 
+        }
+        EffectStart();
+    }
     public void Skip()
     {
         msgText.text = targetMsg;
@@ -49,14 +64,7 @@ public class TypeEffect : MonoBehaviour
 
         if (index < targetMsg.Length && targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" && targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
         {
-            GameObject go = new GameObject("txtSound");
-            AudioSource audioSource = go.AddComponent<AudioSource>();
-
-            audioSource.clip = SoundManager.Instance.txtlist[txtId];
-            audioSource.outputAudioMixerGroup = SoundManager.Instance.mixer.FindMatchingGroups("SFX")[0];
-            audioSource.volume = 0.1f;
-            audioSource.Play();
-            Destroy(go, SoundManager.Instance.txtlist[txtId].length);
+            SoundManager.Instance.SFXTextPlay(txtsound, txtId);
         }
 
         if (index < targetMsg.Length)

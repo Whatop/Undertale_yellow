@@ -45,6 +45,7 @@ public class PortalManager : MonoBehaviour
         {
             Debug.LogError("포탈 지점이 설정되지 않았습니다. 인스펙터에서 포탈 지점을 설정해주세요.");
         }
+        SwitchCamera(-1);
     }
 
     public void OnPortalEnter(PortalGate portal)
@@ -68,15 +69,19 @@ public class PortalManager : MonoBehaviour
     {
         isFading = true;
         gameManager.isPortalTransition = true;
-        // 시간 정지 및 플레이어 애니메이터 비활성화
+
+        // 플레이어 이동과 관련된 모든 입력 차단
+        playerMovement.enabled = false; // 입력을 비활성화
+        playerMovement.SetAnimatorEnabled(false); // 애니메이터 비활성화
+
+        // 시간 정지
         Time.timeScale = 0f;
-        playerMovement.SetAnimatorEnabled(false);
 
         // 페이드 아웃
         yield return StartCoroutine(Fade(1f));
 
-        currentPortalPointIndex = point;
         // 플레이어 이동
+        currentPortalPointIndex = point;
         if (currentPortalPointIndex >= 0 && currentPortalPointIndex < portalPoints.Length)
         {
             Player.transform.position = portalPoints[currentPortalPointIndex].transform.position;
@@ -90,16 +95,20 @@ public class PortalManager : MonoBehaviour
             Debug.Log("잘못된 텔레포트 지점입니다. 기본 지점으로 이동합니다.");
         }
 
-        // 카메라 이동
         // 페이드 인
         yield return StartCoroutine(Fade(0f));
 
+        // 상태 초기화
         gameManager.ChangeGameState(GameState.None);
 
-        // 시간 재개 및 플레이어 애니메이터 활성화
+        // 시간 재개
         Time.timeScale = 1f;
-        playerMovement.SetAnimatorEnabled(true);
+
+        // 플레이어 입력 다시 활성화
+        playerMovement.enabled = true; // 입력 다시 활성화
+        playerMovement.SetAnimatorEnabled(true); // 애니메이터 다시 활성화
         gameManager.isPortalTransition = false;
+
         isFading = false;
     }
 

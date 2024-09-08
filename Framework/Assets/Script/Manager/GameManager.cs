@@ -45,9 +45,6 @@ public class GameManager : MonoBehaviour
     public bool isBattle;
     public int curportalNumber = 0;
 
-    // 카메라 전환 속도 관리용 변수
-    public float normalSmooth = 8.0f;
-    public float fastSmooth = 20.0f;
     public bool isPortalTransition = false;
     public static GameManager Instance
     {
@@ -133,10 +130,6 @@ public class GameManager : MonoBehaviour
     public void OpenUI()
     {
         UIManager.Instance.isUserInterface = true;
-    }
-    public float GetCurrentSmooth()
-    {
-        return isPortalTransition ? fastSmooth : normalSmooth;
     }
 }
 

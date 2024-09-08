@@ -138,6 +138,7 @@ public class PlayerMovement : LivingObject
     public void SetAnimatorEnabled(bool isEnabled)
     {
         animator.enabled = isEnabled;
+        rigid.velocity = Vector2.zero;
     }
 
     // 총알 발사 입력 처리

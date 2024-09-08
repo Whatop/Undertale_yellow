@@ -119,6 +119,19 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void BGSoundPlay(string textName, int textNum)
+    {
+        GameObject go = new GameObject(textName + "Sound");
+        AudioSource audioSource = go.AddComponent<AudioSource>();
+
+        audioSource.clip = bglist[textNum];
+        audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
+        audioSource.volume = 0.1f;
+        audioSource.loop = true;
+        audioSource.Play();
+        Destroy(go, bglist[textNum].length);
+        sfxSources.Add(audioSource); // Add to the list of SFX sources
+    }
     public void StopBGSound()
     {
         if (bgSound.clip != null)

@@ -21,6 +21,8 @@ public class UIManager : MonoBehaviour
     private GameObject[] ui_ammo;
     public GameObject[] pedestal;
     public Image ui_weaponImage;
+    public Image ui_weaponBackImage;
+    public GameObject ui_healthImage;
     public TextMeshProUGUI ui_ammoText;
     public Canvas uicanvas;
     public Camera mainCamera;
@@ -101,6 +103,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] textbarPos;
     public GameObject textbar;
     public TextMeshProUGUI text;
+    public Image npcFaceImage;
 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
@@ -914,6 +917,41 @@ public class UIManager : MonoBehaviour
 
         // 유효하지 않은 인덱스일 경우 기본값(KeyCode.None) 반환
         return KeyCode.None;
+    }
+
+    public void OffPlayerUI()
+    {
+     //   ui_ammo, pedestal,ui_weaponImage,ui_ammoText
+
+       foreach(var ui in ui_ammo)
+        {
+            ui.gameObject.SetActive(false);
+        }
+       foreach(var ui in pedestal)
+        {
+            ui.gameObject.SetActive(false);
+        }
+        ui_weaponImage.gameObject.SetActive(false);
+        ui_ammoText.gameObject.SetActive(false);
+        ui_weaponBackImage.gameObject.SetActive(false);
+        ui_healthImage.gameObject.SetActive(false);
+    }
+
+    public void OnPlayerUI()
+    {
+
+        foreach (var ui in ui_ammo)
+        {
+            ui.gameObject.SetActive(true);
+        }
+        foreach (var ui in pedestal)
+        {
+            ui.gameObject.SetActive(true);
+        }
+        ui_weaponImage.gameObject.SetActive(true);
+        ui_ammoText.gameObject.SetActive(true);
+        ui_weaponBackImage.gameObject.SetActive(true);
+        ui_healthImage.gameObject.SetActive(true);
     }
 
 }

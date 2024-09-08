@@ -2,19 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.IO;
 
 public class DebugModing : MonoBehaviour
 {
-    //치트 `나중에 바꿔야할것`
     [SerializeField]
-    bool isDebugMode = true;
+    bool isDebugMode = true; // 디버그 모드 활성화 여부
     int debugMode = 0;
-   
+
+    public GameObject[] hideObjects;
+
+    private void Start()
+    {
+        HideObjects(); // 숨김 객체 처리
+    }
 
     void Update()
     {
-        GetInputDebug();
+        GetInputDebug(); // 디버그 모드 입력 처리
     }
 
     private void GetInputDebug()
@@ -33,43 +37,53 @@ public class DebugModing : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha5))
             debugMode = 5;
 
-        // 디버그 모드에 따른 처리
+        HandleDebugMode();
+    }
+
+    private void HandleDebugMode()
+    {
         switch (debugMode)
         {
             case 1:
-                // 디버그 모드 1 인트로 화면
-                SceneManager.LoadScene("IntroScene");
-                debugMode = 0;
+                LoadScene("IntroScene");
                 break;
             case 2:
-                // 디버그 모드 2 닉네임 화면
-                SceneManager.LoadScene("ProduceScene");
-                debugMode = 0;
+                LoadScene("ProduceScene");
                 break;
             case 3:
-                // 디버그 모드 3 게임 OverWolrd
-                SceneManager.LoadScene("GameScene");
-               
-                debugMode = 0;
+                LoadScene("GameScene");
                 break;
             case 4:
-                // 디버그 모드 4 게임 InGame
                 if (SceneManager.GetActiveScene().name == "GameScene")
                 {
-                    //UI_Item_Event_Manager.Instance.Init();
-                    //UI_Item_Event_Manager.Instance.IngameStart();
+                    // UI_Item_Event_Manager.Instance.Init();
+                    // UI_Item_Event_Manager.Instance.IngameStart();
                 }
-
                 debugMode = 0;
                 break;
             case 5:
-                // 디버그 모드 5 처리 
-                
+                // 추후 확장 가능
                 debugMode = 0;
                 break;
             default:
-                // 디버그 모드가 설정되지 않은 경우 처리
                 break;
+        }
+    }
+
+    private void LoadScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+        debugMode = 0;
+    }
+
+    private void HideObjects()
+    {
+        foreach (var obj in hideObjects)
+        {
+            if (obj.TryGetComponent(out SpriteRenderer renderer))
+            {
+                renderer.color = Color.clear;
+            }
         }
     }
 }

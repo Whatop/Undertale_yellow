@@ -48,7 +48,8 @@ public class NPC : MonoBehaviour
         // 강제 이벤트 중일 때 대화 처리
         if (isEvent && isFirstInteraction)
         {
-            StartDialogue();
+            isTalking = true;
+            dialogueManager.SetCurrentNPC(this);
             isFirstInteraction = false;
         }
 
