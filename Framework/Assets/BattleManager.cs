@@ -7,7 +7,18 @@ public class BattleManager : MonoBehaviour
     private static BattleManager instance;
     public GameObject battleObject;
     Animator battleAnimator;
+    GameManager gameManager;
+    public enum BattleState { None, BasicBattle, BossBattle }  // 전투 상태를 정의
+    public BattleState currentState;
 
+    public GameObject[] roomPrefabs;  // 여러 전투 방 프리팹 배열
+    public Transform roomSpawnPoint;
+
+    public GameObject[] enemyPrefabs;  // 적 프리팹 배열
+    public Transform[] enemySpawnPoints;  // 적이 생성될 위치들
+
+    public GameObject bossRoomPrefab;  // 보스 방 프리팹
+    public Transform bossSpawnPoint;
 
     public static BattleManager Instance
     {
@@ -26,6 +37,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        gameManager = GameManager.Instance;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +50,16 @@ public class BattleManager : MonoBehaviour
     public void BattleStart(int eventNumber)
     {
         battleAnimator.SetTrigger("BattleStart");
-
+        gameManager.isBattle = true;
+        SpawnEnemies();
+    }
+    void SpawnEnemies()
+    {
+        foreach (var spawnPoint in enemySpawnPoints)
+        {
+            int randomEnemy = Random.Range(0, enemyPrefabs.Length);
+            Instantiate(enemyPrefabs[randomEnemy], spawnPoint.position, Quaternion.identity);
+        }
     }
 
 }

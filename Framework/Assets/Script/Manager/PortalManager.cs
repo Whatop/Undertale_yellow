@@ -122,18 +122,44 @@ public class PortalManager : MonoBehaviour
         }
 
         // 포인트에 해당하는 가상 카메라 활성화
-        if (point >= 0 && point < virtualCameras.Length)
+        switch (point)
         {
-            virtualCameras[point].transform.position = portalPoints[point].transform.position;
-            mainsCamera.transform.position = virtualCameras[point].transform.position;
-            virtualCameras[point].gameObject.SetActive(true);
+            case 0:
+                virtualCameras[1].transform.position = portalPoints[1].transform.position;
+                mainsCamera.transform.position = virtualCameras[1].transform.position;
+                virtualCameras[1].gameObject.SetActive(true);
+                break;
+
+            case 1:
+                virtualCameras[0].transform.position = portalPoints[0].transform.position;
+                mainsCamera.transform.position = virtualCameras[0].transform.position;
+                virtualCameras[0].gameObject.SetActive(true);
+                break;
+
+            case 2:
+                virtualCameras[2].transform.position = portalPoints[2].transform.position;
+                mainsCamera.transform.position = virtualCameras[2].transform.position;
+                virtualCameras[2].gameObject.SetActive(true);
+                break;
+
+            case 3:
+                virtualCameras[1].transform.position = portalPoints[2].transform.position;
+                mainsCamera.transform.position = virtualCameras[2].transform.position;
+                virtualCameras[1].gameObject.SetActive(true);
+                break;
+
+            case 4:
+                virtualCameras[3].transform.position = portalPoints[2].transform.position;
+                mainsCamera.transform.position = virtualCameras[2].transform.position;
+                virtualCameras[3].gameObject.SetActive(true);
+                break;
+            default:
+                defaultvirtualCamera.transform.position = defaultPoint.transform.position;
+                mainsCamera.transform.position = defaultvirtualCamera.transform.position;
+                defaultvirtualCamera.gameObject.SetActive(true);
+                break;
         }
-        else
-        {
-            defaultvirtualCamera.transform.position = defaultPoint.transform.position;
-            mainsCamera.transform.position = defaultvirtualCamera.transform.position;
-            defaultvirtualCamera.gameObject.SetActive(true);
-        }
+
     }
 
     IEnumerator Fade(float targetAlpha)

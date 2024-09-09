@@ -86,7 +86,7 @@ public class DialogueManager : MonoBehaviour
                 sentences.Enqueue("이런, 길을 잃은 것 같네");
                 sentences.Enqueue("내가 조금 도와줄게.");
                 SoundManager.Instance.StopBGSound();
-                SoundManager.Instance.BGSoundPlay("toby fox - UNDERTALE Soundtrack - 03 Your Best Friend", 3);
+                SoundManager.Instance.BGSoundPlay(3);
                 break;
         }
         currentNPC.isEvent = true;
