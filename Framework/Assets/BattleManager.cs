@@ -51,7 +51,6 @@ public class BattleManager : MonoBehaviour
     {
         battleAnimator.SetTrigger("BattleStart");
         gameManager.isBattle = true;
-        SpawnEnemies();
     }
     void SpawnEnemies()
     {

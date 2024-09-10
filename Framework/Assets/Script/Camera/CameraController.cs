@@ -6,13 +6,14 @@ using Cinemachine;
 public class CameraController : MonoBehaviour
 {
     private GameManager gameManager;
+    private CinemachineBrain cinemachineBrain;
 
-    // 여러 가상 카메라를 배열로 관리하지만, 직접 제어하지 않음
     public CinemachineVirtualCamera[] virtualCameras;
 
     private void Awake()
     {
         gameManager = GameManager.Instance;
+        cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>(); // 메인 카메라에 붙은 CinemachineBrain 컴포넌트 가져오기
     }
 
     private void Update()
@@ -22,21 +23,22 @@ public class CameraController : MonoBehaviour
 
     void UpdateCameraSize()
     {
-        foreach (var virtualCamera in virtualCameras)
-        {
-            if (virtualCamera == null)
-            {
-                Debug.LogWarning("CinemachineVirtualCamera가 CameraController에 할당되지 않았습니다.");
-                continue;
-            }
+        // 현재 활성화된 가상 카메라 가져오기
+        CinemachineVirtualCamera activeVirtualCamera = cinemachineBrain.ActiveVirtualCamera as CinemachineVirtualCamera;
 
-            // 2D 카메라의 OrthographicSize를 조정
-            float targetCameraSize = gameManager.isBattle ? 10 : 6; // 전투 중일 때와 기본 상태의 카메라 크기
-            if (Mathf.Abs(virtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f )
+        if (activeVirtualCamera != null)
+        {
+            float targetCameraSize = gameManager.isBattle ? 10 : 6;
+
+            // 카메라 크기가 너무 작게 변동하지 않도록 조정
+            if (Mathf.Abs(activeVirtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
             {
-                
-                virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetCameraSize, 8f * Time.deltaTime);
+             activeVirtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(activeVirtualCamera.m_Lens.OrthographicSize, targetCameraSize, 8f * Time.deltaTime);
             }
+        }
+        else
+        {
+            Debug.LogWarning("활성화된 CinemachineVirtualCamera가 없습니다.");
         }
     }
 }
