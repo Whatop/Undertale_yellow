@@ -51,6 +51,7 @@ public class BattleManager : MonoBehaviour
     {
         battleAnimator.SetTrigger("BattleStart");
         gameManager.isBattle = true;
+        SoundManager.Instance.SFXPlay("BattleStart", 1);
     }
     void SpawnEnemies()
     {
