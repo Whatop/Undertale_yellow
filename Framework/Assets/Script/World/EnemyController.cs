@@ -63,7 +63,7 @@ public class EnemyController : LivingObject
                 weaponData.current_magazine -= 1;
                 weaponData.current_Ammo -= 1;
                 curTime = 0;
-                SoundManager.Instance.SFXPlay("mus_piano7", 38); // ÃÑ »ç¿îµå º¯°æ
+                SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // ÃÑ »ç¿îµå
 
             }
 

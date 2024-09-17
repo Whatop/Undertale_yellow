@@ -68,6 +68,11 @@ public class BulletController : MonoBehaviour
             other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
             DestroyBullet();
         }
+        else if (other.CompareTag("Soul") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+        {
+            other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
+            DestroyBullet();
+        }
         else if (other.CompareTag("Wall"))
         {
             DestroyBullet();

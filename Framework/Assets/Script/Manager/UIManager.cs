@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour
     GameManager gameManager;
 
     private static UIManager instance;
-    public GameObject[] ui_positions; //health : 0, Weapon : 1
+    public GameObject[] ui_positions; //health : 0, Weapon : 1, hp2 : 0
 
     [SerializeField]
     private GameObject[] ui_healths;
@@ -196,6 +196,7 @@ public class UIManager : MonoBehaviour
         InitWeapon();
         ShowPanel("Game");
         OptionInput();
+        UpdateUI();
     }
 
     public void TextBarOpen()
@@ -343,19 +344,40 @@ public class UIManager : MonoBehaviour
     void InitHeart() // 체력 새팅
     {
         PlayerData player = gameManager.GetPlayerData();
-
-        int heart_count = player.Maxhealth / 2;
+        int heart_count = player.Maxhealth / 2; // 총 체력에 맞는 하트 개수 설정
         ui_healths = new GameObject[heart_count];
+
+        // 체력바 전체 길이를 설정하기 위한 부모 UI RectTransform
+        RectTransform parentRect = ui_positions[0].GetComponent<RectTransform>();
+
+        // 각 하트의 가로 간격 (여백 포함)을 결정합니다.
+        float totalWidth = parentRect.rect.width; // 부모 UI의 너비
+        float padding = 10f; // 하트 간의 간격 (필요에 따라 조정)
+        float heartWidth = (totalWidth - padding * (heart_count - 1)) / heart_count; // 각 하트의 너비
+        ui_healthImage.SetActive(true);
 
         for (int i = 0; i < heart_count; i++)
         {
             GameObject heartPrefab = Resources.Load<GameObject>("Prefabs/Heart");
             GameObject instance = Instantiate(heartPrefab, ui_positions[0].transform);
 
-            float sizeX = instance.GetComponent<RectTransform>().sizeDelta.x;
+            RectTransform heartRect = instance.GetComponent<RectTransform>();
 
+            // 하트의 크기를 부모 UI 너비에 맞춰 조정합니다.
+            heartRect.sizeDelta = new Vector2(heartWidth, heartRect.sizeDelta.y);
+
+            // 하트를 가로 방향으로 배치합니다.
             Vector3 newPosition = instance.transform.position;
-            newPosition.x = ui_positions[0].transform.position.x + i * sizeX; // 가로 방향으로 위치 설정
+
+            if (!GameManager.Instance.isBattle)
+            {
+                newPosition.x = parentRect.position.x - totalWidth / 2 + (heartWidth + padding) * i + heartWidth / 2; // 가로 배치
+            }
+            else
+            {
+                newPosition.x = ui_positions[2].transform.position.x + (heartWidth + padding) * i; // 전투 상태일 때 위치 조정
+            }
+
             instance.transform.position = newPosition;
             ui_healths[i] = instance;
         }
@@ -397,16 +419,43 @@ public class UIManager : MonoBehaviour
 
     public void UpdateUI()
     {
+        SetCombatMode();
         PlayerData player = gameManager.GetPlayerData();
         int currentHealth = player.health;
 
         // 체력 이미지 업데이트
-        for (int i = 0; i < ui_healths.Length; i++)
+        RectTransform parentRect = ui_positions[0].GetComponent<RectTransform>();
+        float totalWidth = parentRect.rect.width; // 부모 UI의 너비
+        float padding = 10f; // 하트 간의 간격
+        int heart_count = ui_healths.Length;
+        float heartWidth = (totalWidth - padding * (heart_count - 1)) / heart_count; // 각 하트의 너비
+
+        for (int i = 0; i < heart_count; i++)
         {
-            int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2); // 체력에 따른 스프라이트 인덱스 계산
+            // 체력에 따른 스프라이트 인덱스 계산
+            int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2);
             ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
+
+            // 하트의 위치를 다시 설정 (체력 UI가 갱신될 때마다 위치를 다시 조정)
+            RectTransform heartRect = ui_healths[i].GetComponent<RectTransform>();
+            Vector3 newPosition = ui_healths[i].transform.position;
+
+            if (!GameManager.Instance.isBattle)
+            {
+                newPosition.x = parentRect.position.x - totalWidth / 2 + (heartWidth + padding) * i + heartWidth / 2; // 가로 배치
+                ui_healths[i].GetComponent<Image>().color = new Color(1, 1, 1, 0.75f);
+            }
+            else
+            {
+                newPosition.x = ui_positions[2].transform.position.x + (heartWidth + padding) * i; // 전투 상태일 때 위치 조정
+                ui_healths[i].GetComponent<Image>().color = new Color(1, 1, 1, 1);
+            }
+
+            // 위치 적용
+            ui_healths[i].transform.position = newPosition;
         }
 
+        // 무기 데이터 가져오기 및 총알 이미지 업데이트
         Weapon weapon = gameManager.GetWeaponData();
         int current_magazine = weapon.current_magazine;
 
@@ -414,14 +463,58 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < ui_ammo.Length; i++)
         {
             int spriteIndex = (i < current_magazine) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
-
-            // Image 컴포넌트의 sprite 속성을 사용하여 스프라이트 변경
             ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
 
+        // 무기 탄약 텍스트 업데이트
         ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
     }
 
+    public void SetCombatMode()
+    {
+        if (gameManager.isBattle || GameManager.Instance.GetPlayerData().isInvincible)
+        {
+            OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
+
+        }
+        else
+        {
+            OffPlayerUI(); // 비전투 상태에서는 UI를 숨김
+        }
+    }
+    // 체력, 무기 등의 UI를 끄는 함수
+    public void OffPlayerUI()
+    {
+        foreach (var ui in ui_ammo)
+        {
+            ui.gameObject.SetActive(false);
+        }
+        foreach (var ui in pedestal)
+        {
+            ui.gameObject.SetActive(false);
+        }
+        ui_weaponImage.gameObject.SetActive(false);
+        ui_ammoText.gameObject.SetActive(false);
+        ui_weaponBackImage.gameObject.SetActive(false);
+        ui_healthImage.gameObject.SetActive(false);
+    }
+
+    // 체력, 무기 등의 UI를 켜는 함수
+    public void OnPlayerUI()
+    {
+        foreach (var ui in ui_ammo)
+        {
+            ui.gameObject.SetActive(true);
+        }
+        foreach (var ui in pedestal)
+        {
+            ui.gameObject.SetActive(true);
+        }
+        ui_weaponImage.gameObject.SetActive(true);
+        ui_ammoText.gameObject.SetActive(true);
+        ui_weaponBackImage.gameObject.SetActive(true);
+        ui_healthImage.gameObject.SetActive(true);
+    }
     #endregion
 
     #region optionUI
@@ -919,39 +1012,5 @@ public class UIManager : MonoBehaviour
         return KeyCode.None;
     }
 
-    public void OffPlayerUI()
-    {
-     //   ui_ammo, pedestal,ui_weaponImage,ui_ammoText
-
-       foreach(var ui in ui_ammo)
-        {
-            ui.gameObject.SetActive(false);
-        }
-       foreach(var ui in pedestal)
-        {
-            ui.gameObject.SetActive(false);
-        }
-        ui_weaponImage.gameObject.SetActive(false);
-        ui_ammoText.gameObject.SetActive(false);
-        ui_weaponBackImage.gameObject.SetActive(false);
-        ui_healthImage.gameObject.SetActive(false);
-    }
-
-    public void OnPlayerUI()
-    {
-
-        foreach (var ui in ui_ammo)
-        {
-            ui.gameObject.SetActive(true);
-        }
-        foreach (var ui in pedestal)
-        {
-            ui.gameObject.SetActive(true);
-        }
-        ui_weaponImage.gameObject.SetActive(true);
-        ui_ammoText.gameObject.SetActive(true);
-        ui_weaponBackImage.gameObject.SetActive(true);
-        ui_healthImage.gameObject.SetActive(true);
-    }
 
 }

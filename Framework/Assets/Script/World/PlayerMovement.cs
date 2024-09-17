@@ -35,12 +35,22 @@ public class PlayerMovement : LivingObject
     private bool isReloading = false;
     private float reloadTime = 1.5f; // 재장전 시간 (초)
 
+    public GameObject soulObject; // Soul GameObject
+    public GameObject playerSprite; // Player의 스프라이트 (흐림 효과 적용)
+    public float playerTransparency = 0f; // Player 투명도 값 (흐릿한 효과)
+
+    private bool isSoulActive = false; // Soul 모드 활성화 여부
+    
     // Awake 메서드: 초기 설정
     protected override void Awake()
     {
         base.Awake();
         WeaponsAnimator = Weapons.GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         weaponData = new Weapon();
+
+        // 시작할 때 Soul 비활성화
+        soulObject.SetActive(false);
         // reloadSlider.ManagerreloadSlider.gameObject.SetActive(false); // 슬라이더 비활성화
     }
 
@@ -49,19 +59,74 @@ public class PlayerMovement : LivingObject
     {
         playerData = gameManager.GetPlayerData();
         maxHealth = playerData.health; // 최대 체력 설정
+        playerData.playerAnimator = animator; // 아마도 맞는거 애니메이션 작동
+        playerData.isInvincible = isInvincible;
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
         SoundManager.Instance.BGSoundPlay(); // 배경음악 재생
         OffHpbar();
     }
+    #region
+    // Soul 모드 처리
+    private void HandleSoulMode()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
+        {
+            isSoulActive = !isSoulActive; // Soul 모드 전환
 
+            if (isSoulActive)
+            {
+                EnableSoul();
+            }
+            else
+            {
+                DisableSoul();
+            }
+        }
+    }
+    // Soul 모드 활성화: 투명도 조절
+    private void EnableSoul()
+    {
+        soulObject.SetActive(true); // Soul 활성화
+        SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
+    }
+
+    // Soul 모드 비활성화: 투명도 원상복귀
+    private void DisableSoul()
+    {
+        soulObject.SetActive(false); // Soul 비활성화
+        SetTransparency(playerSprite, 1f); // 플레이어 투명도 복원
+    }
+
+    // 투명도 설정 함수
+    private void SetTransparency(GameObject obj, float alpha)
+    {
+        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = alpha;
+            spriteRenderer.color = color;
+        }
+    }
+    // Soul과 플레이어의 위치 및 회전 동기화
+    private void SyncSoulWithPlayer()
+    {
+        soulObject.transform.position = transform.position; // Soul을 플레이어와 같은 위치로 설정
+    }
+    #endregion
     // Update 메서드: 매 프레임마다 호출
     protected override void Update()
     {
+
         base.Update();
+        playerData.isInvincible = isInvincible;
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
         {
+
+            HandleSoulMode(); // Soul 모드 처리
             if (UIManager.Instance.reloadSlider != null)
             {
                 UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
@@ -106,6 +171,10 @@ public class PlayerMovement : LivingObject
             else
             {
                 Hands.gameObject.SetActive(false);
+            }
+            if (isSoulActive)
+            {
+                SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
             }
         }
     }
@@ -178,6 +247,7 @@ public class PlayerMovement : LivingObject
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         bulletRb.velocity = WeaponTransform.up * bulletSpeed;
         SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
+        WeaponsAnimator.SetTrigger("Shot");
     }
 
     // 구르기 코루틴

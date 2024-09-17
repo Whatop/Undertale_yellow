@@ -21,9 +21,9 @@ public class LivingObject : MonoBehaviour
     protected bool isnpc; // 비전투!
     protected bool isDie = false;
 
-    protected bool isInvincible = false; // 무적 상태인지 여부
-    protected float invincibleDuration = 1.5f; // 무적 지속 시간
-    protected float invincibleTimer = 0f; // 무적 타이머
+    protected bool isInvincible = false; // 무적 상태 여부
+    protected float invincibleDuration = 0.6f; // 무적 지속 시간 (0.6초)
+    protected float invincibleTimer = 0f; // 무적 상태의 타이머
 
     protected Transform healthBarTransform; // 체력바의 Transform
     public GameObject healthBarPrefab; // 체력바 프리팹
@@ -39,6 +39,7 @@ public class LivingObject : MonoBehaviour
     public Canvas worldCanvas; // 월드 캔버스
     private Camera mainCamera;
     public GameObject hpBarPoint;
+
     protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -50,6 +51,7 @@ public class LivingObject : MonoBehaviour
         // 체력바 초기화
         InitializeHealthBar();
     }
+
     protected void InitializeHealthBar()
     {
         if (healthBarPrefab != null && worldCanvas != null)
@@ -69,30 +71,42 @@ public class LivingObject : MonoBehaviour
                 healthText.text = maxHealth + "/" + health;
             }
 
-
             healthBarTransform.position = hpBarPoint.transform.position;
         }
     }
-    
+
     protected virtual void Update()
     {
-            // 체력바 위치 업데이트
-            if (healthBar != null)
+        // 무적 상태 타이머 처리
+        if (isInvincible)
+        {
+            invincibleTimer += Time.deltaTime;
+            if (invincibleTimer >= invincibleDuration)
             {
-                if (healthSlider != null)
-                {
-                    healthSlider.maxValue = maxHealth;
-                    healthSlider.value = health;
-                }
-                if (healthText != null)
-                {
-                    healthText.text = maxHealth + "/" + health;
-                }
-                healthBarTransform.position = hpBarPoint.transform.position;
+                isInvincible = false; // 무적 상태 해제
+                invincibleTimer = 0f;
             }
+        }
 
-            if (transform.tag == "Pleyer")
-                gameManager.SavePlayerData(playerData);
+        // 체력바 위치 업데이트
+        if (healthBar != null)
+        {
+            if (healthSlider != null)
+            {
+                healthSlider.maxValue = maxHealth;
+                healthSlider.value = health;
+            }
+            if (healthText != null)
+            {
+                healthText.text = maxHealth + "/" + health;
+            }
+            healthBarTransform.position = hpBarPoint.transform.position;
+        }
+
+        if (transform.tag == "Player")
+        {
+            gameManager.SavePlayerData(playerData);
+        }
     }
 
     public virtual void Die()
@@ -100,13 +114,13 @@ public class LivingObject : MonoBehaviour
         isDie = true;
         Debug.Log("Object died!");
         Destroy(healthBar); // 체력바 제거
-
     }
 
     public virtual void OffHpbar()
     {
         healthBar.SetActive(false);
     }
+
     public void TakeDamage(int damageAmount)
     {
         if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
@@ -124,12 +138,16 @@ public class LivingObject : MonoBehaviour
             {
                 Die();
             }
+            else
+            {
+                StartCoroutine(StartInvincibility()); // 무적 상태로 전환
+            }
         }
     }
 
     public void TakeDamage(int damageAmount, Vector3 position)
     {
-        if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
+        if (!isInvincible ) // 무적 상태가 아닐 때만 데미지를 받음
         {
             UIManager.Instance.ShowDamageText(position, damageAmount);
             health -= damageAmount;
@@ -144,6 +162,22 @@ public class LivingObject : MonoBehaviour
             {
                 Die();
             }
+            else
+            {
+                SoundManager.Instance.SFXPlay("HitSound", 128);
+                StartCoroutine(StartInvincibility()); // 무적 상태로 전환
+            }
+        }
+    }
+
+    // 무적 상태 시작 코루틴
+    private IEnumerator StartInvincibility()
+    {
+        if (transform.tag == "Player")
+        {
+            isInvincible = true; // 무적 상태 활성화
+            yield return new WaitForSeconds(invincibleDuration); // 무적 상태 유지 시간
+            isInvincible = false; // 무적 상태 해제
         }
     }
 

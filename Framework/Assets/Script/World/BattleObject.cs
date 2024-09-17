@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class BattleObject : MonoBehaviour
 {
-
+    public int battleNumber = 0;
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            BattleManager.Instance.BattleStart(0);
+            BattleManager.Instance.BattleStart(battleNumber);
         }
     }
 }

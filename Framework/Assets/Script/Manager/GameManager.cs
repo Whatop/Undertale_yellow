@@ -1,5 +1,7 @@
 using UnityEngine;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 public enum GameState
 {
     Fight,
@@ -14,20 +16,22 @@ public class PlayerData
     public int health;
     public Vector3 position;
     public string player_Name;
-    public string[] inventory;
+    public List<string> inventory;
     public GameState currentState; // 플레이어의 현재 게임 상태 추가
     public bool isStop = false;
-
+    public Animator playerAnimator;
+    public bool isInvincible;
 
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
-        Maxhealth = 10;
+        Maxhealth = 6;
         health = 6;
         position = Vector3.zero;
         player_Name = "";
-        inventory = new string[10]; // 동적으로 크기를 조절할 수 있도록 고려 가능
+        inventory = new List<string>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
+        playerAnimator = null;
         // 추가 데이터 초기화
     }
 }
@@ -39,6 +43,7 @@ public class GameManager : MonoBehaviour
     private PlayerData playerData;
     private Weapon weaponData;
 
+    public Action<GameState> OnGameStateChanged;
     /// <summary>
     /// 전투 확인용
     /// </summary>
@@ -102,25 +107,11 @@ public class GameManager : MonoBehaviour
         weaponData = newData;
     }
 
-
     public void ChangeGameState(GameState newState)
     {
         playerData.currentState = newState;
-        // 상태에 따른 추가적인 동작 수행
-        switch (newState)
-        {
-            case GameState.Fight:
-                // Fight 상태에 따른 동작 수행
-                break;
-            case GameState.Event:
-                // Event 상태에 따른 동작 수행
-                break;
-            case GameState.NpcTalk:
-                // NpcTalk 상태에 따른 동작 수행
-                break;
-            default:
-                break;
-        }
+        isBattle = (newState == GameState.Fight); // 전투 상태와 연동
+        OnGameStateChanged?.Invoke(newState);
     }
     public void ResumeGame()
     {
