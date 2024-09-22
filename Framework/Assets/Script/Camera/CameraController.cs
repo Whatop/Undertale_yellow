@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     private CinemachineBrain cinemachineBrain;
 
     public CinemachineVirtualCamera[] virtualCameras;
+    public CinemachineVirtualCamera virtualBattleCamera;
 
     private void Awake()
     {
@@ -39,6 +40,14 @@ public class CameraController : MonoBehaviour
         else
         {
             Debug.LogWarning("활성화된 CinemachineVirtualCamera가 없습니다.");
+        }
+        if (gameManager.isBattle)
+        {
+            virtualBattleCamera.Priority = 11;
+        }
+        else
+        {
+            virtualBattleCamera.Priority = 6;
         }
     }
 }
