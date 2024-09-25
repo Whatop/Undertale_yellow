@@ -23,7 +23,9 @@ public class PlayerMovement : LivingObject
 
     public Transform WeaponTransform; // 총의 Transform 컴포넌트
     public Transform shotpoint; // 총의 Transform 컴포넌트
+    public Transform soulshotpoint; // 영혼의 총 Transform 컴포넌트
     public GameObject bulletPrefab; // 총알 프리팹
+    public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f; // 총알 발사 속도
     Weapon weaponData;
 
@@ -90,6 +92,8 @@ public class PlayerMovement : LivingObject
     {
         soulObject.SetActive(true); // Soul 활성화
         SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
+        SetTransparency(Hands, playerTransparency);
+        SetTransparency(Weapons, playerTransparency);
     }
 
     // Soul 모드 비활성화: 투명도 원상복귀
@@ -97,6 +101,8 @@ public class PlayerMovement : LivingObject
     {
         soulObject.SetActive(false); // Soul 비활성화
         SetTransparency(playerSprite, 1f); // 플레이어 투명도 복원
+        SetTransparency(Hands, 1f);
+        SetTransparency(Weapons, 1f);
     }
 
     // 투명도 설정 함수
@@ -121,6 +127,7 @@ public class PlayerMovement : LivingObject
     {
 
         base.Update();
+        SoulRotateToMouse();
         playerData.isInvincible = isInvincible;
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
@@ -243,11 +250,38 @@ public class PlayerMovement : LivingObject
     // 총알 발사
     void Shoot()
     {
-        GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-        SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
-        WeaponsAnimator.SetTrigger("Shot");
+        if (!isSoulActive)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
+            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+            bulletRb.velocity = WeaponTransform.up * bulletSpeed;
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
+            WeaponsAnimator.SetTrigger("Shot");
+        }
+        else 
+        {
+
+            GameObject bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
+            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+            bulletRb.velocity = WeaponTransform.up * bulletSpeed;
+            SoundManager.Instance.SFXPlay("soul_shot_01", 124); // 총 사운드
+            WeaponsAnimator.SetTrigger("Shot");
+        }
+    }
+    void SoulRotateToMouse()
+    {
+        // 1. 마우스의 스크린 좌표를 월드 좌표로 변환
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // 2D 게임이므로 Z 축을 0으로 고정
+
+        // 2. 오브젝트와 마우스 좌표 간의 방향 벡터 계산
+        Vector3 direction = mousePosition - transform.position;
+
+        // 3. 방향 벡터로부터 각도 계산 (라디안 -> 각도로 변환)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // 4. 오브젝트의 회전 적용 (Z축 기준 회전)
+        soulObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
     }
 
     // 구르기 코루틴

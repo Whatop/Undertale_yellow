@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour
 
         if (activeVirtualCamera != null)
         {
-            float targetCameraSize = gameManager.isBattle ? 6 : 6;
+            float targetCameraSize = gameManager.isBattle ? 9 : 6;
 
             // 카메라 크기가 너무 작게 변동하지 않도록 조정
             if (Mathf.Abs(activeVirtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
