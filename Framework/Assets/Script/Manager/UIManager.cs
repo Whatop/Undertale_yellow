@@ -104,6 +104,12 @@ public class UIManager : MonoBehaviour
     public GameObject textbar;
     public TextMeshProUGUI text;
     public Image npcFaceImage;
+    
+    //gameover UI
+    public GameObject gameover_Object;
+    public TextMeshProUGUI gameover_text;
+    public Image gameover_image;
+
 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
