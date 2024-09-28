@@ -143,7 +143,7 @@ public class LivingObject : MonoBehaviour
                 healthSlider.value = health;
             }
 
-            if (health <= 0)
+            if (health <= 0 && !isDie )
             {
                 Die();
             }
@@ -167,7 +167,7 @@ public class LivingObject : MonoBehaviour
                 healthSlider.value = health;
             }
 
-            if (health <= 0)
+            if (health <= 0 && !isDie)
             {
                 Die();
             }

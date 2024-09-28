@@ -60,7 +60,7 @@ public class PlayerMovement : LivingObject
     void Start()
     {
         playerData = gameManager.GetPlayerData();
-        maxHealth = playerData.health; // 최대 체력 설정
+        maxHealth = 1; // 최대 체력 설정
         playerData.playerAnimator = animator; // 아마도 맞는거 애니메이션 작동
         playerData.isInvincible = isInvincible;
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화

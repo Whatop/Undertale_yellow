@@ -109,9 +109,12 @@ public class UIManager : MonoBehaviour
     public GameObject gameover_Object;
     public TextMeshProUGUI gameover_text;
     public Image gameover_image;
+    public GameObject gameover_soul;
+    public Sprite[] soul_sprites;
     // heartbreak sound 87->89
     // heartbreak_c sound 88->90
-
+    // 4,5,6,7 -> 하트 조각
+    // 3-> 부서진 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
     {
@@ -148,6 +151,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        gameover_Object.SetActive(false);
         LoadSettings();
         predefinedResolutions = new List<Resolution>
     {
@@ -250,6 +254,13 @@ public class UIManager : MonoBehaviour
         }
         UpdateUI();
         OptionInput();
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            RectTransform transform = gameover_soul.GetComponent<RectTransform>();
+            gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
+
+        }
     }
     public void LoadIntro()
     {
@@ -1025,12 +1036,12 @@ public class UIManager : MonoBehaviour
     {
         gameover_Object.SetActive(true);
         soundManager.StopBGSound();
-        soundManager.SFXPlayDelayed("heartbreak1", 87, 0.1f);
-        soundManager.SFXPlayDelayed("heartbreak2", 89, 1f);
         soundManager.BGSoundPlayDelayed(4, 3);
         //gameover_Object;
         //gameover_text;
         //gameover_image;
+        StartCoroutine(Okdo());
+        StartCoroutine(Okdso());
         StartCoroutine(FadeIn());
         StartCoroutine(gameoverTextOn());
 
@@ -1038,10 +1049,10 @@ public class UIManager : MonoBehaviour
     } 
     private IEnumerator gameoverTextOn()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4f);
         gameover_text.text = "you cannot aruound dont give up. . .";
-
         gameover_text.GetComponent<TypeEffect>().SetMsg(gameover_text.text, OnSentenceComplete);
+
     }
     private IEnumerator FadeIn()
     {
@@ -1069,6 +1080,24 @@ public class UIManager : MonoBehaviour
         // Ensure the alpha is fully set to 1 after the loop
         color.a = 1f;
         gameover_image.color = color;
+    }
+    private IEnumerator Okdo()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        gameover_soul.GetComponent<Image>().sprite = soul_sprites[1];
+        soundManager.SFXPlay("heartbreak1", 87);
+    }
+    private IEnumerator Okdso()
+    {
+        yield return new WaitForSeconds(1f);
+
+        gameover_soul.GetComponent<Image>().color = new Color(1, 1, 1, 0);
+        soundManager.SFXPlay("heartbreak2", 89);
+        RectTransform transform = gameover_soul.GetComponent<RectTransform>();
+        gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
+        gameover_text.GetComponent<TypeEffect>().SetMsg(gameover_text.text, OnSentenceComplete);
+
     }
     private void OnSentenceComplete()
     {
