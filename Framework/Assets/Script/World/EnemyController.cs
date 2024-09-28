@@ -21,6 +21,7 @@ public class EnemyController : LivingObject
     {
         base.Awake(); // LivingObject의 Awake 메서드 호출
         weaponData = new Weapon();
+        //animator.GetComponent<Animator>();
     }
 
      void Start()

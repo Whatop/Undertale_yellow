@@ -180,4 +180,41 @@ public class SoundManager : MonoBehaviour
         }
         sfxSources.Clear(); // Clear the list of SFX sources
     }
+    public void SFXPlayDelayed(string sfxName, int sfxNum, float delay)
+    {
+        StartCoroutine(PlaySFXAfterDelay(sfxName, sfxNum, delay));
+    }
+
+    private IEnumerator PlaySFXAfterDelay(string sfxName, int sfxNum, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        GameObject go = new GameObject(sfxName + "Sound");
+        AudioSource audioSource = go.AddComponent<AudioSource>();
+
+        audioSource.clip = sfxlist[sfxNum];
+        audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
+        audioSource.volume = 0.1f;
+        audioSource.Play();
+        Destroy(go, sfxlist[sfxNum].length);
+        sfxSources.Add(audioSource); // Add to the list of SFX sources
+    }
+    public void BGSoundPlayDelayed(int bgNum, float delay)
+    {
+        StartCoroutine(PlayBGAfterDelay(bgNum, delay));
+    }
+
+    private IEnumerator PlayBGAfterDelay(int bgNum, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (bgNum >= 0 && bgNum < bglist.Length)
+        {
+            bgSound.clip = bglist[bgNum];
+            bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
+            bgSound.loop = true;
+            bgSound.volume = 0.1f;
+            bgSound.Play();
+        }
+    }
 }

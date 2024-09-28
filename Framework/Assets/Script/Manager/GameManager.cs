@@ -21,6 +21,7 @@ public class PlayerData
     public bool isStop = false;
     public Animator playerAnimator;
     public bool isInvincible;
+    public bool isDie;
 
     public PlayerData()
     {
@@ -32,6 +33,7 @@ public class PlayerData
         inventory = new List<string>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
+        isDie = false;
         // 추가 데이터 초기화
     }
 }
@@ -121,6 +123,24 @@ public class GameManager : MonoBehaviour
     public void OpenUI()
     {
         UIManager.Instance.isUserInterface = true;
+    }
+
+    public void Die()
+    {
+        playerData.isDie = true;
+        playerData.playerAnimator.SetBool("isDie",true);
+        UIManager.Instance.playGameover();
+        DestroyAllEnemies();
+
+    }
+    public void DestroyAllEnemies()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject enemy in enemies)
+        {
+            Destroy(enemy);
+        }
     }
 }
 

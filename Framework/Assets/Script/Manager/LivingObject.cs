@@ -114,6 +114,15 @@ public class LivingObject : MonoBehaviour
         isDie = true;
         Debug.Log("Object died!");
         Destroy(healthBar); // 체력바 제거
+
+        if (transform.tag == "Player")
+        {
+            gameManager.Die(); 
+        }
+        else
+        {
+            animator.SetBool("isDie",true);
+        }
     }
 
     public virtual void OffHpbar()

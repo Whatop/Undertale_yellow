@@ -109,7 +109,8 @@ public class UIManager : MonoBehaviour
     public GameObject gameover_Object;
     public TextMeshProUGUI gameover_text;
     public Image gameover_image;
-
+    // heartbreak sound 87->89
+    // heartbreak_c sound 88->90
 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
@@ -1019,4 +1020,59 @@ public class UIManager : MonoBehaviour
     }
 
 
+    #region gameOver
+    public void playGameover()
+    {
+        gameover_Object.SetActive(true);
+        soundManager.StopBGSound();
+        soundManager.SFXPlayDelayed("heartbreak1", 87, 0.1f);
+        soundManager.SFXPlayDelayed("heartbreak2", 89, 1f);
+        soundManager.BGSoundPlayDelayed(4, 3);
+        //gameover_Object;
+        //gameover_text;
+        //gameover_image;
+        StartCoroutine(FadeIn());
+        StartCoroutine(gameoverTextOn());
+
+
+    } 
+    private IEnumerator gameoverTextOn()
+    {
+        yield return new WaitForSeconds(3f);
+        gameover_text.text = "you cannot aruound dont give up. . .";
+
+        gameover_text.GetComponent<TypeEffect>().SetMsg(gameover_text.text, OnSentenceComplete);
+    }
+    private IEnumerator FadeIn()
+    {
+        yield return new WaitForSeconds(3f);
+        float duration = 2f; // 2 seconds
+        float currentTime = 0f;
+
+        // Get the current color of the image
+        Color color = gameover_image.color;
+        color.a = 0f; // Start with alpha at 0
+        gameover_image.color = color;
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            float alpha = Mathf.Clamp01(currentTime / duration); // Alpha value from 0 to 1
+
+            // Update the alpha of the image color
+            color.a = alpha;
+            gameover_image.color = color;
+
+            yield return null;
+        }
+
+        // Ensure the alpha is fully set to 1 after the loop
+        color.a = 1f;
+        gameover_image.color = color;
+    }
+    private void OnSentenceComplete()
+    {
+        Debug.Log("문장이 완료되었습니다.");
+    }
+    #endregion
 }
