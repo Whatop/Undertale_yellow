@@ -5,6 +5,7 @@ using UnityEngine;
 public class DialogueManager : MonoBehaviour
 {
     private Queue<string> sentences;
+    private Queue<string> gameover_sentences;
     private NPC currentNPC;
     public TypeEffect typeEffect;
 
@@ -95,6 +96,19 @@ public class DialogueManager : MonoBehaviour
         DisplayNextSentence(npcID);
     }
 
+    public void StartGameOverDialogue(int npcID)
+    {
+        sentences.Clear();
+        GameManager.Instance.GetPlayerData().isStop = true;
+        switch (npcID)
+        {
+            case 0:
+                sentences.Enqueue("벌써부터 포기해선 안된다 . . .");
+                sentences.Enqueue(GameManager.Instance.GetPlayerData().player_Name + "!" + "의지를 가지거라 . . .");
+                break;
+
+        }
+    }
     public void DisplayNextSentence()
     {
         if (sentences.Count == 0)
