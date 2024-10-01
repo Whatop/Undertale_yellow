@@ -8,6 +8,7 @@ public class DialogueManager : MonoBehaviour
     private Queue<string> gameover_sentences;
     private NPC currentNPC;
     public TypeEffect typeEffect;
+    public TypeEffect gameOvertypeEffect;
 
     public static DialogueManager instance;
     public Sprite[] npcFaces;
@@ -45,6 +46,7 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         sentences = new Queue<string>();
+        gameover_sentences = new Queue<string>();
     }
 
     public void StartDialogue(int npcID)
@@ -75,9 +77,7 @@ public class DialogueManager : MonoBehaviour
         switch (npcID)
         {
             case 0:
-                sentences.Enqueue("안녕, 나는 테스트 NPC " + npcID);
-                sentences.Enqueue("오늘 하루는 어때?");
-                sentences.Enqueue("잘가~");
+                sentences.Enqueue("테스트 NPC " + npcID);
                 break;
 
             case 1001:
@@ -96,19 +96,31 @@ public class DialogueManager : MonoBehaviour
         DisplayNextSentence(npcID);
     }
 
+    #region gameover
     public void StartGameOverDialogue(int npcID)
     {
-        sentences.Clear();
-        GameManager.Instance.GetPlayerData().isStop = true;
+        gameover_sentences.Clear();
         switch (npcID)
         {
             case 0:
-                sentences.Enqueue("벌써부터 포기해선 안된다 . . .");
-                sentences.Enqueue(GameManager.Instance.GetPlayerData().player_Name + "!" + "의지를 가지거라 . . .");
+                gameover_sentences.Enqueue("벌써부터 \n포기해선 안 된다 . . .");
+                gameover_sentences.Enqueue(GameManager.Instance.GetPlayerData().player_Name + "!" + " \n의지를 가지거라 . . .");
                 break;
 
         }
+        DisplayNextGameOver();
     }
+    public void DisplayNextGameOver()
+    {
+        if (gameover_sentences.Count == 0)
+        {
+            return;
+        }
+
+        string sentence = gameover_sentences.Dequeue();
+        gameOvertypeEffect.SetMsg(sentence, OnGameOverComplete);
+    }
+    #endregion
     public void DisplayNextSentence()
     {
         if (sentences.Count == 0)
@@ -135,7 +147,22 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log("문장이 완료되었습니다.");
     }
-
+    private void End_And_LoadComplete()
+    {
+        Debug.Log("문장이 완료되었습니다."); 
+        UIManager.Instance.End_And_Load();
+    }
+    private void OnGameOverComplete()
+    {
+        Debug.Log("문장이 완료되었습니다.");
+        StartCoroutine(TimeToLate());
+    }
+    IEnumerator TimeToLate()
+    {
+        yield return new WaitForSeconds(0.5f);
+        string sentence = gameover_sentences.Dequeue();
+        gameOvertypeEffect.SetMsg(sentence, End_And_LoadComplete);
+    }
     void EndDialogue()
     {
         if (currentNPC != null)

@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
+    DialogueManager dialogueManager;
 
     private static UIManager instance;
     public GameObject[] ui_positions; //health : 0, Weapon : 1, hp2 : 0
@@ -111,6 +112,7 @@ public class UIManager : MonoBehaviour
     public Image gameover_image;
     public GameObject gameover_soul;
     public Sprite[] soul_sprites;
+    private bool isTalking = false;
     // heartbreak sound 87->89
     // heartbreak_c sound 88->90
     // 4,5,6,7 -> 하트 조각
@@ -147,6 +149,7 @@ public class UIManager : MonoBehaviour
 
         gameManager = GameManager.Instance;
         soundManager = SoundManager.Instance;
+        dialogueManager = DialogueManager.Instance;
     }
 
     private void Start()
@@ -261,7 +264,9 @@ public class UIManager : MonoBehaviour
             gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
 
         }
+       
     }
+
     public void LoadIntro()
     {
         SceneManager.LoadScene("IntroScene");
@@ -1047,11 +1052,27 @@ public class UIManager : MonoBehaviour
 
 
     } 
+    public void End_And_Load()
+    {
+        gameover_text.gameObject.SetActive(false);
+        StartCoroutine(FadeOut());
+        StartCoroutine(Load_SavePoint());
+        // Off gameover
+        // last load -> go!
+
+    }
+    private IEnumerator Load_SavePoint()
+    {
+        yield return new WaitForSeconds(3f);
+        gameover_Object.SetActive(false);
+        gameManager.Load();
+
+    }
     private IEnumerator gameoverTextOn()
     {
         yield return new WaitForSeconds(4f);
-        gameover_text.text = "you cannot aruound dont give up. . .";
-        gameover_text.GetComponent<TypeEffect>().SetMsg(gameover_text.text, OnSentenceComplete);
+        gameover_text.gameObject.SetActive(true);
+        dialogueManager.StartGameOverDialogue(0);
 
     }
     private IEnumerator FadeIn()
@@ -1081,6 +1102,34 @@ public class UIManager : MonoBehaviour
         color.a = 1f;
         gameover_image.color = color;
     }
+    private IEnumerator FadeOut()
+    {
+        yield return new WaitForSeconds(0.8f);
+        float duration = 2f; // 2초 동안 진행
+        float currentTime = 0f;
+
+        // 현재 이미지 색상 가져오기
+        Color color = gameover_image.color;
+        color.a = 1f; // 시작할 때 알파값을 1로 설정
+        gameover_image.color = color;
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            float alpha = Mathf.Clamp01(1 - (currentTime / duration)); // 알파 값을 1에서 0으로
+
+            // 이미지 색상의 알파값 업데이트
+            color.a = alpha;
+            gameover_image.color = color;
+
+            yield return null;
+        }
+
+        // 반복문이 끝난 후 알파 값을 0으로 완전히 설정
+        color.a = 0f;
+        gameover_image.color = color;
+    }
+
     private IEnumerator Okdo()
     {
         yield return new WaitForSeconds(0.1f);
@@ -1096,12 +1145,8 @@ public class UIManager : MonoBehaviour
         soundManager.SFXPlay("heartbreak2", 89);
         RectTransform transform = gameover_soul.GetComponent<RectTransform>();
         gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
-        gameover_text.GetComponent<TypeEffect>().SetMsg(gameover_text.text, OnSentenceComplete);
 
     }
-    private void OnSentenceComplete()
-    {
-        Debug.Log("문장이 완료되었습니다.");
-    }
+   
     #endregion
 }

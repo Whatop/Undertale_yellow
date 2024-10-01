@@ -29,7 +29,7 @@ public class PlayerData
         Maxhealth = 6;
         health = 6;
         position = Vector3.zero;
-        player_Name = "";
+        player_Name = "frisk";
         inventory = new List<string>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
@@ -141,6 +141,59 @@ public class GameManager : MonoBehaviour
         {
             Destroy(enemy);
         }
+    }
+
+    // Save Method
+    public void Save()
+    {
+        // 플레이어 위치 저장
+        PlayerPrefs.SetFloat("PlayerPosX", playerData.position.x);
+        PlayerPrefs.SetFloat("PlayerPosY", playerData.position.y);
+        PlayerPrefs.SetFloat("PlayerPosZ", playerData.position.z);
+
+        // 체력 및 기타 플레이어 데이터 저장
+        PlayerPrefs.SetInt("PlayerHealth", playerData.Maxhealth);  // 최대체력으로 회복
+        PlayerPrefs.SetInt("PlayerMaxHealth", playerData.Maxhealth);
+        PlayerPrefs.SetString("PlayerName", playerData.player_Name);
+
+        // 인벤토리 아이템 저장
+        for (int i = 0; i < playerData.inventory.Count; i++)
+        {
+            PlayerPrefs.SetString("InventoryItem_" + i, playerData.inventory[i]);
+        }
+        PlayerPrefs.SetInt("InventoryCount", playerData.inventory.Count);
+
+        PlayerPrefs.Save();
+        Debug.Log("게임이 저장되었습니다.");
+    }
+
+    // Load Method
+    public void Load()
+    {
+        // 플레이어 위치 로드
+        float posX = PlayerPrefs.GetFloat("PlayerPosX", 0f);
+        float posY = PlayerPrefs.GetFloat("PlayerPosY", 0f);
+        float posZ = PlayerPrefs.GetFloat("PlayerPosZ", 0f);
+        playerData.position = new Vector3(posX, posY, posZ);
+
+        // 체력 및 기타 플레이어 데이터 로드
+        playerData.health = PlayerPrefs.GetInt("PlayerHealth", 6); // 기본 값 6
+        playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 6);
+        playerData.player_Name = PlayerPrefs.GetString("PlayerName", "frisk");
+
+        // 인벤토리 아이템 로드
+        int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
+        playerData.inventory.Clear(); // 기존 인벤토리 초기화
+        for (int i = 0; i < inventoryCount; i++)
+        {
+            string item = PlayerPrefs.GetString("InventoryItem_" + i, string.Empty);
+            if (!string.IsNullOrEmpty(item))
+            {
+                playerData.inventory.Add(item);
+            }
+        }
+
+        Debug.Log("게임이 로드되었습니다.");
     }
 }
 
