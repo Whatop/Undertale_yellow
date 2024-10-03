@@ -31,7 +31,7 @@ public class TypeEffect : MonoBehaviour
         onEffectEndCallback = onEffectEnd;
         switch (eventNumber)
         {
-            case 1001:
+            case 100:
                 txtsound = "voice_flowey_1";
                 txtId = 17;
                 break;

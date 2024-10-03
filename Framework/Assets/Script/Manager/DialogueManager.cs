@@ -12,7 +12,7 @@ public class DialogueManager : MonoBehaviour
 
     public static DialogueManager instance;
     public Sprite[] npcFaces;
-
+    private int npcID;
     void Awake()
     {
         if (instance == null)
@@ -49,39 +49,66 @@ public class DialogueManager : MonoBehaviour
         gameover_sentences = new Queue<string>();
     }
 
-    public void StartDialogue(int npcID)
+    public void StartDialogue(int id)
     {
+        npcID = id;
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
         switch (npcID)
         {
             case 0:
-                sentences.Enqueue("안녕, 나는 테스트 NPC " + npcID);
-                sentences.Enqueue("오늘 하루는 어때?");
-                sentences.Enqueue("잘가~");
+                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
+                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
+                sentences.Enqueue("테스트 NPC " + npcID);
                 break;
 
-            case 1001:
+            case 100:
+                UIManager.Instance.npcFaceImage.gameObject.SetActive(true);
+                UIManager.Instance.npcFaceImage.sprite = npcFaces[0];
+                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(160, UIManager.Instance.text.gameObject.transform.localPosition.y);
+
                 sentences.Enqueue("어라?");
                 sentences.Enqueue("Don't say that.");
+                break;
+
+            case 1000:
+                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
+                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
+
+                SoundManager.Instance.SFXPlay("heal_sound", 123);
+                sentences.Enqueue("* 당신은 리볼버를 정비하며..");
+                sentences.Enqueue("* 당신의 정의가 충만해진다.");
+                break;
+
+
+            case 1001:
+                SoundManager.Instance.SFXPlay("heal_sound", 123);
+                sentences.Enqueue("* 당신은 지난 괴물들을 보며..");
+                sentences.Enqueue("* 당신의 정의가 충만해진다.");
                 break;
         }
 
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }
-    public void StartEventDialogue(int npcID)
+    public void StartEventDialogue(int id)
     {
+        npcID = id;
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
         switch (npcID)
         {
             case 0:
+                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
+                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
                 sentences.Enqueue("테스트 NPC " + npcID);
                 break;
 
-            case 1001:
+            case 100:
+                UIManager.Instance.npcFaceImage.gameObject.SetActive(true);
                 UIManager.Instance.npcFaceImage.sprite = npcFaces[0];
+                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(160, UIManager.Instance.text.gameObject.transform.localPosition.y);
+                
                 sentences.Enqueue(".  .  .");
                 sentences.Enqueue("안녕, 내 이름은 플라위");
                 sentences.Enqueue("이런, 길을 잃은 것 같네");
@@ -149,12 +176,12 @@ public class DialogueManager : MonoBehaviour
     }
     private void End_And_LoadComplete()
     {
-        Debug.Log("문장이 완료되었습니다."); 
+        Debug.Log("게임오버 끝 -> Save로 넘어감"); 
         UIManager.Instance.End_And_Load();
     }
     private void OnGameOverComplete()
     {
-        Debug.Log("문장이 완료되었습니다.");
+        Debug.Log("임시 방편, 게임오버 대화");
         StartCoroutine(TimeToLate());
     }
     IEnumerator TimeToLate()
@@ -168,9 +195,21 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             currentNPC.EndDialogue();
-            UIManager.Instance.CloseTextbar();
-            GameManager.Instance.GetPlayerData().isStop = false;
-            UIManager.Instance.OnPlayerUI();
+
+        }
+        UIManager.Instance.CloseTextbar();
+        GameManager.Instance.GetPlayerData().isStop = false;
+        UIManager.Instance.OnPlayerUI();
+
+        switch (npcID)
+        {
+            case 1000: // Save
+                SoundManager.Instance.SFXPlay("save_sound", 171);
+                UIManager.Instance.SaveOpen();
+
+                break;
+            case 1002: // Chest
+                break;
         }
     }
     void EndDialogue(int eventNumber)
@@ -178,15 +217,16 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             currentNPC.EndDialogue();
-            UIManager.Instance.CloseTextbar();
-            GameManager.Instance.GetPlayerData().isStop = false;
-            UIManager.Instance.OnPlayerUI();
-            switch (eventNumber)
-            {
-                case 1001:
-                    BattleManager.Instance.BattleStart(eventNumber);
-                    break;
-            }
+
+        }
+        UIManager.Instance.CloseTextbar();
+        GameManager.Instance.GetPlayerData().isStop = false;
+        UIManager.Instance.OnPlayerUI();
+        switch (eventNumber)
+        {
+            case 100:
+                BattleManager.Instance.BattleStart(eventNumber);
+                break;
         }
     }
     public void SetCurrentNPC(NPC npc)

@@ -125,7 +125,8 @@ public class PlayerMovement : LivingObject
     // Update 메서드: 매 프레임마다 호출
     protected override void Update()
     {
-
+        if (isDie)
+            return;
         base.Update();
         SoulRotateToMouse();
         playerData.isInvincible = isInvincible;

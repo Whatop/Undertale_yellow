@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using UnityEngine.SceneManagement;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -112,11 +113,28 @@ public class UIManager : MonoBehaviour
     public Image gameover_image;
     public GameObject gameover_soul;
     public Sprite[] soul_sprites;
-    private bool isTalking = false;
     // heartbreak sound 87->89
     // heartbreak_c sound 88->90
     // 4,5,6,7 -> 하트 조각
     // 3-> 부서진 
+
+    // Save UI
+    public GameObject savePanel;
+    /// <summary>
+    /// 0. 저장완료
+    /// 1. 이름
+    /// 2. 레벨
+    /// 3. 시간
+    /// 4. 장소
+    /// 5. 돌아가기
+    /// 6. 저장
+    /// </summary>
+    public TextMeshProUGUI[] savePanel_texts;
+    public GameObject savePanel_soul;
+    public GameObject[] save_points;
+    public bool isSavePanel = false;
+    public int saveNum = 0;
+
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
     {
@@ -211,8 +229,53 @@ public class UIManager : MonoBehaviour
         ShowPanel("Game");
         OptionInput();
         UpdateUI();
+        SaveOff();
     }
 
+    #region savePanel
+    public void SaveOpen()
+    {
+        isSavePanel = true;
+        savePanel.SetActive(true);
+        savePanel_soul.SetActive(true);
+
+        savePanel_texts[1].color = new Color(255, 255, 255);
+        savePanel_texts[2].color = new Color(255, 255, 255);
+        savePanel_texts[3].color = new Color(255, 255, 255);
+        savePanel_texts[4].color = new Color(255, 255, 255);
+
+
+        savePanel_texts[0].gameObject.SetActive(false);
+        savePanel_texts[5].gameObject.SetActive(true);
+        savePanel_texts[6].gameObject.SetActive(true);
+
+    }
+
+    public void SaveOff()
+    {
+        isSavePanel = false;
+        savePanel.SetActive(false);
+
+
+    }
+
+    public void SaveComplete()
+    {
+        TextYellow();
+        savePanel_texts[5].gameObject.SetActive(false);
+        savePanel_texts[6].gameObject.SetActive(false);
+        savePanel_texts[0].gameObject.SetActive(true);
+    }
+    public void TextYellow()
+    {
+        savePanel_texts[1].color = new Color(255,255,0);
+        savePanel_texts[2].color = new Color(255,255,0);
+        savePanel_texts[3].color = new Color(255,255,0);
+        savePanel_texts[4].color = new Color(255,255,0);
+        
+        
+    }
+    #endregion
     public void TextBarOpen()
     {
         // 플레이어 위치 가져오기
@@ -264,7 +327,28 @@ public class UIManager : MonoBehaviour
             gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
 
         }
-       
+        if (isSavePanel)
+        {
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                saveNum--;
+                if (saveNum < 0)
+                {
+                    saveNum = save_points.Length - 1; // 배열의 마지막 인덱스로 순환
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                saveNum++;
+                if (saveNum >= save_points.Length)
+                {
+                    saveNum = 0; // 배열의 처음으로 순환
+                }
+            }
+
+            savePanel_soul.gameObject.transform.localPosition = save_points[saveNum].transform.localPosition;
+        }
+
     }
 
     public void LoadIntro()
@@ -1054,7 +1138,6 @@ public class UIManager : MonoBehaviour
     } 
     public void End_And_Load()
     {
-        gameover_text.gameObject.SetActive(false);
         StartCoroutine(FadeOut());
         StartCoroutine(Load_SavePoint());
         // Off gameover
@@ -1063,7 +1146,7 @@ public class UIManager : MonoBehaviour
     }
     private IEnumerator Load_SavePoint()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(5f);
         gameover_Object.SetActive(false);
         gameManager.Load();
 
@@ -1105,6 +1188,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator FadeOut()
     {
         yield return new WaitForSeconds(0.8f);
+        gameover_text.gameObject.SetActive(false);
         float duration = 2f; // 2초 동안 진행
         float currentTime = 0f;
 
