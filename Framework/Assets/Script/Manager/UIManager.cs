@@ -134,6 +134,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] save_points;
     public bool isSavePanel = false;
     public int saveNum = 0;
+    public bool isSaveDelay = false;
 
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
     public static UIManager Instance
@@ -235,7 +236,9 @@ public class UIManager : MonoBehaviour
     #region savePanel
     public void SaveOpen()
     {
+        saveNum = 0;
         isSavePanel = true;
+        isSaveDelay = false;
         savePanel.SetActive(true);
         savePanel_soul.SetActive(true);
 
@@ -253,15 +256,18 @@ public class UIManager : MonoBehaviour
 
     public void SaveOff()
     {
+        saveNum = 0;
         isSavePanel = false;
         savePanel.SetActive(false);
-
-
     }
 
     public void SaveComplete()
     {
+        saveNum = -1; //야메
+        isSavePanel = false;
+        isSaveDelay = true;
         TextYellow();
+
         savePanel_texts[5].gameObject.SetActive(false);
         savePanel_texts[6].gameObject.SetActive(false);
         savePanel_texts[0].gameObject.SetActive(true);
@@ -347,10 +353,40 @@ public class UIManager : MonoBehaviour
             }
 
             savePanel_soul.gameObject.transform.localPosition = save_points[saveNum].transform.localPosition;
+
+            switch (saveNum)
+            {
+                case 0:
+                    if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+                        SaveComplete();
+                    break;
+
+                case 1:
+                    if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+                        SaveOff();
+                    break;
+            }
+        }
+        else
+        {
+            if(saveNum == -1)
+            {
+                if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+                {
+                    SaveOff();
+                    StartCoroutine(SaveDalay());
+                }
+            }
         }
 
     }
 
+    IEnumerator SaveDalay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isSaveDelay = false;
+
+    }
     public void LoadIntro()
     {
         SceneManager.LoadScene("IntroScene");

@@ -195,11 +195,11 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             currentNPC.EndDialogue();
+            GameManager.Instance.GetPlayerData().isStop = false;
+            UIManager.Instance.OnPlayerUI();
 
         }
         UIManager.Instance.CloseTextbar();
-        GameManager.Instance.GetPlayerData().isStop = false;
-        UIManager.Instance.OnPlayerUI();
 
         switch (npcID)
         {
