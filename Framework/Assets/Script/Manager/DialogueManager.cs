@@ -204,7 +204,6 @@ public class DialogueManager : MonoBehaviour
         switch (npcID)
         {
             case 1000: // Save
-                SoundManager.Instance.SFXPlay("save_sound", 171);
                 UIManager.Instance.SaveOpen();
 
                 break;

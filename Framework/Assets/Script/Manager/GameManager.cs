@@ -51,7 +51,11 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public bool isBattle;
     public int curportalNumber = 0;
+    private float startTime;   // 게임 시작 시간
+    private float savedTime;   // 이전에 저장된 시간 (누적 시간)
+    private bool isSave;
 
+    string mapName = "페허 - 잎 무더기 ";
     public bool isPortalTransition = false;
     public static GameManager Instance
     {
@@ -86,7 +90,46 @@ public class GameManager : MonoBehaviour
         playerData = new PlayerData();
         weaponData = new Weapon();
     }
+    private void Start()
+    {
+        startTime = Time.time;
+        isSave = PlayerPrefs.GetInt("MyBoolValue", 0) == 1 ? true : false;
 
+        if (isSave) // 저장되있다면
+        {
+            Load();
+            LoadGameTime();
+        }
+    }
+    public void SaveGameTime()
+    {
+        // 현재까지의 경과 시간을 저장 (초 단위)
+        savedTime += Time.time - startTime;
+
+        // 저장을 원한다면 PlayerPrefs 사용 (간단한 예로)
+        PlayerPrefs.SetFloat("SavedGameTime", savedTime);
+
+        // 게임을 다시 시작할 때 시간을 재설정
+        startTime = Time.time;
+    }
+    private void LoadGameTime()
+    {
+        // 저장된 시간이 있으면 로드, 없으면 0으로 설정
+        savedTime = PlayerPrefs.GetFloat("SavedGameTime", 0f);
+    }
+    public string GetElapsedTimeInMinutes()
+    { // 현재 경과된 시간 계산 (초 단위)
+        float elapsedTime = (Time.time - startTime) + savedTime;
+
+        // 분과 초를 분리하여 두 자리로 표시
+        string minutes = Mathf.Floor(elapsedTime / 60).ToString("00");
+        string seconds = (elapsedTime % 60).ToString("00");
+        return  (minutes+":"+seconds); // 분 단위로 반환
+    }
+    public string GetMapName()
+    {
+        return mapName;
+    }
     public PlayerData GetPlayerData()
     {
         return playerData;
@@ -146,6 +189,7 @@ public class GameManager : MonoBehaviour
     // Save Method
     public void Save()
     {
+        isSave = true;
         // 플레이어 위치 저장
         PlayerPrefs.SetFloat("PlayerPosX", playerData.position.x);
         PlayerPrefs.SetFloat("PlayerPosY", playerData.position.y);
@@ -156,6 +200,7 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("PlayerMaxHealth", playerData.Maxhealth);
         PlayerPrefs.SetString("PlayerName", playerData.player_Name);
 
+        PlayerPrefs.SetInt("MyBoolValue", isSave ? 1 : 0);
         // 인벤토리 아이템 저장
         for (int i = 0; i < playerData.inventory.Count; i++)
         {

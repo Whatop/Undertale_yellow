@@ -263,14 +263,18 @@ public class UIManager : MonoBehaviour
 
     public void SaveComplete()
     {
+        savePanel_soul.SetActive(false);
         saveNum = -1; //¾ß¸Þ
         isSavePanel = false;
         isSaveDelay = true;
         TextYellow();
+        SoundManager.Instance.SFXPlay("save_sound", 171);
 
         savePanel_texts[5].gameObject.SetActive(false);
         savePanel_texts[6].gameObject.SetActive(false);
         savePanel_texts[0].gameObject.SetActive(true);
+        gameManager.Save();
+        gameManager.SaveGameTime();
     }
     public void TextYellow()
     {
@@ -278,8 +282,9 @@ public class UIManager : MonoBehaviour
         savePanel_texts[2].color = new Color(255,255,0);
         savePanel_texts[3].color = new Color(255,255,0);
         savePanel_texts[4].color = new Color(255,255,0);
-        
-        
+
+        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes().ToString();
+        savePanel_texts[4].text = gameManager.GetMapName();
     }
     #endregion
     public void TextBarOpen()
