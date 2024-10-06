@@ -67,6 +67,7 @@ public class PlayerMovement : LivingObject
 
         SoundManager.Instance.BGSoundPlay(); // 배경음악 재생
         OffHpbar();
+        transform.position = playerData.position;
     }
     #region
     // Soul 모드 처리
