@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
     DialogueManager dialogueManager;
+    private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
 
     private static UIManager instance;
     public GameObject[] ui_positions; //health : 0, Weapon : 1, hp2 : 0
@@ -135,8 +136,31 @@ public class UIManager : MonoBehaviour
     public bool isSavePanel = false;
     public int saveNum = 0;
     public bool isSaveDelay = false;
+    //inventory panel
+    /// <summary>
+    /// 0. 인벤토리
+    /// 1. 아이템
+    /// 2. 스텟 
+    /// 3. 전화
+    /// </summary>
+    public int inventroy_panelNum = 0;
+    public int inventroy_curNum = 0;
+    public bool isInventroy = false;
 
-    private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
+    public GameObject inventroy_panel;
+    public GameObject item_panel;
+    public GameObject stat_panel;
+    public GameObject call_panel;
+
+    public TextMeshProUGUI[] inventroy_texts;
+    public TextMeshProUGUI[] item_texts;
+    public TextMeshProUGUI[] stat_texts;
+    public TextMeshProUGUI[] call_texts;
+    public GameObject[] inventroy_points;
+    public GameObject[] item_points;
+    public GameObject[] call_points;
+    public Image inventroy_soul;
+
     public static UIManager Instance
     {
         get
@@ -312,7 +336,7 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
-        if (isUserInterface)
+        if (isUserInterface || isInventroy)
         {
             Time.timeScale = 0f;
         }
@@ -331,6 +355,9 @@ public class UIManager : MonoBehaviour
         }
         UpdateUI();
         OptionInput();
+
+        HandleInput();
+        UpdateSoulPosition();
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -385,7 +412,100 @@ public class UIManager : MonoBehaviour
         }
 
     }
+    #region InventroyUi
+    void OnInventroy()
+    {
+        isInventroy = true;
+    }
+    void OffInventroy()
+    {
+        isInventroy = false;
+    }
+    void OnPanel(int i)
+    {
+        item_panel.SetActive(false);
+        stat_panel.SetActive(false);
+        call_panel.SetActive(false);
+        switch (i)
+        {
+            case 0:
+                item_panel.SetActive(true);
+                break;
 
+            case 1:
+                stat_panel.SetActive(true);
+                break;
+
+            case 2:
+                call_panel.SetActive(true);
+                break;
+        }
+    }
+    void HandleInput()
+    {
+        if (!isInventroy)
+            return;
+        // W 입력 시 inventroy_curNum 감소
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            inventroy_curNum--;
+            if (inventroy_curNum < 0)
+            {
+                inventroy_curNum = GetCurrentPanelTextLength() - 1; // 현재 패널의 끝으로 이동
+            }
+        }
+
+        // S 입력 시 inventroy_curNum 증가
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            inventroy_curNum++;
+            if (inventroy_curNum >= GetCurrentPanelTextLength())
+            {
+                inventroy_curNum = 0; // 현재 패널의 처음으로 이동
+            }
+        }
+    }
+
+    int GetCurrentPanelTextLength()
+    {
+        switch (inventroy_panelNum)
+        {
+            case 0: // 인벤토리 패널
+                return inventroy_texts.Length;
+            case 1: // 아이템 패널
+                return item_texts.Length;
+            case 3: // 전화 패널
+                return call_texts.Length;
+            default:
+                return 0;
+        }
+    }
+
+    void UpdateSoulPosition()
+    {
+        GameObject[] currentPoints = null;
+
+        // 패널에 맞는 포인트 배열을 선택
+        switch (inventroy_panelNum)
+        {
+            case 0:
+                currentPoints = inventroy_points;
+                break;
+            case 1:
+                currentPoints = item_points;
+                break;
+            case 3: // 스탯 제외
+                currentPoints = call_points;
+                break;
+        }
+
+        // 현재 선택된 포인트 위치로 inventroy_soul 이동
+        if (currentPoints != null && currentPoints.Length > 0 && inventroy_curNum < currentPoints.Length)
+        {
+            inventroy_soul.transform.position = currentPoints[inventroy_curNum].transform.position;
+        }
+    }
+    #endregion
     IEnumerator SaveDalay()
     {
         yield return new WaitForSeconds(0.5f);

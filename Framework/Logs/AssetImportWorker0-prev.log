@@ -1,39 +1,185 @@
 Using pre-set license
 Built from '2020.3/staging' branch; Version is '2020.3.6f1 (338bb68529b2) revision 3378102'; Using compiler version '192528614'; Build Type 'Release'
-OS: 'Windows 10 Home; OS build 22621.2283; Version 2009; 64bit' Language: 'ko' Physical Memory: 16215 MB
+OS: 'Windows 10 Pro; OS build 22631.4249; Version 2009; 64bit' Language: 'ko' Physical Memory: 32469 MB
 BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
 
  COMMAND LINE ARGUMENTS:
-D:\Unity\2020.3.6f1\Editor\Unity.exe
+C:\Program Files\Unity\Hub\Editor\2020.3.6f1\Editor\Unity.exe
 -adb2
 -batchMode
 -noUpm
 -name
 AssetImportWorker0
 -projectPath
-D:/github/FrameWork/Framework
+C:/Users/MSI/Documents/GitHub/FrameWork/Framework
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-2210
-Successfully changed project path to: D:/github/FrameWork/Framework
-D:/github/FrameWork/Framework
+50777
+Successfully changed project path to: C:/Users/MSI/Documents/GitHub/FrameWork/Framework
+C:/Users/MSI/Documents/GitHub/FrameWork/Framework
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 460.70 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 55.95 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.6f1 (338bb68529b2)
-[Subsystems] Discovering subsystems at path D:/Unity/2020.3.6f1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path D:/github/FrameWork/Framework/Assets
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/MSI/Documents/GitHub/FrameWork/Framework/Assets
 GfxDevice: creating device client; threaded=0
 Direct3D:
     Version:  Direct3D 11.0 [level 11.1]
-    Renderer: NVIDIA GeForce RTX 4070 Ti (ID=0x2782)
+    Renderer: NVIDIA GeForce RTX 3050 Laptop GPU (ID=0x25a2)
     Vendor:   
-    VRAM:     12010 MB
-    Driver:   31.0.15.4633
+    VRAM:     3965 MB
+    Driver:   32.0.15.5599
 Initialize mono
-Mono path[0] = 'D:/Unity/2020.3.6f1/Editor/Data/Managed'
-Mono path[1] = 'D:/Unity/2020.3.6f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
-Mono config path = 'D:/Unity/2020.3.6f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56948
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56452
 Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001699 seconds.
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 59.01 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.168 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.001043 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 57.14 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.052 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.05 seconds
+Refreshing native plugins compatible for Editor in 0.59 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2236 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 117.9 MB.
+System memory in use after: 118.0 MB.
+
+Unloading 19 unused Assets to reduce memory usage. Loaded Objects now: 2703.
+Total: 2.943700 ms (FindLiveObjects: 0.474300 ms CreateObjectMapping: 0.187300 ms MarkObjects: 2.240600 ms  DeleteObjects: 0.038700 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Sprite/Player/Soul.png
+  artifactKey: Guid(9c901f0647886554593f8cebe91c8720) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Player/Soul.png using Guid(9c901f0647886554593f8cebe91c8720) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '48d0101a8d02ee45616565f97f6a4d5b') in 0.169249 seconds
+  Import took 0.175957 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000375 seconds.
+  path: Assets/Sprite/Player
+  artifactKey: Guid(06fcb15d787644547984d3187c062569) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Player using Guid(06fcb15d787644547984d3187c062569) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0096acbcf32329ca3a413c909aee0c38') in 0.009265 seconds
+  Import took 0.015135 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 13578.579583 seconds.
+  path: Assets/Script/Manager/UIManager.cs
+  artifactKey: Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/Manager/UIManager.cs using Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9deb5c7938230c5efe6a6a51e29758d') in 0.023242 seconds
+  Import took 0.081818 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.009678 seconds.
+  path: Assets/Script/Manager/UIManager.cs
+  artifactKey: Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/Manager/UIManager.cs using Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9deb5c7938230c5efe6a6a51e29758d') in 0.002539 seconds
+  Import took 0.007272 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 843.252917 seconds.
+  path: Assets/Sprite/Animation/UI/tile_outline.png
+  artifactKey: Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Animation/UI/tile_outline.png using Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7a24266391e38ff373fc1ce3337836fc') in 0.061043 seconds
+  Import took 0.066319 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 14.539845 seconds.
+  path: Assets/Sprite/UI/tile_outline.png
+  artifactKey: Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/tile_outline.png using Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '778c7f47b40379e8eb26fcb77d25c4e4') in 0.020503 seconds
+  Import took 0.023982 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 11.001070 seconds.
+  path: Assets/Sprite/UI/tile_outline.png
+  artifactKey: Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/tile_outline.png using Guid(095795056a8beed4d84d68e614856c78) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '06cd861b288f27298f6ea9f80215b7e2') in 0.009883 seconds
+  Import took 0.013650 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.048353 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.58 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.809 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.65 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2184 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 116.5 MB.
+System memory in use after: 116.7 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2731.
+Total: 2.226000 ms (FindLiveObjects: 0.226000 ms CreateObjectMapping: 0.061400 ms MarkObjects: 1.910800 ms  DeleteObjects: 0.024800 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001202 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.51 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.843 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.59 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2184 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 116.5 MB.
+System memory in use after: 116.7 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2734.
+Total: 2.551600 ms (FindLiveObjects: 0.350200 ms CreateObjectMapping: 0.146200 ms MarkObjects: 2.033000 ms  DeleteObjects: 0.020200 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001073 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.52 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.811 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.54 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2184 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 116.6 MB.
+System memory in use after: 116.8 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2737.
+Total: 1.924400 ms (FindLiveObjects: 0.199500 ms CreateObjectMapping: 0.061100 ms MarkObjects: 1.639200 ms  DeleteObjects: 0.022200 ms)
+
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file

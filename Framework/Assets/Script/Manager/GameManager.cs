@@ -16,7 +16,7 @@ public class PlayerData
     public int health;
     public Vector3 position;
     public string player_Name;
-    public List<string> inventory;
+    public List<Item> inventory;
     public GameState currentState; // 플레이어의 현재 게임 상태 추가
     public bool isStop = false;
     public Animator playerAnimator;
@@ -30,12 +30,27 @@ public class PlayerData
         health = 6;
         position = Vector3.zero;
         player_Name = "frisk";
-        inventory = new List<string>();// 동적으로 크기를 조절할 수 있도록 고려 가능
+        inventory = new List<Item>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
         isDie = false;
         // 추가 데이터 초기화
     }
+}
+[System.Serializable]
+public class Item
+{
+    public int id;          // 아이템 고유 ID
+    public string itemName; // 아이템 이름
+    public string description; // 아이템 설명
+
+    public Item(int id, string name, string description)
+    {
+        this.id = id;
+        this.itemName = name;
+        this.description = description;
+    }
+
 }
 
 public class GameManager : MonoBehaviour
@@ -185,6 +200,21 @@ public class GameManager : MonoBehaviour
             Destroy(enemy);
         }
     }
+    public void AddItem(int id, string name, string description)
+    {
+        // 인벤토리가 가득 차지 않았는지 확인
+        if (GetPlayerData().inventory.Count < 9)
+        {
+            Item newItem = new Item(id, name, description);
+            GetPlayerData().inventory.Add(newItem);
+        }
+        else
+        {
+            Debug.Log("인벤토리가 가득 찼습니다.");
+            //@@ 추가해
+        }
+    }
+
 
     // Save Method
     public void Save()
@@ -204,7 +234,7 @@ public class GameManager : MonoBehaviour
         // 인벤토리 아이템 저장
         for (int i = 0; i < playerData.inventory.Count; i++)
         {
-            PlayerPrefs.SetString("InventoryItem_" + i, playerData.inventory[i]);
+            PlayerPrefs.SetString("InventoryItem_" + i, playerData.inventory[i].ToString());
         }
         PlayerPrefs.SetInt("InventoryCount", playerData.inventory.Count);
 
@@ -227,16 +257,16 @@ public class GameManager : MonoBehaviour
         playerData.player_Name = PlayerPrefs.GetString("PlayerName", "frisk");
 
         // 인벤토리 아이템 로드
-        int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
-        playerData.inventory.Clear(); // 기존 인벤토리 초기화
-        for (int i = 0; i < inventoryCount; i++)
-        {
-            string item = PlayerPrefs.GetString("InventoryItem_" + i, string.Empty);
-            if (!string.IsNullOrEmpty(item))
-            {
-                playerData.inventory.Add(item);
-            }
-        }
+      //  int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
+      //  playerData.inventory.Clear(); // 기존 인벤토리 초기화
+      //  for (int i = 0; i < inventoryCount; i++)
+      //  {
+      //      string item = PlayerPrefs.GetInt("InventoryItem_" + i, );
+      //      if (!string.IsNullOrEmpty(item))
+      //      {
+      //          playerData.inventory.Add(item);
+      //      }
+      //  }
 
         Debug.Log("게임이 로드되었습니다.");
     }
