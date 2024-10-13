@@ -413,31 +413,50 @@ public class UIManager : MonoBehaviour
 
     }
     #region InventroyUi
-    void OnInventroy()
+    public void ChangeInventroy()
     {
-        isInventroy = true;
-    }
-    void OffInventroy()
-    {
-        isInventroy = false;
+        if (!isInventroy)
+        {
+            isInventroy = true;
+            inventroy_panel.SetActive(true);
+        }
+        else
+        {
+            item_panel.SetActive(false);
+            stat_panel.SetActive(false);
+            call_panel.SetActive(false);
+            inventroy_panel.SetActive(false);
+            isInventroy = false;
+        }
     }
     void OnPanel(int i)
     {
         item_panel.SetActive(false);
         stat_panel.SetActive(false);
         call_panel.SetActive(false);
+        inventroy_soul.gameObject.SetActive(true);
         switch (i)
         {
             case 0:
                 item_panel.SetActive(true);
+                inventroy_panelNum = 1;
                 break;
 
             case 1:
                 stat_panel.SetActive(true);
+                inventroy_panelNum = 2;
+                inventroy_soul.gameObject.SetActive(false);
                 break;
 
             case 2:
                 call_panel.SetActive(true);
+                inventroy_panelNum = 3;
+                break;
+            default:
+                if (inventroy_panelNum == 0)
+                    ChangeInventroy();
+
+                inventroy_panelNum = 0;
                 break;
         }
     }
@@ -463,6 +482,14 @@ public class UIManager : MonoBehaviour
             {
                 inventroy_curNum = 0; // 현재 패널의 처음으로 이동
             }
+        }
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            OnPanel(inventroy_curNum);
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            OnPanel(-1);
         }
     }
 

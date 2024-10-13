@@ -24,7 +24,7 @@ public class NPC : MonoBehaviour
 
     void Update()
     {
-        if (IsPlayerNearby() && !isEvent && !UIManager.Instance.isSaveDelay) // 이벤트 중이 아닐 때 상호작용 가능
+        if (IsPlayerNearby() && !isEvent && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy) // 이벤트 중이 아닐 때 상호작용 가능
         {
             Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 

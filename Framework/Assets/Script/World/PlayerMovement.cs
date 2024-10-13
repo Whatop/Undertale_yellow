@@ -145,7 +145,7 @@ public class PlayerMovement : LivingObject
             Hands.gameObject.SetActive(true);
 
             // R키 입력 시 재장전
-            if (Input.GetKeyDown(KeyCode.R) && !isReloading && weaponData.current_magazine != weaponData.magazine)
+            if (Input.GetKeyDown(KeyCode.R) && !isReloading && weaponData.current_magazine != weaponData.magazine && !UIManager.Instance.isInventroy)
             {
                 SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
                 StartCoroutine(Reload());
@@ -171,7 +171,7 @@ public class PlayerMovement : LivingObject
             }
 
             // 구르기 상태가 아닐 때 각도에 따른 상태 설정
-            if (objectState != ObjectState.Roll)
+            if (objectState != ObjectState.Roll && !UIManager.Instance.isInventroy)
             {
                 ShootInput();
                 SetAnimatorBooleansFalse();
@@ -184,6 +184,11 @@ public class PlayerMovement : LivingObject
             if (isSoulActive)
             {
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
+            }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                UIManager.Instance.ChangeInventroy();
             }
         }
     }
@@ -351,7 +356,7 @@ public class PlayerMovement : LivingObject
     // 물리 업데이트
     void FixedUpdate()
     {
-        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
+        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy)
         {
             Move();
         }
