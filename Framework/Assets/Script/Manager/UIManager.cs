@@ -156,9 +156,12 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI[] item_texts;
     public TextMeshProUGUI[] stat_texts;
     public TextMeshProUGUI[] call_texts;
+    public TextMeshProUGUI[] interaction_texts;
+
     public GameObject[] inventroy_points;
     public GameObject[] item_points;
     public GameObject[] call_points;
+    public GameObject[] interaction_points;
     public Image inventroy_soul;
 
     public static UIManager Instance
@@ -419,6 +422,7 @@ public class UIManager : MonoBehaviour
         {
             isInventroy = true;
             inventroy_panel.SetActive(true);
+            soundManager.SFXPlay("move_sound", 185);
         }
         else
         {
@@ -438,23 +442,29 @@ public class UIManager : MonoBehaviour
         switch (i)
         {
             case 0:
+            soundManager.SFXPlay("select_sound", 173);
                 item_panel.SetActive(true);
                 inventroy_panelNum = 1;
                 break;
 
             case 1:
+            soundManager.SFXPlay("select_sound", 173);
                 stat_panel.SetActive(true);
                 inventroy_panelNum = 2;
                 inventroy_soul.gameObject.SetActive(false);
                 break;
 
             case 2:
+            soundManager.SFXPlay("select_sound", 173);
                 call_panel.SetActive(true);
                 inventroy_panelNum = 3;
                 break;
             default:
                 if (inventroy_panelNum == 0)
                     ChangeInventroy();
+                else
+                    soundManager.SFXPlay("move_sound", 185);
+
 
                 inventroy_panelNum = 0;
                 break;
@@ -468,6 +478,7 @@ public class UIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W))
         {
             inventroy_curNum--;
+            soundManager.SFXPlay("move_sound", 185);
             if (inventroy_curNum < 0)
             {
                 inventroy_curNum = GetCurrentPanelTextLength() - 1; // 현재 패널의 끝으로 이동
@@ -477,6 +488,7 @@ public class UIManager : MonoBehaviour
         // S 입력 시 inventroy_curNum 증가
         if (Input.GetKeyDown(KeyCode.S))
         {
+            soundManager.SFXPlay("move_sound", 185);
             inventroy_curNum++;
             if (inventroy_curNum >= GetCurrentPanelTextLength())
             {
@@ -503,6 +515,9 @@ public class UIManager : MonoBehaviour
                 return item_texts.Length;
             case 3: // 전화 패널
                 return call_texts.Length;
+
+            case 4: // 선택 패널
+                return interaction_texts.Length;
             default:
                 return 0;
         }
@@ -523,6 +538,9 @@ public class UIManager : MonoBehaviour
                 break;
             case 3: // 스탯 제외
                 currentPoints = call_points;
+                break;
+            case 4: // 선텍
+                currentPoints = interaction_points;
                 break;
         }
 
