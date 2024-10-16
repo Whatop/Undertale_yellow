@@ -339,7 +339,7 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
-        if (isUserInterface || isInventroy)
+        if (isUserInterface)
         {
             Time.timeScale = 0f;
         }
@@ -459,6 +459,11 @@ public class UIManager : MonoBehaviour
                 call_panel.SetActive(true);
                 inventroy_panelNum = 3;
                 break;
+
+            case 3: // 선택창
+                soundManager.SFXPlay("select_sound", 173);
+                inventroy_panelNum = 4;
+                break;
             default:
                 if (inventroy_panelNum == 0)
                     ChangeInventroy();
@@ -497,14 +502,56 @@ public class UIManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            OnPanel(inventroy_curNum);
+            if(!item_panel.activeSelf)
+                OnPanel(inventroy_curNum);
+            
+            // 인벤토리/아이템
+            else if (inventroy_curNum == 3)
+            {
+                OnPanel(4);
+            }
+            // 선택
+            else if (inventroy_panelNum == 4)
+            {
+                // 아이템 사용
+                switch (inventroy_curNum)
+                {
+                    case 0:
+                        //사용
+                        UseItem();
+                        break;
+
+                    case 1:
+                        // 정보
+                        InfoItem();
+                        break;
+                    case 2:
+                        //버리기
+                        DropItem();
+                        break;
+                }
+               // gameManager.GetPlayerData().inventory[0].id = 
+            }
+           
+
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
             OnPanel(-1);
         }
     }
+    void UseItem()
+    {
 
+    }
+    void InfoItem()
+    {
+
+    }
+    void DropItem()
+    {
+
+    }
     int GetCurrentPanelTextLength()
     {
         switch (inventroy_panelNum)
