@@ -420,6 +420,7 @@ public class UIManager : MonoBehaviour
     {
         if (!isInventroy)
         {
+            inventroy_panelNum = 0;
             isInventroy = true;
             inventroy_panel.SetActive(true);
             soundManager.SFXPlay("move_sound", 185);
@@ -445,6 +446,22 @@ public class UIManager : MonoBehaviour
             soundManager.SFXPlay("select_sound", 173);
                 item_panel.SetActive(true);
                 inventroy_panelNum = 1;
+                foreach (var r in item_texts)
+                {
+                    r.gameObject.SetActive(false); // 모든 item_texts 비활성화
+                }
+
+                int inventoryCount = gameManager.GetPlayerData().inventory.Count;
+                Debug.Log(inventoryCount);
+                int maxDisplayCount = Mathf.Min(inventoryCount, item_texts.Length); // 최대 item_texts 배열 크기만큼 표시
+                Debug.Log(inventoryCount);
+
+                for (int c = 0; c < maxDisplayCount; c++)
+                {
+                    item_texts[c].gameObject.SetActive(true); // 플레이어 인벤토리 크기만큼 item_texts 활성화
+                    item_texts[c].text = gameManager.GetPlayerData().inventory[c].itemName; // 아이템 이름 표시
+                }
+
                 break;
 
             case 1:
@@ -462,6 +479,7 @@ public class UIManager : MonoBehaviour
 
             case 3: // 선택창
                 soundManager.SFXPlay("select_sound", 173);
+                item_panel.SetActive(true);
                 inventroy_panelNum = 4;
                 break;
             default:
@@ -480,35 +498,61 @@ public class UIManager : MonoBehaviour
         if (!isInventroy)
             return;
         // W 입력 시 inventroy_curNum 감소
-        if (Input.GetKeyDown(KeyCode.W))
+        if (inventroy_panelNum != 4)
         {
-            inventroy_curNum--;
-            soundManager.SFXPlay("move_sound", 185);
-            if (inventroy_curNum < 0)
+            if (Input.GetKeyDown(KeyCode.W))
             {
-                inventroy_curNum = GetCurrentPanelTextLength() - 1; // 현재 패널의 끝으로 이동
+                inventroy_curNum--;
+                soundManager.SFXPlay("move_sound", 185);
+                if (inventroy_curNum < 0)
+                {
+                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // 현재 패널의 끝으로 이동
+                }
             }
-        }
 
-        // S 입력 시 inventroy_curNum 증가
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            soundManager.SFXPlay("move_sound", 185);
-            inventroy_curNum++;
-            if (inventroy_curNum >= GetCurrentPanelTextLength())
+            // S 입력 시 inventroy_curNum 증가
+            if (Input.GetKeyDown(KeyCode.S))
             {
-                inventroy_curNum = 0; // 현재 패널의 처음으로 이동
+                soundManager.SFXPlay("move_sound", 185);
+                inventroy_curNum++;
+                if (inventroy_curNum >= GetCurrentPanelTextLength())
+                {
+                    inventroy_curNum = 0; // 현재 패널의 처음으로 이동
+                }
             }
         }
-        if (Input.GetKeyDown(KeyCode.Z))
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                inventroy_curNum--;
+                soundManager.SFXPlay("move_sound", 185);
+                if (inventroy_curNum < 0)
+                {
+                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // 현재 패널의 끝으로 이동
+                }
+            }
+
+            // S 입력 시 inventroy_curNum 증가
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                soundManager.SFXPlay("move_sound", 185);
+                inventroy_curNum++;
+                if (inventroy_curNum >= GetCurrentPanelTextLength())
+                {
+                    inventroy_curNum = 0; // 현재 패널의 처음으로 이동
+                }
+            }
+        }
+            if (Input.GetKeyDown(KeyCode.Z))
         {
             if(!item_panel.activeSelf)
                 OnPanel(inventroy_curNum);
             
             // 인벤토리/아이템
-            else if (inventroy_curNum == 3)
+            else if (inventroy_panelNum == 1)
             {
-                OnPanel(4);
+                OnPanel(3);
             }
             // 선택
             else if (inventroy_panelNum == 4)
@@ -518,16 +562,16 @@ public class UIManager : MonoBehaviour
                 {
                     case 0:
                         //사용
-                        UseItem();
+                        gameManager.UseItem(inventroy_curNum);
                         break;
 
                     case 1:
                         // 정보
-                        InfoItem();
+                        gameManager.InfoItem(inventroy_curNum);
                         break;
                     case 2:
                         //버리기
-                        DropItem();
+                        gameManager.DropItem(inventroy_curNum);
                         break;
                 }
                // gameManager.GetPlayerData().inventory[0].id = 
@@ -540,26 +584,15 @@ public class UIManager : MonoBehaviour
             OnPanel(-1);
         }
     }
-    void UseItem()
-    {
-
-    }
-    void InfoItem()
-    {
-
-    }
-    void DropItem()
-    {
-
-    }
     int GetCurrentPanelTextLength()
     {
+        int result = gameManager.GetPlayerData().inventory.Count;
         switch (inventroy_panelNum)
         {
             case 0: // 인벤토리 패널
                 return inventroy_texts.Length;
             case 1: // 아이템 패널
-                return item_texts.Length;
+                return Mathf.Min(result, item_texts.Length);
             case 3: // 전화 패널
                 return call_texts.Length;
 

@@ -36,6 +36,15 @@ public class PlayerData
         isDie = false;
         // 추가 데이터 초기화
     }
+
+    public void IncreaseHealth(int v)
+    {
+        if(health < Maxhealth)
+            health += v;
+        else
+            health = Maxhealth;
+
+    }
 }
 [System.Serializable]
 public class Item
@@ -57,7 +66,9 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
 
+    [SerializeField]
     private PlayerData playerData;
+    [SerializeField]
     private Weapon weaponData;
 
     public Action<GameState> OnGameStateChanged;
@@ -112,6 +123,8 @@ public class GameManager : MonoBehaviour
 
         if (isSave) // 저장되있다면
         {
+            AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.");
+            AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.");
             Load();
             LoadGameTime();
         }
@@ -214,7 +227,62 @@ public class GameManager : MonoBehaviour
             //@@ 추가해
         }
     }
+    public void UseItem(int Id)
+    {
+                SoundManager.Instance.SFXPlay("select_sound", 173);
+        // Inventory에 존재하는지 확인하는 검증
+        if (Id < 0 || Id >= GetPlayerData().inventory.Count)
+        {
+            Debug.LogWarning("Invalid item ID.");
+            return;
+        }
 
+        int itemId = GetPlayerData().inventory[Id].id;
+        switch (itemId)
+        {
+            case 0:
+                Debug.Log("Item does nothing.");
+                break;
+            case 1:
+                // 예시: 체력 증가
+                GetPlayerData().IncreaseHealth(1);
+                DropItem(Id); // 사용 후 삭제
+                break;
+            case 2:
+                // 예시: 무기 착용
+                //EquipWeapon(GetPlayerData().inventory[Id]);
+                break;
+            // 다른 아이템 효과 추가 가능
+            default:
+                Debug.Log("Unknown item.");
+                break;
+        }
+    }
+
+    public string InfoItem(int Id)
+    {
+                SoundManager.Instance.SFXPlay("select_sound", 173);
+        if (Id < 0 || Id >= GetPlayerData().inventory.Count)
+        {
+            return "Invalid item ID.";
+        }
+
+        string item_Description = GetPlayerData().inventory[Id].description;
+        return item_Description;
+    }
+
+    public void DropItem(int Id)
+    {
+                SoundManager.Instance.SFXPlay("select_sound", 173);
+        if (Id < 0 || Id >= GetPlayerData().inventory.Count)
+        {
+            Debug.LogWarning("Invalid item ID.");
+            return;
+        }
+
+        GetPlayerData().inventory.RemoveAt(Id);
+        Debug.Log("Item dropped.");
+    }
 
     // Save Method
     public void Save()

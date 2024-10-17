@@ -121,7 +121,7 @@ MonoBehaviour:
   m_MinSize: {x: 813, y: 492}
   m_MaxSize: {x: 26008, y: 14042}
   vertical: 1
-  controlID: 200
+  controlID: 210
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_MinSize: {x: 813, y: 492}
   m_MaxSize: {x: 26008, y: 14042}
   vertical: 0
-  controlID: 201
+  controlID: 211
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_MinSize: {x: 435, y: 271}
   m_MaxSize: {x: 18005, y: 10021}
   vertical: 0
-  controlID: 176
+  controlID: 114
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -535,9 +535,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 590.9386, y: 515.09393, z: -52.711063}
+    m_Target: {x: 946.5926, y: 663.6582, z: -52.42499}
     speed: 2
-    m_Value: {x: 590.9386, y: 515.09393, z: -52.711063}
+    m_Value: {x: 946.5926, y: 663.6582, z: -52.42499}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -588,9 +588,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 356.75266
+    m_Target: 425.43417
     speed: 2
-    m_Value: 356.75266
+    m_Value: 425.43417
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -643,9 +643,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 5c490000
-      m_LastClickedID: 18780
-      m_ExpandedIDs: 12fbffff0c4400000a4800009e480000ec480000
+      m_SelectedIDs: 024b0000
+      m_LastClickedID: 19202
+      m_ExpandedIDs: 12fbfffff4ffffff0c440000ec480000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -904,7 +904,8 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SkipHidden: 0
     m_SearchArea: 1
-    m_Folders: []
+    m_Folders:
+    - Assets/Script/Manager
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 0
@@ -918,7 +919,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 50450000
     m_LastClickedID: 17744
-    m_ExpandedIDs: 000000006c4f00006652000044530000f0550000f2550000f4550000f6550000f8550000fa550000fc550000fe55000000560000025600000456000006560000085600000a5600000c5600000e56000010560000125600001456000016560000185600001a5600001c5600001e56000020560000225600002456000026560000
+    m_ExpandedIDs: 000000006c4f00006652000044530000f0550000f2550000f4550000f6550000f8550000fa550000fc550000fe55000000560000025600000456000006560000085600000a5600000c5600000e56000010560000125600001456000016560000185600001a5600001c5600001e56000020560000225600002456000026560000285600002a5600002c5600002e560000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -943,10 +944,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_AssetTreeState:
-    scrollPos: {x: 0, y: 3658}
+    scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff000000006c4f00006652000044530000f0550000f2550000f4550000f6550000f8550000fa550000fc550000fe55000000560000025600000456000006560000085600000a5600000c5600000e56000010560000125600001456000016560000185600001a5600001c5600001e56000020560000225600002456000026560000bc560000c4560000ce560000886b0000
+    m_ExpandedIDs: ffffffff000000006c4f00006652000044530000f0550000f2550000f4550000f6550000f8550000fa550000fc550000fe55000000560000025600000456000006560000085600000a5600000c5600000e56000010560000125600001456000016560000185600001a5600001c5600001e560000205600002256000026560000285600002a5600002c5600002e560000cc560000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1033,7 +1034,7 @@ MonoBehaviour:
     m_CachedPref: -159
     m_ControlHash: 1412526313
     m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: 21390
+  m_LastInspectedObjectInstanceID: -1
   m_LastVerticalScrollValue: 0
   m_GlobalObjectId: 
   m_LockTracker:
@@ -1073,14 +1074,14 @@ MonoBehaviour:
     - {fileID: -2620765484698515443, guid: 99e9bc1468a9fc64bb0f36456f1d7881, type: 2}
     - {fileID: -5763238886235962938, guid: 24d3187e394913341a5fe606f891882a, type: 2}
     m_ValueSerializationHelper:
-    - e00: 0.60808927
+    - e00: 0.63845783
       e01: 0
       e02: 0
-      e03: 224.0872
+      e03: 177.69344
       e10: 0
-      e11: 0.60808927
+      e11: 0.63845783
       e12: 0
-      e13: 624.3805
+      e13: 572.47925
       e20: 0
       e21: 0
       e22: 1
