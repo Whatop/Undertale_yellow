@@ -1,6 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+[System.Serializable]
+public class DialogueData
+{
+    public int npcID;
+    public bool isEvent;
+    public string[] sentences;
+}
+
+[System.Serializable]
+public class GameOverDialogueData
+{
+    public int npcID;
+    public string[] sentences;
+}
+
+[System.Serializable]
+public class DialogueDatabase
+{
+    public DialogueData[] dialogues;
+    public GameOverDialogueData[] gameOverDialogues;
+}
 
 public class DialogueManager : MonoBehaviour
 {
@@ -10,14 +31,16 @@ public class DialogueManager : MonoBehaviour
     public TypeEffect typeEffect;
     public TypeEffect gameOvertypeEffect;
 
-    public static DialogueManager instance;
+    private DialogueDatabase dialogueDatabase;
+    public static DialogueManager Instance { get; private set; }
     public Sprite[] npcFaces;
     private int npcID;
+
     void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -26,115 +49,124 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public static DialogueManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<DialogueManager>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject("DialogueManager");
-                    instance = obj.AddComponent<DialogueManager>();
-                }
-            }
-            return instance;
-        }
-    }
-
     void Start()
     {
         sentences = new Queue<string>();
         gameover_sentences = new Queue<string>();
+
+        LoadDialogueData();
     }
 
-    public void StartDialogue(int id)
+    private void ConfigureDialogueUI(bool isEvent = false, int eventID = -1)
+    {
+        bool showFace = isEvent;
+        int faceIndex = -1;
+        Vector2 textPosition = new Vector2(isEvent ? 160f : -160f, UIManager.Instance.text.gameObject.transform.localPosition.y);
+        // 얼굴 이미지를 보여줄지 여부 설정
+        UIManager.Instance.npcFaceImage.gameObject.SetActive(showFace);
+
+        // isEvent가 true일 때 eventID에 따라 얼굴 이미지 설정
+        if (isEvent)
+        {
+            switch (eventID)
+            {
+                case 100:
+                    faceIndex = 0; // 예: eventID가 1000일 때 0번 얼굴 이미지 사용
+                    SoundManager.Instance.StopBGSound();
+                    SoundManager.Instance.BGSoundPlay(3);
+                    break;
+                case 101:
+                    faceIndex = 1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
+                    break;
+                case 1000:
+                    faceIndex = -1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
+                    SoundManager.Instance.SFXPlay("heal_sound", 123);
+                    break;
+                // 추가 이벤트 ID 처리
+                default:
+                    faceIndex = -1; // 기본값 (얼굴 이미지를 설정하지 않음)
+                    break;
+            }
+        }
+
+        // 얼굴 이미지를 보이게 설정하고, 유효한 인덱스일 때만 설정
+        if (showFace && faceIndex >= 0 && faceIndex < npcFaces.Length)
+        {
+            UIManager.Instance.npcFaceImage.sprite = npcFaces[faceIndex];
+        }
+            UIManager.Instance.text.gameObject.transform.localPosition = textPosition;
+    }
+
+    private void LoadDialogueData()
+    {
+        TextAsset jsonFile = Resources.Load<TextAsset>("dialogues");
+        if (jsonFile != null)
+        {
+            dialogueDatabase = JsonUtility.FromJson<DialogueDatabase>(jsonFile.text);
+        }
+        else
+        {
+            Debug.LogError("Failed to load dialogue data.");
+        }
+    }
+
+    public void StartDialogue(int id, bool isEvent = false)
     {
         npcID = id;
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
-        switch (npcID)
+        // JSON에서 대사 데이터 가져오기
+        DialogueData dialogue = FindDialogue(npcID, isEvent);
+
+        ConfigureDialogueUI(isEvent, id);
+        currentNPC.isEvent = isEvent;
+        if (dialogue != null)
         {
-            case 0:
-                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
-                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
-                sentences.Enqueue("테스트 NPC " + npcID);
-                break;
-
-            case 100:
-                UIManager.Instance.npcFaceImage.gameObject.SetActive(true);
-                UIManager.Instance.npcFaceImage.sprite = npcFaces[0];
-                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(160, UIManager.Instance.text.gameObject.transform.localPosition.y);
-
-                sentences.Enqueue("어라?");
-                sentences.Enqueue("Don't say that.");
-                break;
-
-            case 1000:
-                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
-                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
-
-                SoundManager.Instance.SFXPlay("heal_sound", 123);
-                sentences.Enqueue("* 당신은 리볼버를 정비하며..");
-                sentences.Enqueue("* 당신의 정의가 충만해진다.");
-                break;
-
-
-            case 1001:
-                SoundManager.Instance.SFXPlay("heal_sound", 123);
-                sentences.Enqueue("* 당신은 지난 괴물들을 보며..");
-                sentences.Enqueue("* 당신의 정의가 충만해진다.");
-                break;
+            foreach (var sentence in dialogue.sentences)
+            {
+                sentences.Enqueue(sentence);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No dialogue found for NPC ID: " + npcID);
         }
 
         UIManager.Instance.TextBarOpen();
-        DisplayNextSentence();
+        DisplayNextSentence(id);
     }
-    public void StartEventDialogue(int id)
+
+    private DialogueData FindDialogue(int id, bool isEvent)
     {
-        npcID = id;
-        sentences.Clear();
-        GameManager.Instance.GetPlayerData().isStop = true;
-        switch (npcID)
+        foreach (var dialogue in dialogueDatabase.dialogues)
         {
-            case 0:
-                UIManager.Instance.npcFaceImage.gameObject.SetActive(false);
-                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(-140, UIManager.Instance.text.gameObject.transform.localPosition.y);
-                sentences.Enqueue("테스트 NPC " + npcID);
-                break;
-
-            case 100:
-                UIManager.Instance.npcFaceImage.gameObject.SetActive(true);
-                UIManager.Instance.npcFaceImage.sprite = npcFaces[0];
-                UIManager.Instance.text.gameObject.transform.localPosition = new Vector2(160, UIManager.Instance.text.gameObject.transform.localPosition.y);
-                
-                sentences.Enqueue(".  .  .");
-                sentences.Enqueue("안녕, 내 이름은 플라위");
-                sentences.Enqueue("이런, 길을 잃은 것 같네");
-                sentences.Enqueue("내가 조금 도와줄게.");
-                SoundManager.Instance.StopBGSound();
-                SoundManager.Instance.BGSoundPlay(3);
-                break;
+            if (dialogue.npcID == id && dialogue.isEvent == isEvent)
+            {
+                return dialogue;
+            }
         }
-        currentNPC.isEvent = true;
-        UIManager.Instance.TextBarOpen();
-        UIManager.Instance.OffPlayerUI();
-        DisplayNextSentence(npcID);
+        return null;
     }
 
-    #region gameover
-    public void StartGameOverDialogue(int npcID)
+
+#region Game Over
+public void StartGameOverDialogue(int npcID)
     {
         gameover_sentences.Clear();
-        switch (npcID)
-        {
-            case 0:
-                gameover_sentences.Enqueue("벌써부터 \n포기해선 안 된다 . . .");
-                gameover_sentences.Enqueue(GameManager.Instance.GetPlayerData().player_Name + "!" + " \n의지를 가지거라 . . .");
-                break;
 
+        GameOverDialogueData gameOverDialogue = FindGameOverDialogue(npcID);
+        if (gameOverDialogue != null)
+        {
+            foreach (var sentence in gameOverDialogue.sentences)
+            {
+                gameover_sentences.Enqueue(sentence.Replace("[PLAYER_NAME]", GameManager.Instance.GetPlayerData().player_Name));
+            }
         }
+        else
+        {
+            Debug.LogWarning("No game over dialogue found for NPC ID: " + npcID);
+        }
+
         DisplayNextGameOver();
     }
     public void DisplayNextGameOver()
@@ -147,8 +179,33 @@ public class DialogueManager : MonoBehaviour
         string sentence = gameover_sentences.Dequeue();
         gameOvertypeEffect.SetMsg(sentence, OnGameOverComplete);
     }
+    private GameOverDialogueData FindGameOverDialogue(int id)
+    {
+        foreach (var dialogue in dialogueDatabase.gameOverDialogues)
+        {
+            if (dialogue.npcID == id)
+            {
+                return dialogue;
+            }
+        }
+        return null;
+    }
+
+    private void OnGameOverComplete()
+    {
+        Debug.Log("임시 방편, 게임오버 대화");
+        StartCoroutine(TimeToLate());
+    }
+
+    IEnumerator TimeToLate()
+    {
+        yield return new WaitForSeconds(0.5f);
+        string sentence = gameover_sentences.Dequeue();
+        gameOvertypeEffect.SetMsg(sentence, End_And_LoadComplete);
+    }
     #endregion
-    public void DisplayNextSentence()
+
+    public void DisplayNextSentence(int eventNumber)
     {
         if (sentences.Count == 0)
         {
@@ -157,77 +214,42 @@ public class DialogueManager : MonoBehaviour
         }
 
         string sentence = sentences.Dequeue();
-        typeEffect.SetMsg(sentence, OnSentenceComplete);
-    }
-    public void DisplayNextSentence(int eventNumber)
-    {
-        if (sentences.Count == 0)
-        {
-            EndDialogue(eventNumber);
-            return;
-        }
-
-        string sentence = sentences.Dequeue();
+        
         typeEffect.SetMsg(sentence, OnSentenceComplete, eventNumber);
     }
     private void OnSentenceComplete()
     {
         Debug.Log("문장이 완료되었습니다.");
     }
+
     private void End_And_LoadComplete()
     {
-        Debug.Log("게임오버 끝 -> Save로 넘어감"); 
+        Debug.Log("게임오버 끝 -> Save로 넘어감");
         UIManager.Instance.End_And_Load();
     }
-    private void OnGameOverComplete()
-    {
-        Debug.Log("임시 방편, 게임오버 대화");
-        StartCoroutine(TimeToLate());
-    }
-    IEnumerator TimeToLate()
-    {
-        yield return new WaitForSeconds(0.5f);
-        string sentence = gameover_sentences.Dequeue();
-        gameOvertypeEffect.SetMsg(sentence, End_And_LoadComplete);
-    }
-    void EndDialogue()
+
+    void EndDialogue(int eventNumber = 0)
     {
         if (currentNPC != null)
         {
             currentNPC.EndDialogue();
-            GameManager.Instance.GetPlayerData().isStop = false;
             UIManager.Instance.OnPlayerUI();
-
         }
+
+        GameManager.Instance.GetPlayerData().isStop = false;
         UIManager.Instance.CloseTextbar();
 
         switch (npcID)
         {
-            case 1000: // Save
+            case 1000:
                 UIManager.Instance.SaveOpen();
-
                 break;
-            case 1002: // Chest
-                break;
-        }
-    }
-    void EndDialogue(int eventNumber)
-    {
-        if (currentNPC != null)
-        {
-            currentNPC.EndDialogue();
-
-        }
-        UIManager.Instance.CloseTextbar();
-        GameManager.Instance.GetPlayerData().isStop = false;
-        UIManager.Instance.OnPlayerUI();
-        switch (eventNumber)
-        {
-            case 100:
-                BattleManager.Instance.BattleStart(eventNumber);
+            case 1002:
+                // Add actions if necessary
                 break;
         }
     }
+
     public void SetCurrentNPC(NPC npc)
     {
         currentNPC = npc;

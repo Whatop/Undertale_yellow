@@ -398,7 +398,11 @@ public class UIManager : MonoBehaviour
 
                 case 1:
                     if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+                    {
+                        isSaveDelay = true;
                         SaveOff();
+                        StartCoroutine(SaveDalay());
+                    }
                     break;
             }
         }
@@ -408,6 +412,7 @@ public class UIManager : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
                 {
+                    isSaveDelay = true;
                     SaveOff();
                     StartCoroutine(SaveDalay());
                 }
@@ -581,7 +586,13 @@ public class UIManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
-            OnPanel(-1);
+            if (inventroy_panelNum != 4)
+                OnPanel(-1);
+            else
+            {
+                OnPanel(0);
+                inventroy_curNum = 0;
+            }
         }
     }
     int GetCurrentPanelTextLength()

@@ -32,7 +32,7 @@ public class NPC : MonoBehaviour
             {
                 if (isTalking)
                 {
-                    dialogueManager.DisplayNextSentence();
+                    dialogueManager.DisplayNextSentence(npcID);
                 }
                 else
                 {
@@ -51,12 +51,15 @@ public class NPC : MonoBehaviour
             isTalking = true;
             dialogueManager.SetCurrentNPC(this);
             isFirstInteraction = false;
+            StartDialogue(); // 대화를 시작하도록 호출
         }
 
-        if (isEvent && Input.GetKeyDown(KeyCode.Space) && isTalking)
+
+        if (isEvent && (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && isTalking)
         {
-            dialogueManager.DisplayNextSentence();
+            dialogueManager.DisplayNextSentence(npcID);
         }
+
     }
 
     void StartDialogue()
@@ -76,7 +79,7 @@ public class NPC : MonoBehaviour
     bool IsPlayerNearby()
     {
         float distance = Vector3.Distance(transform.position, GameManager.Instance.GetPlayerData().position);
-        return distance <= 3f; // 원하는 거리로 조정
+        return distance <= 3f;
     }
 
     // 외곽선 오브젝트 생성

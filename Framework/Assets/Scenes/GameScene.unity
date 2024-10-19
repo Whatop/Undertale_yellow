@@ -6816,6 +6816,7 @@ MonoBehaviour:
   gameOvertypeEffect: {fileID: 528046422}
   npcFaces:
   - {fileID: -1235738091175948780, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
+  - {fileID: -8747060222000869025, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
 --- !u!1 &92184756
 GameObject:
   m_ObjectHideFlags: 0
@@ -10107,7 +10108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ConfineMode: 0
   m_BoundingVolume: {fileID: 0}
-  m_BoundingShape2D: {fileID: 720971298}
+  m_BoundingShape2D: {fileID: 608469891}
   m_ConfineScreenEdges: 1
   m_Damping: 0.1
 --- !u!114 &295794387
@@ -11122,7 +11123,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 138.68109, y: -4.7013}
+  m_AnchoredPosition: {x: 160, y: -4.7013}
   m_SizeDelta: {x: 926.4972, y: 260.2867}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &352131533
@@ -33892,7 +33893,7 @@ GameObject:
   m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1292206862
 Transform:
   m_ObjectHideFlags: 0
@@ -38550,7 +38551,7 @@ Camera:
   far clip plane: 5000
   field of view: 40
   orthographic: 1
-  orthographic size: 9
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -38574,7 +38575,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575677067}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 79.4102, y: 62.994434, z: -10}
+  m_LocalPosition: {x: 1.99, y: -2.51, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 657703201}
@@ -45788,7 +45789,7 @@ MonoBehaviour:
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
-  isEvent: 0
+  isEvent: 1
 --- !u!61 &2117052922
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -37,7 +37,7 @@ public class EventManager : MonoBehaviour
 
     public void TriggerEvent(int eventNumber)
     {
-        DialogueManager.Instance.StartEventDialogue(eventNumber);
+        DialogueManager.Instance.StartDialogue(eventNumber,true);
     }
 
 }

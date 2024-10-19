@@ -9,6 +9,13 @@ public enum GameState
     NpcTalk,
     None
 }
+public enum ItemType
+{
+    HealingItem,
+    Weapon,
+    Armor,
+    None
+}
 [System.Serializable]
 public class PlayerData
 {
@@ -23,6 +30,10 @@ public class PlayerData
     public bool isInvincible;
     public bool isDie;
 
+    // 플레이어 착용중인 무기, 장갑
+    private Item curWeapon;
+    private Item curAmmor;
+
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
@@ -30,6 +41,7 @@ public class PlayerData
         health = 6;
         position = Vector3.zero;
         player_Name = "frisk";
+        
         inventory = new List<Item>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
@@ -45,6 +57,14 @@ public class PlayerData
             health = Maxhealth;
 
     }
+    public void EquipWeapon(Item item)
+    {
+        curWeapon = item;
+    }
+    public void EquipAmmor(Item item)
+    {
+        curAmmor = item;
+    }
 }
 [System.Serializable]
 public class Item
@@ -52,14 +72,20 @@ public class Item
     public int id;          // 아이템 고유 ID
     public string itemName; // 아이템 이름
     public string description; // 아이템 설명
-
+    public ItemType itemType = ItemType.None;
     public Item(int id, string name, string description)
     {
         this.id = id;
         this.itemName = name;
         this.description = description;
     }
-
+    public Item(int id, string name, string description,ItemType itemType)
+    {
+        this.id = id;
+        this.itemName = name;
+        this.description = description;
+        this.itemType = itemType;
+    }
 }
 
 public class GameManager : MonoBehaviour
@@ -123,10 +149,12 @@ public class GameManager : MonoBehaviour
 
         if (isSave) // 저장되있다면
         {
-            AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.");
-            AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.");
             Load();
             LoadGameTime();
+            //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
+            //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
+            //AddItem(49,"리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            //AddItem(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Armor);
         }
     }
     public void SaveGameTime()
@@ -213,12 +241,12 @@ public class GameManager : MonoBehaviour
             Destroy(enemy);
         }
     }
-    public void AddItem(int id, string name, string description)
+    public void AddItem(int id, string name, string description, ItemType itemType = ItemType.None)
     {
         // 인벤토리가 가득 차지 않았는지 확인
         if (GetPlayerData().inventory.Count < 9)
         {
-            Item newItem = new Item(id, name, description);
+            Item newItem = new Item(id, name, description, itemType);
             GetPlayerData().inventory.Add(newItem);
         }
         else
@@ -250,7 +278,7 @@ public class GameManager : MonoBehaviour
                 break;
             case 2:
                 // 예시: 무기 착용
-                //EquipWeapon(GetPlayerData().inventory[Id]);
+                GetPlayerData().EquipWeapon(GetPlayerData().inventory[Id]);
                 break;
             // 다른 아이템 효과 추가 가능
             default:
@@ -258,6 +286,8 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
+  
 
     public string InfoItem(int Id)
     {
@@ -305,7 +335,19 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString("InventoryItem_" + i, playerData.inventory[i].ToString());
         }
         PlayerPrefs.SetInt("InventoryCount", playerData.inventory.Count);
+        List<Item> inventory = playerData.inventory;
 
+        // 인벤토리 크기 저장
+        PlayerPrefs.SetInt("InventoryCount", inventory.Count);
+
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            // 각 아이템의 개별 속성 저장 (ID, 이름, 설명, 타입)
+            PlayerPrefs.SetInt($"Item_{i}_ID", inventory[i].id);
+            PlayerPrefs.SetString($"Item_{i}_Name", inventory[i].itemName);
+            PlayerPrefs.SetString($"Item_{i}_Description", inventory[i].description);
+            PlayerPrefs.SetInt($"Item_{i}_Type", (int)inventory[i].itemType);
+        }
         PlayerPrefs.Save();
         Debug.Log("게임이 저장되었습니다.");
     }
@@ -322,19 +364,24 @@ public class GameManager : MonoBehaviour
         // 체력 및 기타 플레이어 데이터 로드
         playerData.health = PlayerPrefs.GetInt("PlayerHealth", 6); // 기본 값 6
         playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 6);
-        playerData.player_Name = PlayerPrefs.GetString("PlayerName", "frisk");
+        playerData.player_Name = PlayerPrefs.GetString("PlayerName", playerData.player_Name);
 
-        // 인벤토리 아이템 로드
-      //  int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
-      //  playerData.inventory.Clear(); // 기존 인벤토리 초기화
-      //  for (int i = 0; i < inventoryCount; i++)
-      //  {
-      //      string item = PlayerPrefs.GetInt("InventoryItem_" + i, );
-      //      if (!string.IsNullOrEmpty(item))
-      //      {
-      //          playerData.inventory.Add(item);
-      //      }
-      //  }
+        int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
+        List<Item> loadedInventory = new List<Item>();
+
+        for (int i = 0; i < inventoryCount; i++)
+        {
+            // 개별 속성 가져오기
+            int id = PlayerPrefs.GetInt($"Item_{i}_ID");
+            string name = PlayerPrefs.GetString($"Item_{i}_Name");
+            string description = PlayerPrefs.GetString($"Item_{i}_Description");
+            ItemType itemType = (ItemType)PlayerPrefs.GetInt($"Item_{i}_Type");
+
+            // 아이템 객체를 조립해서 리스트에 추가
+            Item newItem = new Item(id, name, description, itemType);
+            loadedInventory.Add(newItem);
+        }
+        playerData.inventory = loadedInventory;
 
         Debug.Log("게임이 로드되었습니다.");
     }
