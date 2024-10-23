@@ -116,10 +116,10 @@ public class DialogueManager : MonoBehaviour
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
         // JSON에서 대사 데이터 가져오기
+        currentNPC.isEvent = isEvent;
         DialogueData dialogue = FindDialogue(npcID, isEvent);
 
         ConfigureDialogueUI(isEvent, id);
-        currentNPC.isEvent = isEvent;
         if (dialogue != null)
         {
             foreach (var sentence in dialogue.sentences)

@@ -51,7 +51,6 @@ public class NPC : MonoBehaviour
             isTalking = true;
             dialogueManager.SetCurrentNPC(this);
             isFirstInteraction = false;
-            StartDialogue(); // 대화를 시작하도록 호출
         }
 
 

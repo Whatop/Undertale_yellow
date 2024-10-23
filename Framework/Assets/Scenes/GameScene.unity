@@ -6815,8 +6815,9 @@ MonoBehaviour:
   typeEffect: {fileID: 352131537}
   gameOvertypeEffect: {fileID: 528046422}
   npcFaces:
-  - {fileID: -1235738091175948780, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
-  - {fileID: -8747060222000869025, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
+  - {fileID: -5768105342854998959, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
+  - {fileID: -2337456427806330803, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
+  - {fileID: 4616617646514060565, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
 --- !u!1 &92184756
 GameObject:
   m_ObjectHideFlags: 0
@@ -32439,6 +32440,8 @@ GameObject:
   - component: {fileID: 1216921598}
   - component: {fileID: 1216921600}
   - component: {fileID: 1216921599}
+  - component: {fileID: 1216921602}
+  - component: {fileID: 1216921601}
   m_Layer: 5
   m_Name: Face
   m_TagString: Untagged
@@ -32463,7 +32466,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -484, y: 6}
-  m_SizeDelta: {x: 258, y: 156}
+  m_SizeDelta: {x: 210, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1216921599
 MonoBehaviour:
@@ -32485,7 +32488,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1235738091175948780, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
+  m_Sprite: {fileID: -5768105342854998959, guid: e3d045d3bf58f264c9afeb0e4d39f86b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -32503,6 +32506,40 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1216921597}
   m_CullTransparentMesh: 1
+--- !u!95 &1216921601
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216921597}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!111 &1216921602
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216921597}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &1218674909
 GameObject:
   m_ObjectHideFlags: 0
@@ -45789,7 +45826,7 @@ MonoBehaviour:
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
-  isEvent: 1
+  isEvent: 0
 --- !u!61 &2117052922
 BoxCollider2D:
   m_ObjectHideFlags: 0

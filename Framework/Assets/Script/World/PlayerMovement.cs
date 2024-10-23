@@ -186,10 +186,15 @@ public class PlayerMovement : LivingObject
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
             }
 
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.C) && !UIManager.Instance.savePanel.activeSelf)
             {
                 UIManager.Instance.ChangeInventroy();
             }
+        }
+        else
+        {
+            h = 0f;
+            v = 0f;
         }
     }
     IEnumerator Reload()
@@ -366,7 +371,10 @@ public class PlayerMovement : LivingObject
         }
         else
         {
+            animator.SetBool("isMove", false);
             rigid.velocity = Vector2.zero;
+            h = 0;
+            v = 0;
         }
     }
     private void HandleRollAnimation(Vector2 rollDirection)
@@ -414,6 +422,10 @@ public class PlayerMovement : LivingObject
                 currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
                 animator.SetBool("IsSide", true);
             }
+            else
+            {
+                animator.SetBool("isMove", false);
+            }
         }
         transform.localScale = currentScale;
         animator.SetTrigger("IsRoll");
@@ -446,6 +458,7 @@ public class PlayerMovement : LivingObject
 
         if (gameManager.GetPlayerData().currentState == GameState.Event)
         {
+            animator.SetBool("isMove", false);
             animator.SetInteger("v", 0);
             animator.SetInteger("h", 0);
             speed = 0f;
