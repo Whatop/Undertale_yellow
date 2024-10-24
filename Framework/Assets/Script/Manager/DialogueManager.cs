@@ -2,11 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
+public class SentenceData
+{
+    public string text;
+    public string expression;
+}
+
+[System.Serializable]
 public class DialogueData
 {
     public int npcID;
     public bool isEvent;
-    public string[] sentences;
+    public SentenceData[] sentences;
 }
 
 [System.Serializable]
@@ -25,7 +32,7 @@ public class DialogueDatabase
 
 public class DialogueManager : MonoBehaviour
 {
-    private Queue<string> sentences;
+    private Queue<SentenceData> sentences;
     private Queue<string> gameover_sentences;
     private NPC currentNPC;
     public TypeEffect typeEffect;
@@ -51,7 +58,7 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        sentences = new Queue<string>();
+        sentences = new Queue<SentenceData>();
         gameover_sentences = new Queue<string>();
 
         LoadDialogueData();
@@ -59,30 +66,30 @@ public class DialogueManager : MonoBehaviour
 
     private void ConfigureDialogueUI(bool isEvent = false, int eventID = -1)
     {
-        bool showFace = isEvent;
+        bool showFace = isEvent; // isEvent가 true일 때만 얼굴 이미지를 보이게 함
         int faceIndex = -1;
         Vector2 textPosition = new Vector2(isEvent ? 160f : -160f, UIManager.Instance.text.gameObject.transform.localPosition.y);
-        // 얼굴 이미지를 보여줄지 여부 설정
+
+        // 얼굴 이미지를 보이게 할지 여부를 설정
         UIManager.Instance.npcFaceImage.gameObject.SetActive(showFace);
 
-        // isEvent가 true일 때 eventID에 따라 얼굴 이미지 설정
+        // isEvent가 true일 때만 eventID에 따라 얼굴 이미지 설정
         if (isEvent)
         {
             switch (eventID)
             {
                 case 100:
-                    faceIndex = 0; // 예: eventID가 1000일 때 0번 얼굴 이미지 사용
+                    faceIndex = 0; // 예: eventID가 100일 때 0번 얼굴 이미지 사용
                     SoundManager.Instance.StopBGSound();
                     SoundManager.Instance.BGSoundPlay(3);
                     break;
                 case 101:
-                    faceIndex = 1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
+                    faceIndex = 1; // 예: eventID가 101일 때 1번 얼굴 이미지 사용
                     break;
                 case 1000:
-                    faceIndex = -1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
+                    faceIndex = -1; // 예: eventID가 1000일 때 1번 얼굴 이미지 사용
                     SoundManager.Instance.SFXPlay("heal_sound", 123);
                     break;
-                // 추가 이벤트 ID 처리
                 default:
                     faceIndex = -1; // 기본값 (얼굴 이미지를 설정하지 않음)
                     break;
@@ -94,8 +101,10 @@ public class DialogueManager : MonoBehaviour
         {
             UIManager.Instance.npcFaceImage.sprite = npcFaces[faceIndex];
         }
-            UIManager.Instance.text.gameObject.transform.localPosition = textPosition;
+
+        UIManager.Instance.text.gameObject.transform.localPosition = textPosition;
     }
+
 
     private void LoadDialogueData()
     {
@@ -115,15 +124,17 @@ public class DialogueManager : MonoBehaviour
         npcID = id;
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
-        // JSON에서 대사 데이터 가져오기
+
         currentNPC.isEvent = isEvent;
         DialogueData dialogue = FindDialogue(npcID, isEvent);
 
         ConfigureDialogueUI(isEvent, id);
         if (dialogue != null)
         {
+            // `SentenceData`로 대사 저장
             foreach (var sentence in dialogue.sentences)
             {
+                // JSON에서 로드된 `SentenceData` 객체를 큐에 직접 추가
                 sentences.Enqueue(sentence);
             }
         }
@@ -135,6 +146,7 @@ public class DialogueManager : MonoBehaviour
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence(id);
     }
+
 
     private DialogueData FindDialogue(int id, bool isEvent)
     {
@@ -205,7 +217,7 @@ public void StartGameOverDialogue(int npcID)
     }
     #endregion
 
-    public void DisplayNextSentence(int eventNumber)
+    public void DisplayNextSentence(int eventNumber = -1)
     {
         if (sentences.Count == 0)
         {
@@ -213,10 +225,19 @@ public void StartGameOverDialogue(int npcID)
             return;
         }
 
-        string sentence = sentences.Dequeue();
-        
-        typeEffect.SetMsg(sentence, OnSentenceComplete, eventNumber);
+        SentenceData sentenceData = sentences.Dequeue();
+
+        // isEvent가 true일 때만 표정 설정
+        if (currentNPC != null && currentNPC.isEvent)
+        {
+            currentNPC.SetExpression(sentenceData.expression);
+        }
+
+        // 텍스트 출력
+        typeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber);
     }
+
+
     private void OnSentenceComplete()
     {
         Debug.Log("문장이 완료되었습니다.");
@@ -228,14 +249,14 @@ public void StartGameOverDialogue(int npcID)
         UIManager.Instance.End_And_Load();
     }
 
-    void EndDialogue(int eventNumber = 0)
+    private void EndDialogue(int eventNumber = 0)
     {
         if (currentNPC != null)
         {
+            currentNPC.ResetToDefaultExpression(); // 기본 표정으로 복원
             currentNPC.EndDialogue();
             UIManager.Instance.OnPlayerUI();
         }
-
         GameManager.Instance.GetPlayerData().isStop = false;
         UIManager.Instance.CloseTextbar();
 

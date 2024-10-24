@@ -8,11 +8,11 @@ public class TypeEffect : MonoBehaviour
     public float CharPerSeconds = 10f; // 초당 문자 수
     private string targetMsg;
     public TextMeshProUGUI msgText;
-    private float interval;
     private int index;
     public int txtId = 0;
     private System.Action onEffectEndCallback;
     private string txtsound = "SND_TXT1";
+    private Coroutine typingCoroutine;
 
     private void Awake()
     {
@@ -23,7 +23,7 @@ public class TypeEffect : MonoBehaviour
     {
         targetMsg = msg;
         onEffectEndCallback = onEffectEnd;
-        EffectStart();
+        StartEffect();
     }
 
     public void SetMsg(string msg, System.Action onEffectEnd, int eventNumber)
@@ -45,61 +45,64 @@ public class TypeEffect : MonoBehaviour
                 txtId = 0;
                 break;
         }
-        EffectStart();
+        StartEffect();
     }
 
     public void Skip()
     {
-        CancelInvoke("Effecting"); // 모든 호출 취소
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
         msgText.text = targetMsg;
         EffectEnd();
     }
 
-    private void EffectStart()
+    private void StartEffect()
     {
-        CancelInvoke("Effecting"); // 기존의 호출을 취소하여 중복 방지
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
         msgText.text = "";
         index = 0;
-        interval = 1.0f / CharPerSeconds;
-        Invoke("Effecting", interval);
+        typingCoroutine = StartCoroutine(Effecting());
     }
 
-    private void Effecting()
+    private IEnumerator Effecting()
     {
-        if (index >= targetMsg.Length)
+        while (index < targetMsg.Length)
         {
-            EffectEnd();
-            return;
-        }
-
-        // 태그를 처리하기 위한 로직 추가
-        if (targetMsg[index] == '<')
-        {
-            // 태그가 끝날 때까지 문자열을 계속 추가
-            int closeIndex = targetMsg.IndexOf('>', index);
-            if (closeIndex != -1)
+            // 태그 시작 감지 및 처리
+            if (targetMsg[index] == '<')
             {
-                string tag = targetMsg.Substring(index, closeIndex - index + 1);
-                msgText.text += tag;
-                index = closeIndex + 1;
+                int closeIndex = targetMsg.IndexOf('>', index);
+                if (closeIndex != -1)
+                {
+                    string tag = targetMsg.Substring(index, closeIndex - index + 1);
+                    msgText.text += tag;
+                    index = closeIndex + 1;
+                }
             }
-        }
-        else
-        {
-            // 기존 로직: 개별 문자 추가
-            if (index < targetMsg.Length && targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" && targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
+            else
             {
-                SoundManager.Instance.SFXTextPlay(txtsound, txtId);
+                // 개별 문자 출력
+                if (targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" &&
+                    targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
+                {
+                    SoundManager.Instance.SFXTextPlay(txtsound, txtId);
+                }
+
+                msgText.text += targetMsg[index];
+                index++;
             }
 
-            msgText.text += targetMsg[index];
-            index++;
+            // 지연 시간 적용
+            float delay = (index < targetMsg.Length && targetMsg[index - 1].ToString() == " ") ? 0.02f : 1f / CharPerSeconds;
+            yield return new WaitForSeconds(delay);
         }
 
-        // 기존 호출 취소 후 새로운 호출 예약
-        CancelInvoke("Effecting");
-        float delay = targetMsg[index - 1].ToString() == " " ? 0.02f : 1f / CharPerSeconds;
-        Invoke("Effecting", delay);
+        EffectEnd();
     }
 
     private void EffectEnd()

@@ -4,38 +4,72 @@
       "npcID": 0,
       "isEvent": false,
       "sentences": [
-        "테스트 NPC 0"
+        {
+          "text": "테스트 NPC 0",
+          "expression": "Default"
+        }
       ]
     },
     {
       "npcID": 100,
       "isEvent": false,
       "sentences": [
-        "어라?",
-        "Don't say that."
+        {
+          "text": "어라?",
+          "expression": "Default"
+        },
+        {
+          "text": "Don't say that.",
+          "expression": "Angry"
+        }
       ]
     },
     {
       "npcID": 100,
       "isEvent": true,
-      "faceIndex": 0, // 첫 번째 얼굴 이미지 사용
       "sentences": [
-        ".  .  .",
-        "* 반가워 !\n* 내 이름은 <color=#FFFF00>플라위</color>.\n* 노란 꽃 <color=#FFFF00>플라위</color>야!!",
-        "* 너 이 지하세계는\n   처음인가 보구나,\n   그렇지?",
-        "* 이런, 정말\n   정신없겠네.",
-        "* 이곳이 어떤 곳인지\n   누군가 알려줘야 겠는데!",
-        "* 작고 힘없는 나라도\n   알려줘야겠네.",
-        "* 준비됐니?\n* 간다!."
+        {
+          "text": ".  .  .",
+          "expression": "Default"
+        },
+        {
+          "text": "* 반가워 !\n* 내 이름은 <color=#FFFF00>플라위</color>.\n* 노란 꽃 <color=#FFFF00>플라위</color>야!!",
+          "expression": "Smile"
+        },
+        {
+          "text": "* 너 이 지하세계는\n   처음인가 보구나,\n   그렇지?",
+          "expression": "Talking"
+        },
+        {
+          "text": "* 이런, 정말\n   정신없겠네.",
+          "expression": "Sneer"
+        },
+        {
+          "text": "* 이곳이 어떤 곳인지\n   누군가 알려줘야 겠는데!",
+          "expression": "Talking"
+        },
+        {
+          "text": "* 작고 힘없는 나라도\n   알려줘야겠네.",
+          "expression": "Smile"
+        },
+        {
+          "text": "* 준비됐니?\n* 간다!.",
+          "expression": "Talking"
+        }
       ]
-    }
-,
+    },
     {
       "npcID": 1000,
       "isEvent": false,
       "sentences": [
-        "* 당신은 리볼버를 정비하며..",
-        "* 당신의 정의가 충만해진다."
+        {
+          "text": "* 당신은 리볼버를 정비하며..",
+          "expression": "Default"
+        },
+        {
+          "text": "* 당신의 정의가 충만해진다.",
+          "expression": "Smile"
+        }
       ]
     }
   ],
@@ -43,10 +77,22 @@
     {
       "npcID": 0,
       "sentences": [
-        "벌써부터 \n포기해선 안 된다 . . .",
-        "[PLAYER_NAME]!",
-        "+",
-        " \n의지를 가지거라 . . ."
+        {
+          "text": "벌써부터 \n포기해선 안 된다 . . .",
+          "expression": "Pain"
+        },
+        {
+          "text": "[PLAYER_NAME]!",
+          "expression": "Angry"
+        },
+        {
+          "text": "+",
+          "expression": "Default"
+        },
+        {
+          "text": " \n의지를 가지거라 . . .",
+          "expression": "Talking"
+        }
       ]
     }
   ]

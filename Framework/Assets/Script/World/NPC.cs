@@ -14,17 +14,28 @@ public class NPC : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer outlineSpriteRenderer;
     public Material outlineMaterial; // 외곽선 Material
+    private Animator animator;
 
     public bool isEvent = false;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
     }
 
     void Update()
     {
-        if (IsPlayerNearby() && !isEvent && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy) // 이벤트 중이 아닐 때 상호작용 가능
+        HandleInteraction();
+    }
+
+    // 상호작용 로직을 메소드로 분리
+    private void HandleInteraction()
+    {
+        bool playerNearby = IsPlayerNearby();
+
+        if (playerNearby && !isEvent && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy)
         {
             Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 
@@ -45,7 +56,12 @@ public class NPC : MonoBehaviour
             Highlight(false); // 플레이어가 멀어지면 하이라이트 해제
         }
 
-        // 강제 이벤트 중일 때 대화 처리
+        // 이벤트 대사 처리
+        HandleEventDialogue();
+    }
+
+    private void HandleEventDialogue()
+    {
         if (isEvent && isFirstInteraction)
         {
             isTalking = true;
@@ -53,12 +69,28 @@ public class NPC : MonoBehaviour
             isFirstInteraction = false;
         }
 
-
         if (isEvent && (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && isTalking)
         {
             dialogueManager.DisplayNextSentence(npcID);
         }
+    }
 
+    // 표정을 설정하는 메소드
+    public void SetExpression(string expression)
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(expression);
+        }
+    }
+
+    // 기본 표정으로 돌아가는 메소드
+    public void ResetToDefaultExpression()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Default");
+        }
     }
 
     void StartDialogue()
