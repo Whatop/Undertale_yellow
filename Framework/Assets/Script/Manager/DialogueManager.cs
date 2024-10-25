@@ -42,6 +42,7 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance { get; private set; }
     public Sprite[] npcFaces;
     private int npcID;
+    public TypeEffect currentTypeEffect;
 
     void Awake()
     {
@@ -60,10 +61,20 @@ public class DialogueManager : MonoBehaviour
     {
         sentences = new Queue<SentenceData>();
         gameover_sentences = new Queue<string>();
-
         LoadDialogueData();
     }
+    public bool IsEffecting()
+    {
+        return currentTypeEffect != null && currentTypeEffect.IsEffecting();
+    }
 
+    public void SkipTypeEffect()
+    {
+        if (currentTypeEffect != null && currentTypeEffect.IsEffecting())
+        {
+            currentTypeEffect.Skip();
+        }
+    }
     private void ConfigureDialogueUI(bool isEvent = false, int eventID = -1)
     {
         bool showFace = isEvent; // isEvent가 true일 때만 얼굴 이미지를 보이게 함
@@ -255,7 +266,6 @@ public void StartGameOverDialogue(int npcID)
         {
             currentNPC.ResetToDefaultExpression(); // 기본 표정으로 복원
             currentNPC.EndDialogue();
-            UIManager.Instance.OnPlayerUI();
         }
         GameManager.Instance.GetPlayerData().isStop = false;
         UIManager.Instance.CloseTextbar();

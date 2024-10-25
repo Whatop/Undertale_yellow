@@ -372,6 +372,7 @@ public class UIManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
+            soundManager.SFXPlay("move_sound", 185);
                 saveNum--;
                 if (saveNum < 0)
                 {
@@ -380,6 +381,7 @@ public class UIManager : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
+            soundManager.SFXPlay("move_sound", 185);
                 saveNum++;
                 if (saveNum >= save_points.Length)
                 {
@@ -399,6 +401,7 @@ public class UIManager : MonoBehaviour
                 case 1:
                     if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
                     {
+            soundManager.SFXPlay("select_sound", 173);
                         isSaveDelay = true;
                         SaveOff();
                         StartCoroutine(SaveDalay());

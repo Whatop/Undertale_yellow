@@ -361,7 +361,7 @@ public class PlayerMovement : LivingObject
     // 물리 업데이트
     void FixedUpdate()
     {
-        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy)
+        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy && !UIManager.Instance.savePanel.activeSelf)
         {
             Move();
         }

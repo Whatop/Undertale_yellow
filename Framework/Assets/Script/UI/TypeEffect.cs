@@ -48,14 +48,19 @@ public class TypeEffect : MonoBehaviour
         StartEffect();
     }
 
+    public bool IsEffecting()
+    {
+        return typingCoroutine != null; // `Effecting` 코루틴이 실행 중이면 true 반환
+    }
+
     public void Skip()
     {
-        if (typingCoroutine != null)
+        if (IsEffecting()) // 코루틴이 진행 중일 때만 스킵 허용
         {
             StopCoroutine(typingCoroutine);
+            msgText.text = targetMsg;
+            EffectEnd();
         }
-        msgText.text = targetMsg;
-        EffectEnd();
     }
 
     private void StartEffect()
@@ -101,12 +106,20 @@ public class TypeEffect : MonoBehaviour
             float delay = (index < targetMsg.Length && targetMsg[index - 1].ToString() == " ") ? 0.02f : 1f / CharPerSeconds;
             yield return new WaitForSeconds(delay);
         }
-
+        typingCoroutine = null; // 타이핑 완료 후 null로 설정
         EffectEnd();
     }
 
     private void EffectEnd()
     {
+        typingCoroutine = null; // 코루틴이 종료되었음을 명확히 설정
         onEffectEndCallback?.Invoke();
+    }
+    private void OnDisable()
+    {
+        if (msgText != null)
+        {
+            msgText.text = "";
+        }
     }
 }

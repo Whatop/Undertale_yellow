@@ -30,7 +30,6 @@ public class NPC : MonoBehaviour
         HandleInteraction();
     }
 
-    // 상호작용 로직을 메소드로 분리
     private void HandleInteraction()
     {
         bool playerNearby = IsPlayerNearby();
@@ -43,7 +42,16 @@ public class NPC : MonoBehaviour
             {
                 if (isTalking)
                 {
-                    dialogueManager.DisplayNextSentence(npcID);
+                    // 대화가 출력 중일 때와 완료된 상태를 구분
+                    if (dialogueManager.IsEffecting())
+                    {
+                        Debug.Log("대화 : 스킵됨");
+                        dialogueManager.SkipTypeEffect(); // 현재 텍스트를 끝까지 출력
+                    }
+                    else
+                    {
+                        dialogueManager.DisplayNextSentence(npcID); // 다음 문장 표시
+                    }
                 }
                 else
                 {
@@ -60,6 +68,8 @@ public class NPC : MonoBehaviour
         HandleEventDialogue();
     }
 
+
+
     private void HandleEventDialogue()
     {
         if (isEvent && isFirstInteraction)
@@ -71,7 +81,15 @@ public class NPC : MonoBehaviour
 
         if (isEvent && (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && isTalking)
         {
-            dialogueManager.DisplayNextSentence(npcID);
+            // 현재 대사 출력 중인 경우와 완료된 상태를 구분
+            if (dialogueManager.IsEffecting())
+            {
+                dialogueManager.SkipTypeEffect(); // 타이핑 효과를 즉시 완료
+            }
+            else
+            {
+                dialogueManager.DisplayNextSentence(npcID); // 다음 문장 표시
+            }
         }
     }
 
