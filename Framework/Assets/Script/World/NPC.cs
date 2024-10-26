@@ -94,6 +94,10 @@ public class NPC : MonoBehaviour
     }
 
     // 표정을 설정하는 메소드
+    /// <summary>
+    /// Default, Smile,Smiling, Pain, Angry, Sneer, Talking, Surprise, Sad
+    /// </summary>
+    /// <param name="expression"></param>
     public void SetExpression(string expression)
     {
         if (animator != null)
