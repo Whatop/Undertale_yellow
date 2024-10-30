@@ -30,9 +30,18 @@ public class PlayerData
     public bool isInvincible;
     public bool isDie;
 
+    public int LEVEL = 1;
+    public int AT = 0;
+    public int DF = 0;
+    public int AT_level = 0;
+    public int DF_level = 0;
+    public int EXP = 10;
+    public int NextEXP = 0;
+    public int GOLD = 0;
+
     // 플레이어 착용중인 무기, 장갑
-    private Item curWeapon;
-    private Item curAmmor;
+    public Item curWeapon;
+    public Item curAmmor;
 
     public PlayerData()
     {
@@ -41,7 +50,8 @@ public class PlayerData
         health = 6;
         position = Vector3.zero;
         player_Name = "frisk";
-        
+        LEVEL = 1;
+
         inventory = new List<Item>();// 동적으로 크기를 조절할 수 있도록 고려 가능
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
@@ -56,6 +66,11 @@ public class PlayerData
         else
             health = Maxhealth;
 
+    }
+    public void LevelUp()
+    {
+        LEVEL++;
+        IncreaseHealth(10);
     }
     public void EquipWeapon(Item item)
     {
@@ -265,20 +280,24 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        int itemId = GetPlayerData().inventory[Id].id;
+        ItemType itemId = GetPlayerData().inventory[Id].itemType;
         switch (itemId)
         {
-            case 0:
+            case ItemType.None:
                 Debug.Log("Item does nothing.");
                 break;
-            case 1:
+            case ItemType.HealingItem:
                 // 예시: 체력 증가
                 GetPlayerData().IncreaseHealth(1);
                 DropItem(Id); // 사용 후 삭제
                 break;
-            case 2:
+            case ItemType.Weapon:
                 // 예시: 무기 착용
                 GetPlayerData().EquipWeapon(GetPlayerData().inventory[Id]);
+                break;
+            case ItemType.Armor:
+                // 예시: 갑옷 착용
+                GetPlayerData().EquipAmmor(GetPlayerData().inventory[Id]);
                 break;
             // 다른 아이템 효과 추가 가능
             default:
@@ -303,16 +322,17 @@ public class GameManager : MonoBehaviour
 
     public void DropItem(int Id)
     {
-                SoundManager.Instance.SFXPlay("select_sound", 173);
+        SoundManager.Instance.SFXPlay("select_sound", 173);
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
         {
             Debug.LogWarning("Invalid item ID.");
             return;
         }
 
-        GetPlayerData().inventory.RemoveAt(Id);
+        GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
         Debug.Log("Item dropped.");
     }
+
 
     // Save Method
     public void Save()

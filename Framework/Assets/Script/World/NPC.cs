@@ -15,6 +15,7 @@ public class NPC : MonoBehaviour
     private SpriteRenderer outlineSpriteRenderer;
     public Material outlineMaterial; // 외곽선 Material
     private Animator animator;
+    private Animator TextBar_animator;
 
     public bool isEvent = false;
 
@@ -22,6 +23,7 @@ public class NPC : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        TextBar_animator = UIManager.Instance.npcFaceImage.GetComponent<Animator>();
         CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
     }
 
@@ -102,7 +104,17 @@ public class NPC : MonoBehaviour
     {
         if (animator != null)
         {
+            animator.ResetTrigger("Talking");
+            animator.ResetTrigger("Default");
+
             animator.SetTrigger(expression);
+        }
+        if (TextBar_animator != null)
+        {
+            TextBar_animator.ResetTrigger("Talking");
+            TextBar_animator.ResetTrigger("Default");
+
+            TextBar_animator.SetTrigger(expression);
         }
     }
 
@@ -112,6 +124,10 @@ public class NPC : MonoBehaviour
         if (animator != null)
         {
             animator.SetTrigger("Default");
+        }
+        if (TextBar_animator != null)
+        {
+            TextBar_animator.SetTrigger("Default");
         }
     }
 

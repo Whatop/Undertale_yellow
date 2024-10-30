@@ -34,7 +34,7 @@ public class DialogueManager : MonoBehaviour
 {
     private Queue<SentenceData> sentences;
     private Queue<string> gameover_sentences;
-    private NPC currentNPC;
+    public NPC currentNPC;
     public TypeEffect typeEffect;
     public TypeEffect gameOvertypeEffect;
 
@@ -238,14 +238,8 @@ public void StartGameOverDialogue(int npcID)
 
         SentenceData sentenceData = sentences.Dequeue();
 
-        // isEvent가 true일 때만 표정 설정
-        if (currentNPC != null && currentNPC.isEvent)
-        {
-            currentNPC.SetExpression(sentenceData.expression);
-        }
-
         // 텍스트 출력
-        typeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber);
+        typeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber, sentenceData.expression);
     }
 
 

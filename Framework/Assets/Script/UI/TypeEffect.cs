@@ -13,6 +13,8 @@ public class TypeEffect : MonoBehaviour
     private System.Action onEffectEndCallback;
     private string txtsound = "SND_TXT1";
     private Coroutine typingCoroutine;
+    // 기존 코드 유지
+    private string currentExpression; // 현재 표정 정보 저장
 
     private void Awake()
     {
@@ -30,6 +32,7 @@ public class TypeEffect : MonoBehaviour
     {
         targetMsg = msg;
         onEffectEndCallback = onEffectEnd;
+
         switch (eventNumber)
         {
             case 0:
@@ -45,6 +48,31 @@ public class TypeEffect : MonoBehaviour
                 txtId = 0;
                 break;
         }
+        StartEffect();
+    }
+    public void SetMsg(string msg, System.Action onEffectEnd, int eventNumber, string expression = null)
+    {
+        targetMsg = msg;
+        onEffectEndCallback = onEffectEnd;
+        currentExpression = expression; // 현재 표정 정보를 저장
+
+       
+        switch (eventNumber)
+        {
+            case 0:
+                txtsound = "SND_TXT1";
+                txtId = 1;
+                break;
+            case 100:
+                txtsound = "voice_flowey_1";
+                txtId = 17;
+                break;
+            default:
+                txtsound = "SND_TXT1";
+                txtId = 0;
+                break;
+        }
+
         StartEffect();
     }
 
@@ -76,8 +104,20 @@ public class TypeEffect : MonoBehaviour
 
     private IEnumerator Effecting()
     {
+        bool isExpressionSet = false; // 표정 설정 여부를 추적
+
         while (index < targetMsg.Length)
         {
+            // 새로운 단어나 문장이 시작될 때 표정 설정 (index가 0이거나 이전 문자가 공백일 때)
+            if (!isExpressionSet && (index == 0 || targetMsg[index - 1] == ' '))
+            {
+                if (currentExpression != null && DialogueManager.Instance.currentNPC != null)
+                {
+                    DialogueManager.Instance.currentNPC.SetExpression(currentExpression);
+                    isExpressionSet = true; // 중복 호출 방지
+                }
+            }
+
             // 태그 시작 감지 및 처리
             if (targetMsg[index] == '<')
             {
@@ -106,6 +146,7 @@ public class TypeEffect : MonoBehaviour
             float delay = (index < targetMsg.Length && targetMsg[index - 1].ToString() == " ") ? 0.02f : 1f / CharPerSeconds;
             yield return new WaitForSeconds(delay);
         }
+
         typingCoroutine = null; // 타이핑 완료 후 null로 설정
         EffectEnd();
     }
@@ -114,6 +155,10 @@ public class TypeEffect : MonoBehaviour
     {
         typingCoroutine = null; // 코루틴이 종료되었음을 명확히 설정
         onEffectEndCallback?.Invoke();
+        if (DialogueManager.Instance.currentNPC != null)
+        {
+            DialogueManager.Instance.currentNPC.SetExpression("Default");
+        }
     }
     private void OnDisable()
     {

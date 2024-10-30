@@ -144,6 +144,7 @@ public class UIManager : MonoBehaviour
     /// 3. 전화
     /// </summary>
     public int inventroy_panelNum = 0;
+    private int item_prevNum = 0;
     public int inventroy_curNum = 0;
     public bool isInventroy = false;
 
@@ -361,7 +362,7 @@ public class UIManager : MonoBehaviour
 
         HandleInput();
         UpdateSoulPosition();
-
+        UpdateInventoryUI();
         if (Input.GetKeyDown(KeyCode.E))
         {
             RectTransform transform = gameover_soul.GetComponent<RectTransform>();
@@ -424,6 +425,24 @@ public class UIManager : MonoBehaviour
 
     }
     #region InventroyUi
+    void UpdateInventoryUI()
+    {
+        // 인벤토리의 첫 번째 텍스트 비활성화 및 색상 변경 로직
+        if (gameManager.GetPlayerData().inventory.Count == 0)
+        {
+            inventroy_texts[0].color = Color.gray;
+        }
+        else
+        {
+            inventroy_texts[0].color = Color.white;
+        }
+        // 아이템 없을때 돌아가는 코드
+        if ((inventroy_panelNum == 4 || inventroy_panelNum == 1) && gameManager.GetPlayerData().inventory.Count == 0)
+        {
+            OnPanel(-1);
+        }
+    }
+
     public void ChangeInventroy()
     {
         if (!isInventroy)
@@ -448,28 +467,30 @@ public class UIManager : MonoBehaviour
         stat_panel.SetActive(false);
         call_panel.SetActive(false);
         inventroy_soul.gameObject.SetActive(true);
+        inventroy_curNum = 0;
         switch (i)
         {
             case 0:
-            soundManager.SFXPlay("select_sound", 173);
-                item_panel.SetActive(true);
-                inventroy_panelNum = 1;
-                foreach (var r in item_texts)
+                if (gameManager.GetPlayerData().inventory.Count > 0)
                 {
-                    r.gameObject.SetActive(false); // 모든 item_texts 비활성화
+                    soundManager.SFXPlay("select_sound", 173);
+                    item_panel.SetActive(true);
+                    inventroy_panelNum = 1;
+
+                    foreach (var r in item_texts)
+                    {
+                        r.gameObject.SetActive(false); // 모든 item_texts 비활성화
+                    }
+
+                    int inventoryCount = gameManager.GetPlayerData().inventory.Count;
+                    int maxDisplayCount = Mathf.Min(inventoryCount, item_texts.Length); // 최대 item_texts 배열 크기만큼 표시
+
+                    for (int c = 0; c < maxDisplayCount; c++)
+                    {
+                        item_texts[c].gameObject.SetActive(true); // 플레이어 인벤토리 크기만큼 item_texts 활성화
+                        item_texts[c].text = gameManager.GetPlayerData().inventory[c].itemName; // 아이템 이름 표시
+                    }
                 }
-
-                int inventoryCount = gameManager.GetPlayerData().inventory.Count;
-                Debug.Log(inventoryCount);
-                int maxDisplayCount = Mathf.Min(inventoryCount, item_texts.Length); // 최대 item_texts 배열 크기만큼 표시
-                Debug.Log(inventoryCount);
-
-                for (int c = 0; c < maxDisplayCount; c++)
-                {
-                    item_texts[c].gameObject.SetActive(true); // 플레이어 인벤토리 크기만큼 item_texts 활성화
-                    item_texts[c].text = gameManager.GetPlayerData().inventory[c].itemName; // 아이템 이름 표시
-                }
-
                 break;
 
             case 1:
@@ -477,6 +498,7 @@ public class UIManager : MonoBehaviour
                 stat_panel.SetActive(true);
                 inventroy_panelNum = 2;
                 inventroy_soul.gameObject.SetActive(false);
+                StatUpdate();
                 break;
 
             case 2:
@@ -500,6 +522,20 @@ public class UIManager : MonoBehaviour
                 inventroy_panelNum = 0;
                 break;
         }
+    }
+    void StatUpdate()
+    {
+        stat_texts[0].text = gameManager.GetPlayerData().player_Name;
+        stat_texts[1].text = "LV " + gameManager.GetPlayerData().LEVEL;
+        stat_texts[2].text = "HP " + gameManager.GetPlayerData().health + "/"+ gameManager.GetPlayerData().Maxhealth;
+        stat_texts[3].text = "AT " + gameManager.GetPlayerData().AT_level + " ("+ gameManager.GetPlayerData().AT+")" ;
+        stat_texts[4].text = "DF " + gameManager.GetPlayerData().DF_level + " ("+ gameManager.GetPlayerData().DF+")";
+        stat_texts[5].text = "EXP: " + gameManager.GetPlayerData().EXP;
+        stat_texts[6].text = "NEXT: " + gameManager.GetPlayerData().NextEXP;
+        stat_texts[7].text = "무기: " + gameManager.GetPlayerData().curWeapon.itemName;
+        stat_texts[8].text = "갑옷: " + gameManager.GetPlayerData().curAmmor.itemName;
+        stat_texts[9].text = "GOLD: " + gameManager.GetPlayerData().GOLD;
+
     }
     void HandleInput()
     {
@@ -560,6 +596,7 @@ public class UIManager : MonoBehaviour
             // 인벤토리/아이템
             else if (inventroy_panelNum == 1)
             {
+                item_prevNum = inventroy_curNum;
                 OnPanel(3);
             }
             // 선택
@@ -570,16 +607,19 @@ public class UIManager : MonoBehaviour
                 {
                     case 0:
                         //사용
-                        gameManager.UseItem(inventroy_curNum);
+                        gameManager.UseItem(item_prevNum);
+                         OnPanel(0);
                         break;
 
                     case 1:
                         // 정보
-                        gameManager.InfoItem(inventroy_curNum);
+                        gameManager.InfoItem(item_prevNum);
                         break;
                     case 2:
                         //버리기
-                        gameManager.DropItem(inventroy_curNum);
+                        Debug.Log(inventroy_curNum);
+                        gameManager.DropItem(item_prevNum);
+                          OnPanel(0);
                         break;
                 }
                // gameManager.GetPlayerData().inventory[0].id = 
