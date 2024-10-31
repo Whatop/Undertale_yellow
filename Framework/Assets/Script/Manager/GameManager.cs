@@ -13,7 +13,7 @@ public enum ItemType
 {
     HealingItem,
     Weapon,
-    Armor,
+    Ammor,
     None
 }
 [System.Serializable]
@@ -79,6 +79,14 @@ public class PlayerData
     public void EquipAmmor(Item item)
     {
         curAmmor = item;
+    }
+    public Item GetEquippedWeapon()
+    {
+        return curWeapon;
+    }
+    public Item GetEquippedAmmor()
+    {
+        return curAmmor;
     }
 }
 [System.Serializable]
@@ -168,8 +176,20 @@ public class GameManager : MonoBehaviour
             LoadGameTime();
             //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
             //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
-            //AddItem(49,"리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            //AddItem(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Armor);
+            //AddItem(13,"장난감 칼", "플라스틱 재질. 요즘엔 희귀한 것.", ItemType.Weapon);
+            //AddItem(12, "빛바랜 리본", "더 귀엽게 보인다면 세게 때리진 않겠지.", ItemType.Ammor);
+            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            GetPlayerData().EquipWeapon(fristWaepon);
+            GetPlayerData().EquipAmmor(fristIAmmor);
+
+        }
+        else
+        {
+            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            Item fristIAmmor = new Item(48,"카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            GetPlayerData().EquipWeapon(fristWaepon);
+            GetPlayerData().EquipAmmor(fristIAmmor);
         }
     }
     public void SaveGameTime()
@@ -272,41 +292,64 @@ public class GameManager : MonoBehaviour
     }
     public void UseItem(int Id)
     {
-                SoundManager.Instance.SFXPlay("select_sound", 173);
-        // Inventory에 존재하는지 확인하는 검증
+        SoundManager.Instance.SFXPlay("select_sound", 173);
+
+        // 인벤토리에서 유효한 아이템 ID인지 확인
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
         {
             Debug.LogWarning("Invalid item ID.");
             return;
         }
 
-        ItemType itemId = GetPlayerData().inventory[Id].itemType;
-        switch (itemId)
+        Item itemToEquip = GetPlayerData().inventory[Id];
+        ItemType itemType = itemToEquip.itemType;
+
+        switch (itemType)
         {
             case ItemType.None:
                 Debug.Log("Item does nothing.");
                 break;
+
             case ItemType.HealingItem:
-                // 예시: 체력 증가
+                // 체력 증가 예시
                 GetPlayerData().IncreaseHealth(1);
-                DropItem(Id); // 사용 후 삭제
+                DropItem(Id); // 사용 후 인벤토리에서 삭제
                 break;
+
             case ItemType.Weapon:
-                // 예시: 무기 착용
-                GetPlayerData().EquipWeapon(GetPlayerData().inventory[Id]);
+                // 무기 착용 및 교체
+                Item currentWeapon = GetPlayerData().GetEquippedWeapon();
+                if (currentWeapon != null)
+                {
+                    // 기존에 착용한 무기를 인벤토리에 다시 추가
+                    GetPlayerData().inventory.Add(currentWeapon);
+                }
+                // 새로운 무기 착용
+                GetPlayerData().EquipWeapon(itemToEquip);
+                DropItem(Id); // 새롭게 착용된 무기를 인벤토리에서 제거
                 break;
-            case ItemType.Armor:
-                // 예시: 갑옷 착용
-                GetPlayerData().EquipAmmor(GetPlayerData().inventory[Id]);
+
+            case ItemType.Ammor:
+                // 방어구 착용 및 교체
+                Item currentAmmor = GetPlayerData().GetEquippedAmmor();
+                if (currentAmmor != null)
+                {
+                    // 기존에 착용한 방어구를 인벤토리에 다시 추가
+                    GetPlayerData().inventory.Add(currentAmmor);
+                }
+                // 새로운 방어구 착용
+                GetPlayerData().EquipAmmor(itemToEquip);
+                DropItem(Id); // 새롭게 착용된 방어구를 인벤토리에서 제거
                 break;
-            // 다른 아이템 효과 추가 가능
+
+            // 추가적인 아이템 효과는 여기서 추가 가능
             default:
                 Debug.Log("Unknown item.");
                 break;
         }
     }
 
-  
+
 
     public string InfoItem(int Id)
     {
