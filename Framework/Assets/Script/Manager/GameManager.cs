@@ -178,10 +178,10 @@ public class GameManager : MonoBehaviour
             //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
             //AddItem(13,"장난감 칼", "플라스틱 재질. 요즘엔 희귀한 것.", ItemType.Weapon);
             //AddItem(12, "빛바랜 리본", "더 귀엽게 보인다면 세게 때리진 않겠지.", ItemType.Ammor);
-            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
-            GetPlayerData().EquipWeapon(fristWaepon);
-            GetPlayerData().EquipAmmor(fristIAmmor);
+            //Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            //Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            //GetPlayerData().EquipWeapon(fristWaepon);
+            //GetPlayerData().EquipAmmor(fristIAmmor);
 
         }
         else
@@ -381,26 +381,21 @@ public class GameManager : MonoBehaviour
     public void Save()
     {
         isSave = true;
+
         // 플레이어 위치 저장
         PlayerPrefs.SetFloat("PlayerPosX", playerData.position.x);
         PlayerPrefs.SetFloat("PlayerPosY", playerData.position.y);
         PlayerPrefs.SetFloat("PlayerPosZ", playerData.position.z);
 
         // 체력 및 기타 플레이어 데이터 저장
-        PlayerPrefs.SetInt("PlayerHealth", playerData.Maxhealth);  // 최대체력으로 회복
+        PlayerPrefs.SetInt("PlayerHealth", playerData.Maxhealth);  // 최대 체력으로 회복
         PlayerPrefs.SetInt("PlayerMaxHealth", playerData.Maxhealth);
         PlayerPrefs.SetString("PlayerName", playerData.player_Name);
 
         PlayerPrefs.SetInt("MyBoolValue", isSave ? 1 : 0);
-        // 인벤토리 아이템 저장
-        for (int i = 0; i < playerData.inventory.Count; i++)
-        {
-            PlayerPrefs.SetString("InventoryItem_" + i, playerData.inventory[i].ToString());
-        }
-        PlayerPrefs.SetInt("InventoryCount", playerData.inventory.Count);
-        List<Item> inventory = playerData.inventory;
 
-        // 인벤토리 크기 저장
+        // 인벤토리 아이템 저장
+        List<Item> inventory = playerData.inventory;
         PlayerPrefs.SetInt("InventoryCount", inventory.Count);
 
         for (int i = 0; i < inventory.Count; i++)
@@ -411,9 +406,30 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString($"Item_{i}_Description", inventory[i].description);
             PlayerPrefs.SetInt($"Item_{i}_Type", (int)inventory[i].itemType);
         }
+
+        // 현재 무기 저장
+        if (playerData.curWeapon != null)
+        {
+            PlayerPrefs.SetInt("CurWeapon_ID", playerData.curWeapon.id);
+            PlayerPrefs.SetString("CurWeapon_Name", playerData.curWeapon.itemName);
+            PlayerPrefs.SetString("CurWeapon_Description", playerData.curWeapon.description);
+            PlayerPrefs.SetInt("CurWeapon_Type", (int)playerData.curWeapon.itemType);
+        }
+
+        // 현재 갑옷 저장
+        if (playerData.curAmmor != null)
+        {
+            PlayerPrefs.SetInt("CurAmmor_ID", playerData.curAmmor.id);
+            PlayerPrefs.SetString("CurAmmor_Name", playerData.curAmmor.itemName);
+            PlayerPrefs.SetString("CurAmmor_Description", playerData.curAmmor.description);
+            PlayerPrefs.SetInt("CurAmmor_Type", (int)playerData.curAmmor.itemType);
+        }
+
         PlayerPrefs.Save();
         Debug.Log("게임이 저장되었습니다.");
     }
+
+
 
     // Load Method
     public void Load()
@@ -429,6 +445,7 @@ public class GameManager : MonoBehaviour
         playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 6);
         playerData.player_Name = PlayerPrefs.GetString("PlayerName", playerData.player_Name);
 
+        // 인벤토리 아이템 로드
         int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
         List<Item> loadedInventory = new List<Item>();
 
@@ -440,13 +457,38 @@ public class GameManager : MonoBehaviour
             string description = PlayerPrefs.GetString($"Item_{i}_Description");
             ItemType itemType = (ItemType)PlayerPrefs.GetInt($"Item_{i}_Type");
 
-            // 아이템 객체를 조립해서 리스트에 추가
+            // 아이템 객체를 생성하여 리스트에 추가
             Item newItem = new Item(id, name, description, itemType);
             loadedInventory.Add(newItem);
         }
         playerData.inventory = loadedInventory;
 
+        // 현재 무기 로드
+        if (PlayerPrefs.HasKey("CurWeapon_ID"))
+        {
+            int weaponId = PlayerPrefs.GetInt("CurWeapon_ID");
+            string weaponName = PlayerPrefs.GetString("CurWeapon_Name");
+            string weaponDescription = PlayerPrefs.GetString("CurWeapon_Description");
+            ItemType weaponType = (ItemType)PlayerPrefs.GetInt("CurWeapon_Type");
+
+            // 현재 무기 아이템 생성
+            playerData.curWeapon = new Item(weaponId, weaponName, weaponDescription, weaponType);
+        }
+
+        // 현재 갑옷 로드
+        if (PlayerPrefs.HasKey("CurAmmor_ID"))
+        {
+            int armorId = PlayerPrefs.GetInt("CurAmmor_ID");
+            string armorName = PlayerPrefs.GetString("CurAmmor_Name");
+            string armorDescription = PlayerPrefs.GetString("CurAmmor_Description");
+            ItemType armorType = (ItemType)PlayerPrefs.GetInt("CurAmmor_Type");
+
+            // 현재 갑옷 아이템 생성
+            playerData.curAmmor = new Item(armorId, armorName, armorDescription, armorType);
+        }
+
         Debug.Log("게임이 로드되었습니다.");
     }
+
 }
 
