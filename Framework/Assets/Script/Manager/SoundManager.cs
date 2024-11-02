@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +12,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] sfxlist;
     public AudioClip[] txtlist;
     private static SoundManager instance;
-    private List<AudioSource> sfxSources = new List<AudioSource>(); // List to keep track of SFX sources
+    private Queue<AudioSource> sfxPool = new Queue<AudioSource>(); // SFX 풀
+    public int initialPoolSize = 10; // 초기 풀 크기
 
     private void Awake()
     {
@@ -22,6 +22,17 @@ public class SoundManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
+
+            // 초기 SFX 풀 생성
+            for (int i = 0; i < initialPoolSize; i++)
+            {
+                GameObject go = new GameObject("SFXSource");
+                AudioSource audioSource = go.AddComponent<AudioSource>();
+                audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
+                go.transform.SetParent(transform);
+                go.SetActive(false);
+                sfxPool.Enqueue(audioSource);
+            }
         }
         else
         {
@@ -33,10 +44,6 @@ public class SoundManager : MonoBehaviour
     {
         get
         {
-            if (null == instance)
-            {
-                return null;
-            }
             return instance;
         }
     }
@@ -52,55 +59,47 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    private float LinearToDecibel(float linearValue)
-    {
-        if (linearValue == 0)
-        {
-            return -80f; // -80 dB is usually considered as silent
-        }
-        else
-        {
-            return 20f * Mathf.Log10(linearValue);
-        }
-    }
-
-    public void BGSoundVolume(float val)
-    {
-        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
-        mixer.SetFloat("BGSound", LinearToDecibel(val));
-    }
-
-    public void SFXSoundVolume(float val)
-    {
-        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
-        mixer.SetFloat("SFXSound", LinearToDecibel(val));
-    }
-
     public void SFXPlay(string sfxName, int sfxNum)
     {
-        GameObject go = new GameObject(sfxName + "Sound");
-        AudioSource audioSource = go.AddComponent<AudioSource>();
-
+        AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = sfxlist[sfxNum];
-        audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
         audioSource.volume = 0.1f;
         audioSource.Play();
-        Destroy(go, sfxlist[sfxNum].length);
-        sfxSources.Add(audioSource); // Add to the list of SFX sources
+        StartCoroutine(DeactivateAfterPlay(audioSource));
     }
-
 
     public void SFXTextPlay(string textName, int textNum)
     {
-        GameObject go = new GameObject(textName + "Sound");
-        AudioSource audioSource = go.AddComponent<AudioSource>();
-
+        AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = txtlist[textNum];
-        audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
         audioSource.volume = 0.1f;
         audioSource.Play();
-        Destroy(go, txtlist[textNum].length);
-        sfxSources.Add(audioSource); // Add to the list of SFX sources
+        StartCoroutine(DeactivateAfterPlay(audioSource));
+    }
+
+    private AudioSource GetAudioSourceFromPool()
+    {
+        if (sfxPool.Count > 0)
+        {
+            AudioSource source = sfxPool.Dequeue();
+            source.gameObject.SetActive(true);
+            return source;
+        }
+        else
+        {
+            GameObject go = new GameObject("SFXSource");
+            AudioSource audioSource = go.AddComponent<AudioSource>();
+            audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
+            go.transform.SetParent(transform);
+            return audioSource;
+        }
+    }
+
+    private IEnumerator DeactivateAfterPlay(AudioSource audioSource)
+    {
+        yield return new WaitForSeconds(audioSource.clip.length);
+        audioSource.gameObject.SetActive(false);
+        sfxPool.Enqueue(audioSource);
     }
 
     public void BGSoundSave(AudioClip clip)
@@ -130,75 +129,7 @@ public class SoundManager : MonoBehaviour
             bgSound.Play();
         }
     }
-    public void StopBGSound()
-    {
-        if (bgSound.clip != null)
-            bgSound.Stop();
-    }
 
-    // Pause the background sound
-    public void PauseBGSound()
-    {
-        if (bgSound.isPlaying)
-            bgSound.Pause();
-    }
-
-    // Resume the background sound
-    public void ResumeBGSound()
-    {
-        if (!bgSound.isPlaying)
-            bgSound.UnPause();
-    }
-
-    // Pause all currently playing SFX
-    public void PauseAllSFX()
-    {
-        foreach (AudioSource source in sfxSources)
-        {
-            if (source.isPlaying)
-                source.Pause();
-        }
-    }
-
-    // Resume all paused SFX
-    public void ResumeAllSFX()
-    {
-        foreach (AudioSource source in sfxSources)
-        {
-            if (source.clip != null && !source.isPlaying)
-                source.UnPause();
-        }
-    }
-
-    // Stop all currently playing SFX
-    public void StopAllSFX()
-    {
-        foreach (AudioSource source in sfxSources)
-        {
-            if (source.isPlaying)
-                source.Stop();
-        }
-        sfxSources.Clear(); // Clear the list of SFX sources
-    }
-    public void SFXPlayDelayed(string sfxName, int sfxNum, float delay)
-    {
-        StartCoroutine(PlaySFXAfterDelay(sfxName, sfxNum, delay));
-    }
-
-    private IEnumerator PlaySFXAfterDelay(string sfxName, int sfxNum, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        GameObject go = new GameObject(sfxName + "Sound");
-        AudioSource audioSource = go.AddComponent<AudioSource>();
-
-        audioSource.clip = sfxlist[sfxNum];
-        audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
-        audioSource.volume = 0.1f;
-        audioSource.Play();
-        Destroy(go, sfxlist[sfxNum].length);
-        sfxSources.Add(audioSource); // Add to the list of SFX sources
-    }
     public void BGSoundPlayDelayed(int bgNum, float delay)
     {
         StartCoroutine(PlayBGAfterDelay(bgNum, delay));
@@ -216,5 +147,50 @@ public class SoundManager : MonoBehaviour
             bgSound.volume = 0.1f;
             bgSound.Play();
         }
+    }
+
+    public void StopBGSound()
+    {
+        if (bgSound.clip != null)
+            bgSound.Stop();
+    }
+
+    // 배경음 볼륨 조절
+    public void BGSoundVolume(float val)
+    {
+        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
+        mixer.SetFloat("BGSound", LinearToDecibel(val));
+    }
+
+    // 효과음 볼륨 조절
+    public void SFXSoundVolume(float val)
+    {
+        val = Mathf.Clamp(val, 0f, 1f); // 값이 항상 0과 1 사이에 있도록 보장
+        mixer.SetFloat("SFXSound", LinearToDecibel(val));
+    }
+
+    private float LinearToDecibel(float linearValue)
+    {
+        if (linearValue == 0)
+        {
+            return -80f; // -80 dB는 무음으로 간주
+        }
+        else
+        {
+            return 20f * Mathf.Log10(linearValue);
+        }
+    }
+
+    // 배경음 일시 정지 및 재개
+    public void PauseBGSound()
+    {
+        if (bgSound.isPlaying)
+            bgSound.Pause();
+    }
+
+    public void ResumeBGSound()
+    {
+        if (!bgSound.isPlaying)
+            bgSound.UnPause();
     }
 }
