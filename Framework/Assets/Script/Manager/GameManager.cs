@@ -373,7 +373,10 @@ public class GameManager : MonoBehaviour
         }
 
         GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
-        Debug.Log("Item dropped.");
+
+        // 아이템 버림 대사
+        string message = $"{GetPlayerData().inventory[Id].itemName} 아이템을 버렸다.";
+        DialogueManager.Instance.ShowItemDialogue(message);
     }
 
 

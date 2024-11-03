@@ -158,6 +158,15 @@ public class DialogueManager : MonoBehaviour
         DisplayNextSentence(id);
     }
 
+    public void ShowItemDialogue(string message)
+    {
+        sentences.Clear();
+        GameManager.Instance.GetPlayerData().isStop = true;
+        SentenceData itemSentence = new SentenceData { text = message, expression = "Default" };
+        sentences.Enqueue(itemSentence);
+        UIManager.Instance.TextBarOpen();
+        DisplayNextSentence();
+    }
 
     private DialogueData FindDialogue(int id, bool isEvent)
     {
