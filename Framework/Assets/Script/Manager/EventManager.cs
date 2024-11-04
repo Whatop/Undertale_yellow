@@ -40,4 +40,8 @@ public class EventManager : MonoBehaviour
         DialogueManager.Instance.StartDialogue(eventNumber,true);
     }
 
+    public void TriggerUIEvent(int eventNumber)
+    {
+        DialogueManager.Instance.StartDialogue(eventNumber, false);
+    }
 }

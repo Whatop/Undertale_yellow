@@ -36,8 +36,8 @@ public class TypeEffect : MonoBehaviour
         switch (eventNumber)
         {
             case 0:
-                txtsound = "SND_TXT1";
-                txtId = 1;
+                txtsound = "SND_sASR";
+                txtId = 3;
                 break;
             case 100:
                 txtsound = "voice_flowey_1";
@@ -60,8 +60,8 @@ public class TypeEffect : MonoBehaviour
         switch (eventNumber)
         {
             case 0:
-                txtsound = "SND_TXT1";
-                txtId = 1;
+                txtsound = "SND_sASR";
+                txtId = 3;
                 break;
             case 100:
                 txtsound = "voice_flowey_1";

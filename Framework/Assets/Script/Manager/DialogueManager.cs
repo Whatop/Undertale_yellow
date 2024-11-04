@@ -20,7 +20,7 @@ public class DialogueData
 public class GameOverDialogueData
 {
     public int npcID;
-    public string[] sentences;
+    public SentenceData[] sentences;
 }
 
 [System.Serializable]
@@ -33,16 +33,20 @@ public class DialogueDatabase
 public class DialogueManager : MonoBehaviour
 {
     private Queue<SentenceData> sentences;
-    private Queue<string> gameover_sentences;
+    private Queue<SentenceData> gameover_sentences;
     public NPC currentNPC;
     public TypeEffect typeEffect;
     public TypeEffect gameOvertypeEffect;
 
+    [SerializeField]
     private DialogueDatabase dialogueDatabase;
     public static DialogueManager Instance { get; private set; }
     public Sprite[] npcFaces;
     private int npcID;
+    [SerializeField]
+    private NPC uiNpc;
     public TypeEffect currentTypeEffect;
+
 
     void Awake()
     {
@@ -60,7 +64,7 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         sentences = new Queue<SentenceData>();
-        gameover_sentences = new Queue<string>();
+        gameover_sentences = new Queue<SentenceData>();
         LoadDialogueData();
     }
     public bool IsEffecting()
@@ -158,15 +162,6 @@ public class DialogueManager : MonoBehaviour
         DisplayNextSentence(id);
     }
 
-    public void ShowItemDialogue(string message)
-    {
-        sentences.Clear();
-        GameManager.Instance.GetPlayerData().isStop = true;
-        SentenceData itemSentence = new SentenceData { text = message, expression = "Default" };
-        sentences.Enqueue(itemSentence);
-        UIManager.Instance.TextBarOpen();
-        DisplayNextSentence();
-    }
 
     private DialogueData FindDialogue(int id, bool isEvent)
     {
@@ -181,8 +176,8 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-#region Game Over
-public void StartGameOverDialogue(int npcID)
+    #region Game Over
+    public void StartGameOverDialogue(int npcID)
     {
         gameover_sentences.Clear();
 
@@ -191,7 +186,12 @@ public void StartGameOverDialogue(int npcID)
         {
             foreach (var sentence in gameOverDialogue.sentences)
             {
-                gameover_sentences.Enqueue(sentence.Replace("[PLAYER_NAME]", GameManager.Instance.GetPlayerData().player_Name));
+                // 게임 오버 대사에 대해 텍스트와 표정을 모두 큐에 추가
+                gameover_sentences.Enqueue(new SentenceData
+                {
+                    text = sentence.text.Replace("[PLAYER_NAME]", GameManager.Instance.GetPlayerData().player_Name),
+                    expression = sentence.expression
+                });
             }
         }
         else
@@ -201,6 +201,7 @@ public void StartGameOverDialogue(int npcID)
 
         DisplayNextGameOver();
     }
+
     public void DisplayNextGameOver()
     {
         if (gameover_sentences.Count == 0)
@@ -208,9 +209,10 @@ public void StartGameOverDialogue(int npcID)
             return;
         }
 
-        string sentence = gameover_sentences.Dequeue();
-        gameOvertypeEffect.SetMsg(sentence, OnGameOverComplete);
+        SentenceData sentence = gameover_sentences.Dequeue();
+        gameOvertypeEffect.SetMsg(sentence.text, OnGameOverComplete,0, expression: sentence.expression);
     }
+
     private GameOverDialogueData FindGameOverDialogue(int id)
     {
         foreach (var dialogue in dialogueDatabase.gameOverDialogues)
@@ -232,8 +234,8 @@ public void StartGameOverDialogue(int npcID)
     IEnumerator TimeToLate()
     {
         yield return new WaitForSeconds(0.5f);
-        string sentence = gameover_sentences.Dequeue();
-        gameOvertypeEffect.SetMsg(sentence, End_And_LoadComplete);
+        SentenceData sentence = gameover_sentences.Dequeue();
+        gameOvertypeEffect.SetMsg(sentence.text, End_And_LoadComplete, 0);
     }
     #endregion
 
@@ -287,5 +289,9 @@ public void StartGameOverDialogue(int npcID)
     public void SetCurrentNPC(NPC npc)
     {
         currentNPC = npc;
+    }
+    public void SetUINPC()
+    {
+        currentNPC = uiNpc;
     }
 }

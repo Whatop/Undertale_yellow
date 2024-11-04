@@ -132,6 +132,8 @@ public class GameManager : MonoBehaviour
 
     string mapName = "페허 - 잎 무더기 ";
     public bool isPortalTransition = false;
+
+    private DialogueManager dialogueManager;
     public static GameManager Instance
     {
         get
@@ -164,6 +166,7 @@ public class GameManager : MonoBehaviour
         // 플레이어 데이터 초기화
         playerData = new PlayerData();
         weaponData = new Weapon();
+        dialogueManager = DialogueManager.Instance;
     }
     private void Start()
     {
@@ -174,8 +177,8 @@ public class GameManager : MonoBehaviour
         {
             Load();
             LoadGameTime();
-            //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
-            //AddItem(0, "괴물 사탕", "감초향은 아니지만 뚜렷한 맛이 난다.", ItemType.HealingItem);
+           AddItem(0, "괴물 사탕", "감초향은 아니지만\n    뚜렷한 맛이 난다.", ItemType.HealingItem);
+           AddItem(0, "괴물 사탕", "감초향은 아니지만\n    뚜렷한 맛이 난다.", ItemType.HealingItem);
             //AddItem(13,"장난감 칼", "플라스틱 재질. 요즘엔 희귀한 것.", ItemType.Weapon);
             //AddItem(12, "빛바랜 리본", "더 귀엽게 보인다면 세게 때리진 않겠지.", ItemType.Ammor);
             //Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
@@ -187,7 +190,7 @@ public class GameManager : MonoBehaviour
         else
         {
             Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            Item fristIAmmor = new Item(48,"카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            Item fristIAmmor = new Item(48,"카우보이 모자", "전투로 낡은 이 모자엔 \n    턱수염이 딱 어울릴텐데.", ItemType.Ammor);
             GetPlayerData().EquipWeapon(fristWaepon);
             GetPlayerData().EquipAmmor(fristIAmmor);
         }
@@ -312,8 +315,21 @@ public class GameManager : MonoBehaviour
 
             case ItemType.HealingItem:
                 // 체력 증가 예시
-                GetPlayerData().IncreaseHealth(1);
-                DropItem(Id); // 사용 후 인벤토리에서 삭제
+                GetPlayerData().IncreaseHealth(1); 
+                //string itemname = GetPlayerData().inventory[Id].itemName;
+                //string itemdescription = GetPlayerData().inventory[Id].description;
+                //string message = $" * \"{itemname}\" - HP 2 회복\n * {itemdescription}";
+                dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
+                dialogueManager.StartDialogue(itemToEquip.id, true); // 이벤트 대사처럼 처리
+
+                // 아이템 사용 대사
+                string message = $"{itemToEquip.itemName} 을 먹었다.";
+                
+                if(GetPlayerData().Maxhealth >= GetPlayerData().health + 1)
+                    message += "\n* 당신의 HP가 가득찼다";
+                        
+                        
+                GetPlayerData().inventory.RemoveAt(Id); 
                 break;
 
             case ItemType.Weapon:
@@ -326,7 +342,7 @@ public class GameManager : MonoBehaviour
                 }
                 // 새로운 무기 착용
                 GetPlayerData().EquipWeapon(itemToEquip);
-                DropItem(Id); // 새롭게 착용된 무기를 인벤토리에서 제거
+                GetPlayerData().inventory.RemoveAt(Id); 
                 break;
 
             case ItemType.Ammor:
@@ -339,7 +355,8 @@ public class GameManager : MonoBehaviour
                 }
                 // 새로운 방어구 착용
                 GetPlayerData().EquipAmmor(itemToEquip);
-                DropItem(Id); // 새롭게 착용된 방어구를 인벤토리에서 제거
+                GetPlayerData().inventory.RemoveAt(Id); 
+                // 새롭게 착용된 방어구를 인벤토리에서 제거
                 break;
 
             // 추가적인 아이템 효과는 여기서 추가 가능
@@ -375,8 +392,8 @@ public class GameManager : MonoBehaviour
         GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
 
         // 아이템 버림 대사
-        string message = $"{GetPlayerData().inventory[Id].itemName} 아이템을 버렸다.";
-        DialogueManager.Instance.ShowItemDialogue(message);
+                dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
+        string message = $"* {GetPlayerData().inventory[Id].itemName} 은(는)\n    버려졌다.";
     }
 
 

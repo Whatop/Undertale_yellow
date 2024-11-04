@@ -149,11 +149,13 @@ public class UIManager : MonoBehaviour
     public bool isInventroy = false;
 
     public GameObject inventroy_panel;
+    public GameObject inventroy_simple_panel;
     public GameObject item_panel;
     public GameObject stat_panel;
     public GameObject call_panel;
 
     public TextMeshProUGUI[] inventroy_texts;
+    public TextMeshProUGUI[] inventroy_simple_texts;
     public TextMeshProUGUI[] item_texts;
     public TextMeshProUGUI[] stat_texts;
     public TextMeshProUGUI[] call_texts;
@@ -315,10 +317,17 @@ public class UIManager : MonoBehaviour
         savePanel_texts[4].text = gameManager.GetMapName();
     }
     #endregion
-    public void TextBarOpen()
+    public void SetTextBar()
     {
         // 플레이어 위치 가져오기
         Vector3 playerPosition = gameManager.GetPlayerData().position;
+        Vector3 none = inventroy_simple_panel.gameObject.transform.localPosition;
+
+        // 음 추가로 
+        inventroy_simple_texts[0].text = gameManager.GetPlayerData().player_Name;
+        inventroy_simple_texts[1].text = "HP " + gameManager.GetPlayerData().health + "/" + gameManager.GetPlayerData().Maxhealth;
+        inventroy_simple_texts[2].text = "G  " + gameManager.GetPlayerData().GOLD;
+        inventroy_simple_texts[3].text = "LV " + gameManager.GetPlayerData().LEVEL;
 
         // 카메라 위치 가져오기
         Vector3 cameraPosition = Camera.main.transform.position;
@@ -326,12 +335,19 @@ public class UIManager : MonoBehaviour
         {
             // 플레이어가 카메라보다 높이 있는 경우
             textbar.transform.position = textbarPos[1].transform.position;
+            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, 320);
+
         }
-        else 
+        else
         {
             // 플레이어가 카메라보다 낮게 있는 경우
             textbar.transform.position = textbarPos[0].transform.position;
+            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, -220);
         }
+    }
+    public void TextBarOpen()
+    {
+        SetTextBar();
         textbar.SetActive(true);
     }
     public void CloseTextbar()
@@ -608,7 +624,7 @@ public class UIManager : MonoBehaviour
                     case 0:
                         //사용
                         gameManager.UseItem(item_prevNum);
-                         OnPanel(0);
+                         OnPanel(-1);
                         break;
 
                     case 1:
@@ -619,7 +635,7 @@ public class UIManager : MonoBehaviour
                         //버리기
                         Debug.Log(inventroy_curNum);
                         gameManager.DropItem(item_prevNum);
-                          OnPanel(0);
+                         OnPanel(-1);
                         break;
                 }
                // gameManager.GetPlayerData().inventory[0].id = 

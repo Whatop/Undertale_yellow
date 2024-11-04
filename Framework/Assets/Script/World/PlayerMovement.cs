@@ -188,6 +188,7 @@ public class PlayerMovement : LivingObject
 
             if (Input.GetKeyDown(KeyCode.C) && !UIManager.Instance.savePanel.activeSelf)
             {
+                UIManager.Instance.SetTextBar();
                 UIManager.Instance.ChangeInventroy();
             }
         }
