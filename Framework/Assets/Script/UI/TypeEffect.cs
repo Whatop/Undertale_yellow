@@ -88,6 +88,9 @@ public class TypeEffect : MonoBehaviour
             StopCoroutine(typingCoroutine);
             msgText.text = targetMsg;
             EffectEnd();
+            // Skip 시에도 대화 종료 후 상호작용을 딜레이합니다.
+            DialogueManager.Instance.currentNPC?.StartCoroutine(DialogueManager.Instance.currentNPC.InteractionDelay());
+
         }
     }
 

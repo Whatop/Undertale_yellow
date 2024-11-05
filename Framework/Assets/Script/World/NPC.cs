@@ -6,8 +6,8 @@ public class NPC : MonoBehaviour
 {
     public int npcID; // NPC의 ID
     public DialogueManager dialogueManager;
-    [SerializeField]
-    private bool isTalking = false;
+    
+    public bool isTalking = false;
     [SerializeField]
     private bool isFirstInteraction = true; // 처음 대화인지 확인
     private GameObject outlineObject; // 외곽선 효과를 위한 오브젝트
@@ -31,12 +31,17 @@ public class NPC : MonoBehaviour
     {
         HandleInteraction();
     }
-
     private void HandleInteraction()
     {
         bool playerNearby = IsPlayerNearby();
 
-        if (playerNearby && !isEvent && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy)
+        // 대화 중에는 인벤토리 상호작용 차단
+        if (isTalking)
+        {
+            UIManager.Instance.isInventroy = false;
+        }
+
+        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy)
         {
             Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 
@@ -44,15 +49,14 @@ public class NPC : MonoBehaviour
             {
                 if (isTalking)
                 {
-                    // 대화가 출력 중일 때와 완료된 상태를 구분
                     if (dialogueManager.IsEffecting())
                     {
-                        Debug.Log("대화 : 스킵됨");
-                        dialogueManager.SkipTypeEffect(); // 현재 텍스트를 끝까지 출력
+                        UIManager.Instance.isSaveDelay = true; // 상호작용 가능하도록 설정
+                        dialogueManager.SkipTypeEffect();
                     }
                     else
                     {
-                        dialogueManager.DisplayNextSentence(npcID); // 다음 문장 표시
+                        dialogueManager.DisplayNextSentence(npcID);
                     }
                 }
                 else
@@ -66,12 +70,29 @@ public class NPC : MonoBehaviour
             Highlight(false); // 플레이어가 멀어지면 하이라이트 해제
         }
 
-        // 이벤트 대사 처리
         HandleEventDialogue();
     }
 
 
+    public void EndDialogue()
+    {
+        isTalking = false;
+        isEvent = false;
+        isFirstInteraction = true;
+        // 대화가 끝나면 잠시 상호작용 차단
+        UIManager.Instance.isSaveDelay = true; // 상호작용 가능하도록 설정
+        StartCoroutine(InteractionDelay());
 
+        // 대화가 끝나면 인벤토리 상호작용 허용
+        UIManager.Instance.isInventroy = true;
+        UIManager.Instance.ChangeInventroy();
+    }
+
+    public IEnumerator InteractionDelay()
+    {
+        yield return new WaitForSeconds(0.2f); // 0.2초 동안 상호작용 차단
+        UIManager.Instance.isSaveDelay = false; // 상호작용 가능하도록 설정
+    }
     private void HandleEventDialogue()
     {
         if (isEvent && isFirstInteraction)
@@ -81,11 +102,12 @@ public class NPC : MonoBehaviour
             isFirstInteraction = false;
         }
 
-        if (isEvent && (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && isTalking)
+        if (isEvent && (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && isTalking && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy)
         {
             // 현재 대사 출력 중인 경우와 완료된 상태를 구분
             if (dialogueManager.IsEffecting())
             {
+                UIManager.Instance.isSaveDelay = true; // 상호작용 가능하도록 설정
                 dialogueManager.SkipTypeEffect(); // 타이핑 효과를 즉시 완료
             }
             else
@@ -136,13 +158,6 @@ public class NPC : MonoBehaviour
         isTalking = true;
         dialogueManager.SetCurrentNPC(this);
         dialogueManager.StartDialogue(npcID);
-    }
-
-    public void EndDialogue()
-    {
-        isTalking = false;
-        isEvent = false;
-        isFirstInteraction = true;
     }
 
     bool IsPlayerNearby()

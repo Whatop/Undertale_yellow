@@ -22,6 +22,11 @@ public class GameOverDialogueData
     public int npcID;
     public SentenceData[] sentences;
 }
+[System.Serializable]
+public class ItemDatabase
+{
+    public List<Item> items;
+}
 
 [System.Serializable]
 public class DialogueDatabase
@@ -32,8 +37,9 @@ public class DialogueDatabase
 
 public class DialogueManager : MonoBehaviour
 {
-    private Queue<SentenceData> sentences;
-    private Queue<SentenceData> gameover_sentences;
+    public Queue<SentenceData> sentences;
+    public Queue<SentenceData> gameover_sentences;
+    public ItemDatabase itemDatabase;
     public NPC currentNPC;
     public TypeEffect typeEffect;
     public TypeEffect gameOvertypeEffect;
@@ -65,8 +71,48 @@ public class DialogueManager : MonoBehaviour
     {
         sentences = new Queue<SentenceData>();
         gameover_sentences = new Queue<SentenceData>();
+        itemDatabase = new ItemDatabase();
+
         LoadDialogueData();
+        LoadItemData();
     }
+
+    private void LoadDialogueData()
+    {
+        TextAsset jsonFile = Resources.Load<TextAsset>("dialogues");
+        if (jsonFile != null)
+        {
+            dialogueDatabase = JsonUtility.FromJson<DialogueDatabase>(jsonFile.text);
+        }
+        else
+        {
+            Debug.LogError("Failed to load dialogue data.");
+        }
+    }
+    private void LoadItemData()
+    {
+        TextAsset jsonFile = Resources.Load<TextAsset>("items"); // 'items.json' 파일을 불러옴
+        if (jsonFile != null)
+        {
+            itemDatabase = JsonUtility.FromJson<ItemDatabase>(jsonFile.text);
+        }
+        else
+        {
+            Debug.LogError("Failed to load item data.");
+        }
+    }
+    private GameOverDialogueData FindGameOverDialogue(int id)
+    {
+        foreach (var dialogue in dialogueDatabase.gameOverDialogues)
+        {
+            if (dialogue.npcID == id)
+            {
+                return dialogue;
+            }
+        }
+        return null;
+    }
+
     public bool IsEffecting()
     {
         return currentTypeEffect != null && currentTypeEffect.IsEffecting();
@@ -121,18 +167,6 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    private void LoadDialogueData()
-    {
-        TextAsset jsonFile = Resources.Load<TextAsset>("dialogues");
-        if (jsonFile != null)
-        {
-            dialogueDatabase = JsonUtility.FromJson<DialogueDatabase>(jsonFile.text);
-        }
-        else
-        {
-            Debug.LogError("Failed to load dialogue data.");
-        }
-    }
 
     public void StartDialogue(int id, bool isEvent = false)
     {
@@ -160,6 +194,51 @@ public class DialogueManager : MonoBehaviour
 
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence(id);
+    }
+    public void StartItemDialogue(Item item)
+    {
+        // 대화 큐 초기화
+        sentences.Clear();
+        GameManager.Instance.GetPlayerData().isStop = true;
+        SetUINPC(); // 이벤트 대사처럼 처리
+
+        currentNPC.isEvent = true;
+        string message = "";
+        ConfigureDialogueUI(false, -1);
+
+        // 아이템 타입에 따라 메시지 설정
+        switch (item.itemType)
+        {
+            case ItemType.HealingItem:
+                message = $"* {item.itemName}을(를) 먹었다.";
+
+                // 회복 아이템 사용 시 체력 체크
+                if (GameManager.Instance.GetPlayerData().health == GameManager.Instance.GetPlayerData().Maxhealth)
+                {
+                    message += "\n* 당신의 HP가 가득 찼다.";
+                }
+                break;
+
+            case ItemType.Weapon:
+            case ItemType.Ammor:
+                message = $"* {item.itemName}을(를) 장착했다.";
+                break;
+
+            default:
+                message = "* 이 아이템은 사용해도 아무 일도 일어나지 않았다.";
+                break;
+        }
+
+        // 대사를 큐에 추가
+        sentences.Enqueue(new SentenceData
+        {
+            text = message,
+            expression = "Default"
+        });
+
+        // UI 열기 및 첫 번째 대사 출력
+        UIManager.Instance.TextBarOpen();
+        DisplayNextSentence();
     }
 
 
@@ -213,17 +292,6 @@ public class DialogueManager : MonoBehaviour
         gameOvertypeEffect.SetMsg(sentence.text, OnGameOverComplete,0, expression: sentence.expression);
     }
 
-    private GameOverDialogueData FindGameOverDialogue(int id)
-    {
-        foreach (var dialogue in dialogueDatabase.gameOverDialogues)
-        {
-            if (dialogue.npcID == id)
-            {
-                return dialogue;
-            }
-        }
-        return null;
-    }
 
     private void OnGameOverComplete()
     {
@@ -284,7 +352,10 @@ public class DialogueManager : MonoBehaviour
                 // Add actions if necessary
                 break;
         }
+
+        npcID = -1; // npcID 초기화
     }
+
 
     public void SetCurrentNPC(NPC npc)
     {

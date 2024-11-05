@@ -177,19 +177,19 @@ public class GameManager : MonoBehaviour
         {
             Load();
             LoadGameTime();
-           AddItem(0, "괴물 사탕", "감초향은 아니지만\n    뚜렷한 맛이 난다.", ItemType.HealingItem);
-           AddItem(0, "괴물 사탕", "감초향은 아니지만\n    뚜렷한 맛이 난다.", ItemType.HealingItem);
-            //AddItem(13,"장난감 칼", "플라스틱 재질. 요즘엔 희귀한 것.", ItemType.Weapon);
-            //AddItem(12, "빛바랜 리본", "더 귀엽게 보인다면 세게 때리진 않겠지.", ItemType.Ammor);
-            //Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            //Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
-            //GetPlayerData().EquipWeapon(fristWaepon);
-            //GetPlayerData().EquipAmmor(fristIAmmor);
+           AddItem(0);
+           AddItem(0);
+           AddItem(52);
+           AddItem(61);
+            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            GetPlayerData().EquipWeapon(fristWaepon);
+            GetPlayerData().EquipAmmor(fristIAmmor);
 
         }
         else
         {
-            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            Item fristWaepon = new Item(51, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
             Item fristIAmmor = new Item(48,"카우보이 모자", "전투로 낡은 이 모자엔 \n    턱수염이 딱 어울릴텐데.", ItemType.Ammor);
             GetPlayerData().EquipWeapon(fristWaepon);
             GetPlayerData().EquipAmmor(fristIAmmor);
@@ -279,20 +279,42 @@ public class GameManager : MonoBehaviour
             Destroy(enemy);
         }
     }
-    public void AddItem(int id, string name, string description, ItemType itemType = ItemType.None)
+    public void AddItem(int id)
     {
         // 인벤토리가 가득 차지 않았는지 확인
-        if (GetPlayerData().inventory.Count < 9)
-        {
-            Item newItem = new Item(id, name, description, itemType);
-            GetPlayerData().inventory.Add(newItem);
-        }
-        else
+        if (GetPlayerData().inventory.Count >= 9)
         {
             Debug.Log("인벤토리가 가득 찼습니다.");
-            //@@ 추가해
+            return;
+        }
+
+        // JSON 데이터에서 해당 id의 아이템을 찾기
+        Item itemToAdd = dialogueManager.itemDatabase.items.Find(item => item.id == id);
+        if (itemToAdd != null)
+        {
+            // ID 범위에 따라 아이템 타입 설정
+            if (itemToAdd.id >= 0 && itemToAdd.id <= 50)
+            {
+                itemToAdd.itemType = ItemType.HealingItem;
+            }
+            else if (itemToAdd.id >= 51 && itemToAdd.id <= 60)
+            {
+                itemToAdd.itemType = ItemType.Ammor;
+            }
+            else if (itemToAdd.id >= 61 && itemToAdd.id <= 70)
+            {
+                itemToAdd.itemType = ItemType.Weapon;
+            }
+            else
+            {
+                itemToAdd.itemType = ItemType.None;
+            }
+
+            // 설정된 타입과 함께 아이템을 인벤토리에 추가
+            GetPlayerData().inventory.Add(itemToAdd);
         }
     }
+
     public void UseItem(int Id)
     {
         SoundManager.Instance.SFXPlay("select_sound", 173);
@@ -306,6 +328,7 @@ public class GameManager : MonoBehaviour
 
         Item itemToEquip = GetPlayerData().inventory[Id];
         ItemType itemType = itemToEquip.itemType;
+        dialogueManager.StartItemDialogue(itemToEquip); // 이벤트 대사처럼 처리
 
         switch (itemType)
         {
@@ -316,17 +339,6 @@ public class GameManager : MonoBehaviour
             case ItemType.HealingItem:
                 // 체력 증가 예시
                 GetPlayerData().IncreaseHealth(1); 
-                //string itemname = GetPlayerData().inventory[Id].itemName;
-                //string itemdescription = GetPlayerData().inventory[Id].description;
-                //string message = $" * \"{itemname}\" - HP 2 회복\n * {itemdescription}";
-                dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
-                dialogueManager.StartDialogue(itemToEquip.id, true); // 이벤트 대사처럼 처리
-
-                // 아이템 사용 대사
-                string message = $"{itemToEquip.itemName} 을 먹었다.";
-                
-                if(GetPlayerData().Maxhealth >= GetPlayerData().health + 1)
-                    message += "\n* 당신의 HP가 가득찼다";
                         
                         
                 GetPlayerData().inventory.RemoveAt(Id); 
