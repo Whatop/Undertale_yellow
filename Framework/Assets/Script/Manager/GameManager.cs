@@ -19,6 +19,7 @@ public enum ItemType
 [System.Serializable]
 public class PlayerData
 {
+    public GameObject player;
     public int Maxhealth;
     public int health;
     public Vector3 position;
@@ -29,6 +30,7 @@ public class PlayerData
     public Animator playerAnimator;
     public bool isInvincible;
     public bool isDie;
+    public bool isPhone;
 
     public int LEVEL = 1;
     public int AT = 0;
@@ -56,6 +58,7 @@ public class PlayerData
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
         isDie = false;
+        isPhone = false;
         // 추가 데이터 초기화
     }
 
@@ -520,6 +523,8 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log("게임이 로드되었습니다.");
+        if (GetPlayerData().player !=null)
+        GetPlayerData().player.GetComponent<PlayerMovement>().updateLoad();
     }
 
 }

@@ -68,6 +68,20 @@ public class PlayerMovement : LivingObject
         SoundManager.Instance.BGSoundPlay(); // 배경음악 재생
         OffHpbar();
         transform.position = playerData.position;
+        playerData.player = transform.gameObject;
+    }
+    public void updateLoad()
+    {
+        UIManager.Instance.isInventroy = false;
+        gameManager.GetPlayerData().isStop = false;
+        gameManager.GetPlayerData().isDie = false;
+        isDie = false;
+        playerData = gameManager.GetPlayerData();
+        maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
+        health = gameManager.GetPlayerData().health; // 최대 체력 설정
+        transform.position = playerData.position;
+        playerData.playerAnimator = animator; // 아마도 맞는거 애니메이션 작동
+        playerData.isInvincible = isInvincible;
     }
     #region
     // Soul 모드 처리
@@ -132,7 +146,7 @@ public class PlayerMovement : LivingObject
         SoulRotateToMouse();
         playerData.isInvincible = isInvincible;
 
-        if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop)
+        if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
         {
 
             HandleSoulMode(); // Soul 모드 처리
@@ -362,7 +376,7 @@ public class PlayerMovement : LivingObject
     // 물리 업데이트
     void FixedUpdate()
     {
-        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy && !UIManager.Instance.savePanel.activeSelf)
+        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy && !UIManager.Instance.savePanel.activeSelf && !gameManager.GetPlayerData().isDie)
         {
             Move();
         }

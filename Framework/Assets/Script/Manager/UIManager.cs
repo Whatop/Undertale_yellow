@@ -107,7 +107,7 @@ public class UIManager : MonoBehaviour
     public GameObject textbar;
     public TextMeshProUGUI text;
     public Image npcFaceImage;
-    
+
     //gameover UI
     public GameObject gameover_Object;
     public TextMeshProUGUI gameover_text;
@@ -308,10 +308,10 @@ public class UIManager : MonoBehaviour
     }
     public void TextYellow()
     {
-        savePanel_texts[1].color = new Color(255,255,0);
-        savePanel_texts[2].color = new Color(255,255,0);
-        savePanel_texts[3].color = new Color(255,255,0);
-        savePanel_texts[4].color = new Color(255,255,0);
+        savePanel_texts[1].color = new Color(255, 255, 0);
+        savePanel_texts[2].color = new Color(255, 255, 0);
+        savePanel_texts[3].color = new Color(255, 255, 0);
+        savePanel_texts[4].color = new Color(255, 255, 0);
 
         savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes().ToString();
         savePanel_texts[4].text = gameManager.GetMapName();
@@ -389,7 +389,7 @@ public class UIManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
                 saveNum--;
                 if (saveNum < 0)
                 {
@@ -398,7 +398,7 @@ public class UIManager : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
                 saveNum++;
                 if (saveNum >= save_points.Length)
                 {
@@ -418,7 +418,7 @@ public class UIManager : MonoBehaviour
                 case 1:
                     if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
                     {
-            soundManager.SFXPlay("select_sound", 173);
+                        soundManager.SFXPlay("select_sound", 173);
                         isSaveDelay = true;
                         SaveOff();
                         StartCoroutine(SaveDalay());
@@ -428,7 +428,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            if(saveNum == -1)
+            if (saveNum == -1)
             {
                 if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
                 {
@@ -452,6 +452,7 @@ public class UIManager : MonoBehaviour
         {
             inventroy_texts[0].color = Color.white;
         }
+        inventroy_texts[2].gameObject.SetActive(gameManager.GetPlayerData().isPhone);
         // 아이템 없을때 돌아가는 코드
         if ((inventroy_panelNum == 4 || inventroy_panelNum == 1) && gameManager.GetPlayerData().inventory.Count == 0)
         {
@@ -510,7 +511,7 @@ public class UIManager : MonoBehaviour
                 break;
 
             case 1:
-            soundManager.SFXPlay("select_sound", 173);
+                soundManager.SFXPlay("select_sound", 173);
                 stat_panel.SetActive(true);
                 inventroy_panelNum = 2;
                 inventroy_soul.gameObject.SetActive(false);
@@ -518,7 +519,7 @@ public class UIManager : MonoBehaviour
                 break;
 
             case 2:
-            soundManager.SFXPlay("select_sound", 173);
+                soundManager.SFXPlay("select_sound", 173);
                 call_panel.SetActive(true);
                 inventroy_panelNum = 3;
                 break;
@@ -543,9 +544,9 @@ public class UIManager : MonoBehaviour
     {
         stat_texts[0].text = gameManager.GetPlayerData().player_Name;
         stat_texts[1].text = "LV " + gameManager.GetPlayerData().LEVEL;
-        stat_texts[2].text = "HP " + gameManager.GetPlayerData().health + "/"+ gameManager.GetPlayerData().Maxhealth;
-        stat_texts[3].text = "AT " + gameManager.GetPlayerData().AT_level + " ("+ gameManager.GetPlayerData().AT+")" ;
-        stat_texts[4].text = "DF " + gameManager.GetPlayerData().DF_level + " ("+ gameManager.GetPlayerData().DF+")";
+        stat_texts[2].text = "HP " + gameManager.GetPlayerData().health + "/" + gameManager.GetPlayerData().Maxhealth;
+        stat_texts[3].text = "AT " + gameManager.GetPlayerData().AT_level + " (" + gameManager.GetPlayerData().AT + ")";
+        stat_texts[4].text = "DF " + gameManager.GetPlayerData().DF_level + " (" + gameManager.GetPlayerData().DF + ")";
         stat_texts[5].text = "EXP: " + gameManager.GetPlayerData().EXP;
         stat_texts[6].text = "NEXT: " + gameManager.GetPlayerData().NextEXP;
         stat_texts[7].text = "무기: " + gameManager.GetPlayerData().curWeapon.itemName;
@@ -604,11 +605,11 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
-            if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKeyDown(KeyCode.Z) && inventroy_panelNum != 2)
         {
-            if(!item_panel.activeSelf)
+            if (!item_panel.activeSelf)
                 OnPanel(inventroy_curNum);
-            
+
             // 인벤토리/아이템
             else if (inventroy_panelNum == 1)
             {
@@ -624,7 +625,7 @@ public class UIManager : MonoBehaviour
                     case 0:
                         //사용
                         gameManager.UseItem(item_prevNum);
-                         OnPanel(-1);
+                        OnPanel(-1);
                         break;
 
                     case 1:
@@ -635,12 +636,12 @@ public class UIManager : MonoBehaviour
                         //버리기
                         Debug.Log(inventroy_curNum);
                         gameManager.DropItem(item_prevNum);
-                         OnPanel(-1);
+                        OnPanel(-1);
                         break;
                 }
-               // gameManager.GetPlayerData().inventory[0].id = 
+                // gameManager.GetPlayerData().inventory[0].id = 
             }
-           
+
 
         }
         if (Input.GetKeyDown(KeyCode.X))
@@ -656,11 +657,14 @@ public class UIManager : MonoBehaviour
     }
     int GetCurrentPanelTextLength()
     {
+        int phoneValue = gameManager.GetPlayerData().isPhone ? 0 : 1;
         int result = gameManager.GetPlayerData().inventory.Count;
+
+
         switch (inventroy_panelNum)
         {
             case 0: // 인벤토리 패널
-                return inventroy_texts.Length;
+                return inventroy_texts.Length - phoneValue;
             case 1: // 아이템 패널
                 return Mathf.Min(result, item_texts.Length);
             case 3: // 전화 패널
@@ -1491,7 +1495,7 @@ public class UIManager : MonoBehaviour
         StartCoroutine(gameoverTextOn());
 
 
-    } 
+    }
     public void End_And_Load()
     {
         StartCoroutine(FadeOut());
@@ -1587,6 +1591,6 @@ public class UIManager : MonoBehaviour
         gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
 
     }
-   
+
     #endregion
 }

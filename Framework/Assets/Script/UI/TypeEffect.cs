@@ -12,7 +12,7 @@ public class TypeEffect : MonoBehaviour
     public int txtId = 0;
     private System.Action onEffectEndCallback;
     private string txtsound = "SND_TXT1";
-    private Coroutine typingCoroutine;
+    public Coroutine typingCoroutine;
     // 기존 코드 유지
     private string currentExpression; // 현재 표정 정보 저장
 

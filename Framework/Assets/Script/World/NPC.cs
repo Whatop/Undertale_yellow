@@ -17,6 +17,8 @@ public class NPC : MonoBehaviour
     private Animator animator;
     private Animator TextBar_animator;
 
+    private bool canAdvanceDialogue = false; // 대화 진행 가능 여부를 추적하는 플래그
+
     public bool isEvent = false;
 
     void Start()
@@ -41,7 +43,7 @@ public class NPC : MonoBehaviour
             UIManager.Instance.isInventroy = false;
         }
 
-        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy)
+        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy && !GameManager.Instance.GetPlayerData().isDie)
         {
             Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 
@@ -70,7 +72,11 @@ public class NPC : MonoBehaviour
             Highlight(false); // 플레이어가 멀어지면 하이라이트 해제
         }
 
-        HandleEventDialogue();
+        if(GameManager.Instance.GetPlayerData().isDie)
+            HandleOverDialogue();
+        else
+            HandleEventDialogue();
+
     }
 
 
@@ -115,6 +121,21 @@ public class NPC : MonoBehaviour
                 dialogueManager.DisplayNextSentence(npcID); // 다음 문장 표시
             }
         }
+    }
+
+    private void HandleOverDialogue()
+    {
+        // Z 또는 Space 키가 눌렸고, 대화 진행이 가능한 상태에서만 실행
+        if ((Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space)) && canAdvanceDialogue)
+        {
+            // 현재 대사가 끝난 경우에만 다음 문장으로 넘어감
+            dialogueManager.DisplayNextGameOver();
+            canAdvanceDialogue = false; // 다음 대사로 넘어간 후에는 다시 false로 설정
+        }
+    }
+    public void OnDialogueEffectComplete()
+    {
+        canAdvanceDialogue = true; // 대사 타이핑 완료 시 true로 설정하여 키 입력 가능하게 함
     }
 
     // 표정을 설정하는 메소드

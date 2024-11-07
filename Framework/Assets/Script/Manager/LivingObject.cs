@@ -113,7 +113,7 @@ public class LivingObject : MonoBehaviour
     {
         isDie = true;
         Debug.Log("Object died!");
-        Destroy(healthBar); // 체력바 제거
+        //Destroy(healthBar); // 체력바 제거
 
         if (transform.tag == "Player")
         {

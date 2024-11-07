@@ -51,6 +51,8 @@ public class DialogueManager : MonoBehaviour
     private int npcID;
     [SerializeField]
     private NPC uiNpc;
+    [SerializeField]
+    private NPC gameoverNpc;
     public TypeEffect currentTypeEffect;
 
 
@@ -259,7 +261,7 @@ public class DialogueManager : MonoBehaviour
     public void StartGameOverDialogue(int npcID)
     {
         gameover_sentences.Clear();
-
+        SetOverNPC();
         GameOverDialogueData gameOverDialogue = FindGameOverDialogue(npcID);
         if (gameOverDialogue != null)
         {
@@ -285,26 +287,22 @@ public class DialogueManager : MonoBehaviour
     {
         if (gameover_sentences.Count == 0)
         {
+            End_And_LoadComplete();
             return;
         }
 
         SentenceData sentence = gameover_sentences.Dequeue();
-        gameOvertypeEffect.SetMsg(sentence.text, OnGameOverComplete,0, expression: sentence.expression);
+        gameOvertypeEffect.SetMsg(sentence.text, OnGameOverComplete, 0);
     }
 
 
     private void OnGameOverComplete()
     {
-        Debug.Log("임시 방편, 게임오버 대화");
-        StartCoroutine(TimeToLate());
+        currentNPC.OnDialogueEffectComplete(); // 현재 NPC의 대화 완료 처리 호출
+
+        Debug.Log(" 게임오버 대화");
     }
 
-    IEnumerator TimeToLate()
-    {
-        yield return new WaitForSeconds(0.5f);
-        SentenceData sentence = gameover_sentences.Dequeue();
-        gameOvertypeEffect.SetMsg(sentence.text, End_And_LoadComplete, 0);
-    }
     #endregion
 
     public void DisplayNextSentence(int eventNumber = -1)
@@ -320,7 +318,6 @@ public class DialogueManager : MonoBehaviour
         // 텍스트 출력
         typeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber, sentenceData.expression);
     }
-
 
     private void OnSentenceComplete()
     {
@@ -364,5 +361,9 @@ public class DialogueManager : MonoBehaviour
     public void SetUINPC()
     {
         currentNPC = uiNpc;
+    }
+    public void SetOverNPC()
+    {
+        currentNPC = gameoverNpc;
     }
 }
