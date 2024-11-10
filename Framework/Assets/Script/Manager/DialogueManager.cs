@@ -212,7 +212,7 @@ public class DialogueManager : MonoBehaviour
         switch (item.itemType)
         {
             case ItemType.HealingItem:
-                message = $"* {item.itemName}을(를) 먹었다.";
+                message = $"* {item.itemName}을 먹었다.";
 
                 // 회복 아이템 사용 시 체력 체크
                 if (GameManager.Instance.GetPlayerData().health == GameManager.Instance.GetPlayerData().Maxhealth)
@@ -242,7 +242,51 @@ public class DialogueManager : MonoBehaviour
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }
+    public void StartInfoDialogue(Item item)
+    {
+        // 대화 큐 초기화
+        sentences.Clear();
+        GameManager.Instance.GetPlayerData().isStop = true;
+        SetUINPC(); // 이벤트 대사처럼 처리
 
+        currentNPC.isEvent = true;
+        string message = "";
+        ConfigureDialogueUI(false, -1);
+        string item_Description = item.description;
+        message = item_Description;
+
+        // 대사를 큐에 추가
+        sentences.Enqueue(new SentenceData
+        {
+            text = message,
+            expression = "Default"
+        });
+
+        // UI 열기 및 첫 번째 대사 출력
+        UIManager.Instance.TextBarOpen();
+        DisplayNextSentence();
+    }public void StartDropDialogue(Item item)
+    {
+        // 대화 큐 초기화
+        sentences.Clear();
+        GameManager.Instance.GetPlayerData().isStop = true;
+        SetUINPC(); // 이벤트 대사처럼 처리
+        string message = $"* {item.itemName} 은(는)\n    버려졌다.";
+
+        currentNPC.isEvent = true;
+        ConfigureDialogueUI(false, -1);
+
+        // 대사를 큐에 추가
+        sentences.Enqueue(new SentenceData
+        {
+            text = message,
+            expression = "Default"
+        });
+
+        // UI 열기 및 첫 번째 대사 출력
+        UIManager.Instance.TextBarOpen();
+        DisplayNextSentence();
+    }
 
     private DialogueData FindDialogue(int id, bool isEvent)
     {

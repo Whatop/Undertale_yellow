@@ -383,16 +383,19 @@ public class GameManager : MonoBehaviour
 
 
 
-    public string InfoItem(int Id)
+    public void InfoItem(int Id)
     {
                 SoundManager.Instance.SFXPlay("select_sound", 173);
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
         {
-            return "Invalid item ID.";
+            Debug.LogWarning("Invalid item ID.");
+            return;
         }
 
-        string item_Description = GetPlayerData().inventory[Id].description;
-        return item_Description;
+        Item itemToEquip = GetPlayerData().inventory[Id];
+        
+        dialogueManager.StartInfoDialogue(itemToEquip); // 이벤트 대사처럼 처리
+
     }
 
     public void DropItem(int Id)
@@ -408,7 +411,8 @@ public class GameManager : MonoBehaviour
 
         // 아이템 버림 대사
                 dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
-        string message = $"* {GetPlayerData().inventory[Id].itemName} 은(는)\n    버려졌다.";
+        Item itemToEquip = GetPlayerData().inventory[Id];
+        dialogueManager.StartDropDialogue(itemToEquip); // 이벤트 대사처럼 처리
     }
 
 

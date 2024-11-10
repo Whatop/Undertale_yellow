@@ -631,6 +631,7 @@ public class UIManager : MonoBehaviour
                     case 1:
                         // 정보
                         gameManager.InfoItem(item_prevNum);
+                        OnPanel(-1);
                         break;
                     case 2:
                         //버리기
