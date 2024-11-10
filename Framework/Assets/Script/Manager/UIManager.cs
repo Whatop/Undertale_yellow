@@ -1088,7 +1088,7 @@ public class UIManager : MonoBehaviour
     }
     public void ResetSettings()
     {
-        PlayerPrefs.DeleteAll();
+        //PlayerPrefs.DeleteAll();
         // 기본값 설정
         bgmScrollbar.value = 0.5f; // 기본 볼륨 값
         sfxScrollbar.value = 0.5f;  // 기본 볼륨 값
@@ -1182,7 +1182,7 @@ public class UIManager : MonoBehaviour
 
     void OptionInput()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape)&& !GameManager.Instance.GetPlayerData().isDie)
         {
             if (currentPanel == "KeyChange")
             {
@@ -1215,7 +1215,7 @@ public class UIManager : MonoBehaviour
                 Time.timeScale = 0f;
                 soundManager.PauseBGSound();
             }
-            soundManager.SFXPlay("mus_piano1", 32);
+            soundManager.SFXPlay("move_sound", 185);
         }
 
         if (isUserInterface)
@@ -1223,24 +1223,24 @@ public class UIManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 Navigate(-1);
-                soundManager.SFXPlay("snd_piano3", 34);
+            soundManager.SFXPlay("move_sound", 185);
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 Navigate(1);
-                soundManager.SFXPlay("snd_piano4", 35);
+            soundManager.SFXPlay("move_sound", 185);
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-                soundManager.SFXPlay("snd_piano5", 36);
+            soundManager.SFXPlay("move_sound", 185);
                 AdjustValue(-1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
-                soundManager.SFXPlay("snd_piano5", 36);
+            soundManager.SFXPlay("move_sound", 185);
                 AdjustValue(1);
             }
-            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Z))
             {
                 if (currentButtons != null && currentButtons.Length > 0)
                 {
@@ -1251,13 +1251,11 @@ public class UIManager : MonoBehaviour
                         else
                         {
                             currentButtons[currentIndex].onClick.Invoke();
-                            soundManager.SFXPlay("snd_piano6", 37);
                         }
                     }
                     else
                     {
                         currentButtons[currentIndex].onClick.Invoke();
-                        soundManager.SFXPlay("snd_piano6", 37);
                     }
                 }
             }
@@ -1399,7 +1397,7 @@ public class UIManager : MonoBehaviour
     {
         currentIndex = index;
         UpdateSelection();
-        soundManager.SFXPlay("snd_piano2", 33);
+            soundManager.SFXPlay("select_sound", 173);
     }
     public void ChangeResolution(int direction)
     {
@@ -1500,6 +1498,7 @@ public class UIManager : MonoBehaviour
     {
         StartCoroutine(FadeOut());
         StartCoroutine(Load_SavePoint());
+        SoundManager.Instance.FadeOutBGSound(3f);  // 게임오버 브금 끄기
         // Off gameover
         // last load -> go!
 

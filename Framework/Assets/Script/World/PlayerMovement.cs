@@ -76,6 +76,8 @@ public class PlayerMovement : LivingObject
         gameManager.GetPlayerData().isStop = false;
         gameManager.GetPlayerData().isDie = false;
         isDie = false;
+        //그 방에 맞는 배경음악을 불러온다.
+        SoundManager.Instance.BGSoundPlayDelayed(0,1f);
         playerData = gameManager.GetPlayerData();
         maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
         health = gameManager.GetPlayerData().health; // 최대 체력 설정

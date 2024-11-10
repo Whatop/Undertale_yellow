@@ -43,7 +43,8 @@ public class NPC : MonoBehaviour
             UIManager.Instance.isInventroy = false;
         }
 
-        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy && !GameManager.Instance.GetPlayerData().isDie)
+        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy && 
+            !GameManager.Instance.GetPlayerData().isDie && !UIManager.Instance.isUserInterface)
         {
             Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
 

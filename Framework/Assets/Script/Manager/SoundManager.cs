@@ -193,4 +193,34 @@ public class SoundManager : MonoBehaviour
         if (!bgSound.isPlaying)
             bgSound.UnPause();
     }
+
+    public void FadeOutBGSound(float duration)
+    {
+        StartCoroutine(FadeOutCoroutine(duration));
+    }
+
+    private IEnumerator FadeOutCoroutine(float duration)
+    {
+        float currentTime = 0;
+        float startVolume;
+
+        // 현재 볼륨 값을 가져옵니다 (데시벨 값)
+        mixer.GetFloat("BGSound", out startVolume);
+        // 데시벨 값을 선형 값(0~1)으로 변환합니다.
+        startVolume = Mathf.Pow(10, startVolume / 20);
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            // 볼륨을 선형적으로 감소시킵니다.
+            float newVolume = Mathf.Lerp(startVolume, 0f, currentTime / duration);
+            BGSoundVolume(newVolume);
+            yield return null;
+        }
+
+        // 볼륨을 완전히 0으로 설정하고 배경음을 정지합니다.
+        BGSoundVolume(0f);
+        StopBGSound();
+    }
+
 }
