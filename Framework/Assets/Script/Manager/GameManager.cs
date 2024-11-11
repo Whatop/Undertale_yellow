@@ -180,22 +180,24 @@ public class GameManager : MonoBehaviour
         {
             Load();
             LoadGameTime();
-           AddItem(0);
-           AddItem(0);
-           AddItem(52);
-           AddItem(61);
-            Item fristWaepon = new Item(49, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            Item fristIAmmor = new Item(48, "카우보이 모자", "전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            //UIManager.Instance.ResetSettings();
+         
+            Item fristWaepon = new Item(49, "리볼버", "* 골동품 리볼버다.", ItemType.Weapon);
+            Item fristIAmmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
             GetPlayerData().EquipWeapon(fristWaepon);
             GetPlayerData().EquipAmmor(fristIAmmor);
 
         }
         else
         {
-            Item fristWaepon = new Item(51, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            Item fristIAmmor = new Item(48,"카우보이 모자", "전투로 낡은 이 모자엔 \n    턱수염이 딱 어울릴텐데.", ItemType.Ammor);
-            GetPlayerData().EquipWeapon(fristWaepon);
-            GetPlayerData().EquipAmmor(fristIAmmor);
+            //AddItem(0);
+            //AddItem(0);
+            //AddItem(52);
+            //AddItem(61);
+            //Item fristWaepon = new Item(51, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
+            //Item fristIAmmor = new Item(48,"카우보이 모자", "* 전투로 낡은 이 모자엔 \n    * 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            //GetPlayerData().EquipWeapon(fristWaepon);
+            //GetPlayerData().EquipAmmor(fristIAmmor);
         }
     }
     public void SaveGameTime()

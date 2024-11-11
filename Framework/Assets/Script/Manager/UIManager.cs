@@ -56,12 +56,17 @@ public class UIManager : MonoBehaviour
     public Scrollbar cameraShakeScrollbar;
     public Scrollbar miniMapSizeScrollbar;
 
+    public Button mouseShotToggle;
+    public Button mouseRollToggle;
+
     public Sprite onSprite;
     public Sprite offSprite;
 
-    public bool isFullScreen = false;
-    public bool isVSyncOn = false;
+    public bool isFullScreen = true;
+    public bool isVSyncOn = true;
     public bool isCursorVisible = true;
+    public bool isMouseShot= true;
+    public bool isMouseRoll= true;
 
     [SerializeField]
     private int currentIndex = 0;
@@ -556,7 +561,7 @@ public class UIManager : MonoBehaviour
     }
     void HandleInput()
     {
-        if (!isInventroy)
+        if (!isInventroy || isUserInterface)
             return;
         // W 입력 시 inventroy_curNum 감소
         if (inventroy_panelNum != 4)
@@ -758,6 +763,7 @@ public class UIManager : MonoBehaviour
         currentKeyIndex = index;
         isWaitingForKey = true;
         Debug.Log("Press any key to bind to action " + index);
+        soundManager.SFXPlay("select_sound", 173);
     }
 
     private void SaveKeyBindings()
@@ -1013,6 +1019,13 @@ public class UIManager : MonoBehaviour
         // 커서 설정 저장
         PlayerPrefs.SetInt("IsCursorVisible", isCursorVisible ? 1 : 0);
 
+        // 마우스 조준 사용
+        PlayerPrefs.SetInt("IsMouseShot", isMouseShot? 1 : 0);
+
+        // 마우스로 돌진
+        PlayerPrefs.SetInt("isMouseRoll", isMouseRoll ? 1 : 0);
+
+
         // 밝기 설정 저장
         PlayerPrefs.SetFloat("Brightness", brightnessScrollbar.value);
 
@@ -1061,6 +1074,19 @@ public class UIManager : MonoBehaviour
             Cursor.visible = isCursorVisible;
             cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
         }
+        // 마우스로 쏘기 불러오기
+        if (PlayerPrefs.HasKey("isMouseShot"))
+        {
+            isMouseShot = PlayerPrefs.GetInt("isMouseShot") == 1;
+            mouseShotToggle.image.sprite = isMouseShot ? onSprite : offSprite;
+        }
+
+        // 마우스로 구르기
+        if (PlayerPrefs.HasKey("isMouseRoll"))
+        {
+            isMouseRoll = PlayerPrefs.GetInt("isMouseRoll") == 1;
+            mouseRollToggle.image.sprite = isMouseRoll ? onSprite : offSprite;
+        }
 
         // 밝기 설정 불러오기
         if (PlayerPrefs.HasKey("Brightness"))
@@ -1089,13 +1115,15 @@ public class UIManager : MonoBehaviour
     }
     public void ResetSettings()
     {
-        //PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll();
         // 기본값 설정
         bgmScrollbar.value = 0.5f; // 기본 볼륨 값
         sfxScrollbar.value = 0.5f;  // 기본 볼륨 값
         isFullScreen = true;
         isVSyncOn = true;
         isCursorVisible = true;
+        isMouseRoll = true;
+        isMouseShot = true;
         brightnessScrollbar.value = 0.5f; // 기본 밝기 값
         cameraShakeScrollbar.value = 0.5f;  // 기본 카메라 흔들림 값
         miniMapSizeScrollbar.value = 0.5f;  // 기본 미니맵 크기 값
@@ -1118,6 +1146,8 @@ public class UIManager : MonoBehaviour
         Cursor.visible = isCursorVisible;
         cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
 
+        mouseRollToggle.image.sprite = isMouseRoll ? onSprite : offSprite;
+        mouseShotToggle.image.sprite = isMouseShot? onSprite : offSprite;
         // 저장
         SaveSettings();
     }
@@ -1252,18 +1282,26 @@ public class UIManager : MonoBehaviour
                         else
                         {
                             currentButtons[currentIndex].onClick.Invoke();
+                            
+                         if(currentIndex != 2&& currentIndex != 5 && currentIndex != 6 && currentIndex != 7 && currentIndex != 8 && currentIndex != 0)
+                            soundManager.SFXPlay("select_sound", 173);
                         }
                     }
                     else
                     {
                         currentButtons[currentIndex].onClick.Invoke();
+                        soundManager.SFXPlay("select_sound", 173);
                     }
                 }
             }
         }
     }
 
-    void AdjustValue(int direction)
+    public void soundSfx()
+    {
+        soundManager.SFXPlay("select_sound", 173);
+    }
+    public void AdjustValue(int direction)
     {
         switch (currentIndex)
         {
@@ -1290,7 +1328,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 5
     public void SetBGVolume()
     {
         if (soundManager != null)
@@ -1307,7 +1344,7 @@ public class UIManager : MonoBehaviour
         }
     }
     //
-    void ToggleValue()
+    public void ToggleValue()
     {
         switch (currentIndex)
         {
@@ -1321,6 +1358,23 @@ public class UIManager : MonoBehaviour
                 ToggleCursorVisibility();
                 break;
         }
+        soundManager.SFXPlay("select_sound", 173);
+        StartCoroutine(ForceToggleUpdate());
+    }
+    public void ToggleKeyValue()
+    {
+        switch (currentIndex)
+        {
+            case 9: // 마우스 조준
+                ToggleMouseShot();
+                Debug.Log("마우스 조준 만들어");
+                break;
+            case 10: // 마우스로 돌진
+                ToggleMouseRoll();
+                Debug.Log("마우스로 돌진 만들어");
+                break;
+        }
+        soundManager.SFXPlay("select_sound", 173);
         StartCoroutine(ForceToggleUpdate());
     }
     void UpdateButtonState(Button button, bool state)
@@ -1367,6 +1421,17 @@ public class UIManager : MonoBehaviour
         Cursor.visible = isCursorVisible;
         UpdateButtonState(cusorToggle, isCursorVisible);
     }
+    void ToggleMouseShot()
+    {
+        isMouseShot = !isMouseShot;
+        UpdateButtonState(mouseShotToggle, isMouseShot);
+    }
+
+    void ToggleMouseRoll()
+    {
+        isMouseRoll= !isMouseRoll;
+        UpdateButtonState(mouseRollToggle, isMouseRoll);
+    }
 
     IEnumerator ForceToggleUpdate()
     {
@@ -1398,7 +1463,6 @@ public class UIManager : MonoBehaviour
     {
         currentIndex = index;
         UpdateSelection();
-            soundManager.SFXPlay("select_sound", 173);
     }
     public void ChangeResolution(int direction)
     {
