@@ -93,6 +93,12 @@ public class NPC : MonoBehaviour
         // 대화가 끝나면 인벤토리 상호작용 허용
         UIManager.Instance.isInventroy = true;
         UIManager.Instance.ChangeInventroy();
+    
+        if(npcID == 100)
+        {
+            BattleManager.Instance.BattleStart(2);
+            
+        }
     }
 
     public IEnumerator InteractionDelay()

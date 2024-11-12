@@ -15,8 +15,6 @@ public class BattleManager : MonoBehaviour
     public GameObject[] roomPrefabs;  // 여러 전투 방 프리팹 배열
     public Transform roomSpawnPoint;
 
-    public GameObject bossRoomPrefab;  // 보스 방 프리팹
-    public Transform bossSpawnPoint;
 
     public GameObject[] enemyPrefabs;  // 적 프리팹 배열
     public Room currentRoom;  // 현재 방
@@ -98,8 +96,9 @@ public class BattleManager : MonoBehaviour
         currentState = BattleState.BossBattle;
         gameManager.ChangeGameState(GameState.Fight);
 
-        // 보스 방 생성
-        currentRoom = Instantiate(bossRoomPrefab, bossSpawnPoint.position, Quaternion.identity).GetComponent<Room>();
+        // 보스 방 생성, 이동?
+        // 카메라 변경
+
 
         // 보스 적을 스폰
         SpawnEnemies();

@@ -23,6 +23,8 @@ public class PortalManager : MonoBehaviour
     public CinemachineVirtualCamera[] virtualCameras;  // 각 포탈 지점에 대응하는 가상 카메라 배열
     public Camera mainsCamera;
 
+    public GameObject[] Rooms;
+
     private void Awake()
     {
         if (Instance == null)
