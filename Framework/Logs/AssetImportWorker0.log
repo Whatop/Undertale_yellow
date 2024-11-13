@@ -15,11 +15,11 @@ C:/Users/MSI/Documents/GitHub/FrameWork/Framework
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-51526
+51461
 Successfully changed project path to: C:/Users/MSI/Documents/GitHub/FrameWork/Framework
 C:/Users/MSI/Documents/GitHub/FrameWork/Framework
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 43.37 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 42.34 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.6f1 (338bb68529b2)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Resources/UnitySubsystems
@@ -39,579 +39,107 @@ Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,susp
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.001635 seconds.
+Registered in 0.001621 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 43.49 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 44.64 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  2.158 seconds
+- Completed reload, in  2.068 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.002853 seconds.
+Registered in 0.002303 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 44.22 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 43.44 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.784 seconds
+- Completed reload, in  0.768 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
-Refreshing native plugins compatible for Editor in 0.51 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 0.50 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Unloading 2239 Unused Serialized files (Serialized files now loaded: 0)
 System memory in use before: 118.1 MB.
 System memory in use after: 118.2 MB.
 
 Unloading 22 unused Assets to reduce memory usage. Loaded Objects now: 2703.
-Total: 1.931600 ms (FindLiveObjects: 0.197000 ms CreateObjectMapping: 0.179200 ms MarkObjects: 1.519100 ms  DeleteObjects: 0.034900 ms)
+Total: 2.279600 ms (FindLiveObjects: 0.271300 ms CreateObjectMapping: 0.046700 ms MarkObjects: 1.898300 ms  DeleteObjects: 0.061400 ms)
 
 ========================================================================
 Received Import Request.
-  path: Assets/Sound/SFX/dodge_roll_01.wav
-  artifactKey: Guid(e60c60e5c73a66d41a1f0eb85060e8d3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sound/SFX/dodge_roll_01.wav using Guid(e60c60e5c73a66d41a1f0eb85060e8d3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a173e86beed4217fcd90e5db67977b0b') in 0.102052 seconds
-  Import took 0.105679 seconds .
+  path: Assets/Sprite/UI/wall.png
+  artifactKey: Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/wall.png using Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4af135b3bcbbeda34ef953377f054116') in 0.151826 seconds
+  Import took 0.157409 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000250 seconds.
-  path: Assets/TextMesh Pro/Examples & Extras/Sprites/DropCap Numbers.psd
-  artifactKey: Guid(fd09957580ac4326916010f1f260975b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/TextMesh Pro/Examples & Extras/Sprites/DropCap Numbers.psd using Guid(fd09957580ac4326916010f1f260975b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3561fe2a1aa2d1384582683e3d472335') in 0.035589 seconds
-  Import took 0.039570 seconds .
+  Time since last request: 6.463379 seconds.
+  path: Assets/Sprite/UI/wall.png
+  artifactKey: Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/wall.png using Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1bc97623daa11eefd3e8cf3e638865a2') in 0.010653 seconds
+  Import took 0.015177 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 21.785665 seconds.
+  path: Assets/Sprite/UI/wall.png
+  artifactKey: Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/wall.png using Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9acf449510da24367d19961b83a300e5') in 0.010497 seconds
+  Import took 0.015204 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.366829 seconds.
+  path: Assets/Sprite/UI/wall.png
+  artifactKey: Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/wall.png using Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '766b04e8ab8387ec71d5944f66a7efd2') in 0.010684 seconds
+  Import took 0.015629 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 31124.220839 seconds.
+  path: Assets/Sprite/Animation/Obejct
+  artifactKey: Guid(07d0edd795991f8469ee30dc7391ee57) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Animation/Obejct using Guid(07d0edd795991f8469ee30dc7391ee57) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '282e907ba3b96825f5a90465e9697cc7') in 0.016813 seconds
+  Import took 0.063977 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.390644 seconds.
+  path: Assets/Sprite/Animation/Flowe/Flowey_overworld.controller
+  artifactKey: Guid(98551499e4ca8c24592676df206074ac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Animation/Flowe/Flowey_overworld.controller using Guid(98551499e4ca8c24592676df206074ac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '649e18a30a252498272ed689d3698321') in 0.132264 seconds
+  Import took 0.140535 seconds .
 
 ========================================================================
 Received Prepare
 Registering precompiled user dll's ...
-Registered in 0.001939 seconds.
+Registered in 0.302842 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.51 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 0.89 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.804 seconds
+- Completed reload, in  1.498 seconds
 Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.51 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 0.68 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.7 MB.
-System memory in use after: 116.8 MB.
+System memory in use before: 116.5 MB.
+System memory in use after: 116.7 MB.
 
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2716.
-Total: 1.758600 ms (FindLiveObjects: 0.149400 ms CreateObjectMapping: 0.037300 ms MarkObjects: 1.553800 ms  DeleteObjects: 0.017000 ms)
-
-========================================================================
-Received Import Request.
-  Time since last request: 343.498759 seconds.
-  path: Assets/Script/Manager/PortalManager.cs
-  artifactKey: Guid(475ef691a7166e04bb02664ee28d222f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/Manager/PortalManager.cs using Guid(475ef691a7166e04bb02664ee28d222f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8d3effe45ffd3da778b6f13f9d367d0c') in 0.018738 seconds
-  Import took 0.022370 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002527 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.53 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.682 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.50 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 116.9 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2719.
-Total: 1.762400 ms (FindLiveObjects: 0.167300 ms CreateObjectMapping: 0.036800 ms MarkObjects: 1.539600 ms  DeleteObjects: 0.017700 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002031 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.53 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.711 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.78 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2722.
-Total: 1.943000 ms (FindLiveObjects: 0.178300 ms CreateObjectMapping: 0.045900 ms MarkObjects: 1.697200 ms  DeleteObjects: 0.020400 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.003322 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.67 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.869 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.57 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.1 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2725.
-Total: 2.147300 ms (FindLiveObjects: 0.188300 ms CreateObjectMapping: 0.059100 ms MarkObjects: 1.875200 ms  DeleteObjects: 0.023400 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002083 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.65 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.962 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.54 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2728.
-Total: 3.872700 ms (FindLiveObjects: 0.210500 ms CreateObjectMapping: 0.059200 ms MarkObjects: 3.569500 ms  DeleteObjects: 0.031200 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002103 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.55 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.907 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.58 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2731.
-Total: 2.574000 ms (FindLiveObjects: 0.301600 ms CreateObjectMapping: 0.080700 ms MarkObjects: 2.132500 ms  DeleteObjects: 0.057000 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002326 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.67 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.875 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.52 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2734.
-Total: 2.849500 ms (FindLiveObjects: 0.216100 ms CreateObjectMapping: 0.073800 ms MarkObjects: 2.529500 ms  DeleteObjects: 0.028400 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.003019 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 2.97 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  1.563 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 1.01 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2737.
-Total: 8.117300 ms (FindLiveObjects: 1.977700 ms CreateObjectMapping: 0.614200 ms MarkObjects: 5.488100 ms  DeleteObjects: 0.035800 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.003669 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 1.62 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  2.459 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 1.32 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2740.
-Total: 5.599500 ms (FindLiveObjects: 0.691600 ms CreateObjectMapping: 0.216600 ms MarkObjects: 4.658600 ms  DeleteObjects: 0.029800 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002979 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.59 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  1.131 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.57 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 116.8 MB.
-System memory in use after: 117.0 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2743.
-Total: 4.567500 ms (FindLiveObjects: 0.440700 ms CreateObjectMapping: 0.290700 ms MarkObjects: 3.803100 ms  DeleteObjects: 0.030700 ms)
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2712.
+Total: 4.729000 ms (FindLiveObjects: 0.700900 ms CreateObjectMapping: 0.286100 ms MarkObjects: 3.673900 ms  DeleteObjects: 0.066000 ms)
 
 ========================================================================
 Received Import Request.
-  Time since last request: 20930.070599 seconds.
-  path: Assets/Sprite/UI/empty_Ammo.png
-  artifactKey: Guid(fef1d72e20334464890ce3fa7691d5cd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/UI/empty_Ammo.png using Guid(fef1d72e20334464890ce3fa7691d5cd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6c6fe82b8fe12f10323a3c0fe47eb22c') in 0.083964 seconds
-  Import took 0.089551 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 2795.528417 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_half.png
-  artifactKey: Guid(78f60435ed909104c98d93837d077fbf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_half.png using Guid(78f60435ed909104c98d93837d077fbf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '92d2ebf94d0d922f90dee8dd4f81653a') in 0.030986 seconds
-  Import took 0.036808 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000328 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_left.png
-  artifactKey: Guid(bd76a973ac723644ebb947d915d2ecf7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_left.png using Guid(bd76a973ac723644ebb947d915d2ecf7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '751ddd934e0af6bce8057d363a74e101') in 0.023032 seconds
-  Import took 0.029199 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000283 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_half.png
-  artifactKey: Guid(78f60435ed909104c98d93837d077fbf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_half.png using Guid(78f60435ed909104c98d93837d077fbf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '92d2ebf94d0d922f90dee8dd4f81653a') in 0.016186 seconds
-  Import took 0.021327 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000511 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_right.png
-  artifactKey: Guid(29c8e1ff09667624fb915ef4c41239f9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_right.png using Guid(29c8e1ff09667624fb915ef4c41239f9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b6c49e316c2e904537fc316c0c201406') in 0.022286 seconds
-  Import took 0.028553 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000307 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_left.png
-  artifactKey: Guid(bd76a973ac723644ebb947d915d2ecf7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_left.png using Guid(bd76a973ac723644ebb947d915d2ecf7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '751ddd934e0af6bce8057d363a74e101') in 0.013562 seconds
-  Import took 0.018335 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.021979 seconds.
-  path: Assets/Sprite/TILE/Ruin/black_right.png
-  artifactKey: Guid(29c8e1ff09667624fb915ef4c41239f9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/TILE/Ruin/black_right.png using Guid(29c8e1ff09667624fb915ef4c41239f9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b6c49e316c2e904537fc316c0c201406') in 0.011636 seconds
-  Import took 0.016699 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 9.394123 seconds.
-  path: Assets/Sprite/Ruin/flowerdoor.png
-  artifactKey: Guid(6a8170f08273965439569dd6c35fea8a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/Ruin/flowerdoor.png using Guid(6a8170f08273965439569dd6c35fea8a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '31d99bf91ccb1adac689498fab6d6aa7') in 0.024261 seconds
-  Import took 0.028629 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000440 seconds.
-  path: Assets/Sprite/Animation/Flowe/Flowey_Ingame.png
-  artifactKey: Guid(d1840e23d4d3f4844aacb0089a6788fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/Animation/Flowe/Flowey_Ingame.png using Guid(d1840e23d4d3f4844aacb0089a6788fc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3405b49beb26089c5532270a58bcb984') in 0.095345 seconds
-  Import took 0.099710 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.544449 seconds.
-  path: Assets/Sprite/UI/gameover.png
-  artifactKey: Guid(ab84b5a2327a47b4a8842067d1cdec33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/UI/gameover.png using Guid(ab84b5a2327a47b4a8842067d1cdec33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '28a043f2659e81256020c41b26c440c4') in 0.025697 seconds
-  Import took 0.031233 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.007079 seconds.
-  path: Assets/Sprite/UI/gameover.png
-  artifactKey: Guid(ab84b5a2327a47b4a8842067d1cdec33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/UI/gameover.png using Guid(ab84b5a2327a47b4a8842067d1cdec33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '28a043f2659e81256020c41b26c440c4') in 0.014624 seconds
-  Import took 0.019287 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.245561 seconds.
-  path: Assets/UI pack/Button/Green outline gradient.png
-  artifactKey: Guid(f9f25bb6be8733f4894d60fe54097b1d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/UI pack/Button/Green outline gradient.png using Guid(f9f25bb6be8733f4894d60fe54097b1d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '67080b180186906a5721bd83167f8d6d') in 0.035959 seconds
-  Import took 0.041478 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000405 seconds.
-  path: Assets/UI pack/Icons/Healthbar.png
-  artifactKey: Guid(1b289ca454f3cdf4ca785ab70305a4ad) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/UI pack/Icons/Healthbar.png using Guid(1b289ca454f3cdf4ca785ab70305a4ad) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '044f0f34a9f4274f02c7a8e842d894c9') in 0.035512 seconds
-  Import took 0.042114 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.027832 seconds.
-  path: Assets/UI pack/Icons/Heart.png
-  artifactKey: Guid(54af60d343d3e3b458ad7e97dd60dd04) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/UI pack/Icons/Heart.png using Guid(54af60d343d3e3b458ad7e97dd60dd04) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6371cf1c21ac0a27f869b2941ec0d7c9') in 0.028707 seconds
-  Import took 0.034765 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.159754 seconds.
-  path: Assets/Sprite/Animation/Obejct/Object.png
-  artifactKey: Guid(d533afe0e67f4f74ea70c93dce16809f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/Animation/Obejct/Object.png using Guid(d533afe0e67f4f74ea70c93dce16809f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '628bb7a3f49313db0626bb3b41c0e201') in 0.029405 seconds
-  Import took 0.033442 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 2.944626 seconds.
-  path: Assets/Sprite/UI/Pedestal.png
-  artifactKey: Guid(a2a9366804d47204199acb4f7da8cc28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/UI/Pedestal.png using Guid(a2a9366804d47204199acb4f7da8cc28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd4990ed02aa4ea65ab77f579d9d1f3a1') in 0.020150 seconds
-  Import took 0.025057 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000448 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo.png
-  artifactKey: Guid(6f2302e9f2b72774bbaa4831e3d26402) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo.png using Guid(6f2302e9f2b72774bbaa4831e3d26402) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '343f7524332fd64b341f5fcdcc790e25') in 0.030218 seconds
-  Import took 0.036150 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000619 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo UPSCALE 20X.png
-  artifactKey: Guid(58e1d6c9d1a7cb545966480373166d45) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo UPSCALE 20X.png using Guid(58e1d6c9d1a7cb545966480373166d45) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '87370dd9608713cbce27126a6c4dc504') in 0.032727 seconds
-  Import took 0.037963 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000292 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo.png
-  artifactKey: Guid(6f2302e9f2b72774bbaa4831e3d26402) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo.png using Guid(6f2302e9f2b72774bbaa4831e3d26402) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '343f7524332fd64b341f5fcdcc790e25') in 0.014566 seconds
-  Import took 0.020522 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000333 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo mag.png
-  artifactKey: Guid(3c90d7dfec86c7a41b1a4c45431d88dc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol 0ZI Sexatoo mag.png using Guid(3c90d7dfec86c7a41b1a4c45431d88dc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '86ff5e4659d1b56a6454572f2826ebe8') in 0.028251 seconds
-  Import took 0.032870 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000287 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo mag UPSCALE 20X.png
-  artifactKey: Guid(ddcb90a0bb8c3464da23b7f0ac32ef2a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo mag UPSCALE 20X.png using Guid(ddcb90a0bb8c3464da23b7f0ac32ef2a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8d9e70522766a018d2118c3b2c23847f') in 0.037648 seconds
-  Import took 0.043597 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000399 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock.png
-  artifactKey: Guid(90b8bee4c0dbf4547a03785223205be8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock.png using Guid(90b8bee4c0dbf4547a03785223205be8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '574a5a2223abe775aa821b43fc550bef') in 0.029033 seconds
-  Import took 0.035077 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000327 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo mag UPSCALE 20X.png
-  artifactKey: Guid(ddcb90a0bb8c3464da23b7f0ac32ef2a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol 0ZI Sexatoo mag UPSCALE 20X.png using Guid(ddcb90a0bb8c3464da23b7f0ac32ef2a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8d9e70522766a018d2118c3b2c23847f') in 0.014748 seconds
-  Import took 0.019097 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000266 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol I0L Moderock mag UPSCALE 20X.png
-  artifactKey: Guid(747414b7f46cfff459370fb5440d2e52) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol I0L Moderock mag UPSCALE 20X.png using Guid(747414b7f46cfff459370fb5440d2e52) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '298d38fce3bb96736f9528258376d232') in 0.031179 seconds
-  Import took 0.036676 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000399 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock.png
-  artifactKey: Guid(90b8bee4c0dbf4547a03785223205be8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock.png using Guid(90b8bee4c0dbf4547a03785223205be8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '574a5a2223abe775aa821b43fc550bef') in 0.015289 seconds
-  Import took 0.021167 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000398 seconds.
-  path: Assets/Sprite/UI/Pedestal.png
-  artifactKey: Guid(a2a9366804d47204199acb4f7da8cc28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Sprite/UI/Pedestal.png using Guid(a2a9366804d47204199acb4f7da8cc28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd4990ed02aa4ea65ab77f579d9d1f3a1') in 0.013412 seconds
-  Import took 0.018777 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000455 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure mag.png
-  artifactKey: Guid(2c8e59efcf79d0e45a75e4f61b42e161) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure mag.png using Guid(2c8e59efcf79d0e45a75e4f61b42e161) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd9fad038c14655a027d5e105e5105b1c') in 0.030443 seconds
-  Import took 0.034745 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000334 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol P7 Kiraric Mag.png
-  artifactKey: Guid(cb9341d51a8626649ad8c9c4265ddd2f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol P7 Kiraric Mag.png using Guid(cb9341d51a8626649ad8c9c4265ddd2f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '810a51f97e37133533ce0c80c395c52f') in 0.024890 seconds
-  Import took 0.030278 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000324 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure.png
-  artifactKey: Guid(02fac7c078988a249a05819fb018ece0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure.png using Guid(02fac7c078988a249a05819fb018ece0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'afbdfc6d67f76ffb22351a1b8f724c0a') in 0.027579 seconds
-  Import took 0.032442 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000396 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol P7 Kiraric Mag UPSCALE 20X.png
-  artifactKey: Guid(6af8a7ac58ad75e45baf28f1867fe27a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol P7 Kiraric Mag UPSCALE 20X.png using Guid(6af8a7ac58ad75e45baf28f1867fe27a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b25f3d21b67adcf98e452a51d1062298') in 0.030772 seconds
-  Import took 0.037000 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000325 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure mag UPSCALE 20X.png
-  artifactKey: Guid(f305a3c95dc0d2a4983016122f50c968) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure mag UPSCALE 20X.png using Guid(f305a3c95dc0d2a4983016122f50c968) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e65889615677f12986c1e463a9fb161e') in 0.027598 seconds
-  Import took 0.032658 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000278 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure nomag.png
-  artifactKey: Guid(4772d7990a4ab7747ba16a605565c7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol SSL Printure nomag.png using Guid(4772d7990a4ab7747ba16a605565c7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '67263e04ad39ae37d128e0bec8c5f3a9') in 0.026694 seconds
-  Import took 0.031471 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000301 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure UPSCALE 20X.png
-  artifactKey: Guid(89ff525a87caac545a16768ec7d5a2f1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure UPSCALE 20X.png using Guid(89ff525a87caac545a16768ec7d5a2f1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a21044d6f93dd806da5f3be11dba441e') in 0.029431 seconds
-  Import took 0.034568 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000354 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol P7 Kiraric UPSCALE 20X.png
-  artifactKey: Guid(bae1e254730021f429594066cb3baa95) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol P7 Kiraric UPSCALE 20X.png using Guid(bae1e254730021f429594066cb3baa95) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f37ddac53b3188cebb19f6a4798d931b') in 0.032206 seconds
-  Import took 0.037774 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000380 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol P7 Kiraric.png
-  artifactKey: Guid(381dae8cc164af646a2e0356bb311c10) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol P7 Kiraric.png using Guid(381dae8cc164af646a2e0356bb311c10) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '62b094ef3ee7211d28ab1ca7f5c56bd7') in 0.029779 seconds
-  Import took 0.035802 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000271 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock mag.png
-  artifactKey: Guid(b4c907402699a844cbcab9a6109ffdb5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Sprites/Pistol I0L Moderock mag.png using Guid(b4c907402699a844cbcab9a6109ffdb5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9730be0337d89c313a63b6e82c7c1a1') in 0.030102 seconds
-  Import took 0.035090 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000302 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol I0L Moderock UPSCALE 20X.png
-  artifactKey: Guid(6dd4bf8b7fdf18343b4b8f3a48dd6e7c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol I0L Moderock UPSCALE 20X.png using Guid(6dd4bf8b7fdf18343b4b8f3a48dd6e7c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ce6e87164a512665856212e89711f1a4') in 0.029777 seconds
-  Import took 0.034800 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.000294 seconds.
-  path: Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure nomag UPSCALE 20X.png
-  artifactKey: Guid(c4fe6acd05db23a41827f7a7475ffb62) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/OMA Pixel - Sidearm Weapons/Upscales/Pistol SSL Printure nomag UPSCALE 20X.png using Guid(c4fe6acd05db23a41827f7a7475ffb62) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5804358fc42de86853b95e043c9dbc2e') in 0.029556 seconds
-  Import took 0.033931 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.002604 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.60 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.813 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 1.45 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2187 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 117.1 MB.
-System memory in use after: 117.3 MB.
-
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2796.
-Total: 3.638600 ms (FindLiveObjects: 0.585600 ms CreateObjectMapping: 0.497800 ms MarkObjects: 2.524400 ms  DeleteObjects: 0.028900 ms)
+  Time since last request: 216.021317 seconds.
+  path: Assets/Sprite/UI/Text Bubbles.png
+  artifactKey: Guid(7f667ccdbbf62fc4f9a2cd804d7f8e66) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/Text Bubbles.png using Guid(7f667ccdbbf62fc4f9a2cd804d7f8e66) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '649122d50c5b7f68352cff6ab47b3e83') in 0.104554 seconds
+  Import took 0.111155 seconds .
 
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file
