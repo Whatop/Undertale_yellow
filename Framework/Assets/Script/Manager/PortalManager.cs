@@ -89,6 +89,11 @@ public class PortalManager : MonoBehaviour
             Player.transform.position = portalPoints[currentPortalPointIndex].transform.position;
             SwitchCamera(point);
         }
+        else if (point == 999)
+        {
+            Player.transform.position = portalPoints[5].transform.position;
+            SwitchCamera(point);
+        }
         else
         {
             Player.transform.position = defaultPoint.transform.position;
@@ -154,6 +159,11 @@ public class PortalManager : MonoBehaviour
                 virtualCameras[3].transform.position = portalPoints[2].transform.position;
                 mainsCamera.transform.position = virtualCameras[2].transform.position;
                 virtualCameras[3].gameObject.SetActive(true);
+                break;
+            case 999:
+                virtualCameras[4].transform.position = portalPoints[5].transform.position;
+                mainsCamera.transform.position = virtualCameras[4].transform.position;
+                virtualCameras[4].gameObject.SetActive(true);
                 break;
             default:
                 defaultvirtualCamera.transform.position = defaultPoint.transform.position;

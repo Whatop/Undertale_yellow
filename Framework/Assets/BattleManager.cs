@@ -83,8 +83,8 @@ public class BattleManager : MonoBehaviour
         gameManager.ChangeGameState(GameState.Fight);
 
         // 랜덤으로 방을 생성
-        int randomRoomIndex = Random.Range(0, roomPrefabs.Length);
-        currentRoom = Instantiate(roomPrefabs[randomRoomIndex], roomSpawnPoint.position, Quaternion.identity).GetComponent<Room>();
+        //int randomRoomIndex = Random.Range(0, roomPrefabs.Length);
+        //currentRoom = Instantiate(roomPrefabs[randomRoomIndex], roomSpawnPoint.position, Quaternion.identity).GetComponent<Room>();
 
         // 적을 스폰
         SpawnEnemies();
