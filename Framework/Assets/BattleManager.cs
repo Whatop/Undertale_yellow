@@ -50,6 +50,8 @@ public class BattleManager : MonoBehaviour
 
     public void BattleStart(int eventNumber)
     {
+        gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+        gameManager.isBattle = true;
         // 사운드 재생
         SoundManager.Instance.SFXPlay("BattleStart", 0);
         // 전투 애니메이션 시작

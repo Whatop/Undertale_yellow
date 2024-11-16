@@ -105,8 +105,9 @@ public class PlayerMovement : LivingObject
         }
     }
     // Soul 모드 활성화: 투명도 조절
-    private void EnableSoul()
+    public void EnableSoul()
     {
+        isSoulActive = true;
         soulObject.SetActive(true); // Soul 활성화
         SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
         SetTransparency(Hands, playerTransparency);
