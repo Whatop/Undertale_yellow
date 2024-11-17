@@ -282,11 +282,11 @@ public class UIManager : MonoBehaviour
         savePanel_texts[3].color = new Color(255, 255, 255);
         savePanel_texts[4].color = new Color(255, 255, 255);
 
-
+        savePanel_texts[1].text = gameManager.GetPlayerData().player_Name;
+        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes();
         savePanel_texts[0].gameObject.SetActive(false);
         savePanel_texts[5].gameObject.SetActive(true);
         savePanel_texts[6].gameObject.SetActive(true);
-        Debug.Log("작동되는대 오얀ㅇㅁ나ㅓ앻 ㅜㅑ");
     }
 
     public void SaveOff()

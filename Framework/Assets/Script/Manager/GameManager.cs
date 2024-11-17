@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour
     public bool isBattle;
     public int curportalNumber = 0;
     private float startTime;   // 게임 시작 시간
-    private float savedTime;   // 이전에 저장된 시간 (누적 시간)
+    public float savedTime;   // 이전에 저장된 시간 (누적 시간)
     private bool isSave;
 
     string mapName = "페허 - 잎 무더기 ";
