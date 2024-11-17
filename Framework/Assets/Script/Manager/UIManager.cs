@@ -286,7 +286,7 @@ public class UIManager : MonoBehaviour
         savePanel_texts[0].gameObject.SetActive(false);
         savePanel_texts[5].gameObject.SetActive(true);
         savePanel_texts[6].gameObject.SetActive(true);
-
+        Debug.Log("작동되는대 오얀ㅇㅁ나ㅓ앻 ㅜㅑ");
     }
 
     public void SaveOff()
@@ -417,7 +417,9 @@ public class UIManager : MonoBehaviour
             {
                 case 0:
                     if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space) && !dialogueManager.currentNPC.isTalking)
+                    {
                         SaveComplete();
+                    }
                     break;
 
                 case 1:

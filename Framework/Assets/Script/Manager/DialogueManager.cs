@@ -153,6 +153,10 @@ public class DialogueManager : MonoBehaviour
                     faceIndex = -1; // 예: eventID가 1000일 때 1번 얼굴 이미지 사용
                     SoundManager.Instance.SFXPlay("heal_sound", 123);
                     break;
+                case 1001:
+                    faceIndex = -1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
+                    SoundManager.Instance.SFXPlay("heal_sound", 123);
+                    break;
                 default:
                     faceIndex = -1; // 기본값 (얼굴 이미지를 설정하지 않음)
                     break;
@@ -179,24 +183,24 @@ public class DialogueManager : MonoBehaviour
         currentNPC.isEvent = isEvent;
         DialogueData dialogue = FindDialogue(npcID, isEvent);
 
-        ConfigureDialogueUI(isEvent, id);
-        if (dialogue != null)
+        // 대화 데이터가 없는 경우 로그 출력
+        if (dialogue == null)
         {
-            // `SentenceData`로 대사 저장
-            foreach (var sentence in dialogue.sentences)
-            {
-                // JSON에서 로드된 `SentenceData` 객체를 큐에 직접 추가
-                sentences.Enqueue(sentence);
-            }
+            Debug.LogWarning($"No dialogue found for NPC ID: {npcID}, isEvent: {isEvent}");
+            return;
         }
-        else
+
+        ConfigureDialogueUI(isEvent, id);
+
+        foreach (var sentence in dialogue.sentences)
         {
-            Debug.LogWarning("No dialogue found for NPC ID: " + npcID);
+            sentences.Enqueue(sentence);
         }
 
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence(id);
     }
+
     public void StartItemDialogue(Item item)
     {
         // 대화 큐 초기화
@@ -387,6 +391,7 @@ public class DialogueManager : MonoBehaviour
         switch (npcID)
         {
             case 1000:
+            case 1001:
                 UIManager.Instance.SaveOpen();
                 break;
             case 1002:

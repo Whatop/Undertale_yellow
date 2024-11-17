@@ -27,6 +27,13 @@ public class NPC : MonoBehaviour
         animator = GetComponent<Animator>();
         TextBar_animator = UIManager.Instance.npcFaceImage.GetComponent<Animator>();
         CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
+
+        // 필수 상태 초기화
+        isTalking = false;
+        isFirstInteraction = true;
+        isEvent = false;
+
+        Debug.Log($"NPC {npcID} 초기화 완료: isFirstInteraction={isFirstInteraction}, isTalking={isTalking}");
     }
 
     void Update()
@@ -37,43 +44,45 @@ public class NPC : MonoBehaviour
     {
         bool playerNearby = IsPlayerNearby();
 
-        // 대화 중에는 인벤토리 상호작용 차단
         if (isTalking)
         {
+            // 대화 중에는 상호작용 제한
             UIManager.Instance.isInventroy = false;
+
+            // 타이핑 효과 중인 경우
+            if (dialogueManager.IsEffecting())
+            {
+                if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+                {
+                    dialogueManager.SkipTypeEffect();
+                    UIManager.Instance.isSaveDelay = true;
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
+            {
+                dialogueManager.DisplayNextSentence(npcID);
+            }
+
+            return; // 대화 중이므로 나머지 상호작용은 처리하지 않음
         }
 
-        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay && !UIManager.Instance.isInventroy && 
-            !GameManager.Instance.GetPlayerData().isDie && !UIManager.Instance.isUserInterface)
+        if (playerNearby && !isEvent && isFirstInteraction && !UIManager.Instance.isSaveDelay &&
+            !UIManager.Instance.isInventroy && !GameManager.Instance.GetPlayerData().isDie &&
+            !UIManager.Instance.isUserInterface)
         {
-            Highlight(true); // 플레이어가 가까이 있으면 하이라이트 표시
+            Highlight(true);
 
             if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
             {
-                if (isTalking)
-                {
-                    if (dialogueManager.IsEffecting())
-                    {
-                        UIManager.Instance.isSaveDelay = true; // 상호작용 가능하도록 설정
-                        dialogueManager.SkipTypeEffect();
-                    }
-                    else
-                    {
-                        dialogueManager.DisplayNextSentence(npcID);
-                    }
-                }
-                else
-                {
-                    StartDialogue();
-                }
+                StartDialogue();
             }
         }
         else
         {
-            Highlight(false); // 플레이어가 멀어지면 하이라이트 해제
+            Highlight(false);
         }
 
-        if(GameManager.Instance.GetPlayerData().isDie)
+        if (GameManager.Instance.GetPlayerData().isDie)
             HandleOverDialogue();
         else
             HandleEventDialogue();
