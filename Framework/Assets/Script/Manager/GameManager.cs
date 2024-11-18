@@ -124,6 +124,10 @@ public class GameManager : MonoBehaviour
     private Weapon weaponData;
 
     public Action<GameState> OnGameStateChanged;
+    public GameObject savePrefab; // SavePoint Prefab
+    public Transform[] savePointTransforms; // SavePoint 위치 배열
+    private List<GameObject> instantiatedSavePoints = new List<GameObject>(); // 생성된 SavePoint 리스트
+
     /// <summary>
     /// 전투 확인용
     /// </summary>
@@ -173,6 +177,8 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+
+        InitializeSavePoints();
         startTime = Time.time;
         isSave = PlayerPrefs.GetInt("MyBoolValue", 0) == 1 ? true : false;
 
@@ -200,6 +206,50 @@ public class GameManager : MonoBehaviour
             //GetPlayerData().EquipAmmor(fristIAmmor);
         }
     }
+    #region Savepoint
+    void InitializeSavePoints()
+    {
+        for (int i = 0; i < savePointTransforms.Length; i++)
+        {
+            CreateSavePoint(savePointTransforms[i].position, 1000 + i);
+        }
+    }
+    // SavePoint 생성 메서드
+    // SavePoint 생성 메서드
+    public void CreateSavePoint(Vector3 position, int id)
+    {
+        if (savePrefab == null)
+        {
+            Debug.LogError("SavePrefab이 설정되지 않았습니다.");
+            return;
+        }
+
+        // SavePoint 인스턴스 생성
+        GameObject savePoint = Instantiate(savePrefab, position, Quaternion.identity);
+        instantiatedSavePoints.Add(savePoint);
+
+        // SavePoint 초기 설정
+        NPC savePointNPC = savePoint.GetComponent<NPC>();
+        if (savePointNPC != null)
+        {
+            savePointNPC.npcID = id;
+        }
+
+        Debug.Log($"SavePoint 생성: ID={id}, 위치={position}");
+    }
+
+    // 모든 SavePoint 삭제 (필요할 경우)
+    public void ClearSavePoints()
+    {
+        foreach (var savePoint in instantiatedSavePoints)
+        {
+            Destroy(savePoint);
+        }
+        instantiatedSavePoints.Clear();
+    }
+
+
+    #endregion
     public void SaveGameTime()
     {
         // 현재까지의 경과 시간을 저장 (초 단위)

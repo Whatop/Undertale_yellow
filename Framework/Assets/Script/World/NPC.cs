@@ -5,7 +5,8 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     public int npcID; // NPC의 ID
-    public DialogueManager dialogueManager;
+    [SerializeField]
+    private DialogueManager dialogueManager;
     
     public bool isTalking = false;
     [SerializeField]
@@ -26,6 +27,7 @@ public class NPC : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         TextBar_animator = UIManager.Instance.npcFaceImage.GetComponent<Animator>();
+        dialogueManager = DialogueManager.Instance;
         CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
 
         // 필수 상태 초기화
