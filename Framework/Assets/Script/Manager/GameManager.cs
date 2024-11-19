@@ -116,6 +116,11 @@ public class Item
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private PlayerDataSO playerDataSO; // ScriptableObject 사용
+    private PlayerData runtimePlayerData; // 런타임 중 관리할 데이터
+
+    [SerializeField] private GameConfigSO gameConfig;
+
     private static GameManager instance;
 
     [SerializeField]
@@ -163,13 +168,16 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // 씬 전환 시 삭제되지 않음
+            InitializePlayerData(); // 런타임 데이터 초기화
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
+        LoadGameConfig(); // PlayerPrefs에서 게임 설정 로드
         // 플레이어 데이터 초기화
         playerData = new PlayerData();
         weaponData = new Weapon();
@@ -177,6 +185,18 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+        savePrefab = gameConfig.savePrefab;
+        // GameConfigSO의 위치 데이터로 SavePointTransforms 초기화
+        if (gameConfig != null && gameConfig.savePointPositions != null)
+        {
+            savePointTransforms = new Transform[gameConfig.savePointPositions.Length];
+            for (int i = 0; i < gameConfig.savePointPositions.Length; i++)
+            {
+                GameObject tempObj = new GameObject($"SavePointTransform_{i}");
+                tempObj.transform.position = gameConfig.savePointPositions[i];
+                savePointTransforms[i] = tempObj.transform;
+            }
+        }
 
         InitializeSavePoints();
         startTime = Time.time;
@@ -207,8 +227,110 @@ public class GameManager : MonoBehaviour
         }
     }
     #region Savepoint
+    void InitializePlayerData()
+    {
+        if (playerDataSO != null)
+        {
+            runtimePlayerData = new PlayerData
+            {
+                player = playerDataSO.player,
+                Maxhealth = playerDataSO.Maxhealth,
+                health = playerDataSO.health,
+                position = playerDataSO.position,
+                player_Name = playerDataSO.player_Name,
+                inventory = new List<Item>(playerDataSO.inventory), // 깊은 복사
+                currentState = playerDataSO.currentState,
+                isStop = playerDataSO.isStop,
+                playerAnimator = playerDataSO.playerAnimator,
+                isInvincible = playerDataSO.isInvincible,
+                isDie = playerDataSO.isDie,
+                isPhone = playerDataSO.isPhone,
+                LEVEL = playerDataSO.LEVEL,
+                AT = playerDataSO.AT,
+                DF = playerDataSO.DF,
+                AT_level = playerDataSO.AT_level,
+                DF_level = playerDataSO.DF_level,
+                EXP = playerDataSO.EXP,
+                NextEXP = playerDataSO.NextEXP,
+                GOLD = playerDataSO.GOLD,
+                curWeapon = playerDataSO.curWeapon,
+                curAmmor = playerDataSO.curAmmor
+            };
+        }
+        else
+        {
+            Debug.LogError("PlayerDataSO가 설정되지 않았습니다.");
+        }
+    }
+
+    void SaveGameConfig()
+    {
+        if (savePointTransforms != null)
+        {
+            PlayerPrefs.SetInt("SavePointCount", savePointTransforms.Length);
+
+            for (int i = 0; i < savePointTransforms.Length; i++)
+            {
+                PlayerPrefs.SetFloat($"SavePoint_{i}_X", savePointTransforms[i].position.x);
+                PlayerPrefs.SetFloat($"SavePoint_{i}_Y", savePointTransforms[i].position.y);
+                PlayerPrefs.SetFloat($"SavePoint_{i}_Z", savePointTransforms[i].position.z);
+            }
+        }
+
+        // SavePrefab 경로 저장
+        if (savePrefab != null)
+        {
+            PlayerPrefs.SetString("SavePrefabPath", savePrefab.name);
+        }
+
+        PlayerPrefs.Save();
+        Debug.Log("SaveGameConfig: 게임 설정이 저장되었습니다.");
+    }
+    void LoadGameConfig()
+    {
+        int savePointCount = PlayerPrefs.GetInt("SavePointCount", 0);
+
+        if (savePointCount > 0)
+        {
+            savePointTransforms = new Transform[savePointCount];
+
+            for (int i = 0; i < savePointCount; i++)
+            {
+                float x = PlayerPrefs.GetFloat($"SavePoint_{i}_X", 0f);
+                float y = PlayerPrefs.GetFloat($"SavePoint_{i}_Y", 0f);
+                float z = PlayerPrefs.GetFloat($"SavePoint_{i}_Z", 0f);
+
+                // Transform 생성 및 위치 설정 (임시 GameObject)
+                GameObject tempObj = new GameObject($"SavePoint_{i}");
+                tempObj.transform.position = new Vector3(x, y, z);
+                savePointTransforms[i] = tempObj.transform;
+            }
+        }
+
+        // SavePrefab 경로에서 Prefab 로드
+        string prefabPath = PlayerPrefs.GetString("SavePrefabPath", null);
+        if (!string.IsNullOrEmpty(prefabPath))
+        {
+            savePrefab = Resources.Load<GameObject>(prefabPath);
+            if (savePrefab == null)
+            {
+                Debug.LogError($"LoadGameConfig: {prefabPath} 경로에서 SavePrefab을 찾을 수 없습니다.");
+            }
+        }
+
+        Debug.Log("LoadGameConfig: 게임 설정이 로드되었습니다.");
+    }
+    private void OnApplicationQuit()
+    {
+        SaveGameConfig(); // 게임 종료 시 게임 설정 저장
+    }
     void InitializeSavePoints()
     {
+        if (gameConfig.savePrefab == null || gameConfig.savePointPositions == null)
+        {
+            Debug.LogError("SavePrefab or SavePointPositions are not configured in GameConfigSO!");
+            return;
+        }
         for (int i = 0; i < savePointTransforms.Length; i++)
         {
             CreateSavePoint(savePointTransforms[i].position, 1000 + i);
@@ -218,12 +340,6 @@ public class GameManager : MonoBehaviour
     // SavePoint 생성 메서드
     public void CreateSavePoint(Vector3 position, int id)
     {
-        if (savePrefab == null)
-        {
-            Debug.LogError("SavePrefab이 설정되지 않았습니다.");
-            return;
-        }
-
         // SavePoint 인스턴스 생성
         GameObject savePoint = Instantiate(savePrefab, position, Quaternion.identity);
         instantiatedSavePoints.Add(savePoint);

@@ -123,6 +123,100 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &5025497
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5025498}
+  - component: {fileID: 5025499}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5025498
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5025497}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 10417262}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5025499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5025497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dfc4aea1c1842d4eb5856f5d4396f05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerDataSO: {fileID: 11400000, guid: c02694be969d6e64c8dd91bb31a92a69, type: 2}
+  gameConfig: {fileID: 11400000, guid: 3f4334cfa43328642b8c9cf2c36cbbc0, type: 2}
+  playerData:
+    player: {fileID: 0}
+    Maxhealth: 6
+    health: 6
+    position: {x: 0, y: 0, z: 0}
+    player_Name: frisk
+    inventory: []
+    currentState: 3
+    isStop: 0
+    playerAnimator: {fileID: 0}
+    isInvincible: 0
+    isDie: 0
+    isPhone: 0
+    LEVEL: 1
+    AT: 0
+    DF: 0
+    AT_level: 0
+    DF_level: 0
+    EXP: 10
+    NextEXP: 0
+    GOLD: 0
+    curWeapon:
+      id: 0
+      itemName: 
+      description: 
+      itemType: 0
+    curAmmor:
+      id: 0
+      itemName: 
+      description: 
+      itemType: 0
+  weaponData:
+    id: 0
+    WeaponName: None
+    damage: 1
+    current_Ammo: 200
+    magazine: 10
+    current_magazine: 10
+    maxAmmo: 200
+    maxRange: 0
+    bulletSpeed: 1
+    accuracy: 1
+    firePoint: {fileID: 0}
+  savePrefab: {fileID: 0}
+  savePointTransforms: []
+  isBattle: 0
+  curportalNumber: 0
+  savedTime: 0
+  isPortalTransition: 0
 --- !u!1 &10417261
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +249,7 @@ Transform:
   - {fileID: 960699768}
   - {fileID: 634102352}
   - {fileID: 84828284}
-  - {fileID: 1887541440}
+  - {fileID: 5025498}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -46614,100 +46708,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1875238915}
   m_CullTransparentMesh: 1
---- !u!1 &1887541439
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1887541440}
-  - component: {fileID: 1887541441}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1887541440
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1887541439}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 10417262}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1887541441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1887541439}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dfc4aea1c1842d4eb5856f5d4396f05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData:
-    player: {fileID: 0}
-    Maxhealth: 6
-    health: 6
-    position: {x: 0, y: 0, z: 0}
-    player_Name: frisk
-    inventory: []
-    currentState: 3
-    isStop: 0
-    playerAnimator: {fileID: 0}
-    isInvincible: 0
-    isDie: 0
-    isPhone: 0
-    LEVEL: 1
-    AT: 0
-    DF: 0
-    AT_level: 0
-    DF_level: 0
-    EXP: 10
-    NextEXP: 0
-    GOLD: 0
-    curWeapon:
-      id: 0
-      itemName: 
-      description: 
-      itemType: 0
-    curAmmor:
-      id: 0
-      itemName: 
-      description: 
-      itemType: 0
-  weaponData:
-    id: 0
-    WeaponName: None
-    damage: 1
-    current_Ammo: 200
-    magazine: 10
-    current_magazine: 10
-    maxAmmo: 200
-    maxRange: 0
-    bulletSpeed: 1
-    accuracy: 1
-    firePoint: {fileID: 0}
-  savePrefab: {fileID: 4794404565756284647, guid: 30e39bc33811f004d81ef31aa331ba31, type: 3}
-  savePointTransforms:
-  - {fileID: 1716953448}
-  - {fileID: 1673044478}
-  isBattle: 0
-  curportalNumber: 0
-  savedTime: 0
-  isPortalTransition: 0
 --- !u!1 &1891078807
 GameObject:
   m_ObjectHideFlags: 0
