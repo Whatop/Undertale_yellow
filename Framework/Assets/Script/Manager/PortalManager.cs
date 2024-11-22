@@ -19,6 +19,8 @@ public class PortalManager : MonoBehaviour
     public static PortalManager Instance;
     public GameObject[] portalPoints;
     private int currentPortalPointIndex = 0;
+    public int lastPortalNumber = -1; // 초기값은 기본 상태를 의미 (-1)
+
     private GameObject Player;
     private PlayerMovement playerMovement;
     public GameObject defaultPoint;
@@ -134,12 +136,18 @@ public class PortalManager : MonoBehaviour
 
     void SwitchCamera(int point)
     {
+        lastPortalNumber = point; // 현재 활성화된 포탈 번호 저장
+
         foreach (var data in portalDataList)
         {
             data.virtualCamera.gameObject.SetActive(data.portalNumber == point);
         }
         defaultvirtualCamera.gameObject.SetActive(!portalDataList.Exists(data => data.portalNumber == point));
+
+        Debug.Log(lastPortalNumber + " : 번호로 이동함");
+    
     }
+
 
 
 

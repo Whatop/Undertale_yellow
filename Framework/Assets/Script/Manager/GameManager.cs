@@ -632,6 +632,9 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("CurAmmor_Type", (int)playerData.curAmmor.itemType);
         }
 
+        // 마지막 포탈 번호
+        PlayerPrefs.SetInt("LastPortalNumber", PortalManager.Instance.lastPortalNumber);
+
         PlayerPrefs.Save();
         Debug.Log("게임이 저장되었습니다.");
     }
@@ -693,6 +696,8 @@ public class GameManager : MonoBehaviour
             // 현재 갑옷 아이템 생성
             playerData.curAmmor = new Item(armorId, armorName, armorDescription, armorType);
         }
+        // 마지막 포탈 벊로 로드됨
+        PortalManager.Instance.lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // 기본값 -1
 
         Debug.Log("게임이 로드되었습니다.");
         if (GetPlayerData().player !=null)

@@ -73,6 +73,7 @@ public class NPC : MonoBehaviour
             !UIManager.Instance.isInventroy && !GameManager.Instance.GetPlayerData().isDie &&
             !UIManager.Instance.isUserInterface)
         {
+            if(npcID > 1002 && npcID < 1000)
             Highlight(true);
 
             if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
