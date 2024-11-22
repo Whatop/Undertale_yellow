@@ -75,6 +75,8 @@ public class BattleManager : MonoBehaviour
         {
             StartBossBattle();
         }
+        UIManager.Instance.OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
+
     }
 
 

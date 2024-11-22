@@ -266,6 +266,7 @@ public class UIManager : MonoBehaviour
         OptionInput();
         UpdateUI();
         SaveOff();
+        OffPlayerUI(); // 비전투 상태에서는 UI를 숨김
     }
 
     #region savePanel
@@ -895,7 +896,6 @@ public class UIManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        SetCombatMode();
         PlayerData player = gameManager.GetPlayerData();
         int currentHealth = player.health;
 
@@ -946,18 +946,6 @@ public class UIManager : MonoBehaviour
         ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
     }
 
-    public void SetCombatMode()
-    {
-        if (gameManager.isBattle || GameManager.Instance.GetPlayerData().isInvincible)
-        {
-            OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
-
-        }
-        else
-        {
-            OffPlayerUI(); // 비전투 상태에서는 UI를 숨김
-        }
-    }
     // 체력, 무기 등의 UI를 끄는 함수
     public void OffPlayerUI()
     {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class NPC : MonoBehaviour
 {
@@ -85,7 +86,9 @@ public class NPC : MonoBehaviour
         }
 
         if (GameManager.Instance.GetPlayerData().isDie)
+        {
             HandleOverDialogue();
+        }
         else
             HandleEventDialogue();
 
@@ -163,14 +166,14 @@ public class NPC : MonoBehaviour
     /// <param name="expression"></param>
     public void SetExpression(string expression)
     {
-        if (animator != null)
+        if (animator != null && HasTrigger(animator, expression))
         {
             animator.ResetTrigger("Talking");
             animator.ResetTrigger("Default");
 
             animator.SetTrigger(expression);
         }
-        if (TextBar_animator != null)
+        if (TextBar_animator != null && HasTrigger(TextBar_animator, expression))
         {
             TextBar_animator.ResetTrigger("Talking");
             TextBar_animator.ResetTrigger("Default");
@@ -179,14 +182,20 @@ public class NPC : MonoBehaviour
         }
     }
 
+    // Animator에 해당 트리거가 있는지 확인하는 메서드
+    private bool HasTrigger(Animator animator, string triggerName)
+    {
+        return animator.parameters.Any(param => param.type == AnimatorControllerParameterType.Trigger && param.name == triggerName);
+    }
+
     // 기본 표정으로 돌아가는 메소드
     public void ResetToDefaultExpression()
     {
-        if (animator != null)
+        if (animator != null && HasTrigger(animator, "Default"))
         {
             animator.SetTrigger("Default");
         }
-        if (TextBar_animator != null)
+        if (TextBar_animator != null && HasTrigger(TextBar_animator, "Default"))
         {
             TextBar_animator.SetTrigger("Default");
         }

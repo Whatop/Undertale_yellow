@@ -4,6 +4,16 @@ using UnityEngine;
 using Cinemachine; // Cinemachine 네임스페이스 추가
 using UnityEngine.UI; // Cinemachine 네임스페이스 추가
 
+[System.Serializable]
+public class PortalData
+{
+    public int portalNumber;
+    public GameObject portalPoint;
+    public CinemachineVirtualCamera virtualCamera;
+}
+
+
+
 public class PortalManager : MonoBehaviour
 {
     public static PortalManager Instance;
@@ -22,6 +32,8 @@ public class PortalManager : MonoBehaviour
 
     public CinemachineVirtualCamera[] virtualCameras;  // 각 포탈 지점에 대응하는 가상 카메라 배열
     public Camera mainsCamera;
+    // 인스펙터에서 설정
+    public List<PortalData> portalDataList;
 
     public GameObject[] Rooms;
 
@@ -47,24 +59,25 @@ public class PortalManager : MonoBehaviour
         {
             Debug.LogError("포탈 지점이 설정되지 않았습니다. 인스펙터에서 포탈 지점을 설정해주세요.");
         }
-        SwitchCamera(-1);
+        //SwitchCamera();
+    }
+    public void HandlePortal(int point)
+    {
+        if (isFading)
+            return;
+
+        StartCoroutine(FadeAndMove(point));
     }
 
     public void OnPortalEnter(PortalGate portal)
     {
-        if (isFading)
-            return;
-
-        StartCoroutine(FadeAndMove(portal.portalNumber));
+        HandlePortal(portal.portalNumber);
     }
 
     public void OnPortalTeleport(int point)
     {
-        if (isFading)
-            return;
-
         gameManager.ChangeGameState(GameState.Event);
-        StartCoroutine(FadeAndMove(point));
+        HandlePortal(point);
     }
 
     IEnumerator FadeAndMove(int point)
@@ -121,58 +134,14 @@ public class PortalManager : MonoBehaviour
 
     void SwitchCamera(int point)
     {
-        // 모든 가상 카메라 비활성화
-        foreach (var cam in virtualCameras)
+        foreach (var data in portalDataList)
         {
-            cam.gameObject.SetActive(false);
-            defaultvirtualCamera.gameObject.SetActive(false);
+            data.virtualCamera.gameObject.SetActive(data.portalNumber == point);
         }
-
-        // 포인트에 해당하는 가상 카메라 활성화
-        switch (point)
-        {
-            case 0:
-                virtualCameras[1].transform.position = portalPoints[1].transform.position;
-                mainsCamera.transform.position = virtualCameras[1].transform.position;
-                virtualCameras[1].gameObject.SetActive(true);
-                break;
-
-            case 1:
-                virtualCameras[0].transform.position = portalPoints[0].transform.position;
-                mainsCamera.transform.position = virtualCameras[0].transform.position;
-                virtualCameras[0].gameObject.SetActive(true);
-                break;
-
-            case 2:
-                virtualCameras[2].transform.position = portalPoints[2].transform.position;
-                mainsCamera.transform.position = virtualCameras[2].transform.position;
-                virtualCameras[2].gameObject.SetActive(true);
-                break;
-
-            case 3:
-                virtualCameras[1].transform.position = portalPoints[2].transform.position;
-                mainsCamera.transform.position = virtualCameras[2].transform.position;
-                virtualCameras[1].gameObject.SetActive(true);
-                break;
-
-            case 4:
-                virtualCameras[3].transform.position = portalPoints[2].transform.position;
-                mainsCamera.transform.position = virtualCameras[2].transform.position;
-                virtualCameras[3].gameObject.SetActive(true);
-                break;
-            case 999:
-                virtualCameras[4].transform.position = portalPoints[5].transform.position;
-                mainsCamera.transform.position = virtualCameras[4].transform.position;
-                virtualCameras[4].gameObject.SetActive(true);
-                break;
-            default:
-                defaultvirtualCamera.transform.position = defaultPoint.transform.position;
-                mainsCamera.transform.position = defaultvirtualCamera.transform.position;
-                defaultvirtualCamera.gameObject.SetActive(true);
-                break;
-        }
-
+        defaultvirtualCamera.gameObject.SetActive(!portalDataList.Exists(data => data.portalNumber == point));
     }
+
+
 
     IEnumerator Fade(float targetAlpha)
     {
@@ -185,7 +154,7 @@ public class PortalManager : MonoBehaviour
             color.a = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
             fadeImage.color = color;
 
-            elapsedTime += Time.unscaledDeltaTime; // 시간 정지 상태에서 페이드가 올바르게 진행되도록 unscaledDeltaTime 사용
+            elapsedTime += isFading ? Time.unscaledDeltaTime : Time.deltaTime;
             yield return null;
         }
 

@@ -150,10 +150,8 @@ public class DialogueManager : MonoBehaviour
                     faceIndex = 1; // 예: eventID가 101일 때 1번 얼굴 이미지 사용
                     break;
                 case 1000:
-                    faceIndex = -1; // 예: eventID가 1000일 때 1번 얼굴 이미지 사용
-                    SoundManager.Instance.SFXPlay("heal_sound", 123);
-                    break;
                 case 1001:
+                case 1002:
                     faceIndex = -1; // 예: eventID가 1001일 때 1번 얼굴 이미지 사용
                     SoundManager.Instance.SFXPlay("heal_sound", 123);
                     break;
@@ -392,10 +390,8 @@ public class DialogueManager : MonoBehaviour
         {
             case 1000:
             case 1001:
-                UIManager.Instance.SaveOpen();
-                break;
             case 1002:
-                // Add actions if necessary
+                UIManager.Instance.SaveOpen();
                 break;
         }
 
