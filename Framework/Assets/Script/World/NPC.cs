@@ -73,7 +73,7 @@ public class NPC : MonoBehaviour
             !UIManager.Instance.isInventroy && !GameManager.Instance.GetPlayerData().isDie &&
             !UIManager.Instance.isUserInterface)
         {
-            if(npcID > 1002 && npcID < 1000)
+            if(npcID != 1002 && npcID != 1000 && npcID != 1001)
             Highlight(true);
 
             if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
@@ -112,7 +112,6 @@ public class NPC : MonoBehaviour
         if(npcID == 100)
         {
             BattleManager.Instance.BattleStart(2);
-            
         }
     }
 

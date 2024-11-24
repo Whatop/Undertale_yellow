@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BattleManager : MonoBehaviour
 {
@@ -18,6 +19,14 @@ public class BattleManager : MonoBehaviour
 
     public GameObject[] enemyPrefabs;  // 적 프리팹 배열
     public Room currentRoom;  // 현재 방
+
+    //테스트용 아마도 나중에는 배열로 하든지 보스꺼를 따로 만드는지 할듯
+    //일단 이건 튜토 보스용 
+    public GameObject Boss_AllObject;
+    public GameObject Boss_Face;
+    public TextMeshProUGUI Boss_Text;
+
+    public GameObject Boss_Wall;
 
     public static BattleManager Instance
     {
@@ -104,10 +113,15 @@ public class BattleManager : MonoBehaviour
         // 카메라 변경
 
 
-        // 보스 적을 스폰
-        SpawnEnemies();
-    }
 
+        // 보스 적을 스폰
+        NextPatturn();
+    }
+    
+    void NextPatturn()
+    {
+
+    }
     // 적 스폰 로직
     void SpawnEnemies()
     {
