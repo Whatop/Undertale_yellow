@@ -601,4 +601,9 @@ public class PlayerMovement : LivingObject
             animator.SetFloat("Vertical", 0);
         }
     }
+
+    public void TeleportPlayer(Vector2 pos)
+    {
+        transform.position = pos;
+    }
 }

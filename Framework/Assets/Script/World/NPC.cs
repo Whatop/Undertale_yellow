@@ -39,6 +39,7 @@ public class NPC : MonoBehaviour
         Debug.Log($"NPC {npcID} 초기화 완료: isFirstInteraction={isFirstInteraction}, isTalking={isTalking}");
     }
 
+    
     void Update()
     {
         HandleInteraction();
