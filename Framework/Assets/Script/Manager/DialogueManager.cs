@@ -15,7 +15,6 @@ public class DialogueData
     public bool isEvent;
     public SentenceData[] sentences;
 }
-
 [System.Serializable]
 public class GameOverDialogueData
 {

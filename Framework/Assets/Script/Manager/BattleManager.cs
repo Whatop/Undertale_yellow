@@ -31,7 +31,7 @@ public class BattleDatabase
 
 public class BattleManager : MonoBehaviour
 {
-    public Queue<SentenceData> boss_sentences;
+    public Queue<BossDialogue> boss_sentences;
     [SerializeField]
     private BattleDatabase battleDatabase;
     private static BattleManager instance;
@@ -96,7 +96,7 @@ public class BattleManager : MonoBehaviour
     {
         battleAnimator = battleObject.GetComponent<Animator>();
         battleObject.SetActive(true);
-        boss_sentences = new Queue<SentenceData>();
+        boss_sentences = new Queue<BossDialogue>();
 
         // 필수 상태 초기화
         isTalking = false;
@@ -110,13 +110,20 @@ public class BattleManager : MonoBehaviour
         StartDialogue(1);
         prevPos = player.transform.position;
         player.TeleportPlayer(battlePoint.transform.position);
-
+        Boss_Text.gameObject.SetActive(true);
+        Boss_Wall.gameObject.SetActive(true);
+        gameManager.ChangeGameState(GameState.Fight);
+        isTalking = true;
 
     }
     void BattleReSetting()
     {
         Boss_AllObject.SetActive(false);
         player.TeleportPlayer(prevPos);
+        Boss_Text.gameObject.SetActive(false);
+        Boss_Wall.gameObject.SetActive(false);
+        gameManager.ChangeGameState(GameState.None);
+
     }
 
     void Update()
@@ -165,46 +172,7 @@ public class BattleManager : MonoBehaviour
         currentDialogueIndex = 0;
         DisplayNextDialogue();
     }
-
-    private void DisplayNextDialogue()
-    {
-        if (currentBoss == null || currentDialogueIndex >= currentBoss.dialogues.Count)
-        {
-            Debug.Log("All dialogues completed.");
-            return;
-        }
-
-        var dialogue = currentBoss.dialogues[currentDialogueIndex];
-        Boss_Text.text = dialogue.text;
-
-        // 표정 설정
-        SetBossExpression(dialogue.expression);
-
-        // 공격 패턴 실행
-        if (!string.IsNullOrEmpty(dialogue.attack))
-        {
-            ExecuteAttack(dialogue.attack);
-        }
-
-        // 특수 이벤트 처리
-        if (!string.IsNullOrEmpty(dialogue.eventType))
-        {
-            HandleSpecialEvent(dialogue.eventType);
-        }
-
-
-        // 특정 대사로 건너뛰기
-        if (dialogue.skipToDialogue > 0)
-        {
-            currentDialogueIndex = dialogue.skipToDialogue - 1; // 인덱스는 0부터 시작
-        }
-        else
-        {
-            currentDialogueIndex++;
-        }
-
-       
-    }
+    
     private void HandleInteraction()
     {
 
@@ -224,7 +192,7 @@ public class BattleManager : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space))
             {
-                DisplayNextSentence();
+                DisplayNextDialogue();
             }
 
             return; // 대화 중이므로 나머지 상호작용은 처리하지 않음
@@ -232,16 +200,38 @@ public class BattleManager : MonoBehaviour
 
       
     }
-    public void StartDialogue(int id, bool isEvent = false)
+    public void StartDialogue(int bossID)
     {
-        boss_id = id;
         boss_sentences.Clear();
 
+        // 보스 데이터 검색
+        currentBoss = FindBossBattle(bossID);
+        if (currentBoss == null)
+        {
+            Debug.LogError($"Boss with ID {bossID} not found.");
+            return;
+        }
 
-        DisplayNextSentence(id);
+        // 대사 데이터를 큐에 추가
+        foreach (var dialogue in currentBoss.dialogues)
+        {
+            boss_sentences.Enqueue(new BossDialogue
+            {
+                text = dialogue.text,
+                expression = dialogue.expression,
+                attack = dialogue.attack,
+                direction = dialogue.direction,
+                eventType = dialogue.eventType,
+                music = dialogue.music,
+                skipToDialogue = dialogue.skipToDialogue,
+            });
+        }
+
+        // 첫 번째 대사 출력
+        DisplayNextDialogue();
     }
 
-    public void DisplayNextSentence(int eventNumber = -1)
+    private void DisplayNextDialogue()
     {
         if (boss_sentences.Count == 0)
         {
@@ -249,11 +239,57 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        SentenceData sentenceData = boss_sentences.Dequeue();
+        var dialogue = boss_sentences.Dequeue();
+        currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
 
-        // 텍스트 출력
-        currentTypeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber, sentenceData.expression);
+        // 표정 설정
+        SetBossExpression(dialogue.expression);
+
+        // 공격 패턴 실행
+        if (!string.IsNullOrEmpty(dialogue.attack))
+        {
+            ExecuteAttack(dialogue.attack);
+        }
+
+        // 특수 이벤트 처리
+        if (!string.IsNullOrEmpty(dialogue.eventType))
+        {
+            HandleSpecialEvent(dialogue.eventType);
+        }
+
+        // 특정 대사로 건너뛰기 처리
+        if (currentBoss.dialogues[currentDialogueIndex].skipToDialogue > 0)
+        {
+            currentDialogueIndex = currentBoss.dialogues[currentDialogueIndex].skipToDialogue - 1;
+            DisplayNextDialogue(); // 건너뛴 대사로 즉시 이동
+        }
+        else
+        {
+            currentDialogueIndex++;
+        }
     }
+
+
+    private BossBattleData FindBossBattle(int bossID)
+    {
+        if (battleDatabase == null || battleDatabase.bossBattles == null)
+        {
+            Debug.LogError("Battle database is not loaded or empty.");
+            return null;
+        }
+
+        foreach (var bossBattle in battleDatabase.bossBattles)
+        {
+            if (bossBattle.bossID == bossID)
+            {
+                return bossBattle;
+            }
+        }
+
+        Debug.LogWarning($"No boss battle found for Boss ID: {bossID}");
+        return null;
+    }
+
     private void OnSentenceComplete()
     {
         Debug.Log("보스 문장이 완료되었습니다.");

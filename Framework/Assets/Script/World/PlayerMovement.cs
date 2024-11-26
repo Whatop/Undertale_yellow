@@ -203,7 +203,9 @@ public class PlayerMovement : LivingObject
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
             }
 
-            if (Input.GetKeyDown(KeyCode.C) && !UIManager.Instance.savePanel.activeSelf)
+            if (Input.GetKeyDown(KeyCode.C) && 
+                !UIManager.Instance.savePanel.activeSelf
+                && gameManager.GetPlayerData().currentState == GameState.None)
             {
                 UIManager.Instance.SetTextBar();
                 UIManager.Instance.ChangeInventroy();
