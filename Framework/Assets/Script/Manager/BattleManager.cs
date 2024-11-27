@@ -292,6 +292,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnSentenceComplete()
     {
+        SetBossExpression("Default");
         Debug.Log("보스 문장이 완료되었습니다.");
     }
 
@@ -301,7 +302,7 @@ public class BattleManager : MonoBehaviour
         isEvent = false;
         isFirstInteraction = true;
     }
-        public bool IsEffecting()
+    public bool IsEffecting()
         {
             return currentTypeEffect != null && currentTypeEffect.IsEffecting();
         }
