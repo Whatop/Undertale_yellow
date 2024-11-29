@@ -294,6 +294,7 @@ public class BattleManager : MonoBehaviour
     {
         SetBossExpression("Default");
         Debug.Log("보스 문장이 완료되었습니다.");
+        SetBossExpression("Restare");
     }
 
     public void EndDialogue()
