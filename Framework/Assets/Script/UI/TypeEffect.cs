@@ -108,16 +108,17 @@ public class TypeEffect : MonoBehaviour
     private IEnumerator Effecting()
     {
         bool isExpressionSet = false; // 표정 설정 여부를 추적
+        string currentText = "";      // 현재까지 출력된 텍스트
 
         while (index < targetMsg.Length)
         {
-            // 새로운 단어나 문장이 시작될 때 표정 설정 (index가 0이거나 이전 문자가 공백일 때)
+            // 새로운 단어나 문장이 시작될 때 표정 설정
             if (!isExpressionSet && (index == 0 || targetMsg[index - 1] == ' '))
             {
                 if (currentExpression != null && DialogueManager.Instance.currentNPC != null)
                 {
                     DialogueManager.Instance.currentNPC.SetExpression(currentExpression);
-                    isExpressionSet = true; // 중복 호출 방지
+                    isExpressionSet = true;
                 }
             }
 
@@ -127,23 +128,26 @@ public class TypeEffect : MonoBehaviour
                 int closeIndex = targetMsg.IndexOf('>', index);
                 if (closeIndex != -1)
                 {
+                    // 태그를 전체적으로 처리
                     string tag = targetMsg.Substring(index, closeIndex - index + 1);
-                    msgText.text += tag;
+                    currentText += tag; // 태그를 유지하며 추가
+                    msgText.text = currentText; // 텍스트 업데이트
                     index = closeIndex + 1;
+                    continue; // 태그는 한 번에 처리되므로 다음 루프로 넘어감
                 }
             }
-            else
-            {
-                // 개별 문자 출력
-                if (targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" &&
-                    targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
-                {
-                    SoundManager.Instance.SFXTextPlay(txtsound, txtId);
-                }
 
-                msgText.text += targetMsg[index];
-                index++;
+            // 일반 문자 출력
+            if (targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" &&
+                targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
+            {
+                SoundManager.Instance.SFXTextPlay(txtsound, txtId);
             }
+
+            // 문자 추가
+            currentText += targetMsg[index];
+            msgText.text = currentText; // 텍스트 업데이트
+            index++;
 
             // 지연 시간 적용
             float delay = (index < targetMsg.Length && targetMsg[index - 1].ToString() == " ") ? 0.02f : 1f / CharPerSeconds;
@@ -153,6 +157,8 @@ public class TypeEffect : MonoBehaviour
         typingCoroutine = null; // 타이핑 완료 후 null로 설정
         EffectEnd();
     }
+
+
 
     private void EffectEnd()
     {

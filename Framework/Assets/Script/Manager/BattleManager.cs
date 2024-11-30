@@ -54,6 +54,7 @@ public class BattleManager : MonoBehaviour
     //일단 이건 튜토 보스용 
     public GameObject Boss_AllObject;
     public GameObject Boss_Face;
+    public GameObject Boss_Textbar;
     public TextMeshProUGUI Boss_Text;
     public GameObject battlePoint;
 
@@ -107,7 +108,6 @@ public class BattleManager : MonoBehaviour
     public void BattleSetting()
     {
         Boss_AllObject.SetActive(true);
-        StartDialogue(1);
         prevPos = player.transform.position;
         player.TeleportPlayer(battlePoint.transform.position);
         Boss_Text.gameObject.SetActive(true);
@@ -123,6 +123,7 @@ public class BattleManager : MonoBehaviour
         Boss_Text.gameObject.SetActive(false);
         Boss_Wall.gameObject.SetActive(false);
         gameManager.ChangeGameState(GameState.None);
+        Boss_Textbar.SetActive(false);
 
     }
 
@@ -140,6 +141,8 @@ public class BattleManager : MonoBehaviour
         battleAnimator.SetTrigger("BattleStart");
 
         // 코루틴으로 전투를 지연시켜 시작
+        prevPos = player.transform.position;
+        player.TeleportPlayer(battlePoint.transform.position);
         StartCoroutine(StartBattleAfterDelay(eventNumber, 1.5f));
     }
     private void LoadBossData()
@@ -176,7 +179,7 @@ public class BattleManager : MonoBehaviour
     private void HandleInteraction()
     {
 
-        if (isTalking)
+        if (isTalking && !UIManager.Instance.isInventroy)
         {
             // 대화 중에는 상호작용 제한
             UIManager.Instance.isInventroy = false;
@@ -203,6 +206,7 @@ public class BattleManager : MonoBehaviour
     public void StartDialogue(int bossID)
     {
         boss_sentences.Clear();
+        isTalking = true;
 
         // 보스 데이터 검색
         currentBoss = FindBossBattle(bossID);
@@ -241,7 +245,6 @@ public class BattleManager : MonoBehaviour
 
         var dialogue = boss_sentences.Dequeue();
         currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
-
         // 표정 설정
         SetBossExpression(dialogue.expression);
 
@@ -317,7 +320,7 @@ public class BattleManager : MonoBehaviour
         }
         private void SetBossExpression(string expression)
     {
-        Debug.Log($"Setting boss expression to: {expression}");
+        Debug.Log($"보스 표정 : {expression}");
         // 애니메이션 트리거 설정
         if (!string.IsNullOrEmpty(expression))
         {
@@ -379,13 +382,18 @@ public class BattleManager : MonoBehaviour
         else if (eventNumber == 2)
         {
             StartBossBattle();
-            BattleSetting();
+            BattleSetting(); 
+            StartCoroutine(DelayDialogue(1, 1f)); 
         }
         UIManager.Instance.OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
-
     }
 
-
+    private IEnumerator DelayDialogue(int eventNumber, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Boss_Textbar.SetActive(true);
+        StartDialogue(eventNumber);
+    }
     // 기본 전투 시작
     void StartBasicBattle()
     {

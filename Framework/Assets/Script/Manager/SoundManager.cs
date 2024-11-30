@@ -184,6 +184,7 @@ public class SoundManager : MonoBehaviour
     // 배경음 일시 정지 및 재개
     public void PauseBGSound()
     {
+        Debug.Log("배경음 멈춤");
         if (bgSound.isPlaying)
             bgSound.Pause();
     }
@@ -191,6 +192,7 @@ public class SoundManager : MonoBehaviour
     public void ResumeBGSound()
     {
         if (!bgSound.isPlaying)
+        Debug.Log("배경음 재개");
             bgSound.UnPause();
     }
 
