@@ -206,8 +206,9 @@ public class GameManager : MonoBehaviour
         {
             Load();
             LoadGameTime();
+            PortalManager.Instance.LoadLastCamera();
             //UIManager.Instance.ResetSettings();
-         
+
             Item fristWaepon = new Item(49, "리볼버", "* 골동품 리볼버다.", ItemType.Weapon);
             Item fristIAmmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
             GetPlayerData().EquipWeapon(fristWaepon);

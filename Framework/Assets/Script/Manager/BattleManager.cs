@@ -353,14 +353,44 @@ public class BattleManager : MonoBehaviour
     {
         switch (eventType)
         {
+            case "Left":
+                // "Left" 이벤트: 대사에 "친"이라는 글자일때 표정 Left로 변경
+                Debug.Log("Ending dialogue and moving left.");
+                // 예: 플레이어를 왼쪽으로 이동시키는 코드 추가
+                break;
+
             case "MoveToReceiveFriendly":
+                // 문장이 끝나면 대사가 자동으로 끝나도록
                 Debug.Log("Moving to receive friendly items.");
-                // 플레이어 이동 관련 처리 로직
+                                      // 상호작용 시작을 위한 다른 로직 추가
                 break;
 
             case "EndDialogue":
+                // 문장이 끝나면 표정 Oh로 표정변경 0.3초뒤 "총알"이라는 대사를 "친절"로 변경 
                 Debug.Log("Ending dialogue.");
-                currentDialogueIndex = currentBoss.dialogues.Count; // 대화 종료
+               
+                break;
+
+            case "LowerTone":
+                // 음악을 낮은 톤으로 변경
+                Debug.Log("Changing music to lower tone.");
+                SoundManager.Instance.PlayMusic("LowerTone");  // 음악을 변경하는 예시
+                break;
+
+            case "AttackWithBullet":
+                // 대사 후 총알로 공격하는 이벤트 처리
+                Debug.Log("Attacking with bullet after dialogue.");
+                ExecuteAttack("Attack1");  // 예시로 Attack1을 실행
+                break;
+
+            case "CreepFace":
+                // 소리나 애니메이션을 점점 느리게, creep_face로 전환
+                Debug.Log("Slowing down sound and switching to creep face.");
+                // 음성을 느리게 하거나 애니메이션을 변경하는 로직 추가
+                SoundManager.Instance.SlowDownMusic();  // 음악을 느리게 조절하는 예시
+                SetBossExpression("Smile");  // 보스의 표정을 'CreepFace'로 설정
+                Debug.Log("Revelation after 1 second.");
+                StartCoroutine(HandleFinalRevelation());
                 break;
 
             default:
@@ -368,6 +398,14 @@ public class BattleManager : MonoBehaviour
                 break;
         }
     }
+
+    private IEnumerator HandleFinalRevelation()
+    {
+        yield return new WaitForSeconds(1f);  // 1초 기다리기
+        Debug.Log("눈치챘다는 대사: 이제 네가 뭐 하는지 알겠다.");
+        // 추가적인 대사나 애니메이션 처리
+    }
+
 
     private IEnumerator StartBattleAfterDelay(int eventNumber, float delay)
     {

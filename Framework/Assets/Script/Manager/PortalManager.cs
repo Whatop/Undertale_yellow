@@ -134,22 +134,67 @@ public class PortalManager : MonoBehaviour
         isFading = false;
     }
 
-    void SwitchCamera(int point)
+    public void SwitchCamera(int point)
     {
         lastPortalNumber = point; // 현재 활성화된 포탈 번호 저장
+        Debug.Log("현재 포탈 번호: " + point);
 
+        // 모든 카메라 비활성화
         foreach (var data in portalDataList)
         {
-            data.virtualCamera.gameObject.SetActive(data.portalNumber == point);
+            data.virtualCamera.gameObject.SetActive(false);
         }
-        defaultvirtualCamera.gameObject.SetActive(!portalDataList.Exists(data => data.portalNumber == point));
+
+        // 주어진 포탈 번호에 해당하는 카메라만 활성화
+        foreach (var data in portalDataList)
+        {
+            if (data.portalNumber == point)
+            {
+                data.virtualCamera.gameObject.SetActive(true);
+                Debug.Log(point + "번 포탈 카메라 활성화됨");
+            }
+        }
+
+        // 포탈 번호에 해당하는 카메라가 없으면 기본 카메라 활성화
+        bool hasMatchingPortal = portalDataList.Exists(data => data.portalNumber == point);
+        defaultvirtualCamera.gameObject.SetActive(!hasMatchingPortal);
 
         Debug.Log(lastPortalNumber + " : 번호로 이동함");
-    
+        PlayerPrefs.SetInt("LastPortalNumber", lastPortalNumber); // 포탈 번호 저장
     }
 
 
+    public void LoadLastCamera()
+    {
+        if (PlayerPrefs.HasKey("LastPortalNumber"))
+        {
+            lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber");
+        }
 
+        Debug.Log("마지막 포탈 번호: " + lastPortalNumber);
+
+        // 모든 카메라 비활성화
+        foreach (var data in portalDataList)
+        {
+            data.virtualCamera.gameObject.SetActive(false);
+        }
+
+        // 마지막 포탈 번호에 해당하는 카메라만 활성화
+        foreach (var data in portalDataList)
+        {
+            if (data.portalNumber == lastPortalNumber)
+            {
+                data.virtualCamera.gameObject.SetActive(true);
+                Debug.Log(lastPortalNumber + "번 포탈 카메라 활성화됨");
+            }
+        }
+
+        // 마지막 포탈 번호에 해당하는 카메라가 없다면 기본 카메라 활성화
+        bool hasMatchingPortal = portalDataList.Exists(data => data.portalNumber == lastPortalNumber);
+        defaultvirtualCamera.gameObject.SetActive(!hasMatchingPortal);
+
+        Debug.Log(lastPortalNumber + " : 마지막 방으로 이동함");
+    }
 
     IEnumerator Fade(float targetAlpha)
     {

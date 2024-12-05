@@ -50,6 +50,7 @@ public class SoundManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
+        // 씬에 맞는 배경 음악 재생
         for (int i = 0; i < bglist.Length; i++)
         {
             if (scene.name == bglist[i].name)
@@ -59,6 +60,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    // 사운드 이펙트(SFX) 재생
     public void SFXPlay(string sfxName, int sfxNum)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
@@ -68,6 +70,7 @@ public class SoundManager : MonoBehaviour
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
 
+    // 텍스트 관련 SFX 재생
     public void SFXTextPlay(string textName, int textNum)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
@@ -107,6 +110,7 @@ public class SoundManager : MonoBehaviour
         bgSound.clip = clip;
     }
 
+    // 배경 음악 재생
     public void BGSoundPlay()
     {
         if (bgSound.clip != null)
@@ -192,10 +196,13 @@ public class SoundManager : MonoBehaviour
     public void ResumeBGSound()
     {
         if (!bgSound.isPlaying)
-        Debug.Log("배경음 재개");
+        {
+            Debug.Log("배경음 재개");
             bgSound.UnPause();
+        }
     }
 
+    // 배경음 페이드 아웃
     public void FadeOutBGSound(float duration)
     {
         StartCoroutine(FadeOutCoroutine(duration));
@@ -225,4 +232,27 @@ public class SoundManager : MonoBehaviour
         StopBGSound();
     }
 
+    // 배경 음악을 느리게 조정하는 메서드
+    public void SlowDownMusic()
+    {
+        if (bgSound != null)
+        {
+            bgSound.pitch = 0.5f; // 음속을 느리게 설정 (기본 1.0에서 0.5로 설정)
+            Debug.Log("음악 속도를 느리게 변경했습니다.");
+        }
+    }
+
+    // 배경 음악을 변경하는 메서드
+    public void PlayMusic(string musicName)
+    {
+        for (int i = 0; i < bglist.Length; i++)
+        {
+            if (bglist[i].name == musicName)
+            {
+                BGSoundPlay(i);
+                Debug.Log($"{musicName} 음악을 재생합니다.");
+                break;
+            }
+        }
+    }
 }
