@@ -49,6 +49,10 @@ public class BattleManager : MonoBehaviour
     public GameObject[] enemyPrefabs;  // 적 프리팹 배열
     public Room currentRoom;  // 현재 방
 
+    public Transform[] bulletPoints;
+    public Transform nonePoint;
+    public GameObject floweybulletprefab;
+
     public TextAsset bossDataJson;
     //테스트용 아마도 나중에는 배열로 하든지 보스꺼를 따로 만드는지 할듯
     //일단 이건 튜토 보스용 
@@ -57,9 +61,11 @@ public class BattleManager : MonoBehaviour
     public GameObject Boss_Textbar;
     public TextMeshProUGUI Boss_Text;
     public GameObject battlePoint;
+    private List<GameObject> activeBullets = new List<GameObject>(); // 현재 활성화된 총알 목록
 
     public TypeEffect currentTypeEffect;
     public GameObject Boss_Wall;
+
 
     public PlayerMovement player;
     private Vector2 prevPos;
@@ -175,7 +181,7 @@ public class BattleManager : MonoBehaviour
         currentDialogueIndex = 0;
         DisplayNextDialogue();
     }
-    
+
     private void HandleInteraction()
     {
 
@@ -201,7 +207,7 @@ public class BattleManager : MonoBehaviour
             return; // 대화 중이므로 나머지 상호작용은 처리하지 않음
         }
 
-      
+
     }
     public void StartDialogue(int bossID)
     {
@@ -307,18 +313,18 @@ public class BattleManager : MonoBehaviour
         isFirstInteraction = true;
     }
     public bool IsEffecting()
-        {
-            return currentTypeEffect != null && currentTypeEffect.IsEffecting();
-        }
+    {
+        return currentTypeEffect != null && currentTypeEffect.IsEffecting();
+    }
 
-        public void SkipTypeEffect()
+    public void SkipTypeEffect()
+    {
+        if (currentTypeEffect != null && currentTypeEffect.IsEffecting())
         {
-            if (currentTypeEffect != null && currentTypeEffect.IsEffecting())
-            {
-                currentTypeEffect.Skip();
-            }
+            currentTypeEffect.Skip();
         }
-        private void SetBossExpression(string expression)
+    }
+    private void SetBossExpression(string expression)
     {
         Debug.Log($"보스 표정 : {expression}");
         // 애니메이션 트리거 설정
@@ -335,12 +341,13 @@ public class BattleManager : MonoBehaviour
         {
             case "Attack1":
                 Debug.Log("Executing Attack 1");
-                // Attack 1에 대한 구체적인 로직 추가
+                SpawnAndMoveBullets();
                 break;
 
             case "Attack2":
                 Debug.Log("Executing Attack 2");
-                // Attack 2에 대한 구체적인 로직 추가
+
+                MoveBulletsToPlayer();
                 break;
 
             default:
@@ -349,6 +356,67 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    // 총알을 생성하고 각 위치로 이동시키는 메서드 (Attack1)
+    private void SpawnAndMoveBullets()
+    {
+        if (bulletPoints == null || bulletPoints.Length == 0)
+        {
+            Debug.LogError("Bullet points not assigned!");
+            return;
+        }
+
+        for (int i = 0; i < bulletPoints.Length; i++)
+        {
+            // 총알 생성
+            GameObject bullet = Instantiate(floweybulletprefab, nonePoint.position, Quaternion.identity);
+
+            // 총알 리스트에 추가
+            activeBullets.Add(bullet);
+
+            // 생성된 총알을 목표 위치로 이동
+            StartCoroutine(MoveBulletToTarget(bullet, bulletPoints[i].position));
+        }
+    }
+    // 총알을 목표 위치로 이동시키는 코루틴
+    private IEnumerator MoveBulletToTarget(GameObject bullet, Vector3 targetPosition)
+    {
+        float speed = 4f; // 총알 이동 속도
+
+        while (bullet != null && Vector3.Distance(bullet.transform.position, targetPosition) > 0.1f)
+        {
+            bullet.transform.position = Vector3.MoveTowards(bullet.transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null; // 다음 프레임까지 대기
+        }
+
+    }
+    // Attack2에서 플레이어 방향으로 총알 이동
+    private void MoveBulletsToPlayer()
+    {
+        if (activeBullets.Count == 0)
+        {
+            Debug.LogWarning("No active bullets to move.");
+            return;
+        }
+
+        Vector3 playerPosition = gameManager.GetPlayerData().position;
+
+        foreach (var bullet in activeBullets)
+        {
+            if (bullet != null)
+            {
+                // BulletController를 이용하여 방향 재설정
+                BulletController bulletController = bullet.GetComponent<BulletController>();
+                if (bulletController != null)
+                {
+                    Vector2 direction = (playerPosition - bullet.transform.position).normalized;
+                    bulletController.InitializeBullet(direction, bulletController.speed, bulletController.accuracy, bulletController.damage, bulletController.maxrange);
+                }
+            }
+        }
+
+        // 총알을 이동 후 리스트 초기화 (필요하면 유지 가능)
+        activeBullets.Clear();
+    }
     private void HandleSpecialEvent(string eventType)
     {
         switch (eventType)
@@ -362,13 +430,13 @@ public class BattleManager : MonoBehaviour
             case "MoveToReceiveFriendly":
                 // 문장이 끝나면 대사가 자동으로 끝나도록
                 Debug.Log("Moving to receive friendly items.");
-                                      // 상호작용 시작을 위한 다른 로직 추가
+                // 상호작용 시작을 위한 다른 로직 추가
                 break;
 
             case "EndDialogue":
                 // 문장이 끝나면 표정 Oh로 표정변경 0.3초뒤 "총알"이라는 대사를 "친절"로 변경 
                 Debug.Log("Ending dialogue.");
-               
+
                 break;
 
             case "LowerTone":
@@ -420,8 +488,8 @@ public class BattleManager : MonoBehaviour
         else if (eventNumber == 2)
         {
             StartBossBattle();
-            BattleSetting(); 
-            StartCoroutine(DelayDialogue(1, 1f)); 
+            BattleSetting();
+            StartCoroutine(DelayDialogue(1, 1f));
         }
         UIManager.Instance.OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
     }
@@ -452,18 +520,9 @@ public class BattleManager : MonoBehaviour
         currentState = BattleState.BossBattle;
         gameManager.ChangeGameState(GameState.Fight);
         // 보스 방 생성, 이동?
-        // 카메라 변경
-
-
-
-        // 보스 적을 스폰
-        NextPatturn();
-    }
-    
-    void NextPatturn()
-    {
 
     }
+
     // 적 스폰 로직
     void SpawnEnemies()
     {
