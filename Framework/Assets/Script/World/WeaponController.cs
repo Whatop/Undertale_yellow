@@ -21,13 +21,18 @@ public class Weapon
         id = 0;
         WeaponName = "None";
         damage = 1;
-        maxAmmo = 200;
+        maxAmmo = -1;
         current_Ammo = maxAmmo;
-        magazine = 10;
+        magazine = 6;
         current_magazine = magazine;
         bulletSpeed = 1;
         accuracy = 1;
         // 추가 데이터 초기화
+    }
+    // 무한 총알 상태 확인 메소드
+    public bool IsInfiniteAmmo()
+    {
+        return current_Ammo == -1;  // Ammo가 -1이면 무한으로 간주
     }
 }
 
@@ -82,8 +87,11 @@ public class WeaponController : MonoBehaviour
             BulletController bulletController = bullet.GetComponent<BulletController>();
             bulletController.InitializeBullet(direction, currentWeapon.bulletSpeed, currentWeapon.accuracy, currentWeapon.damage, currentWeapon.maxRange);
 
-            // 현재 탄알집에서 총알 감소
-            currentWeapon.current_magazine--;
+            // 무한 총알 상태가 아니면 탄알 감소
+            if (!currentWeapon.IsInfiniteAmmo())
+            {
+                currentWeapon.current_magazine--;
+            }
 
             // 로그 출력
             Debug.Log($"Shot {currentWeapon.WeaponName}! Ammo: {currentWeapon.current_magazine}/{currentWeapon.maxAmmo}");

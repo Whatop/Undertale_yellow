@@ -141,6 +141,8 @@ public class GameManager : MonoBehaviour
     private float startTime;   // 게임 시작 시간
     public float savedTime;   // 이전에 저장된 시간 (누적 시간)
     private bool isSave;
+    public GameObject gameoverSoul;
+    public Canvas canvas;          // UI가 포함된 Canvas
 
     string mapName = "페허 - 잎 무더기 ";
     public bool isPortalTransition = false;
@@ -227,6 +229,31 @@ public class GameManager : MonoBehaviour
             //GetPlayerData().EquipAmmor(fristIAmmor);
         }
     }
+    private void Update()
+    {
+        RectTransform gameoverSoulRect = gameoverSoul.GetComponent<RectTransform>();
+        Vector2 screenPosition = Camera.main.WorldToScreenPoint(GetPlayerData().position);
+
+        // Canvas가 Screen Space - Overlay 모드인지 확인
+        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+        {
+            // 화면 좌표를 그대로 UI의 localPosition으로 변환
+            gameoverSoul.transform.position = screenPosition;
+        }
+        else if (canvas.renderMode == RenderMode.ScreenSpaceCamera || canvas.renderMode == RenderMode.WorldSpace)
+        {
+            // Screen Space - Camera 또는 World Space 모드에서는 RectTransformUtility를 사용
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvas.GetComponent<RectTransform>(),
+                screenPosition,
+                canvas.worldCamera,
+                out Vector2 localPosition
+            );
+
+            // 변환된 좌표를 gameoverSoul의 localPosition으로 설정
+            gameoverSoul.GetComponent<RectTransform>().localPosition = localPosition;
+        }
+}
     #region Savepoint
     void InitializePlayerData()
     {
@@ -439,6 +466,7 @@ public class GameManager : MonoBehaviour
         playerData.isDie = true;
         playerData.playerAnimator.SetBool("isDie",true);
         UIManager.Instance.playGameover();
+        BattleManager.Instance.BattleReSetting();
         DestroyAllEnemies();
 
     }

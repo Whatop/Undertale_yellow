@@ -122,7 +122,7 @@ public class BattleManager : MonoBehaviour
         isTalking = true;
 
     }
-    void BattleReSetting()
+    public void BattleReSetting()
     {
         Boss_AllObject.SetActive(false);
         player.TeleportPlayer(prevPos);
@@ -130,6 +130,7 @@ public class BattleManager : MonoBehaviour
         Boss_Wall.gameObject.SetActive(false);
         gameManager.ChangeGameState(GameState.None);
         Boss_Textbar.SetActive(false);
+        EndDialogue();
 
     }
 
