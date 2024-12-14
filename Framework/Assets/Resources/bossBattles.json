@@ -32,34 +32,36 @@
         },
         {
           "text": "작고 하얀 . . .\n\"친절 알갱이\" 로\n서로 나누지.",
-          "expression": "LeftSlight",
+          "expression": "Left",
           "type": "Left"
         },
         {
           "text": "준비 됐어?",
-          "expression": "Default",
-          "attack": "Attack2"
+          "expression": "Default"
         },
         {
           "text": "움직여!\n친절을 최대한\n많이 받는거야!",
           "expression": "Default",
           "event": "Special",
-          "type": "MoveToReceiveFriendly"
+          "type": "MoveToReceiveFriendly",
+          "attack": "Attack2"
+            
         },
         {
           "text": "이봐 친구,\n놓쳐버렸잖아.",
           "expression": "Sneer",
-          "music": "LowerTone"
+          "music": "LowerTone",
+          "attack": "Attack3"
         },
         {
           "text": "다시 해 보자고,\n알았지?",
           "expression": "Default",
-          "attack": "Attack3"
+          "attack": "Attack4"
         },
         {
-          "text": "장난치는 거야?\n너 무뇌아니?\n달려. 가라고. 저 총알로!!!",
+          "text": "장난치는 거야?\n너 무뇌아니?\n달려. 가라고. \n저 친절로!!!",
           "expression": "Angry",
-          "attack": "Attack4"
+          "attack": "Attack3"
         },
         {
           "text": " <shake>눈치 채고 있었던\n거지, 응?</shake>",
@@ -67,7 +69,7 @@
 
         },
         {
-          "text": "<shake>그저 날 괴롭히고\n싶었을 뿐이었어.</shake>",
+          "text": "<shake>그저 나랑 놀고\n싶었을 뿐이었어.</shake>",
           "expression": "Smlie",
           "skipToDialogue": 18
         },
@@ -76,7 +78,7 @@
           "expression": "Smlie"
         },
         {
-          "text": "<shake>이 세상에선, 죽이지\n않으면 죽는거야.</shake>",
+          "text": "<shake>이 세상에선, 정의롭지\n않으면 죽는거야.</shake>",
           "expression": "Smlie"
         },
         {
@@ -84,7 +86,7 @@
           "expression": "Smlie"
         },
         {
-          "text": "죽어.",
+          "text": "굴러.",
           "expression": "Smliing",
           "attack": "Attack5"
         },

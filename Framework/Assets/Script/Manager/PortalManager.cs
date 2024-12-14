@@ -160,7 +160,7 @@ public class PortalManager : MonoBehaviour
         defaultvirtualCamera.gameObject.SetActive(!hasMatchingPortal);
 
         Debug.Log(lastPortalNumber + " : 번호로 이동함");
-        PlayerPrefs.SetInt("LastPortalNumber", lastPortalNumber); // 포탈 번호 저장
+      //  PlayerPrefs.SetInt("LastPortalNumber", lastPortalNumber); // 포탈 번호 저장
     }
 
 

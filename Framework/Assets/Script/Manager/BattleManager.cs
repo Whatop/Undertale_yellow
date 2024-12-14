@@ -64,8 +64,7 @@ public class BattleManager : MonoBehaviour
     private List<GameObject> activeBullets = new List<GameObject>(); // 현재 활성화된 총알 목록
 
     public TypeEffect currentTypeEffect;
-    public GameObject Boss_Wall;
-
+    
 
     public PlayerMovement player;
     private Vector2 prevPos;
@@ -117,7 +116,6 @@ public class BattleManager : MonoBehaviour
         prevPos = player.transform.position;
         player.TeleportPlayer(battlePoint.transform.position);
         Boss_Text.gameObject.SetActive(true);
-        Boss_Wall.gameObject.SetActive(true);
         gameManager.ChangeGameState(GameState.Fight);
         isTalking = true;
 
@@ -125,9 +123,8 @@ public class BattleManager : MonoBehaviour
     public void BattleReSetting()
     {
         Boss_AllObject.SetActive(false);
-        player.TeleportPlayer(prevPos);
+       // player.TeleportPlayer(prevPos);
         Boss_Text.gameObject.SetActive(false);
-        Boss_Wall.gameObject.SetActive(false);
         gameManager.ChangeGameState(GameState.None);
         Boss_Textbar.SetActive(false);
         EndDialogue();

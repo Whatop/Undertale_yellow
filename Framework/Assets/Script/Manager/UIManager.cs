@@ -16,6 +16,8 @@ public class UIManager : MonoBehaviour
 
     private static UIManager instance;
     public GameObject[] ui_positions; //health : 0, Weapon : 1, hp2 : 0
+    public GameObject top;
+    public GameObject down;
 
     [SerializeField]
     private GameObject[] ui_healths;
@@ -362,6 +364,14 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            OffPlayerUI();
+        }
+        else if (Input.GetKeyDown(KeyCode.U))
+        {
+            OnPlayerUI();
+        }
         if (isUserInterface)
         {
             Time.timeScale = 0f;
@@ -874,8 +884,13 @@ public class UIManager : MonoBehaviour
 
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
             Vector3 newPosition = instance.transform.position;
-            newPosition.y = ui_positions[1].transform.position.y + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
+            newPosition.x = ui_positions[1].transform.position.x + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
             instance.transform.position = newPosition;
+            if(ammo_count == i + 1)
+            {
+            newPosition.x *= 1.1f; // 세로 방향으로 위치 설정
+                top.transform.position = newPosition;
+            }
             ui_ammo[i] = instance;
         }
     }

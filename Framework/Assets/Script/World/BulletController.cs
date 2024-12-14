@@ -91,14 +91,14 @@ public class BulletController : MonoBehaviour
             DestroyBullet();
         }
         // 플레이어와 충돌 시 처리
-        else if (other.CompareTag("Player") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+       // else if (other.CompareTag("Player") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+       // {
+       //     other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
+       //     DestroyBullet();
+       // }
+        else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
         {
-            other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
-            DestroyBullet();
-        }
-        else if (other.CompareTag("Soul") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
-        {
-            other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
             DestroyBullet();
         }
         else if (other.CompareTag("Wall"))

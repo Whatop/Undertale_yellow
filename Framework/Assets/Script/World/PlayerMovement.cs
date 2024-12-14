@@ -3,6 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 각 총의 특성을 나타내는 클래스
+[System.Serializable]
+public class Weapon
+{
+    public int id;             // 총의 고유한 ID
+    public string WeaponName;  // 총의 이름
+    public int damage;         // 총의 공격력
+    public int current_Ammo;   // 현재 탄알집에 남아있는 총알 수
+    public int magazine;       // 탄창 최대 총알수  
+    public int current_magazine; // 현재 남아있는 총알 수
+    public int maxAmmo;        // 최대 총알 수
+    public int maxRange;       // 사거리
+    public float bulletSpeed;  // 총알 속도
+    public float accuracy;     // 총의 정확도
+    public Transform firePoint; // 총알이 발사될 위치
+
+    public Weapon()
+    {
+        // 초기화 로직 추가 (예: 기본값 설정)
+        id = 0;
+        WeaponName = "None";
+        damage = 1;
+        maxAmmo = -1;
+        current_Ammo = maxAmmo;
+        magazine = 6;
+        current_magazine = magazine;
+        bulletSpeed = 1;
+        accuracy = 1;
+        // 추가 데이터 초기화
+    }
+
+    // 무한 총알 상태 확인 메소드
+    public bool IsInfiniteAmmo()
+    {
+        return current_Ammo == -1;  // Ammo가 -1이면 무한으로 간주
+    }
+}
+
 public class PlayerMovement : LivingObject
 {
     // 공개 변수
@@ -22,27 +60,27 @@ public class PlayerMovement : LivingObject
     Animator WeaponsAnimator;
 
     public Transform WeaponTransform; // 총의 Transform 컴포넌트
-    public Transform shotpoint; // 총의 Transform 컴포넌트
-    public Transform soulshotpoint; // 영혼의 총 Transform 컴포넌트
-    public GameObject bulletPrefab; // 총알 프리팹
+    public Transform shotpoint;       // 총의 Transform 컴포넌트
+    public Transform soulshotpoint;   // 영혼의 총 Transform 컴포넌트
+    public GameObject bulletPrefab;   // 총알 프리팹
     public GameObject soulbulletPrefab; // 총알 프리팹
-    public float bulletSpeed = 10f; // 총알 발사 속도
-    Weapon weaponData;
+    public float bulletSpeed = 10f;   // 총알 발사 속도
+    public Weapon weaponData;
 
     private Vector2 rollDirection;
-    private float rollSpeed = 16f; // 구르기 속도
-    private float rollDuration = 0.5f; // 구르기 지속 시간
-    private float rollTime; // 구르기 시간
+    private float rollSpeed = 16f;      // 구르기 속도
+    private float rollDuration = 0.5f;  // 구르기 지속 시간
+    private float rollTime;             // 구르기 시간
 
     private bool isReloading = false;
-    private float reloadTime = 1.5f; // 재장전 시간 (초)
+    private float reloadTime = 1.5f;    // 재장전 시간 (초)
 
-    public GameObject soulObject; // Soul GameObject
-    public GameObject playerSprite; // Player의 스프라이트 (흐림 효과 적용)
+    public GameObject soulObject;       // Soul GameObject
+    public GameObject playerSprite;     // Player의 스프라이트 (흐림 효과 적용)
     public float playerTransparency = 0f; // Player 투명도 값 (흐릿한 효과)
 
     private bool isSoulActive = false; // Soul 모드 활성화 여부
-    
+
     // Awake 메서드: 초기 설정
     protected override void Awake()
     {
@@ -53,7 +91,6 @@ public class PlayerMovement : LivingObject
 
         // 시작할 때 Soul 비활성화
         soulObject.SetActive(false);
-        // reloadSlider.ManagerreloadSlider.gameObject.SetActive(false); // 슬라이더 비활성화
     }
 
     // Start 메서드: 게임 시작 시 초기화
@@ -61,7 +98,7 @@ public class PlayerMovement : LivingObject
     {
         playerData = gameManager.GetPlayerData();
         maxHealth = 1; // 최대 체력 설정
-        playerData.playerAnimator = animator; // 아마도 맞는거 애니메이션 작동
+        playerData.playerAnimator = animator;
         playerData.isInvincible = isInvincible;
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
@@ -70,6 +107,7 @@ public class PlayerMovement : LivingObject
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
     }
+
     public void updateLoad()
     {
         UIManager.Instance.isInventroy = false;
@@ -77,19 +115,19 @@ public class PlayerMovement : LivingObject
         gameManager.GetPlayerData().isDie = false;
         isDie = false;
         //그 방에 맞는 배경음악을 불러온다.
-        SoundManager.Instance.BGSoundPlayDelayed(0,1f);
+        SoundManager.Instance.BGSoundPlayDelayed(0, 1f);
         playerData = gameManager.GetPlayerData();
         maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
-        health = gameManager.GetPlayerData().health; // 최대 체력 설정
+        health = gameManager.GetPlayerData().health;       // 최대 체력 설정
         transform.position = playerData.position;
-        playerData.playerAnimator = animator; // 아마도 맞는거 애니메이션 작동
+        playerData.playerAnimator = animator;
         playerData.isInvincible = isInvincible;
     }
-    #region
+
+    #region soul_code
     // Soul 모드 처리
     private void HandleSoulMode()
     {
-        
         if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
         {
             isSoulActive = !isSoulActive; // Soul 모드 전환
@@ -104,6 +142,7 @@ public class PlayerMovement : LivingObject
             }
         }
     }
+
     // Soul 모드 활성화: 투명도 조절
     public void EnableSoul()
     {
@@ -134,24 +173,40 @@ public class PlayerMovement : LivingObject
             spriteRenderer.color = color;
         }
     }
+
     // Soul과 플레이어의 위치 및 회전 동기화
     private void SyncSoulWithPlayer()
     {
         soulObject.transform.position = transform.position; // Soul을 플레이어와 같은 위치로 설정
     }
-    #endregion
-    // Update 메서드: 매 프레임마다 호출
+
+    void SoulRotateToMouse()
+    {
+        // 마우스의 스크린 좌표를 월드 좌표로 변환
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // 2D 게임이므로 Z 축을 0으로 고정
+
+        // 오브젝트와 마우스 좌표 간의 방향 벡터 계산
+        Vector3 direction = mousePosition - transform.position;
+
+        // 방향 벡터로부터 각도 계산 (라디안 -> 각도)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // 오브젝트 회전 적용
+        soulObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
+    }
+    #endregion soul_code
+
     protected override void Update()
     {
         if (isDie)
             return;
         base.Update();
-        SoulRotateToMouse();
+
         playerData.isInvincible = isInvincible;
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
         {
-
             HandleSoulMode(); // Soul 모드 처리
             if (UIManager.Instance.reloadSlider != null)
             {
@@ -198,12 +253,13 @@ public class PlayerMovement : LivingObject
             {
                 Hands.gameObject.SetActive(false);
             }
+
             if (isSoulActive)
             {
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
             }
 
-            if (Input.GetKeyDown(KeyCode.C) && 
+            if (Input.GetKeyDown(KeyCode.C) &&
                 !UIManager.Instance.savePanel.activeSelf
                 && gameManager.GetPlayerData().currentState == GameState.None)
             {
@@ -217,6 +273,7 @@ public class PlayerMovement : LivingObject
             v = 0f;
         }
     }
+
     IEnumerator Reload()
     {
         isReloading = true;
@@ -224,7 +281,6 @@ public class PlayerMovement : LivingObject
         UIManager.Instance.ShowReloadSlider(true); // 슬라이더 활성화
         UIManager.Instance.SetReloadSliderMaxValue(reloadTime);
         UIManager.Instance.SetReloadSliderValue(0);
-
 
         float reloadProgress = 0f;
         while (reloadProgress < reloadTime)
@@ -241,7 +297,6 @@ public class PlayerMovement : LivingObject
         isReloading = false;
     }
 
-
     // 애니메이터 활성화/비활성화
     public void SetAnimatorEnabled(bool isEnabled)
     {
@@ -249,6 +304,7 @@ public class PlayerMovement : LivingObject
         rigid.velocity = Vector2.zero;
     }
 
+    #region shot_code
     // 총알 발사 입력 처리
     void ShootInput()
     {
@@ -259,24 +315,22 @@ public class PlayerMovement : LivingObject
         Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
         WeaponTransform.up = direction;
 
-        if (Input.GetMouseButtonDown(0) && current_magazine > 0 && weaponData.current_Ammo > 0 && !isReloading)
+        if (Input.GetMouseButtonDown(0) &&
+            current_magazine > 0 && (weaponData.IsInfiniteAmmo() || weaponData.current_Ammo > 0) && !isReloading)
         {
             Shoot();
+            if(!weaponData.IsInfiniteAmmo())
+                weaponData.current_Ammo -= 1;
+
             weaponData.current_magazine -= 1;
-            weaponData.current_Ammo -= 1;
+
             gameManager.SaveWeaponData(weaponData);
         }
-        else if(current_magazine == 0 && !isReloading)
+        else if (current_magazine == 0 && !isReloading)
         {
             SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
             StartCoroutine(Reload());
         }
-
-        //if (weaponData.current_Ammo < weaponData.maxAmmo && Input.GetKeyDown(KeyCode.R) && weaponData.current_magazine < weaponData.magazine)
-        //{
-        //    weaponData.current_magazine = weaponData.magazine;
-        //    gameManager.SaveWeaponData(weaponData);
-        //}
     }
 
     // 총알 발사
@@ -290,9 +344,8 @@ public class PlayerMovement : LivingObject
             SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
             WeaponsAnimator.SetTrigger("Shot");
         }
-        else 
+        else
         {
-
             GameObject bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
             Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
             bulletRb.velocity = WeaponTransform.up * bulletSpeed;
@@ -300,20 +353,14 @@ public class PlayerMovement : LivingObject
             WeaponsAnimator.SetTrigger("Shot");
         }
     }
-    void SoulRotateToMouse()
+    #endregion shot_code
+
+    // 구르기와 관련된 메서드를 하나의 영역으로 묶음
+    #region roll_code
+    // 쿨타임 시작
+    void StartCooldown()
     {
-        // 1. 마우스의 스크린 좌표를 월드 좌표로 변환
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0; // 2D 게임이므로 Z 축을 0으로 고정
-
-        // 2. 오브젝트와 마우스 좌표 간의 방향 벡터 계산
-        Vector3 direction = mousePosition - transform.position;
-
-        // 3. 방향 벡터로부터 각도 계산 (라디안 -> 각도로 변환)
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        // 4. 오브젝트의 회전 적용 (Z축 기준 회전)
-        soulObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
+        isCooldown = true;
     }
 
     // 구르기 코루틴
@@ -359,7 +406,6 @@ public class PlayerMovement : LivingObject
             yield break; // 입력값이 없으면 구르기를 시작하지 않음
         }
 
-
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
@@ -378,25 +424,6 @@ public class PlayerMovement : LivingObject
         objectState = ObjectState.None;
     }
 
-    // 물리 업데이트
-    void FixedUpdate()
-    {
-        if (objectState != ObjectState.Roll && !UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !UIManager.Instance.isInventroy && !UIManager.Instance.savePanel.activeSelf && !gameManager.GetPlayerData().isDie)
-        {
-            Move();
-        }
-        else if (objectState == ObjectState.Roll)
-        {
-           // Debug.Log("구른다");
-        }
-        else
-        {
-            animator.SetBool("isMove", false);
-            rigid.velocity = Vector2.zero;
-            h = 0;
-            v = 0;
-        }
-    }
     private void HandleRollAnimation(Vector2 rollDirection)
     {
         float vir = rollDirection.normalized.x;
@@ -408,12 +435,13 @@ public class PlayerMovement : LivingObject
             if (vir < 0) // 왼쪽 이동
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
+                animator.SetBool("IsSide", true);
             }
             else // 오른쪽 이동
             {
                 currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
+                animator.SetBool("IsSide", true);
             }
-            animator.SetBool("IsSide", true);
         }
         else if (vir == 0 && hir != 0) // 위 또는 아래로 이동할 때
         {
@@ -424,22 +452,22 @@ public class PlayerMovement : LivingObject
         {
             if (hir > 0 && vir < 0) // 왼쪽 위 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * -1;
                 animator.SetBool("IsAngle", true);
             }
             else if (hir > 0 && vir > 0) // 오른쪽 위 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * 1;
                 animator.SetBool("IsAngle", true);
             }
             else if (hir < 0 && vir < 0) // 왼쪽 아래 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * -1; // 스케일 반대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * -1;
                 animator.SetBool("IsSide", true);
             }
             else if (hir < 0 && vir > 0) // 오른쪽 아래 대각선
             {
-                currentScale.x = Mathf.Abs(currentScale.x) * 1; // 스케일 그대로 설정
+                currentScale.x = Mathf.Abs(currentScale.x) * 1;
                 animator.SetBool("IsSide", true);
             }
             else
@@ -450,9 +478,35 @@ public class PlayerMovement : LivingObject
         transform.localScale = currentScale;
         animator.SetTrigger("IsRoll");
     }
+    #endregion roll_code
+
+    void FixedUpdate()
+    {
+        if (objectState != ObjectState.Roll &&
+            !UIManager.Instance.isUserInterface &&
+            !gameManager.GetPlayerData().isStop &&
+            !UIManager.Instance.isInventroy &&
+            !UIManager.Instance.savePanel.activeSelf &&
+            !gameManager.GetPlayerData().isDie)
+        {
+            Move();
+        }
+        else if (objectState == ObjectState.Roll)
+        {
+            // Debug.Log("구른다");
+        }
+        else
+        {
+            animator.SetBool("isMove", false);
+            rigid.velocity = Vector2.zero;
+            h = 0;
+            v = 0;
+        }
+    }
+
     // 플레이어 이동 처리
     void Move()
-    { 
+    {
         // UIManager의 GetKeyCode를 통해 방향키 입력 감지
         h = 0f;
         v = 0f;
@@ -503,12 +557,6 @@ public class PlayerMovement : LivingObject
             animator.SetInteger("h", (int)h);
         else if (v != animator.GetInteger("v"))
             animator.SetInteger("v", (int)v);
-    }
-
-    // 쿨타임 시작
-    void StartCooldown()
-    {
-        isCooldown = true;
     }
 
     // 오브젝트 상태 설정

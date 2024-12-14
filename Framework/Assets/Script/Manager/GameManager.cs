@@ -335,16 +335,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // SavePrefab 경로에서 Prefab 로드
-        string prefabPath = PlayerPrefs.GetString("SavePrefabPath", null);
-        if (!string.IsNullOrEmpty(prefabPath))
-        {
-            savePrefab = Resources.Load<GameObject>(prefabPath);
-            if (savePrefab == null)
-            {
-                Debug.LogError($"LoadGameConfig: {prefabPath} 경로에서 SavePrefab을 찾을 수 없습니다.");
-            }
-        }
+          
 
         Debug.Log("LoadGameConfig: 게임 설정이 로드되었습니다.");
     }
