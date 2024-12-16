@@ -1,0 +1,173 @@
+Using pre-set license
+Built from '2020.3/staging' branch; Version is '2020.3.6f1 (338bb68529b2) revision 3378102'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10 Pro; OS build 26100.2605; Version 2009; 64bit' Language: 'ko' Physical Memory: 32469 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.3.6f1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker1
+-projectPath
+C:/Users/MSI/Documents/GitHub/FrameWork/Framework
+-logFile
+Logs/AssetImportWorker1.log
+-srvPort
+50770
+Successfully changed project path to: C:/Users/MSI/Documents/GitHub/FrameWork/Framework
+C:/Users/MSI/Documents/GitHub/FrameWork/Framework
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 52.14 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.6f1 (338bb68529b2)
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/MSI/Documents/GitHub/FrameWork/Framework/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 3050 Laptop GPU (ID=0x25a2)
+    Vendor:   
+    VRAM:     3965 MB
+    Driver:   32.0.15.5599
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56180
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001500 seconds.
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 52.20 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.943 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.002027 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 48.59 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  5.455 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.09 seconds
+Refreshing native plugins compatible for Editor in 0.97 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2241 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 118.3 MB.
+System memory in use after: 118.4 MB.
+
+Unloading 22 unused Assets to reduce memory usage. Loaded Objects now: 2705.
+Total: 2.244800 ms (FindLiveObjects: 0.329200 ms CreateObjectMapping: 0.055500 ms MarkObjects: 1.827600 ms  DeleteObjects: 0.030100 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Script/World/PlayerMovement.cs
+  artifactKey: Guid(c4b7859f7d2afb04c889f2db8f0b0dbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/World/PlayerMovement.cs using Guid(c4b7859f7d2afb04c889f2db8f0b0dbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a451883a79acb6e1f0420ee02a446de9') in 0.053855 seconds
+  Import took 0.057459 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 466.272978 seconds.
+  path: Assets/Script/World/HealthBar.cs
+  artifactKey: Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/World/HealthBar.cs using Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7a48f43833d10e3eeb04ffb20061603c') in 0.011062 seconds
+  Import took 0.016782 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002838 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.96 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.919 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 1.10 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2190 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 113.8 MB.
+System memory in use after: 113.9 MB.
+
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2709.
+Total: 3.223100 ms (FindLiveObjects: 0.342100 ms CreateObjectMapping: 0.096400 ms MarkObjects: 2.745700 ms  DeleteObjects: 0.036300 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 20.672257 seconds.
+  path: Assets/Script/World/HealthBar.cs
+  artifactKey: Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/World/HealthBar.cs using Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd4bad0f80b80df2b75ef5977e6f25158') in 0.011954 seconds
+  Import took 0.015476 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 178.446038 seconds.
+  path: Assets/Script/World/HealthBar.cs
+  artifactKey: Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/World/HealthBar.cs using Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6be5259a512a5083abeea3b969fe46b3') in 0.003287 seconds
+  Import took 0.007731 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 205.453186 seconds.
+  path: Assets/Script/World/HealthBar.cs
+  artifactKey: Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/World/HealthBar.cs using Guid(8f01665a50c5568448ff558c45ed37ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3b44bfe2dd086cf183f5a3654878c3a8') in 0.002344 seconds
+  Import took 0.006221 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002370 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.73 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.730 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.52 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2190 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 113.8 MB.
+System memory in use after: 113.9 MB.
+
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2712.
+Total: 2.716700 ms (FindLiveObjects: 0.176000 ms CreateObjectMapping: 0.038700 ms MarkObjects: 2.446200 ms  DeleteObjects: 0.054400 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 1140.357510 seconds.
+  path: Assets/Sprite/UI/wall.png
+  artifactKey: Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/wall.png using Guid(15d5d7c121c065c49b830d4ad19aeb30) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '16a4445c48f6c6fff433960cbe785d48') in 0.121498 seconds
+  Import took 0.126069 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.720953 seconds.
+  path: Assets/Sprite/UI/Text Bubbles.png
+  artifactKey: Guid(7f667ccdbbf62fc4f9a2cd804d7f8e66) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/UI/Text Bubbles.png using Guid(7f667ccdbbf62fc4f9a2cd804d7f8e66) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a00312980ecfd26297e294702f18fb49') in 0.041090 seconds
+  Import took 0.044633 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.792800 seconds.
+  path: Assets/Sprite/Player/Soul.png
+  artifactKey: Guid(9c901f0647886554593f8cebe91c8720) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprite/Player/Soul.png using Guid(9c901f0647886554593f8cebe91c8720) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ed9defc90db1ef93151e81e49ec8aa54') in 0.064549 seconds
+  Import took 0.069161 seconds .
+
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file
