@@ -109,6 +109,14 @@ public class LivingObject : MonoBehaviour
         }
     }
 
+    public void IncreaseHealth(int v)
+    {
+        if (health + v < maxHealth)
+            health += v;
+        else
+            health = maxHealth;
+
+    }
     public virtual void Die()
     {
         isDie = true;
@@ -136,7 +144,7 @@ public class LivingObject : MonoBehaviour
         {
             UIManager.Instance.ShowDamageText(transform.position, damageAmount);
             health -= damageAmount;
-
+            //player라면 체력확인하기아..바본가?
             // 체력바 업데이트
             if (healthSlider != null)
             {
@@ -151,6 +159,7 @@ public class LivingObject : MonoBehaviour
             {
                 StartCoroutine(StartInvincibility()); // 무적 상태로 전환
             }
+            
         }
     }
 

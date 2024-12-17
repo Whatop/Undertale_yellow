@@ -15,19 +15,16 @@ public class UIManager : MonoBehaviour
     private SoundManager soundManager; // SoundManager 인스턴스를 필드로 추가
 
     private static UIManager instance;
-    public GameObject[] ui_positions; //health : 0, Weapon : 1, hp2 : 0
+    public GameObject[] ui_positions; // Weapon : 0
     public GameObject top;
     public GameObject down;
 
-    [SerializeField]
-    private GameObject[] ui_healths;
 
     [SerializeField]
+    private GameObject ammos_td;
     private GameObject[] ui_ammo;
     public GameObject[] pedestal;
     public Image ui_weaponImage;
-    public Image ui_weaponBackImage;
-    public GameObject ui_healthImage;
     public TextMeshProUGUI ui_ammoText;
     public Canvas uicanvas;
     public Camera mainCamera;
@@ -39,6 +36,8 @@ public class UIManager : MonoBehaviour
     public GameObject keyChangePanel;
     public GameObject YN_ResetPanel;
     public GameObject KeyCheckPanel;
+    public Slider hpBar; // 체력바
+    public TextMeshProUGUI hpBar_text;
 
     public Button[] mainButtons;
     public Button[] optionButtons;
@@ -305,6 +304,7 @@ public class UIManager : MonoBehaviour
         saveNum = -1; //야메
         isSavePanel = false;
         isSaveDelay = true;
+       
         TextYellow();
         SoundManager.Instance.SFXPlay("save_sound", 171);
 
@@ -830,44 +830,14 @@ public class UIManager : MonoBehaviour
 
     void InitHeart() // 체력 새팅
     {
+        // 체력이 많아질수록 점점더 길어지도록
         PlayerData player = gameManager.GetPlayerData();
-        int heart_count = player.Maxhealth / 2; // 총 체력에 맞는 하트 개수 설정
-        ui_healths = new GameObject[heart_count];
+        int currentHealth = player.health;
+        int maxHealth = player.Maxhealth;
 
-        // 체력바 전체 길이를 설정하기 위한 부모 UI RectTransform
-        RectTransform parentRect = ui_positions[0].GetComponent<RectTransform>();
-
-        // 각 하트의 가로 간격 (여백 포함)을 결정합니다.
-        float totalWidth = parentRect.rect.width; // 부모 UI의 너비
-        float padding = 10f; // 하트 간의 간격 (필요에 따라 조정)
-        float heartWidth = (totalWidth - padding * (heart_count - 1)) / heart_count; // 각 하트의 너비
-        ui_healthImage.SetActive(true);
-
-        for (int i = 0; i < heart_count; i++)
-        {
-            GameObject heartPrefab = Resources.Load<GameObject>("Prefabs/Heart");
-            GameObject instance = Instantiate(heartPrefab, ui_positions[0].transform);
-
-            RectTransform heartRect = instance.GetComponent<RectTransform>();
-
-            // 하트의 크기를 부모 UI 너비에 맞춰 조정합니다.
-            heartRect.sizeDelta = new Vector2(heartWidth, heartRect.sizeDelta.y);
-
-            // 하트를 가로 방향으로 배치합니다.
-            Vector3 newPosition = instance.transform.position;
-
-            if (!GameManager.Instance.isBattle)
-            {
-                newPosition.x = parentRect.position.x - totalWidth / 2 + (heartWidth + padding) * i + heartWidth / 2; // 가로 배치
-            }
-            else
-            {
-                newPosition.x = ui_positions[2].transform.position.x + (heartWidth + padding) * i; // 전투 상태일 때 위치 조정
-            }
-
-            instance.transform.position = newPosition;
-            ui_healths[i] = instance;
-        }
+        // 체력 이미지 업데이트
+        hpBar.value = Mathf.Clamp((float)currentHealth / (float)maxHealth, 0, 1);
+        hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
     }
 
     void InitWeapon() // 총 새팅
@@ -880,15 +850,15 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < ammo_count; i++)
         {
             GameObject weaponPrefab = Resources.Load<GameObject>("Prefabs/Ammo");
-            GameObject instance = Instantiate(weaponPrefab, ui_positions[1].transform);
+            GameObject instance = Instantiate(weaponPrefab, ui_positions[0].transform);
 
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
             Vector3 newPosition = instance.transform.position;
-            newPosition.x = ui_positions[1].transform.position.x + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
+            newPosition.x = ui_positions[0].transform.position.x + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
             instance.transform.position = newPosition;
             if(ammo_count == i + 1)
             {
-            newPosition.x *= 1.1f; // 세로 방향으로 위치 설정
+            newPosition.x *= 1.05f; // 세로 방향으로 위치 설정
                 top.transform.position = newPosition;
             }
             ui_ammo[i] = instance;
@@ -913,38 +883,12 @@ public class UIManager : MonoBehaviour
     {
         PlayerData player = gameManager.GetPlayerData();
         int currentHealth = player.health;
+        int maxHealth = player.Maxhealth;
 
         // 체력 이미지 업데이트
-        RectTransform parentRect = ui_positions[0].GetComponent<RectTransform>();
-        float totalWidth = parentRect.rect.width; // 부모 UI의 너비
-        float padding = 10f; // 하트 간의 간격
-        int heart_count = ui_healths.Length;
-        float heartWidth = (totalWidth - padding * (heart_count - 1)) / heart_count; // 각 하트의 너비
+        hpBar.value = Mathf.Clamp((float)currentHealth / (float)maxHealth, 0, 1);
 
-        for (int i = 0; i < heart_count; i++)
-        {
-            // 체력에 따른 스프라이트 인덱스 계산
-            int spriteIndex = Mathf.Clamp(currentHealth - i * 2, 0, 2);
-            ui_healths[i].GetComponent<ImageScript>().SetImage(spriteIndex);
-
-            // 하트의 위치를 다시 설정 (체력 UI가 갱신될 때마다 위치를 다시 조정)
-            RectTransform heartRect = ui_healths[i].GetComponent<RectTransform>();
-            Vector3 newPosition = ui_healths[i].transform.position;
-
-            if (!GameManager.Instance.isBattle)
-            {
-                newPosition.x = parentRect.position.x - totalWidth / 2 + (heartWidth + padding) * i + heartWidth / 2; // 가로 배치
-                ui_healths[i].GetComponent<Image>().color = new Color(1, 1, 1, 0.75f);
-            }
-            else
-            {
-                newPosition.x = ui_positions[2].transform.position.x + (heartWidth + padding) * i; // 전투 상태일 때 위치 조정
-                ui_healths[i].GetComponent<Image>().color = new Color(1, 1, 1, 1);
-            }
-
-            // 위치 적용
-            ui_healths[i].transform.position = newPosition;
-        }
+        hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
 
         // 무기 데이터 가져오기 및 총알 이미지 업데이트
         Weapon weapon = gameManager.GetWeaponData();
@@ -958,11 +902,21 @@ public class UIManager : MonoBehaviour
         }
 
         // 무기 탄약 텍스트 업데이트
-        ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
+        if (weapon.current_Ammo == -1)
+        {
+            ui_ammoText.text = "∞";
+            ui_ammoText.fontSize = 80;
+        }
+        else
+        {
+            ui_ammoText.text = weapon.current_Ammo + "/" + weapon.maxAmmo;
+            ui_ammoText.fontSize = 36;
+
+        }
     }
 
-    // 체력, 무기 등의 UI를 끄는 함수
-    public void OffPlayerUI()
+        // 체력, 무기 등의 UI를 끄는 함수
+        public void OffPlayerUI()
     {
         foreach (var ui in ui_ammo)
         {
@@ -974,8 +928,8 @@ public class UIManager : MonoBehaviour
         }
         ui_weaponImage.gameObject.SetActive(false);
         ui_ammoText.gameObject.SetActive(false);
-        ui_weaponBackImage.gameObject.SetActive(false);
-        ui_healthImage.gameObject.SetActive(false);
+        hpBar.gameObject.SetActive(false);
+        ammos_td.gameObject.SetActive(false);
     }
 
     // 체력, 무기 등의 UI를 켜는 함수
@@ -991,8 +945,8 @@ public class UIManager : MonoBehaviour
         }
         ui_weaponImage.gameObject.SetActive(true);
         ui_ammoText.gameObject.SetActive(true);
-        ui_weaponBackImage.gameObject.SetActive(true);
-        ui_healthImage.gameObject.SetActive(true);
+        hpBar.gameObject.SetActive(true);
+        ammos_td.gameObject.SetActive(true);
     }
     #endregion
 

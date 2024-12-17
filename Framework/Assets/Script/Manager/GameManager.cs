@@ -62,18 +62,11 @@ public class PlayerData
         // 추가 데이터 초기화
     }
 
-    public void IncreaseHealth(int v)
-    {
-        if(health < Maxhealth)
-            health += v;
-        else
-            health = Maxhealth;
-
-    }
     public void LevelUp()
     {
         LEVEL++;
-        IncreaseHealth(10);
+        player.GetComponent<LivingObject>().IncreaseHealth(1);
+
     }
     public void EquipWeapon(Item item)
     {
@@ -529,7 +522,7 @@ public class GameManager : MonoBehaviour
 
             case ItemType.HealingItem:
                 // 체력 증가 예시
-                GetPlayerData().IncreaseHealth(1); 
+                GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1); 
                         
                         
                 GetPlayerData().inventory.RemoveAt(Id); 
@@ -607,6 +600,7 @@ public class GameManager : MonoBehaviour
     // Save Method
     public void Save()
     {
+        GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(99);
         isSave = true;
 
         // 플레이어 위치 저장
