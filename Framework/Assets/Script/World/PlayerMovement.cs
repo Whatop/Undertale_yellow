@@ -67,6 +67,10 @@ public class PlayerMovement : LivingObject
     public float bulletSpeed = 10f;   // 총알 발사 속도
     public Weapon weaponData;
 
+    public GameObject feetPoint;
+    private bool isEffectSpawning = false; // 이펙트 생성 중 여부 확인 변수
+
+
     private Vector2 rollDirection;
     private float rollSpeed = 16f;      // 구르기 속도
     private float rollDuration = 0.5f;  // 구르기 지속 시간
@@ -541,12 +545,26 @@ public class PlayerMovement : LivingObject
         {
             speed = 4f;
         }
+        if (isMove && !isEffectSpawning)
+        {
+            StartCoroutine(SpawnEffectCoroutine()); // 코루틴 시작
+        }
+
 
         rigid.velocity = new Vector2(h, v) * speed;
         playerData.position = transform.position;
         playerData.health = health;
     }
-
+    private IEnumerator SpawnEffectCoroutine()
+    {
+        isEffectSpawning = true; // 이펙트 생성 중 상태 설정
+        while (isMove)
+        {
+            EffectManager.Instance.SpawnEffect("foot", feetPoint.transform.position, Quaternion.identity);
+            yield return new WaitForSeconds(0.3f); // 0.1초 대기
+        }
+        isEffectSpawning = false; // 이펙트 생성 종료
+    }
     // 애니메이터 이동 업데이트
     void UpdateAnimatorMovement()
     {

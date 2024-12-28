@@ -48,8 +48,8 @@ public class PlayerData
     public PlayerData()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
-        Maxhealth = 6;
-        health = 6;
+        Maxhealth = 20;
+        health = 20;
         position = Vector3.zero;
         player_Name = "frisk";
         LEVEL = 1;
@@ -717,6 +717,13 @@ public class GameManager : MonoBehaviour
         if (GetPlayerData().player !=null)
         GetPlayerData().player.GetComponent<PlayerMovement>().updateLoad();
     }
-
+    // 버튼 클릭 이벤트에 연결할 메서드
+    public void ClearPlayerPrefs()
+    {
+        // PlayerPrefs 전체 삭제
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save(); // 변경 사항 저장
+        Debug.Log("모든 PlayerPrefs 데이터가 삭제되었습니다.");
+    }
 }
 
