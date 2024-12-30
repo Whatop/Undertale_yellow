@@ -372,6 +372,8 @@ public class PlayerMovement : LivingObject
     {
         objectState = ObjectState.Roll;
         SetAnimatorBooleansFalse();
+        EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
+        isMove = false;
         // UIManager의 GetKeyCode를 통해 방향키 입력 감지
         if (Input.GetKey(UIManager.Instance.GetKeyCode(0)) && Input.GetKey(UIManager.Instance.GetKeyCode(3)))
         {
@@ -414,6 +416,7 @@ public class PlayerMovement : LivingObject
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
         SoundManager.Instance.SFXPlay("dodge_roll_01", 219); // 구르기 사운드
+        bool effectPlayed = false; // 효과가 이미 재생되었는지 확인하는 플래그
 
         while (rollTime < rollDuration)
         {
@@ -421,11 +424,18 @@ public class PlayerMovement : LivingObject
             float t = rollTime / rollDuration;
             // 자연스러운 구르기 동작을 위해 속도를 일정하게 유지
             rigid.velocity = rollDirection * rollSpeed * Mathf.Lerp(1f, 0f, t);
+
+            if (!effectPlayed && rollTime > rollDuration - 0.3f)
+            {
+                EffectManager.Instance.SpawnEffect("rolleffect2", feetPoint.transform.position, Quaternion.identity);
+                effectPlayed = true;
+            }
             yield return null;
         }
 
         rigid.velocity = Vector2.zero;
-        objectState = ObjectState.None;
+        objectState = ObjectState.None; 
+
     }
 
     private void HandleRollAnimation(Vector2 rollDirection)
@@ -561,7 +571,7 @@ public class PlayerMovement : LivingObject
         while (isMove)
         {
             EffectManager.Instance.SpawnEffect("foot", feetPoint.transform.position, Quaternion.identity);
-            yield return new WaitForSeconds(0.3f); // 0.1초 대기
+            yield return new WaitForSeconds(0.5f); // 0.5초 대기
         }
         isEffectSpawning = false; // 이펙트 생성 종료
     }
