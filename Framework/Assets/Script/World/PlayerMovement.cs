@@ -48,6 +48,11 @@ public class PlayerMovement : LivingObject
     public float v;
 
     bool isMove = false;
+    private bool isTouchingHorizontal = false; // 좌우 방향 충돌 상태
+    private bool isTouchingVertical = false;   // 상하 방향 충돌 상태
+
+
+
     public float cooldownTime = 0.5f;
     private bool isCooldown = false;
 
@@ -85,6 +90,18 @@ public class PlayerMovement : LivingObject
 
     private bool isSoulActive = false; // Soul 모드 활성화 여부
 
+    public int walkingSoundStartIndex = 220; // 걷는 효과음 시작 인덱스
+    public int walkingSoundCount = 3;       // 걷는 효과음 개수
+    public float walkingSoundInterval = 0.3f; // 효과음 재생 간격
+    private int currentSoundIndex = 0;      // 현재 재생 중인 효과음 인덱스
+    private bool isPlayingFootsteps = false; // 효과음 재생 여부
+
+    private Vector2 previousPosition;  // 이전 위치
+    private float distanceCovered = 0f;  // 누적 이동 거리
+    public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
+    private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
+
+
     // Awake 메서드: 초기 설정
     protected override void Awake()
     {
@@ -95,6 +112,7 @@ public class PlayerMovement : LivingObject
 
         // 시작할 때 Soul 비활성화
         soulObject.SetActive(false);
+        previousPosition = transform.position; // 초기 위치 설정
     }
 
     // Start 메서드: 게임 시작 시 초기화
@@ -223,7 +241,7 @@ public class PlayerMovement : LivingObject
             // R키 입력 시 재장전
             if (Input.GetKeyDown(KeyCode.R) && !isReloading && weaponData.current_magazine != weaponData.magazine && !UIManager.Instance.isInventroy)
             {
-                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
+                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217,0.05f); // 재장전 사운드
                 StartCoroutine(Reload());
             }
 
@@ -332,7 +350,7 @@ public class PlayerMovement : LivingObject
         }
         else if (current_magazine == 0 && !isReloading)
         {
-            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217); // 재장전 사운드
+            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217,0.05f); // 재장전 사운드
             StartCoroutine(Reload());
         }
     }
@@ -345,7 +363,7 @@ public class PlayerMovement : LivingObject
             GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
             Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
             bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218, 0.05f); // 총 사운드
             WeaponsAnimator.SetTrigger("Shot");
         }
         else
@@ -353,7 +371,7 @@ public class PlayerMovement : LivingObject
             GameObject bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
             Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
             bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-            SoundManager.Instance.SFXPlay("soul_shot_01", 124); // 총 사운드
+            SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.05f); // 총 사운드
             WeaponsAnimator.SetTrigger("Shot");
         }
     }
@@ -415,7 +433,8 @@ public class PlayerMovement : LivingObject
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
-        SoundManager.Instance.SFXPlay("dodge_roll_01", 219); // 구르기 사운드
+
+        SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 0.05f); // 구르기 사운드
         bool effectPlayed = false; // 효과가 이미 재생되었는지 확인하는 플래그
 
         while (rollTime < rollDuration)
@@ -516,8 +535,40 @@ public class PlayerMovement : LivingObject
             h = 0;
             v = 0;
         }
+        if (!gameManager.GetPlayerData().isStop && !isDie)
+        {
+            CalculateDistanceAndTriggerEffects();
+        }
     }
+    private void CalculateDistanceAndTriggerEffects()
+    {
+        Vector2 currentPosition = transform.position; // 현재 위치
+        float distance = Vector2.Distance(previousPosition, currentPosition); // 이전 위치와의 거리 계산
 
+        if (distance > positionTolerance) // 위치 변화가 허용 오차를 초과할 경우
+        {
+            distanceCovered += distance; // 누적 거리 증가
+            previousPosition = currentPosition; // 현재 위치를 이전 위치로 업데이트
+
+            if (distanceCovered >= distanceThreshold) // 기준 거리 이상 이동 시
+            {
+                TriggerWalkingEffects();
+                distanceCovered = 0f; // 누적 거리 초기화
+            }
+        }
+    }
+    private void TriggerWalkingEffects()
+    {
+        // 걷는 소리 재생
+        int soundIndex = walkingSoundStartIndex + currentSoundIndex;
+        SoundManager.Instance.SFXPlay($"footstep_{soundIndex}", soundIndex, 0.1f);
+
+        // 다음 효과음 인덱스로 이동
+        currentSoundIndex = (currentSoundIndex + 1) % walkingSoundCount;
+
+        // 발자국 이펙트 생성
+        EffectManager.Instance.SpawnEffect("foot", feetPoint.transform.position, Quaternion.identity);
+    }
     // 플레이어 이동 처리
     void Move()
     {
@@ -542,7 +593,6 @@ public class PlayerMovement : LivingObject
         {
             v = -1f;
         }
-        UpdateAnimatorMovement();
 
         if (gameManager.GetPlayerData().currentState == GameState.Event)
         {
@@ -553,11 +603,8 @@ public class PlayerMovement : LivingObject
         }
         else
         {
+            UpdateAnimatorMovement();
             speed = 4f;
-        }
-        if (isMove && !isEffectSpawning)
-        {
-            StartCoroutine(SpawnEffectCoroutine()); // 코루틴 시작
         }
 
 
@@ -565,27 +612,53 @@ public class PlayerMovement : LivingObject
         playerData.position = transform.position;
         playerData.health = health;
     }
-    private IEnumerator SpawnEffectCoroutine()
-    {
-        isEffectSpawning = true; // 이펙트 생성 중 상태 설정
-        while (isMove)
-        {
-            EffectManager.Instance.SpawnEffect("foot", feetPoint.transform.position, Quaternion.identity);
-            yield return new WaitForSeconds(0.5f); // 0.5초 대기
-        }
-        isEffectSpawning = false; // 이펙트 생성 종료
-    }
+
+
     // 애니메이터 이동 업데이트
     void UpdateAnimatorMovement()
     {
-        isMove = h != 0 || v != 0;
+        // 기본 이동 상태 계산
+        isMove = (h != 0 || v != 0);
+
+        // 코너 겹침 및 동시 입력 처리
+        if (isTouchingHorizontal && isTouchingVertical)
+        {
+            if (h != 0 && v != 0)
+            {
+                // 두 방향 모두 충돌일 경우만 이동 불가
+                if (isTouchingHorizontal && isTouchingVertical)
+                {
+                    isMove = false;
+                }
+            }
+            else
+            {
+                // 하나의 방향만 충돌한 경우
+                if ((isTouchingHorizontal && h != 0) || (isTouchingVertical && v != 0))
+                {
+                    isMove = false;
+                }
+            }
+        }
+        else
+        {
+            // 개별 충돌 처리
+            if ((isTouchingHorizontal && h != 0) || (isTouchingVertical && v != 0))
+            {
+                isMove = false;
+            }
+        }
+
+        // 애니메이터에 이동 상태 전달
         animator.SetBool("isMove", isMove);
 
+        // 애니메이터에 이동 방향 전달
         if (h != animator.GetInteger("h"))
             animator.SetInteger("h", (int)h);
         else if (v != animator.GetInteger("v"))
             animator.SetInteger("v", (int)v);
     }
+
 
     // 오브젝트 상태 설정
     void SetObjectState(ObjectState newState)
@@ -665,23 +738,48 @@ public class PlayerMovement : LivingObject
         transform.localScale = currentScale;
     }
 
-    // 애니메이션 업데이트
-    void UpdateAnimation(Vector2 moveInput)
-    {
-        if (moveInput.magnitude > 0)
-        {
-            animator.SetFloat("Horizontal", moveInput.x);
-            animator.SetFloat("Vertical", moveInput.y);
-        }
-        else
-        {
-            animator.SetFloat("Horizontal", 0);
-            animator.SetFloat("Vertical", 0);
-        }
-    }
-
     public void TeleportPlayer(Vector2 pos)
     {
         transform.position = pos;
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Vector2 normal = contact.normal;
+
+                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
+                {
+                    isTouchingHorizontal = true;
+                }
+                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
+                {
+                    isTouchingVertical = true;
+                }
+            }
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Vector2 normal = contact.normal;
+
+                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
+                {
+                    isTouchingHorizontal = false;
+                }
+                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
+                {
+                    isTouchingVertical = false;
+                }
+            }
+        }
+    }
+
 }

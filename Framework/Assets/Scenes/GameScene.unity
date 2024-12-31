@@ -887,7 +887,7 @@ GameObject:
   - component: {fileID: 33221139}
   - component: {fileID: 33221138}
   - component: {fileID: 33221137}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WallTile
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -19346,6 +19346,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 973cd8f9d5845b448a041388d115b340, type: 3}
   - {fileID: 8300000, guid: decd57f7f3a2721458b59e0319744a1e, type: 3}
   - {fileID: 8300000, guid: e60c60e5c73a66d41a1f0eb85060e8d3, type: 3}
+  - {fileID: 8300000, guid: b4bb35e9608b7164c93405de37b0e1cf, type: 3}
+  - {fileID: 8300000, guid: 6c720796abc480e4ab8d80c66858ba50, type: 3}
+  - {fileID: 8300000, guid: 1e1508e5c52896049816f855243d9012, type: 3}
+  - {fileID: 8300000, guid: e3f15f8e749b54f45af0b165cd0e52b0, type: 3}
   txtlist:
   - {fileID: 8300000, guid: a5fcf6f43cc911a42a2b19fe5901a30d, type: 3}
   - {fileID: 8300000, guid: 21278621334a6f6418a11cd6f426864b, type: 3}
@@ -36548,6 +36552,10 @@ MonoBehaviour:
   soulObject: {fileID: 644007166}
   playerSprite: {fileID: 1239929335}
   playerTransparency: 0
+  walkingSoundStartIndex: 220
+  walkingSoundCount: 3
+  walkingSoundInterval: 0.3
+  distanceThreshold: 1
 --- !u!4 &1239929340
 Transform:
   m_ObjectHideFlags: 0

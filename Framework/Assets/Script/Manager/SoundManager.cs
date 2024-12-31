@@ -68,6 +68,15 @@ public class SoundManager : MonoBehaviour
         audioSource.volume = 0.1f;
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
+    }  
+    // 사운드 이펙트(SFX) 재생
+    public void SFXPlay(string sfxName, int sfxNum, float volume)
+    {
+        AudioSource audioSource = GetAudioSourceFromPool();
+        audioSource.clip = sfxlist[sfxNum];
+        audioSource.volume = volume;
+        audioSource.Play();
+        StartCoroutine(DeactivateAfterPlay(audioSource));
     }
 
     // 텍스트 관련 SFX 재생
