@@ -535,7 +535,7 @@ public class PlayerMovement : LivingObject
             h = 0;
             v = 0;
         }
-        if (!gameManager.GetPlayerData().isStop && !isDie)
+        if (!gameManager.GetPlayerData().isStop && !isDie && !isSoulActive)
         {
             CalculateDistanceAndTriggerEffects();
         }
@@ -620,32 +620,21 @@ public class PlayerMovement : LivingObject
         // 기본 이동 상태 계산
         isMove = (h != 0 || v != 0);
 
-        // 코너 겹침 및 동시 입력 처리
-        if (isTouchingHorizontal && isTouchingVertical)
+        // 동시 입력 처리
+        if (h != 0 && v != 0)
         {
-            if (h != 0 && v != 0)
+            // 두 방향 중 하나라도 충돌하지 않으면 이동 가능
+            if ((isTouchingHorizontal && h != 0) && (isTouchingVertical && v != 0))
             {
-                // 두 방향 모두 충돌일 경우만 이동 불가
-                if (isTouchingHorizontal && isTouchingVertical)
-                {
-                    isMove = false;
-                }
-            }
-            else
-            {
-                // 하나의 방향만 충돌한 경우
-                if ((isTouchingHorizontal && h != 0) || (isTouchingVertical && v != 0))
-                {
-                    isMove = false;
-                }
+                isMove = false; // 둘 다 충돌 시에만 이동 불가
             }
         }
         else
         {
-            // 개별 충돌 처리
+            // 개별 입력 처리
             if ((isTouchingHorizontal && h != 0) || (isTouchingVertical && v != 0))
             {
-                isMove = false;
+                isMove = false; // 해당 방향으로 이동하려 할 경우 이동 불가
             }
         }
 
@@ -658,6 +647,7 @@ public class PlayerMovement : LivingObject
         else if (v != animator.GetInteger("v"))
             animator.SetInteger("v", (int)v);
     }
+
 
 
     // 오브젝트 상태 설정
