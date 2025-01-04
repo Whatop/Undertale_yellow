@@ -126,7 +126,7 @@ public class SoundManager : MonoBehaviour
         {
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = 0.1f;
+            bgSound.volume = 0.08f;
             bgSound.Play();
         }
     }
@@ -138,7 +138,7 @@ public class SoundManager : MonoBehaviour
             bgSound.clip = bglist[textNum];
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = 0.1f;
+            bgSound.volume = 0.08f;
             bgSound.Play();
         }
     }

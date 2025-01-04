@@ -101,10 +101,10 @@ public class BulletController : MonoBehaviour
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
             DestroyBullet();
         }
-        else if (other.CompareTag("Wall"))
-        {
-            DestroyBullet();
-        }
+       //else if (other.CompareTag("Wall"))
+       //{
+       //    DestroyBullet();
+       //}
     }
 
     void DestroyBullet()

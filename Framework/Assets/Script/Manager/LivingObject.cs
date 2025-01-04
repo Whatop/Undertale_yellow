@@ -39,6 +39,8 @@ public class LivingObject : MonoBehaviour
     public Canvas worldCanvas; // 월드 캔버스
     private Camera mainCamera;
     public GameObject hpBarPoint;
+    private SpriteRenderer spriteRenderer; // SpriteRenderer 참조
+    private Color originalColor; // 원래 색상 저장
 
     protected virtual void Awake()
     {
@@ -47,7 +49,7 @@ public class LivingObject : MonoBehaviour
         gameManager = GameManager.Instance;
         GameObject cameraObject = GameObject.FindGameObjectWithTag("MainCamera");
         mainCamera = cameraObject.GetComponent<Camera>();
-
+        spriteRenderer = GameObject.FindGameObjectWithTag("Soul").GetComponent<SpriteRenderer>();
         // 체력바 초기화
         InitializeHealthBar();
     }
@@ -188,14 +190,39 @@ public class LivingObject : MonoBehaviour
         }
     }
 
-    // 무적 상태 시작 코루틴
     private IEnumerator StartInvincibility()
     {
         if (transform.tag == "Player")
         {
+            if (spriteRenderer == null)
+                yield break;
+
             isInvincible = true; // 무적 상태 활성화
-            yield return new WaitForSeconds(invincibleDuration); // 무적 상태 유지 시간
+            float elapsed = 0f;
+
+            while (elapsed < invincibleDuration)
+            {
+                elapsed += Time.deltaTime;
+
+                // 깜빡임 효과
+                float alpha = Mathf.Abs(Mathf.Sin(elapsed * 10)); // 10은 깜빡이는 속도
+                SetSpriteAlpha(alpha);
+
+                yield return null;
+            }
+
+            SetSpriteAlpha(1f); // 알파 값을 원래대로 복원
             isInvincible = false; // 무적 상태 해제
+        }
+    }
+
+    private void SetSpriteAlpha(float alpha)
+    {
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = alpha;
+            spriteRenderer.color = color;
         }
     }
 
