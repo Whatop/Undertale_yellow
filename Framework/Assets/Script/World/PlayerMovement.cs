@@ -3,6 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Color 값
+//Determination 의지, 불명(빨강) : 255 0 0
+//Patience 인내(하늘) : 66 252 255
+//Bravery 용기(주황) : 252 166 0
+//Integrity 고결(파랑) : 0 60 255
+//Perseverance 끈기(보라) : 213 53 217
+//Kindness 친절(초록) : 0 192 0
+//Justice 정의(노랑) : 255 255 0
+public enum WeaponType
+{
+    Determination,
+    Patience,
+    Bravery,
+    Integrity,
+    Perseverance,
+    Kindness,
+    Justice,
+    None
+}
 // 각 총의 특성을 나타내는 클래스
 [System.Serializable]
 public class Weapon
@@ -18,7 +37,7 @@ public class Weapon
     public float bulletSpeed;  // 총알 속도
     public float accuracy;     // 총의 정확도
     public Transform firePoint; // 총알이 발사될 위치
-
+    public WeaponType weaponType;
     public Weapon()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
@@ -31,6 +50,7 @@ public class Weapon
         current_magazine = magazine;
         bulletSpeed = 1;
         accuracy = 1;
+        weaponType = WeaponType.None;
         // 추가 데이터 초기화
     }
 
@@ -51,8 +71,6 @@ public class PlayerMovement : LivingObject
     private bool isTouchingHorizontal = false; // 좌우 방향 충돌 상태
     private bool isTouchingVertical = false;   // 상하 방향 충돌 상태
 
-
-
     public float cooldownTime = 0.5f;
     private bool isCooldown = false;
 
@@ -62,8 +80,8 @@ public class PlayerMovement : LivingObject
     public ObjectState objectState;
 
     GameObject scanObject;
-    Animator WeaponsAnimator;
 
+    Animator WeaponsAnimator;
     public Transform WeaponTransform; // 총의 Transform 컴포넌트
     public Transform shotpoint;       // 총의 Transform 컴포넌트
     public Transform soulshotpoint;   // 영혼의 총 Transform 컴포넌트
@@ -71,6 +89,15 @@ public class PlayerMovement : LivingObject
     public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f;   // 총알 발사 속도
     public Weapon weaponData;
+    private Color weaponColor; // 7가지의 영혼들 기본..?
+
+    //Determination 의지, 불명(빨강) : 255 0 0
+    //Patience 인내(하늘) : 66 252 255
+    //Bravery 용기(주황) : 252 166 0
+    //Integrity 고결(파랑) : 0 60 255
+    //Perseverance 끈기(보라) : 213 53 217
+    //Kindness 친절(초록) : 0 192 0
+    //Justice 정의(노랑) : 255 255 0
 
     public GameObject feetPoint;
     private bool isEffectSpawning = false; // 이펙트 생성 중 여부 확인 변수
