@@ -10362,7 +10362,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233223326}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 56.13, y: 2.47, z: 0}
+  m_LocalPosition: {x: 55.2, y: 2.66, z: 0}
   m_LocalScale: {x: 0.49, y: 0.49, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -13044,8 +13044,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356459342}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 3.010561, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 55.12, y: 2.58, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 8525553241183183686}
@@ -13055,7 +13055,7 @@ Transform:
   - {fileID: 1442081416}
   m_Father: {fileID: 0}
   m_RootOrder: 10
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &370470080
 GameObject:
   m_ObjectHideFlags: 0
@@ -37951,6 +37951,7 @@ MonoBehaviour:
   isMouseRoll: 1
   currentIndex: 0
   curRIndex: 0
+  pixelPerfectCamera: {fileID: 1575677075}
   Interface:
   - {fileID: 681350678}
   - {fileID: 1934893276}
@@ -43148,12 +43149,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575677067}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AssetsPPU: 100
+  m_AssetsPPU: 32
   m_RefResolutionX: 320
   m_RefResolutionY: 180
   m_UpscaleRT: 0
@@ -50687,7 +50688,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: d6391f8b944d6b5418f4f0aa4b37a308, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

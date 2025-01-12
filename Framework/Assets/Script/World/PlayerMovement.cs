@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 //Color 값
 //Determination 의지, 불명(빨강) : 255 0 0
@@ -13,14 +14,14 @@ using UnityEngine;
 //Justice 정의(노랑) : 255 255 0
 public enum WeaponType
 {
-    Determination,
-    Patience,
-    Bravery,
-    Integrity,
-    Perseverance,
-    Kindness,
-    Justice,
-    None
+    Determination, // 의지 (빨강)
+    Patience,      // 인내 (하늘)
+    Bravery,       // 용기 (주황)
+    Integrity,     // 고결 (파랑)
+    Perseverance,  // 끈기 (보라)
+    Kindness,      // 친절 (초록)
+    Justice,       // 정의 (노랑)
+    None           // 기본값
 }
 // 각 총의 특성을 나타내는 클래스
 [System.Serializable]
@@ -37,7 +38,8 @@ public class Weapon
     public float bulletSpeed;  // 총알 속도
     public float accuracy;     // 총의 정확도
     public Transform firePoint; // 총알이 발사될 위치
-    public WeaponType weaponType;
+    public WeaponType weaponType;// 무기 타입
+    public Color weaponColor;    // 무기 색상
     public Weapon()
     {
         // 초기화 로직 추가 (예: 기본값 설정)
@@ -59,6 +61,35 @@ public class Weapon
     {
         return current_Ammo == -1;  // Ammo가 -1이면 무한으로 간주
     }
+    // WeaponType에 따라 색상을 반환하는 메서드
+    public Color GetColor(WeaponType type)
+    {
+        switch (type)
+        {
+            case WeaponType.Determination:
+                return new Color(1f, 0f, 0f); // 빨강
+            case WeaponType.Patience:
+                return new Color(66f / 255f, 252f / 255f, 255f / 255f); // 하늘색
+            case WeaponType.Bravery:
+                return new Color(252f / 255f, 166f / 255f, 0f); // 주황
+            case WeaponType.Integrity:
+                return new Color(0f, 60f / 255f, 1f); // 파랑
+            case WeaponType.Perseverance:
+                return new Color(213f / 255f, 53f / 255f, 217f / 255f); // 보라
+            case WeaponType.Kindness:
+                return new Color(0f, 192f / 255f, 0f); // 초록
+            case WeaponType.Justice:
+                return new Color(1f, 1f, 0f); // 노랑
+            default:
+                return new Color(0.5f, 0.5f, 0.5f); // 기본 회색
+        }
+    }
+
+    // 무기 타입이 변경되었을 때 색상을 업데이트하는 메서드
+    public void UpdateColor()
+    {
+        weaponColor = GetColor(weaponType);
+    }
 }
 
 public class PlayerMovement : LivingObject
@@ -75,7 +106,6 @@ public class PlayerMovement : LivingObject
     private bool isCooldown = false;
 
     public GameObject Hands;
-    public GameObject Weapons;
     public GameObject reloadPoint;
     public ObjectState objectState;
 
@@ -89,7 +119,7 @@ public class PlayerMovement : LivingObject
     public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f;   // 총알 발사 속도
     public Weapon weaponData;
-    private Color weaponColor; // 7가지의 영혼들 기본..?
+    public GameObject Weapons;
 
     //Determination 의지, 불명(빨강) : 255 0 0
     //Patience 인내(하늘) : 66 252 255
@@ -155,6 +185,10 @@ public class PlayerMovement : LivingObject
         OffHpbar();
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
+
+        weaponData.weaponType = WeaponType.Justice;
+        weaponData.UpdateColor();
+        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = weaponData.weaponColor;
     }
 
     public void updateLoad()

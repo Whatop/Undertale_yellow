@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.U2D;
 
 using UnityEngine.SceneManagement;
 using System;
@@ -72,9 +73,12 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private int currentIndex = 0;
 
+    //Camera 관련
     [SerializeField]
     private int curRIndex = 6; // curResolutionsIndex
     private List<Resolution> predefinedResolutions;
+    public PixelPerfectCamera pixelPerfectCamera;
+
 
     public GameObject[] Interface;
     public bool isUserInterface = false;
@@ -234,6 +238,7 @@ public class UIManager : MonoBehaviour
         int screenWidth = 1920;
         int screenHeight = 1080;
         float screenRatio = (float)screenWidth / screenHeight;
+        UpdateResolution(screenWidth, screenHeight);
 
         Screen.SetResolution(screenWidth, screenHeight, Screen.fullScreen);
 
@@ -1286,6 +1291,19 @@ public class UIManager : MonoBehaviour
                 break;
         }
     }
+    void UpdateResolution(int width, int height)
+    {
+        // Pixel Perfect 카메라 해상도 설정
+        pixelPerfectCamera.refResolutionX = width;
+        pixelPerfectCamera.refResolutionY = height;
+
+        // Canvas Scaler와 연동
+        CanvasScaler scaler = uicanvas.GetComponent<CanvasScaler>();
+        if (scaler != null)
+        {
+            scaler.referenceResolution = new Vector2(width, height);
+        }
+    }
 
     public void SetBGVolume()
     {
@@ -1427,6 +1445,7 @@ public class UIManager : MonoBehaviour
     {
         curRIndex = (curRIndex + direction + predefinedResolutions.Count) % predefinedResolutions.Count;
         Resolution selectedResolution = predefinedResolutions[curRIndex];
+        UpdateResolution(selectedResolution.width, selectedResolution.height);
         Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen);
         Debug.Log("Resolution changed to: " + selectedResolution.width + " x " + selectedResolution.height);
 
