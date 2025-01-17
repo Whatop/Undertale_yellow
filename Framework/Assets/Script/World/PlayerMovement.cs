@@ -118,7 +118,11 @@ public class PlayerMovement : LivingObject
     public GameObject bulletPrefab;   // 총알 프리팹
     public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f;   // 총알 발사 속도
-    public Weapon weaponData;
+
+    List<Weapon> playerWeapons = new List<Weapon>();
+    private int currentWeaponIndex = 0;
+
+    public Weapon curweaponData;
     public GameObject Weapons;
 
     //Determination 의지, 불명(빨강) : 255 0 0
@@ -157,15 +161,15 @@ public class PlayerMovement : LivingObject
     private float distanceCovered = 0f;  // 누적 이동 거리
     public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
     private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
-
-
+  
+    #region unity_code
     // Awake 메서드: 초기 설정
     protected override void Awake()
     {
         base.Awake();
         WeaponsAnimator = Weapons.GetComponent<Animator>();
         animator = GetComponent<Animator>();
-        weaponData = new Weapon();
+        curweaponData = new Weapon();
 
         // 시작할 때 Soul 비활성화
         soulObject.SetActive(false);
@@ -186,26 +190,155 @@ public class PlayerMovement : LivingObject
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
 
-        weaponData.weaponType = WeaponType.Justice;
-        weaponData.UpdateColor();
-        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = weaponData.weaponColor;
+        curweaponData.weaponType = WeaponType.Justice;
+        curweaponData.UpdateColor();
+        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = curweaponData.weaponColor;
     }
 
-    public void updateLoad()
+    protected override void Update()
     {
-        UIManager.Instance.isInventroy = false;
-        gameManager.GetPlayerData().isStop = false;
-        gameManager.GetPlayerData().isDie = false;
-        isDie = false;
-        //그 방에 맞는 배경음악을 불러온다.
-        SoundManager.Instance.BGSoundPlayDelayed(0, 1f);
-        playerData = gameManager.GetPlayerData();
-        maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
-        health = gameManager.GetPlayerData().health;       // 최대 체력 설정
-        transform.position = playerData.position;
-        playerData.playerAnimator = animator;
+        if (isDie)
+            return;
+        base.Update();
+
+        HandleWeaponSwitchInput();
         playerData.isInvincible = isInvincible;
+
+        if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
+        {
+            HandleSoulMode(); // Soul 모드 처리
+            if (UIManager.Instance.reloadSlider != null)
+            {
+                UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
+            }
+
+            float angle = CalculateMouseAngle();
+            Hands.gameObject.SetActive(true);
+
+            // R키 입력 시 재장전
+            if (Input.GetKeyDown(KeyCode.R) && !isReloading && curweaponData.current_magazine != curweaponData.magazine && !UIManager.Instance.isInventroy)
+            {
+                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+                StartCoroutine(Reload());
+            }
+
+            // 우클릭 입력 시 구르기 시작
+            if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
+            {
+                StartCooldown();
+                StartCoroutine(Roll());
+            }
+
+            // 쿨다운 시간 감소
+            if (isCooldown)
+            {
+                cooldownTime -= Time.deltaTime;
+                if (cooldownTime <= 0)
+                {
+                    isCooldown = false;
+                    cooldownTime = 0.75f;
+                    objectState = ObjectState.None;
+                }
+            }
+
+            // 구르기 상태가 아닐 때 각도에 따른 상태 설정
+            if (objectState != ObjectState.Roll && !UIManager.Instance.isInventroy)
+            {
+                ShootInput();
+                SetAnimatorBooleansFalse();
+                HandleObjectState(angle);
+            }
+            else
+            {
+                Hands.gameObject.SetActive(false);
+            }
+
+            if (isSoulActive)
+            {
+                SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
+            }
+
+            if (Input.GetKeyDown(KeyCode.C) &&
+                !UIManager.Instance.savePanel.activeSelf
+                && gameManager.GetPlayerData().currentState == GameState.None)
+            {
+                UIManager.Instance.SetTextBar();
+                UIManager.Instance.ChangeInventroy();
+            }
+        }
+        else
+        {
+            h = 0f;
+            v = 0f;
+        }
     }
+
+    void FixedUpdate()
+    {
+        if (objectState != ObjectState.Roll &&
+            !UIManager.Instance.isUserInterface &&
+            !gameManager.GetPlayerData().isStop &&
+            !UIManager.Instance.isInventroy &&
+            !UIManager.Instance.savePanel.activeSelf &&
+            !gameManager.GetPlayerData().isDie)
+        {
+            Move();
+        }
+        else if (objectState == ObjectState.Roll)
+        {
+            // Debug.Log("구른다");
+        }
+        else
+        {
+            animator.SetBool("isMove", false);
+            rigid.velocity = Vector2.zero;
+            h = 0;
+            v = 0;
+        }
+        if (!gameManager.GetPlayerData().isStop && !isDie && !isSoulActive)
+        {
+            CalculateDistanceAndTriggerEffects();
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Vector2 normal = contact.normal;
+
+                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
+                {
+                    isTouchingHorizontal = true;
+                }
+                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
+                {
+                    isTouchingVertical = true;
+                }
+            }
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Vector2 normal = contact.normal;
+
+                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
+                {
+                    isTouchingHorizontal = false;
+                }
+                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
+                {
+                    isTouchingVertical = false;
+                }
+            }
+        }
+    }
+    #endregion
 
     #region soul_code
     // Soul 모드 처리
@@ -280,83 +413,8 @@ public class PlayerMovement : LivingObject
     }
     #endregion soul_code
 
-    protected override void Update()
-    {
-        if (isDie)
-            return;
-        base.Update();
-
-        playerData.isInvincible = isInvincible;
-
-        if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
-        {
-            HandleSoulMode(); // Soul 모드 처리
-            if (UIManager.Instance.reloadSlider != null)
-            {
-                UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
-            }
-
-            float angle = CalculateMouseAngle();
-            Hands.gameObject.SetActive(true);
-
-            // R키 입력 시 재장전
-            if (Input.GetKeyDown(KeyCode.R) && !isReloading && weaponData.current_magazine != weaponData.magazine && !UIManager.Instance.isInventroy)
-            {
-                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217,0.05f); // 재장전 사운드
-                StartCoroutine(Reload());
-            }
-
-            // 우클릭 입력 시 구르기 시작
-            if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
-            {
-                StartCooldown();
-                StartCoroutine(Roll());
-            }
-
-            // 쿨다운 시간 감소
-            if (isCooldown)
-            {
-                cooldownTime -= Time.deltaTime;
-                if (cooldownTime <= 0)
-                {
-                    isCooldown = false;
-                    cooldownTime = 0.75f;
-                    objectState = ObjectState.None;
-                }
-            }
-
-            // 구르기 상태가 아닐 때 각도에 따른 상태 설정
-            if (objectState != ObjectState.Roll && !UIManager.Instance.isInventroy)
-            {
-                ShootInput();
-                SetAnimatorBooleansFalse();
-                HandleObjectState(angle);
-            }
-            else
-            {
-                Hands.gameObject.SetActive(false);
-            }
-
-            if (isSoulActive)
-            {
-                SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
-            }
-
-            if (Input.GetKeyDown(KeyCode.C) &&
-                !UIManager.Instance.savePanel.activeSelf
-                && gameManager.GetPlayerData().currentState == GameState.None)
-            {
-                UIManager.Instance.SetTextBar();
-                UIManager.Instance.ChangeInventroy();
-            }
-        }
-        else
-        {
-            h = 0f;
-            v = 0f;
-        }
-    }
-
+    #region shot_code
+    // 총알 발사 입력 처리
     IEnumerator Reload()
     {
         isReloading = true;
@@ -374,40 +432,30 @@ public class PlayerMovement : LivingObject
         }
 
         // 재장전 완료
-        weaponData.current_magazine = weaponData.magazine;
-        gameManager.SaveWeaponData(weaponData);
+        curweaponData.current_magazine = curweaponData.magazine;
+        gameManager.SaveWeaponData(curweaponData);
         UIManager.Instance.ShowReloadSlider(false); // 슬라이더 비활성화
         isReloading = false;
     }
-
-    // 애니메이터 활성화/비활성화
-    public void SetAnimatorEnabled(bool isEnabled)
-    {
-        animator.enabled = isEnabled;
-        rigid.velocity = Vector2.zero;
-    }
-
-    #region shot_code
-    // 총알 발사 입력 처리
     void ShootInput()
     {
-        weaponData = gameManager.GetWeaponData();
-        int current_magazine = weaponData.current_magazine;
+        curweaponData = gameManager.GetWeaponData();
+        int current_magazine = curweaponData.current_magazine;
 
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
         WeaponTransform.up = direction;
 
         if (Input.GetMouseButtonDown(0) &&
-            current_magazine > 0 && (weaponData.IsInfiniteAmmo() || weaponData.current_Ammo > 0) && !isReloading)
+            current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading)
         {
             Shoot();
-            if(!weaponData.IsInfiniteAmmo())
-                weaponData.current_Ammo -= 1;
+            if(!curweaponData.IsInfiniteAmmo())
+                curweaponData.current_Ammo -= 1;
 
-            weaponData.current_magazine -= 1;
+            curweaponData.current_magazine -= 1;
 
-            gameManager.SaveWeaponData(weaponData);
+            gameManager.SaveWeaponData(curweaponData);
         }
         else if (current_magazine == 0 && !isReloading)
         {
@@ -416,7 +464,6 @@ public class PlayerMovement : LivingObject
         }
     }
 
-    // 총알 발사
     void Shoot()
     {
         if (!isSoulActive)
@@ -438,7 +485,6 @@ public class PlayerMovement : LivingObject
     }
     #endregion shot_code
 
-    // 구르기와 관련된 메서드를 하나의 영역으로 묶음
     #region roll_code
     // 쿨타임 시작
     void StartCooldown()
@@ -574,33 +620,80 @@ public class PlayerMovement : LivingObject
     }
     #endregion roll_code
 
-    void FixedUpdate()
+    #region weapon_code
+    void InitializeWeapons()
     {
-        if (objectState != ObjectState.Roll &&
-            !UIManager.Instance.isUserInterface &&
-            !gameManager.GetPlayerData().isStop &&
-            !UIManager.Instance.isInventroy &&
-            !UIManager.Instance.savePanel.activeSelf &&
-            !gameManager.GetPlayerData().isDie)
+        // 7가지 무기를 초기화
+        playerWeapons.Add(new Weapon { WeaponName = "Determination", weaponType = WeaponType.Determination });
+        playerWeapons.Add(new Weapon { WeaponName = "Patience", weaponType = WeaponType.Patience });
+        playerWeapons.Add(new Weapon { WeaponName = "Bravery", weaponType = WeaponType.Bravery });
+        playerWeapons.Add(new Weapon { WeaponName = "Integrity", weaponType = WeaponType.Integrity });
+        playerWeapons.Add(new Weapon { WeaponName = "Perseverance", weaponType = WeaponType.Perseverance });
+        playerWeapons.Add(new Weapon { WeaponName = "Kindness", weaponType = WeaponType.Kindness });
+        playerWeapons.Add(new Weapon { WeaponName = "Justice", weaponType = WeaponType.Justice });
+
+        // 각 무기의 색상 업데이트
+        foreach (var weapon in playerWeapons)
         {
-            Move();
-        }
-        else if (objectState == ObjectState.Roll)
-        {
-            // Debug.Log("구른다");
-        }
-        else
-        {
-            animator.SetBool("isMove", false);
-            rigid.velocity = Vector2.zero;
-            h = 0;
-            v = 0;
-        }
-        if (!gameManager.GetPlayerData().isStop && !isDie && !isSoulActive)
-        {
-            CalculateDistanceAndTriggerEffects();
+            weapon.UpdateColor();
         }
     }
+    void HandleWeaponSwitchInput()
+    {
+        for (int i = 1; i <= playerWeapons.Count; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i - 1))
+            {
+                SelectWeapon(i - 1);
+            }
+        }
+    }
+    void HandleMouseWheelInput()
+    {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll > 0f)
+        {
+            currentWeaponIndex = (currentWeaponIndex + 1) % playerWeapons.Count;
+            SelectWeapon(currentWeaponIndex);
+        }
+        else if (scroll < 0f)
+        {
+            currentWeaponIndex = (currentWeaponIndex - 1 + playerWeapons.Count) % playerWeapons.Count;
+            SelectWeapon(currentWeaponIndex);
+        }
+    }
+    public void UpdateWeaponUI(Weapon currentWeapon)
+    {
+        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = currentWeapon.weaponColor;
+        UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
+    }
+    void SelectWeapon(int index)
+    {
+        currentWeaponIndex = index;
+
+        // UI 업데이트
+        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = playerWeapons[currentWeaponIndex].weaponColor;
+
+        Debug.Log($"Selected Weapon: {playerWeapons[currentWeaponIndex].WeaponName}");
+    }
+
+    #endregion
+    public void updateLoad()
+    {
+        UIManager.Instance.isInventroy = false;
+        gameManager.GetPlayerData().isStop = false;
+        gameManager.GetPlayerData().isDie = false;
+        isDie = false;
+        //그 방에 맞는 배경음악을 불러온다.
+        SoundManager.Instance.BGSoundPlayDelayed(0, 1f);
+        playerData = gameManager.GetPlayerData();
+        maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
+        health = gameManager.GetPlayerData().health;       // 최대 체력 설정
+        transform.position = playerData.position;
+        playerData.playerAnimator = animator;
+        playerData.isInvincible = isInvincible;
+    }
+
     private void CalculateDistanceAndTriggerEffects()
     {
         Vector2 currentPosition = transform.position; // 현재 위치
@@ -630,6 +723,7 @@ public class PlayerMovement : LivingObject
         // 발자국 이펙트 생성
         EffectManager.Instance.SpawnEffect("foot", feetPoint.transform.position, Quaternion.identity);
     }
+    #region move_animation
     // 플레이어 이동 처리
     void Move()
     {
@@ -674,6 +768,13 @@ public class PlayerMovement : LivingObject
         playerData.health = health;
     }
 
+    // 애니메이터 활성화/비활성화
+    public void SetAnimatorEnabled(bool isEnabled)
+    {
+        animator.enabled = isEnabled;
+        rigid.velocity = Vector2.zero;
+    }
+
 
     // 애니메이터 이동 업데이트
     void UpdateAnimatorMovement()
@@ -708,7 +809,6 @@ public class PlayerMovement : LivingObject
         else if (v != animator.GetInteger("v"))
             animator.SetInteger("v", (int)v);
     }
-
 
 
     // 오브젝트 상태 설정
@@ -788,49 +888,10 @@ public class PlayerMovement : LivingObject
         currentScale.x = Mathf.Abs(currentScale.x) * direction;
         transform.localScale = currentScale;
     }
-
+    #endregion
     public void TeleportPlayer(Vector2 pos)
     {
         transform.position = pos;
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                Vector2 normal = contact.normal;
-
-                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
-                {
-                    isTouchingHorizontal = true;
-                }
-                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
-                {
-                    isTouchingVertical = true;
-                }
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                Vector2 normal = contact.normal;
-
-                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
-                {
-                    isTouchingHorizontal = false;
-                }
-                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
-                {
-                    isTouchingVertical = false;
-                }
-            }
-        }
     }
 
 }

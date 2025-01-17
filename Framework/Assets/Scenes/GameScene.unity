@@ -212,6 +212,7 @@ MonoBehaviour:
     accuracy: 1
     firePoint: {fileID: 0}
     weaponType: 7
+    weaponColor: {r: 0, g: 0, b: 0, a: 0}
   savePrefab: {fileID: 4794404565756284647, guid: 30e39bc33811f004d81ef31aa331ba31, type: 3}
   savePointTransforms: []
   isBattle: 0
@@ -34804,6 +34805,7 @@ MonoBehaviour:
     accuracy: 1
     firePoint: {fileID: 0}
     weaponType: 7
+    weaponColor: {r: 0, g: 0, b: 0, a: 0}
   WeaponTransform: {fileID: 80146886}
   hand: {fileID: 848881821}
   objectState: 0
@@ -36800,7 +36802,6 @@ MonoBehaviour:
   v: 0
   cooldownTime: 0.5
   Hands: {fileID: 553473655}
-  Weapons: {fileID: 1051695537}
   reloadPoint: {fileID: 1384906521}
   objectState: 0
   WeaponTransform: {fileID: 553473656}
@@ -36809,7 +36810,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
   soulbulletPrefab: {fileID: 5549927540565692596, guid: 3fbde0282b2a573448de87287aeb1299, type: 3}
   bulletSpeed: 10
-  weaponData:
+  curweaponData:
     id: 0
     WeaponName: None
     damage: 1
@@ -36820,8 +36821,10 @@ MonoBehaviour:
     maxRange: 0
     bulletSpeed: 1
     accuracy: 1
-    firePoint: {fileID: 1630593728}
+    firePoint: {fileID: 0}
     weaponType: 7
+    weaponColor: {r: 0, g: 0, b: 0, a: 0}
+  Weapons: {fileID: 1051695537}
   feetPoint: {fileID: 841118636}
   soulObject: {fileID: 644007166}
   playerSprite: {fileID: 1239929335}
@@ -39813,6 +39816,7 @@ MonoBehaviour:
     accuracy: 1
     firePoint: {fileID: 0}
     weaponType: 7
+    weaponColor: {r: 0, g: 0, b: 0, a: 0}
   WeaponTransform: {fileID: 1504719796}
   hand: {fileID: 1424239339}
   objectState: 0
