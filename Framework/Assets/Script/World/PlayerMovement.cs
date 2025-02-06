@@ -665,7 +665,7 @@ public class PlayerMovement : LivingObject
     public void UpdateWeaponUI(Weapon currentWeapon)
     {
         UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = currentWeapon.weaponColor;
-        UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
+       // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
     }
     void SelectWeapon(int index)
     {

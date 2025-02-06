@@ -115,6 +115,7 @@ public class BattleManager : MonoBehaviour
         Boss_AllObject.SetActive(true);
         prevPos = player.transform.position;
         player.TeleportPlayer(battlePoint.transform.position);
+        Boss_Face.gameObject.SetActive(true);
         Boss_Text.gameObject.SetActive(true);
         gameManager.ChangeGameState(GameState.Fight);
         isTalking = true;
@@ -128,7 +129,6 @@ public class BattleManager : MonoBehaviour
         gameManager.ChangeGameState(GameState.None);
         Boss_Textbar.SetActive(false);
         EndDialogue();
-
     }
 
     void Update()
