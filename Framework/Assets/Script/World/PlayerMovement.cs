@@ -147,6 +147,7 @@ public class PlayerMovement : LivingObject
 
     public GameObject soulObject;       // Soul GameObject
     public GameObject playerSprite;     // Player의 스프라이트 (흐림 효과 적용)
+    public GameObject shadowObject;     // Player의 스프라이트 (흐림 효과 적용)
     public float playerTransparency = 0f; // Player 투명도 값 (흐릿한 효과)
 
     private bool isSoulActive = false; // Soul 모드 활성화 여부
@@ -201,6 +202,7 @@ public class PlayerMovement : LivingObject
             return;
         base.Update();
 
+        SoulRotateToMouse();
         HandleWeaponSwitchInput();
         playerData.isInvincible = isInvincible;
 
@@ -367,12 +369,14 @@ public class PlayerMovement : LivingObject
         SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
         SetTransparency(Hands, playerTransparency);
         SetTransparency(Weapons, playerTransparency);
+        shadowObject.SetActive(false);
     }
 
     // Soul 모드 비활성화: 투명도 원상복귀
     private void DisableSoul()
     {
         soulObject.SetActive(false); // Soul 비활성화
+        shadowObject.SetActive(true);
         SetTransparency(playerSprite, 1f); // 플레이어 투명도 복원
         SetTransparency(Hands, 1f);
         SetTransparency(Weapons, 1f);
