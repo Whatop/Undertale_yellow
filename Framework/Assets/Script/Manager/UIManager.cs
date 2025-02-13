@@ -101,6 +101,7 @@ public class UIManager : MonoBehaviour
     //PlayerUI
     public Slider reloadSlider; // 재장전 슬라이더 UI
 
+    public RectTransform crosshairTransform;
 
     public TextMeshProUGUI currentResolutionText;
 
@@ -400,6 +401,11 @@ public class UIManager : MonoBehaviour
         HandleInput();
         UpdateSoulPosition();
         UpdateInventoryUI();
+
+        //MouseCusor
+        Vector2 mousePosition = Input.mousePosition;
+        crosshairTransform.position = mousePosition;
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             RectTransform transform = gameover_soul.GetComponent<RectTransform>();
@@ -1197,6 +1203,7 @@ public class UIManager : MonoBehaviour
                 gameManager.ResumeGame();
                 Time.timeScale = 1f;
                 soundManager.ResumeBGSound();
+                SaveSettings();
                 CloseYNReset();
             }
             else if (currentPanel == "YNCheck")
@@ -1395,6 +1402,7 @@ public class UIManager : MonoBehaviour
     void ToggleCursorVisibility()
     {
         isCursorVisible = !isCursorVisible;
+        crosshairTransform.gameObject.SetActive(!isCursorVisible);
         Cursor.visible = isCursorVisible;
         UpdateButtonState(cusorToggle, isCursorVisible);
     }

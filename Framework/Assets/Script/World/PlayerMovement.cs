@@ -124,6 +124,14 @@ public class PlayerMovement : LivingObject
 
     public Weapon curweaponData;
     public GameObject Weapons;
+    public GameObject muzzleFlashPrefab;  // 총구 화염 이펙트 프리팹
+    public float muzzleFlashDuration = 0.1f; // 화염 이펙트 지속 시간
+
+    // 반동 관련 변수 추가
+    public float recoilDistance = 0.15f;  // 반동 거리 (총이 뒤로 밀리는 정도)
+    public float recoilDuration = 0.1f;   // 반동 지속 시간
+    public float recoilVerticalOffset = 0.05f; // 반동 시 위쪽으로 밀리는 정도
+    private Vector3 originalWeaponPosition; // 원래 총의 위치
 
     //Determination 의지, 불명(빨강) : 255 0 0
     //Patience 인내(하늘) : 66 252 255
@@ -194,6 +202,8 @@ public class PlayerMovement : LivingObject
         curweaponData.weaponType = WeaponType.Justice;
         curweaponData.UpdateColor();
         UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = curweaponData.weaponColor;
+
+        originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
     }
 
     protected override void Update()
@@ -467,25 +477,99 @@ public class PlayerMovement : LivingObject
             StartCoroutine(Reload());
         }
     }
-
     void Shoot()
     {
+        // 현재 Soul 모드인지 확인하여 적절한 총알을 생성
+        GameObject bullet;
+        Transform spawnPoint;
+
         if (!isSoulActive)
         {
-            GameObject bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
-            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-            bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218, 0.05f); // 총 사운드
-            WeaponsAnimator.SetTrigger("Shot");
+            bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
+            spawnPoint = shotpoint;
         }
         else
         {
-            GameObject bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
-            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-            bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-            SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.05f); // 총 사운드
-            WeaponsAnimator.SetTrigger("Shot");
+            bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
+            spawnPoint = soulshotpoint;
         }
+
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        bulletRb.velocity = WeaponTransform.up * bulletSpeed;
+
+        // 총구 화염 이펙트 생성
+        StartCoroutine(ShowMuzzleFlash(spawnPoint));
+
+        // 반동 효과 추가
+        StartCoroutine(ApplyRecoil());
+
+        // 사운드 및 애니메이션 실행
+        SoundManager.Instance.SFXPlay(isSoulActive ? "soul_shot_01" : "shotgun_shot_01", 218, 0.05f);
+        WeaponsAnimator.SetTrigger("Shot");
+    }
+    // 🔥 반동 효과 적용
+    IEnumerator ApplyRecoil()
+    {
+        // 현재 총기의 원래 위치 저장
+        Vector3 originalPosition = WeaponTransform.localPosition;
+
+        // 마우스 위치 가져오기
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // 2D 환경이므로 Z축 무시
+
+        // 플레이어 위치
+        Vector3 playerPosition = transform.position;
+
+        // 마우스가 어느 방향에 있는지 판별
+        bool isLeft = mousePosition.x < playerPosition.x; // 왼쪽
+        bool isRight = mousePosition.x > playerPosition.x; // 오른쪽
+        bool isUp = mousePosition.y > playerPosition.y;   // 위쪽
+        bool isDown = mousePosition.y < playerPosition.y; // 아래쪽
+
+        // 기본 반동 방향 (총이 바라보는 방향의 반대)
+        Vector3 recoilOffset = -WeaponTransform.up * recoilDistance;
+
+        // 위쪽(Y축)으로 살짝 랜덤하게 튀도록 추가
+        float randomVerticalOffset = UnityEngine.Random.Range(-recoilVerticalOffset, recoilVerticalOffset);
+
+        // 반동 방향 조정 (마우스 위치에 따라)
+        if (isLeft)
+        {
+            // 왼쪽에서는 반동 방향을 반전
+            recoilOffset.x = -recoilOffset.x;
+        }
+
+        if (isUp || isDown)
+        {
+            // 위/아래 방향 반동이 너무 강하면 Y축 반동을 약하게 조절
+            randomVerticalOffset *= 0.5f; // 위/아래 반동을 50%로 줄임
+        }
+
+        // 최종 반동 위치 계산
+        recoilOffset += new Vector3(0, randomVerticalOffset, 0);
+        Vector3 targetPosition = originalPosition + recoilOffset;
+
+        // 반동 적용
+        WeaponTransform.localPosition = targetPosition;
+
+        float elapsedTime = 0f;
+        while (elapsedTime < recoilDuration)
+        {
+            WeaponTransform.localPosition = Vector3.Lerp(targetPosition, originalPosition, elapsedTime / recoilDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        WeaponTransform.localPosition = originalPosition;
+    }
+
+
+    // 총구 화염 이펙트 생성 후 일정 시간 후 제거
+    IEnumerator ShowMuzzleFlash(Transform firePoint)
+    {
+        GameObject muzzleFlash = Instantiate(muzzleFlashPrefab, firePoint.position, firePoint.rotation, firePoint);
+        yield return new WaitForSeconds(muzzleFlashDuration);
+        Destroy(muzzleFlash);
     }
     #endregion shot_code
 
