@@ -119,6 +119,10 @@ public class PlayerMovement : LivingObject
     public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f;   // 총알 발사 속도
 
+    [Header("Shell Eject Setting")]
+    public GameObject shellPrefab;   // 탄피 프리팹
+    public Transform shellEjectPoint;// 탄피 배출 위치(권총 옆이나 탄창 부분)
+
     List<Weapon> playerWeapons = new List<Weapon>();
     private int currentWeaponIndex = 0;
 
@@ -435,7 +439,16 @@ public class PlayerMovement : LivingObject
         WeaponsAnimator.SetTrigger("Reload");
         UIManager.Instance.ShowReloadSlider(true); // 슬라이더 활성화
         UIManager.Instance.SetReloadSliderMaxValue(reloadTime);
+
         UIManager.Instance.SetReloadSliderValue(0);
+        // --- [리볼버 탄피 6개 생성] -------------------
+        for (int i = 0; i < 6; i++)
+        {
+            EjectShell();
+        }
+        // -------------------------------------------
+
+        SoundManager.Instance.SFXPlay("shotgun_reload_01", 224); // 재장전 사운드
 
         float reloadProgress = 0f;
         while (reloadProgress < reloadTime)
@@ -451,6 +464,35 @@ public class PlayerMovement : LivingObject
         UIManager.Instance.ShowReloadSlider(false); // 슬라이더 비활성화
         isReloading = false;
     }
+    private void EjectShell()
+    {
+        if (shellPrefab == null || shellEjectPoint == null) return;
+
+        GameObject shellObj = Instantiate(shellPrefab,
+                                          shellEjectPoint.position,
+                                          Quaternion.identity);
+
+        // 기본 방향: 플레이어 쪽으로
+        Vector2 dir = (transform.position - shellEjectPoint.position).normalized;
+
+        // 좌우로 튀도록 수직 벡터 추가 (Vector2.Perpendicular 활용)
+        Vector2 perpendicular = Vector2.Perpendicular(dir); // 방향에 수직인 벡터
+        float sideOffset = UnityEngine.Random.Range(-0.5f, 0.5f); // 좌우 랜덤 편차
+
+        // 최종 방향 계산
+        Vector2 finalDir = (dir + perpendicular * sideOffset).normalized;
+
+        // 속도 랜덤
+        float randSpeed = UnityEngine.Random.Range(2f, 4f);
+
+        // ShellBehavior에 속도 할당
+        ShellBehavior shell = shellObj.GetComponent<ShellBehavior>();
+        if (shell != null)
+        {
+            shell.velocity = finalDir * randSpeed;
+        }
+    }
+
     void ShootInput()
     {
         curweaponData = gameManager.GetWeaponData();
