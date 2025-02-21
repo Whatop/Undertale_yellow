@@ -115,6 +115,7 @@ public class PlayerMovement : LivingObject
     public Transform WeaponTransform; // 총의 Transform 컴포넌트
     public Transform shotpoint;       // 총의 Transform 컴포넌트
     public Transform soulshotpoint;   // 영혼의 총 Transform 컴포넌트
+    public Transform soulpoint;   // 영혼의 총 Transform 컴포넌트
     public GameObject bulletPrefab;   // 총알 프리팹
     public GameObject soulbulletPrefab; // 총알 프리팹
     public float bulletSpeed = 10f;   // 총알 발사 속도
@@ -473,11 +474,11 @@ public class PlayerMovement : LivingObject
                                           Quaternion.identity);
 
         // 기본 방향: 플레이어 쪽으로
-        Vector2 dir = (transform.position - shellEjectPoint.position).normalized;
+        Vector2 dir = (soulpoint.position - shellEjectPoint.position).normalized;
 
         // 좌우로 튀도록 수직 벡터 추가 (Vector2.Perpendicular 활용)
         Vector2 perpendicular = Vector2.Perpendicular(dir); // 방향에 수직인 벡터
-        float sideOffset = UnityEngine.Random.Range(-0.5f, 0.5f); // 좌우 랜덤 편차
+        float sideOffset = UnityEngine.Random.Range(-0.5f, 0.35f); // 좌우 랜덤 편차
 
         // 최종 방향 계산
         Vector2 finalDir = (dir + perpendicular * sideOffset).normalized;

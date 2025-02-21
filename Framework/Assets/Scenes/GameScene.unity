@@ -16785,6 +16785,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_Children:
   - {fileID: 1051695538}
+  - {fileID: 1265392175}
   m_Father: {fileID: 1239929340}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -36921,6 +36922,7 @@ MonoBehaviour:
   WeaponTransform: {fileID: 553473656}
   shotpoint: {fileID: 1630593728}
   soulshotpoint: {fileID: 1815525590}
+  soulpoint: {fileID: 1265392175}
   bulletPrefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
   soulbulletPrefab: {fileID: 5549927540565692596, guid: 3fbde0282b2a573448de87287aeb1299, type: 3}
   bulletSpeed: 10
@@ -36943,7 +36945,7 @@ MonoBehaviour:
   Weapons: {fileID: 1051695537}
   muzzleFlashPrefab: {fileID: 164698175712892112, guid: 0a337bc6314b8f54a932a71df6962a5b, type: 3}
   muzzleFlashDuration: 0.25
-  recoilDistance: 0.15
+  recoilDistance: 0.05
   recoilDuration: 0.1
   recoilVerticalOffset: 0.05
   feetPoint: {fileID: 841118636}
@@ -37153,6 +37155,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!1 &1265392174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1265392175}
+  m_Layer: 6
+  m_Name: soulpoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1265392175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265392174}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.097, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
+  m_Children: []
+  m_Father: {fileID: 553473656}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1266116356
 GameObject:
   m_ObjectHideFlags: 0
