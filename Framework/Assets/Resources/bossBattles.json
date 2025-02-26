@@ -95,6 +95,74 @@
           "expression": "Sneer"
         }
       ]
+    },
+    {
+      "bossID": 2,
+      "name": "플라위(튜토리얼)",
+      "dialogues": [
+        {
+          "text": "안녕! 난 플라위야!\n지금부터 새로운 세계의 규칙을 알려줄게.",
+          "expression": "Talking"
+        },
+        {
+          "text": "이번엔 2D 슈팅게임처럼\n구르기, 쏘기, 재장전,\n그리고 T키로 자비를 베푸는 법까지 배워볼 거야!",
+          "expression": "Talking"
+        },
+        {
+          "text": "봐, 네 영혼(하트 모양)이\n움직이고 있지?\nWASD나 화살표키로 조종해봐!",
+          "expression": "Talking"
+        },
+        {
+          "text": "공격을 피하려면\n우클릭으로 굴러!\n짧게 무적이 될 수 있어.",
+          "expression": "Wink"
+        },
+        {
+          "text": "자, 이제 사격 연습!\n좌클릭을 눌러 탄환을\n발사해봐!",
+          "expression": "Default"
+        },
+        {
+          "text": "탄환은 무한하지만,\n재장전은 필요해.\nR키로 탄창을 채워줘!",
+          "expression": "Talking"
+        },
+        {
+          "text": "그리고... T키로 상대에게\n자비를 베풀 수도 있어.\n싸우고 싶지 않을 때\n유용하겠지?",
+          "expression": "Smile"
+        },
+        {
+          "text": "누구에게나 자비를\n베푸는 게 좋을지는\n상황마다 다르겠지만...",
+          "expression": "Default"
+        },
+        {
+          "text": "이 세계에선 선택의\n무게가 더 크게\n느껴질 거야.",
+          "expression": "Default"
+        },
+        {
+          "text": "하지만 괜찮아.\n내가 있잖아?\n내가 널 '도와줄' 테니까.",
+          "expression": "Wink"
+        },
+        {
+          "text": "이제 연습 해볼까?\n내가 '친절 알갱이'를\n쏠 테니 구르기로\n피하거나 받아봐!",
+          "expression": "Wink",
+          "attack": "FriendlyPellets"
+        },
+        {
+          "text": "맞아도 상관없어.\n이번엔 진짜로\n아프지 않을 거야.\n아마도? 흐흐!",
+          "expression": "Sneer"
+        },
+        {
+          "text": "좋아, 잘하고 있어!\n이제 어느 정도\n익숙해졌다면...",
+          "expression": "Default"
+        },
+        {
+          "text": "출발해볼까?\n이 지하세계에는\n이야깃거리가 잔뜩\n준비되어 있거든!",
+          "expression": "Smile",
+          "event": "EndDialogue"
+        },
+        {
+          "text": "나만 믿고 따라와.\n절대 후회는...\n하지 않을 거야.",
+          "expression": "CreepFace"
+        }
+      ]
     }
   ]
 }

@@ -238,9 +238,10 @@ public class PlayerMovement : LivingObject
                 SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
                 StartCoroutine(Reload());
             }
+            Debug.Log(isMove);
 
             // 우클릭 입력 시 구르기 시작
-            if (Input.GetMouseButtonDown(1) && !isCooldown && isMove && objectState != ObjectState.Roll)
+            if (Input.GetMouseButtonDown(1) && !isCooldown && objectState != ObjectState.Roll)
             {
                 StartCooldown();
                 StartCoroutine(Roll());
@@ -258,17 +259,23 @@ public class PlayerMovement : LivingObject
                 }
             }
 
-            // 구르기 상태가 아닐 때 각도에 따른 상태 설정
-            if (objectState != ObjectState.Roll && !UIManager.Instance.isInventroy)
+            if (!UIManager.Instance.isInventroy)
             {
-                ShootInput();
-                SetAnimatorBooleansFalse();
-                HandleObjectState(angle);
+
+                if (objectState != ObjectState.Roll) // 🔹 구르기 중에는 애니메이션 초기화 X
+                {
+                    ShootInput();
+                    SetAnimatorBooleansFalse();
+                    HandleObjectState(angle);
+                }
+                else
+                {
+                    Hands.gameObject.SetActive(false);
+                }
             }
-            else
-            {
-                Hands.gameObject.SetActive(false);
-            }
+
+           
+
 
             if (isSoulActive)
             {
@@ -626,9 +633,6 @@ public class PlayerMovement : LivingObject
     // 구르기 코루틴
     IEnumerator Roll()
     {
-        objectState = ObjectState.Roll;
-        SetAnimatorBooleansFalse();
-        EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
         isMove = false;
         // UIManager의 GetKeyCode를 통해 방향키 입력 감지
         if (Input.GetKey(UIManager.Instance.GetKeyCode(0)) && Input.GetKey(UIManager.Instance.GetKeyCode(3)))
@@ -668,6 +672,9 @@ public class PlayerMovement : LivingObject
             yield break; // 입력값이 없으면 구르기를 시작하지 않음
         }
 
+        objectState = ObjectState.Roll;
+        SetAnimatorBooleansFalse();
+        EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
@@ -691,8 +698,10 @@ public class PlayerMovement : LivingObject
         }
 
         rigid.velocity = Vector2.zero;
-        objectState = ObjectState.None; 
+        objectState = ObjectState.None;
 
+        // 🔹 구르기 종료 후 `isMove` 상태 복구
+        isMove = (h != 0 || v != 0);
     }
 
     private void HandleRollAnimation(Vector2 rollDirection)
@@ -897,6 +906,7 @@ public class PlayerMovement : LivingObject
         rigid.velocity = new Vector2(h, v) * speed;
         playerData.position = transform.position;
         playerData.health = health;
+
     }
 
     // 애니메이터 활성화/비활성화
@@ -911,23 +921,24 @@ public class PlayerMovement : LivingObject
     void UpdateAnimatorMovement()
     {
         // 기본 이동 상태 계산
-        isMove = (h != 0 || v != 0);
+        if (objectState != ObjectState.Roll) // 🔹 구르기 중이 아닐 때만 `isMove` 값 변경
+        {
+            isMove = (h != 0 || v != 0);
+        }
 
-        // 동시 입력 처리
+        // 충돌 상태에 따른 이동 제한 로직
         if (h != 0 && v != 0)
         {
-            // 두 방향 중 하나라도 충돌하지 않으면 이동 가능
             if ((isTouchingHorizontal && h != 0) && (isTouchingVertical && v != 0))
             {
-                isMove = false; // 둘 다 충돌 시에만 이동 불가
+                isMove = false;
             }
         }
         else
         {
-            // 개별 입력 처리
             if ((isTouchingHorizontal && h != 0) || (isTouchingVertical && v != 0))
             {
-                isMove = false; // 해당 방향으로 이동하려 할 경우 이동 불가
+                isMove = false;
             }
         }
 

@@ -487,7 +487,7 @@ public class BattleManager : MonoBehaviour
         {
             StartBossBattle();
             BattleSetting();
-            StartCoroutine(DelayDialogue(1, 1f));
+            StartCoroutine(DelayDialogue(2, 1f));
         }
         UIManager.Instance.OnPlayerUI(); // 전투 상태에서는 UI를 보여줌
     }
