@@ -131,6 +131,7 @@ public class PlayerMovement : LivingObject
     public GameObject Weapons;
     public GameObject muzzleFlashPrefab;  // 총구 화염 이펙트 프리팹
     public float muzzleFlashDuration = 0.1f; // 화염 이펙트 지속 시간
+    public bool tutorialDontShot = true; // 처음에 총 못쏘도록 막는거
 
     // 반동 관련 변수 추가
     public float recoilDistance = 0.15f;  // 반동 거리 (총이 뒤로 밀리는 정도)
@@ -223,7 +224,6 @@ public class PlayerMovement : LivingObject
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
         {
-            HandleSoulMode(); // Soul 모드 처리
             if (UIManager.Instance.reloadSlider != null)
             {
                 UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
@@ -264,7 +264,8 @@ public class PlayerMovement : LivingObject
 
                 if (objectState != ObjectState.Roll) // 🔹 구르기 중에는 애니메이션 초기화 X
                 {
-                    ShootInput();
+                        ShootInput();
+
                     SetAnimatorBooleansFalse();
                     HandleObjectState(angle);
                 }
@@ -365,7 +366,7 @@ public class PlayerMovement : LivingObject
     #endregion
 
     #region soul_code
-    // Soul 모드 처리
+    // Soul 모드 처리 테스트 용도입니다
     private void HandleSoulMode()
     {
         if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
@@ -383,10 +384,21 @@ public class PlayerMovement : LivingObject
         }
     }
 
-    // Soul 모드 활성화: 투명도 조절
+    // Soul 모드 활성화: 투명도 끄기
     public void EnableSoul()
     {
         isSoulActive = true;
+        soulObject.SetActive(true); // Soul 활성화
+        SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
+        SetTransparency(Hands, playerTransparency);
+        SetTransparency(Weapons, playerTransparency);
+        shadowObject.SetActive(false);
+    }
+    // Soul 모드 활성화: 투명도 조절
+    public void EnableSoul(float a)
+    {
+        isSoulActive = true;
+        playerTransparency = a;
         soulObject.SetActive(true); // Soul 활성화
         SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게
         SetTransparency(Hands, playerTransparency);
@@ -511,7 +523,7 @@ public class PlayerMovement : LivingObject
         WeaponTransform.up = direction;
 
         if (Input.GetMouseButtonDown(0) &&
-            current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading)
+            current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading && !tutorialDontShot)
         {
             Shoot();
             if(!curweaponData.IsInfiniteAmmo())

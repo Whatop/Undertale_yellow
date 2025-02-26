@@ -58,6 +58,7 @@ public class BattleManager : MonoBehaviour
     //일단 이건 튜토 보스용 
     public GameObject Boss_AllObject;
     public GameObject Boss_Face;
+    public GameObject Boss_Face_UI;
     public GameObject Boss_Textbar;
     public TextMeshProUGUI Boss_Text;
     public GameObject battlePoint;
@@ -120,6 +121,7 @@ public class BattleManager : MonoBehaviour
         gameManager.ChangeGameState(GameState.Fight);
         isTalking = true;
 
+
     }
     public void BattleReSetting()
     {
@@ -137,7 +139,8 @@ public class BattleManager : MonoBehaviour
     }
     public void BattleStart(int eventNumber)
     {
-        gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+        gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul(0.5f);
+
         gameManager.isBattle = true;
         // 사운드 재생
         SoundManager.Instance.SFXPlay("BattleStart", 0);
@@ -419,16 +422,16 @@ public class BattleManager : MonoBehaviour
     {
         switch (eventType)
         {
-            case "Left":
-                // "Left" 이벤트: 대사에 "친"이라는 글자일때 표정 Left로 변경
-                Debug.Log("Ending dialogue and moving left.");
-                // 예: 플레이어를 왼쪽으로 이동시키는 코드 추가
+            case "ChangeSoul":
+                gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+                //ingame sink 키고, ui 키기
+
                 break;
 
-            case "MoveToReceiveFriendly":
-                // 문장이 끝나면 대사가 자동으로 끝나도록
-                Debug.Log("Moving to receive friendly items.");
-                // 상호작용 시작을 위한 다른 로직 추가
+            case "tutorialShot":
+
+                //@@@수정할거
+                gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().tutorialDontShot = false;
                 break;
 
             case "EndDialogue":

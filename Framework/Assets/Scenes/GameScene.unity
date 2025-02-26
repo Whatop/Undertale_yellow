@@ -390,7 +390,7 @@ Transform:
   - {fileID: 5025498}
   - {fileID: 1312487774}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &18503566
 GameObject:
@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 18503569}
   - component: {fileID: 18503568}
   m_Layer: 0
-  m_Name: Flower (1)
+  m_Name: Flower
   m_TagString: Npc
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -424,7 +424,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 55, y: 1, z: 0}
   m_LocalScale: {x: 6, y: 6, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 233223328}
   m_Father: {fileID: 846469861}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10375,11 +10376,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233223326}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 55, y: 2, z: 0}
-  m_LocalScale: {x: 0.49, y: 0.49, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.08166667, y: 0.08166667, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_Father: {fileID: 18503567}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &236327962
 GameObject:
@@ -13080,7 +13081,7 @@ Transform:
   - {fileID: 74146935}
   - {fileID: 1442081416}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &370470080
 GameObject:
@@ -19027,6 +19028,7 @@ MonoBehaviour:
   bossDataJson: {fileID: 4900000, guid: ed932abe1d40c5d439dae502fa603679, type: 3}
   Boss_AllObject: {fileID: 1064553042}
   Boss_Face: {fileID: 18503566}
+  Boss_Face_UI: {fileID: 1118514717}
   Boss_Textbar: {fileID: 243818325}
   Boss_Text: {fileID: 166177128}
   battlePoint: {fileID: 1234520303}
@@ -19785,7 +19787,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: c64b2b645cf72174c88210e17905a72d, type: 3}
   m_Color: {r: 1, g: 0.98165107, b: 0, a: 1}
   m_FlipX: 0
@@ -34230,7 +34232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 433.5}
+  m_AnchoredPosition: {x: -450, y: 0}
   m_SizeDelta: {x: 210, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1118514719
@@ -36839,7 +36841,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 5
   m_Sprite: {fileID: 8513216925233994977, guid: 29cec254475757f4185f36f8f2a389c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -36945,6 +36947,7 @@ MonoBehaviour:
   Weapons: {fileID: 1051695537}
   muzzleFlashPrefab: {fileID: 164698175712892112, guid: 0a337bc6314b8f54a932a71df6962a5b, type: 3}
   muzzleFlashDuration: 0.25
+  tutorialDontShot: 1
   recoilDistance: 0.05
   recoilDuration: 0.1
   recoilVerticalOffset: 0.05
@@ -42153,7 +42156,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1533463547
 GameObject:
@@ -49258,7 +49261,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3331785166314683023, guid: 0683f301af29223419dbd41065c4a429, type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3331785166314683023, guid: 0683f301af29223419dbd41065c4a429, type: 3}
       propertyPath: m_LocalPosition.x
