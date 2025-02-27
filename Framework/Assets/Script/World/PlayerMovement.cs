@@ -238,7 +238,6 @@ public class PlayerMovement : LivingObject
                 SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
                 StartCoroutine(Reload());
             }
-            Debug.Log(isMove);
 
             // 우클릭 입력 시 구르기 시작
             if (Input.GetMouseButtonDown(1) && !isCooldown && objectState != ObjectState.Roll)
@@ -262,10 +261,21 @@ public class PlayerMovement : LivingObject
             if (!UIManager.Instance.isInventroy)
             {
 
-                if (objectState != ObjectState.Roll) // 🔹 구르기 중에는 애니메이션 초기화 X
+                // 
+                if (!tutorialDontShot)
                 {
-                        ShootInput();
+                    Weapons.SetActive(true);
+                    ShootInput();
+                }
+                else
+                {
+                    Weapons.SetActive(false);
+                    Hands.gameObject.SetActive(false);
+                }
 
+
+                if (objectState != ObjectState.Roll ) // 🔹 구르기 중에는 애니메이션 초기화 X
+                {
                     SetAnimatorBooleansFalse();
                     HandleObjectState(angle);
                 }
@@ -387,6 +397,7 @@ public class PlayerMovement : LivingObject
     // Soul 모드 활성화: 투명도 끄기
     public void EnableSoul()
     {
+        playerTransparency = 0;
         isSoulActive = true;
         soulObject.SetActive(true); // Soul 활성화
         SetTransparency(playerSprite, playerTransparency); // 플레이어를 흐리게

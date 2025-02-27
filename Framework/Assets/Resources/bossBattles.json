@@ -23,7 +23,7 @@
         {
           "text": "걱정하지마,\n내가 좀 나눠줄게!",
           "expression": "Wink",
-          "event": "EndDialogue"
+          "eventType": "EndDialogue"
         },
         {
           "text": "여기 지하세계에선,\nLOVE를 . . .",
@@ -33,7 +33,7 @@
         {
           "text": "작고 하얀 . . .\n\"친절 알갱이\" 로\n서로 나누지.",
           "expression": "Left",
-          "type": "Left"
+          "eventType": "Left"
         },
         {
           "text": "준비 됐어?",
@@ -42,8 +42,7 @@
         {
           "text": "움직여!\n친절을 최대한\n많이 받는거야!",
           "expression": "Default",
-          "event": "Special",
-          "type": "MoveToReceiveFriendly",
+          "eventType": "Special",
           "attack": "Attack2"
 
         },
@@ -110,8 +109,7 @@
         },
         {
           "text": "봐, 네 영혼(하트 모양)이\n움직이고 있지?\nWASD나 화살표키로 조종해봐!",
-          "expression": "Talking",
-          "event": "ChangeSoul"
+          "eventType": "ChangeSoul"
         },
         {
           "text": "공격을 피하려면\n우클릭으로 굴러!\n짧게 무적이 될 수 있어.",
@@ -120,7 +118,7 @@
         {
           "text": "자, 이제 사격 연습!\n좌클릭을 눌러 탄환을\n발사해봐!",
           "expression": "Talking",
-          "event": "tutorialShot"
+          "eventType": "tutorialShot"
         },
         {
           "text": "탄환은 무한하지만,\n재장전은 필요해.\nR키로 탄창을 채워줘!",
@@ -158,7 +156,7 @@
         {
           "text": "출발해볼까?\n이 지하세계에는\n이야깃거리가 잔뜩\n준비되어 있거든!",
           "expression": "Smile",
-          "event": "EndDialogue"
+          "eventType": "EndDialogue"
         },
         {
           "text": "나만 믿고 따라와.\n절대 후회는...\n하지 않을 거야.",

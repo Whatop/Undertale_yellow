@@ -62,6 +62,7 @@ public class BattleManager : MonoBehaviour
     public GameObject Boss_Textbar;
     public TextMeshProUGUI Boss_Text;
     public GameObject battlePoint;
+    public int test_curboss = 0;
     private List<GameObject> activeBullets = new List<GameObject>(); // 현재 활성화된 총알 목록
 
     public TypeEffect currentTypeEffect;
@@ -109,6 +110,7 @@ public class BattleManager : MonoBehaviour
         isTalking = false;
         isFirstInteraction = true;
         isEvent = false;
+        test_curboss = 0;
         LoadBossData();
     }
     public void BattleSetting()
@@ -139,7 +141,6 @@ public class BattleManager : MonoBehaviour
     }
     public void BattleStart(int eventNumber)
     {
-        gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul(0.5f);
 
         gameManager.isBattle = true;
         // 사운드 재생
@@ -253,7 +254,7 @@ public class BattleManager : MonoBehaviour
         var dialogue = boss_sentences.Dequeue();
         currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
         // 표정 설정
-        SetBossExpression(dialogue.expression);
+        SetBossExpression(dialogue.expression, test_curboss);
 
         // 공격 패턴 실행
         if (!string.IsNullOrEmpty(dialogue.attack))
@@ -335,7 +336,28 @@ public class BattleManager : MonoBehaviour
             animator?.SetTrigger(expression);
         }
     }
+    private void SetBossExpression(string expression, int id) //@@@ test 용
+    {
+        Debug.Log($"보스 표정 : {expression}");
+        // 애니메이션 트리거 설정
+        if (!string.IsNullOrEmpty(expression))
+        {
+            Animator animator = null; // 지역 변수 선언
+            switch (id)
+            {
+                case 0:
+                    animator = Boss_Face.GetComponent<Animator>();
+                    animator?.SetTrigger(expression);
+                    break;
+                case 1:
+                default:
+                    animator = Boss_Face_UI.GetComponent<Animator>();
+                    animator?.SetTrigger(expression);
+                    break;
 
+            }
+        }
+    }
     private void ExecuteAttack(string attack)
     {
         switch (attack)
@@ -423,7 +445,12 @@ public class BattleManager : MonoBehaviour
         switch (eventType)
         {
             case "ChangeSoul":
+                Debug.Log("작동왜 안함?");
                 gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+                SetBossExpression("Sink");  // 보스의 애니메이션 'Sink'로 설정
+                test_curboss = 1;
+                Boss_Face_UI.SetActive(true);
+                SetBossExpression("Appear");
                 //ingame sink 키고, ui 키기
 
                 break;
