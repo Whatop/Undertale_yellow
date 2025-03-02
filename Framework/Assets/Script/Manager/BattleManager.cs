@@ -254,7 +254,7 @@ public class BattleManager : MonoBehaviour
         var dialogue = boss_sentences.Dequeue();
         currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
         // 표정 설정
-        SetBossExpression(dialogue.expression, test_curboss);
+        SetBossExpression(dialogue.expression);
 
         // 공격 패턴 실행
         if (!string.IsNullOrEmpty(dialogue.attack))
@@ -326,24 +326,15 @@ public class BattleManager : MonoBehaviour
             currentTypeEffect.Skip();
         }
     }
-    private void SetBossExpression(string expression)
-    {
-        Debug.Log($"보스 표정 : {expression}");
-        // 애니메이션 트리거 설정
-        if (!string.IsNullOrEmpty(expression))
-        {
-            var animator = Boss_Face.GetComponent<Animator>();
-            animator?.SetTrigger(expression);
-        }
-    }
-    private void SetBossExpression(string expression, int id) //@@@ test 용
+  
+    private void SetBossExpression(string expression) //@@@ test 용
     {
         Debug.Log($"보스 표정 : {expression}");
         // 애니메이션 트리거 설정
         if (!string.IsNullOrEmpty(expression))
         {
             Animator animator = null; // 지역 변수 선언
-            switch (id)
+            switch (test_curboss)
             {
                 case 0:
                     animator = Boss_Face.GetComponent<Animator>();
