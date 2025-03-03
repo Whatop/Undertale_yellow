@@ -498,7 +498,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.25, y: 0.32}
+    oldSize: {x: 0.21, y: 0.21}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -568,7 +568,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: -2012621287756581162, guid: d1840e23d4d3f4844aacb0089a6788fc, type: 3}
+  m_Sprite: {fileID: 5702153547336297777, guid: d1840e23d4d3f4844aacb0089a6788fc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -10376,7 +10376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233223326}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0399, z: 0}
   m_LocalScale: {x: 0.08166667, y: 0.08166667, z: 1}
   m_Children: []
   m_Father: {fileID: 18503567}
@@ -19015,7 +19015,8 @@ MonoBehaviour:
   currentState: 0
   roomPrefabs: []
   roomSpawnPoint: {fileID: 0}
-  enemyPrefabs: []
+  enemyPrefabs:
+  - {fileID: 233223326}
   currentRoom: {fileID: 0}
   bulletPoints:
   - {fileID: 8525553241183183686}
@@ -19035,6 +19036,7 @@ MonoBehaviour:
   test_curboss: 0
   currentTypeEffect: {fileID: 166177125}
   player: {fileID: 1239929339}
+  curEnemies: []
   isTalking: 0
   isEvent: 0
   boss_id: 0

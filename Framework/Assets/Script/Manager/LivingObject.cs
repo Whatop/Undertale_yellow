@@ -237,4 +237,44 @@ public class LivingObject : MonoBehaviour
     public void Init()
     {
     }
+    public IEnumerator FadeOutSprite(GameObject targetObject, float duration)
+    {
+        // targetObject에 SpriteRenderer가 붙어있는지 확인
+        SpriteRenderer spriteRenderer = targetObject.GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            yield break; // 스프라이트가 없으면 종료
+        }
+
+        // 현재 알파값(시작값)
+        float startAlpha = spriteRenderer.color.a;
+        // 목표 알파값
+        float endAlpha = 0f;
+        // 경과 시간
+        float currentTime = 0f;
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            // 0 ~ 1 사이의 보간값 t
+            float t = currentTime / duration;
+            // 선형 보간을 통해 알파값 계산
+            float newAlpha = Mathf.Lerp(startAlpha, endAlpha, t);
+
+            // 새로 계산된 알파값 적용
+            Color color = spriteRenderer.color;
+            color.a = newAlpha;
+            spriteRenderer.color = color;
+
+            yield return null;  // 다음 프레임까지 대기
+        }
+
+        // 마지막으로 알파값을 정확히 0으로 보장
+        {
+            Color finalColor = spriteRenderer.color;
+            finalColor.a = 0f;
+            spriteRenderer.color = finalColor;
+        }
+    }
+
 }

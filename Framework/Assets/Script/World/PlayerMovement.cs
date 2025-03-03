@@ -1058,5 +1058,9 @@ public class PlayerMovement : LivingObject
     {
         transform.position = pos;
     }
-
+    public void MakePlayerTransparent()
+    {
+        // 예: 2초 동안 천천히 페이드아웃
+        StartCoroutine(FadeOutSprite(playerSprite, 1.0f));
+    }
 }

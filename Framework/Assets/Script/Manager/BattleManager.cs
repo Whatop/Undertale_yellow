@@ -67,8 +67,12 @@ public class BattleManager : MonoBehaviour
 
     public TypeEffect currentTypeEffect;
     
-
+    //플레이어
     public PlayerMovement player;
+    //현재 적
+    // 전투 중 등장하는 "현재 활성화된 적" 리스트
+    public List<GameObject> curEnemies = new List<GameObject>();
+
     private Vector2 prevPos;
 
     private BossBattleData currentBoss;
@@ -150,6 +154,7 @@ public class BattleManager : MonoBehaviour
 
         // 코루틴으로 전투를 지연시켜 시작
         prevPos = player.transform.position;
+        
         player.TeleportPlayer(battlePoint.transform.position);
         StartCoroutine(StartBattleAfterDelay(eventNumber, 1.5f));
     }
@@ -179,7 +184,7 @@ public class BattleManager : MonoBehaviour
             Debug.LogError($"Boss with ID {bossID} not found.");
             return;
         }
-
+        curEnemies.Add(enemyPrefabs[0]);
         currentDialogueIndex = 0;
         DisplayNextDialogue();
     }
@@ -252,21 +257,25 @@ public class BattleManager : MonoBehaviour
         }
 
         var dialogue = boss_sentences.Dequeue();
-        currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
-        // 표정 설정
-        SetBossExpression(dialogue.expression);
+        // 특수 이벤트 처리
+        if (!string.IsNullOrEmpty(dialogue.eventType))
+        {
+            HandleSpecialEvent(dialogue.eventType, dialogue.text);
+        }
+        else
+        {
+            currentTypeEffect.SetMsg(dialogue.text, OnSentenceComplete, 100, dialogue.expression);
 
+            // 표정 설정
+            SetBossExpression(dialogue.expression);
+        }
         // 공격 패턴 실행
         if (!string.IsNullOrEmpty(dialogue.attack))
         {
             ExecuteAttack(dialogue.attack);
         }
 
-        // 특수 이벤트 처리
-        if (!string.IsNullOrEmpty(dialogue.eventType))
-        {
-            HandleSpecialEvent(dialogue.eventType);
-        }
+       
 
         // 특정 대사로 건너뛰기 처리
         if (currentBoss.dialogues[currentDialogueIndex].skipToDialogue > 0)
@@ -431,18 +440,20 @@ public class BattleManager : MonoBehaviour
         // 총알을 이동 후 리스트 초기화 (필요하면 유지 가능)
         activeBullets.Clear();
     }
-    private void HandleSpecialEvent(string eventType)
+    private void HandleSpecialEvent(string eventType,string dialogue)
     {
         switch (eventType)
         {
             case "ChangeSoul":
-                Debug.Log("작동왜 안함?");
-                gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+                currentTypeEffect.Clear();
+                gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul(0.7f);
+                gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().MakePlayerTransparent();
                 SetBossExpression("Sink");  // 보스의 애니메이션 'Sink'로 설정
                 test_curboss = 1;
                 Boss_Face_UI.SetActive(true);
                 SetBossExpression("Appear");
                 //ingame sink 키고, ui 키기
+                StartCoroutine(FloweyAnimationThenNextDialogue(dialogue,1.5f));
 
                 break;
 
@@ -485,7 +496,14 @@ public class BattleManager : MonoBehaviour
                 break;
         }
     }
-
+    // 플라위 애니메이션이 끝난 후 다음 대사를 진행하는 코루틴
+    private IEnumerator FloweyAnimationThenNextDialogue(string dialogue, float waitTime)
+    {
+        // waitTime 동안 대기(애니메이션이 끝날 때까지 혹은 넉넉히 잡아둔 시간)
+        yield return new WaitForSeconds(waitTime);
+        SetBossExpression("Talking");
+        currentTypeEffect.SetMsg(dialogue, OnSentenceComplete, 100);
+    }
     private IEnumerator HandleFinalRevelation()
     {
         yield return new WaitForSeconds(1f);  // 1초 기다리기
@@ -548,10 +566,21 @@ public class BattleManager : MonoBehaviour
         if (currentRoom != null)
         {
             currentRoom.SpawnEnemies(enemyPrefabs);
+            //GameObject spawnedEnemy = Instantiate(enemyPrefabs[0], somePosition, Quaternion.identity);
+            //curEnemies.Add(spawnedEnemy);
         }
         else
         {
             Debug.LogWarning("Current Room is not set.");
+        }
+    }
+    // 적이 사망하거나 사라졌을 때 리스트에서 제거
+    public void RemoveEnemy(GameObject enemy)
+    {
+        //BattleManager.Instance.RemoveEnemy(this.gameObject)
+        if (curEnemies.Contains(enemy))
+        {
+            curEnemies.Remove(enemy);
         }
     }
 }

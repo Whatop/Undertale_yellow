@@ -75,7 +75,10 @@ public class TypeEffect : MonoBehaviour
 
         StartEffect();
     }
-
+    public void Clear()
+    {
+            msgText.text = "";
+    }
     public bool IsEffecting()
     {
         return typingCoroutine != null; // `Effecting` 코루틴이 실행 중이면 true 반환
