@@ -218,7 +218,6 @@ public class PlayerMovement : LivingObject
             return;
         base.Update();
 
-        SoulRotateToMouse();
         HandleWeaponSwitchInput();
         playerData.isInvincible = isInvincible;
 
@@ -235,7 +234,11 @@ public class PlayerMovement : LivingObject
             // R키 입력 시 재장전
             if (Input.GetKeyDown(KeyCode.R) && !isReloading && curweaponData.current_magazine != curweaponData.magazine && !UIManager.Instance.isInventroy)
             {
-                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+                if(isSoulActive)
+                    SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+                else
+                    SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+
                 StartCoroutine(Reload());
             }
 
@@ -290,7 +293,10 @@ public class PlayerMovement : LivingObject
 
             if (isSoulActive)
             {
+                SoulRotateToMouse();
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
+                Weapons.SetActive(false);
+                Hands.gameObject.SetActive(false);
             }
 
             if (Input.GetKeyDown(KeyCode.C) &&
@@ -472,23 +478,28 @@ public class PlayerMovement : LivingObject
         UIManager.Instance.SetReloadSliderMaxValue(reloadTime);
 
         UIManager.Instance.SetReloadSliderValue(0);
-        // --- [리볼버 탄피 6개 생성] -------------------
-        for (int i = 0; i < 6; i++)
+        if (!isSoulActive)
         {
-            EjectShell();
+            // --- [리볼버 탄피 6개 생성] -------------------
+            for (int i = 0; i < 6; i++)
+            {
+                EjectShell();
+            }
+            // -------------------------------------------
         }
-        // -------------------------------------------
 
-        SoundManager.Instance.SFXPlay("shotgun_reload_01", 224); // 재장전 사운드
+        if (isSoulActive)
+            SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+        else
+            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
 
         float reloadProgress = 0f;
-        while (reloadProgress < reloadTime)
-        {
-            reloadProgress += Time.deltaTime;
-            UIManager.Instance.SetReloadSliderValue(reloadProgress);
-            yield return null;
-        }
-
+            while (reloadProgress < reloadTime)
+            {
+                reloadProgress += Time.deltaTime;
+                UIManager.Instance.SetReloadSliderValue(reloadProgress);
+                yield return null;
+            }
         // 재장전 완료
         curweaponData.current_magazine = curweaponData.magazine;
         gameManager.SaveWeaponData(curweaponData);
@@ -546,7 +557,11 @@ public class PlayerMovement : LivingObject
         }
         else if (current_magazine == 0 && !isReloading)
         {
-            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217,0.05f); // 재장전 사운드
+
+            if (isSoulActive)
+                SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+            else
+                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
             StartCoroutine(Reload());
         }
     }
@@ -576,8 +591,11 @@ public class PlayerMovement : LivingObject
         // 반동 효과 추가
         StartCoroutine(ApplyRecoil());
 
-        // 사운드 및 애니메이션 실행
-        SoundManager.Instance.SFXPlay(isSoulActive ? "soul_shot_01" : "shotgun_shot_01", 218, 0.05f);
+        // 사운드 및 애니메이션 실행  
+        if(isSoulActive)
+            SoundManager.Instance.SFXPlay("soul_shot_01" , 124);
+        else
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
         WeaponsAnimator.SetTrigger("Shot");
     }
     // 🔥 반동 효과 적용
