@@ -562,6 +562,7 @@ public class PlayerMovement : LivingObject
                 SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
             else
                 SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+
             StartCoroutine(Reload());
         }
     }
@@ -675,6 +676,9 @@ public class PlayerMovement : LivingObject
     IEnumerator Roll()
     {
         isMove = false;
+        float soulEffectSpawnInterval = 0.04f; // Soul 이펙트 생성 간격
+        float lastSpawnTime = 0f; // 마지막 이펙트 생성 시간
+
         // UIManager의 GetKeyCode를 통해 방향키 입력 감지
         if (Input.GetKey(UIManager.Instance.GetKeyCode(0)) && Input.GetKey(UIManager.Instance.GetKeyCode(3)))
         {
@@ -715,12 +719,21 @@ public class PlayerMovement : LivingObject
 
         objectState = ObjectState.Roll;
         SetAnimatorBooleansFalse();
-        EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
         rollTime = 0;
         HandleRollAnimation(rollDirection);
         animator.SetTrigger("IsRoll");
+        if (isSoulActive)
+        {
+            SoundManager.Instance.SFXPlay("soul_roll_01", 157, 0.05f); // 구르기 사운드
+            rollSpeed = 10f;
+        }
+        else
+        {
+            SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 0.05f); // 구르기 사운드
+            EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
+            rollSpeed = 16f;
 
-        SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 0.05f); // 구르기 사운드
+        }
         bool effectPlayed = false; // 효과가 이미 재생되었는지 확인하는 플래그
 
         while (rollTime < rollDuration)
@@ -730,11 +743,17 @@ public class PlayerMovement : LivingObject
             // 자연스러운 구르기 동작을 위해 속도를 일정하게 유지
             rigid.velocity = rollDirection * rollSpeed * Mathf.Lerp(1f, 0f, t);
 
-            if (!effectPlayed && rollTime > rollDuration - 0.3f)
+            if (!isSoulActive&&!effectPlayed && rollTime > rollDuration - 0.3f)
             {
                 EffectManager.Instance.SpawnEffect("rolleffect2", feetPoint.transform.position, Quaternion.identity);
                 effectPlayed = true;
             }
+            if (isSoulActive && Time.time - lastSpawnTime >= soulEffectSpawnInterval)
+            {
+                EffectManager.Instance.SpawnEffect("soul_rolleffect",transform.position, soulObject.transform.rotation);
+                lastSpawnTime = Time.time;
+            }
+
             yield return null;
         }
 
