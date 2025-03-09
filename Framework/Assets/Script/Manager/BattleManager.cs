@@ -379,6 +379,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    #region Attacks
     // 총알을 생성하고 각 위치로 이동시키는 메서드 (Attack1)
     private void SpawnAndMoveBullets()
     {
@@ -440,6 +441,88 @@ public class BattleManager : MonoBehaviour
         // 총알을 이동 후 리스트 초기화 (필요하면 유지 가능)
         activeBullets.Clear();
     }
+
+    // 총알을 특정 방향으로 이동시키는 메서드 (상, 하, 좌, 우)
+    private void MoveBulletsInDirection(Vector2 direction, float speed)
+    {
+        foreach (var bullet in activeBullets)
+        {
+            if (bullet != null)
+            {
+                bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
+            }
+        }
+    }
+
+    // 몇 초 동안 유도 후 직진하는 총알
+    private IEnumerator HomingBullets(float homingDuration, float speed)
+    {
+        float timer = 0f;
+        while (timer < homingDuration)
+        {
+            foreach (var bullet in activeBullets)
+            {
+                if (bullet != null)
+                {
+                    Vector3 direction = (gameManager.GetPlayerData().position - bullet.transform.position).normalized;
+                    bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
+                }
+            }
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        // 유도 종료 후 직진
+        foreach (var bullet in activeBullets)
+        {
+            if (bullet != null)
+            {
+                bullet.GetComponent<Rigidbody2D>().velocity = bullet.transform.up * speed;
+            }
+        }
+    }
+
+    // 회오리 패턴 총알 발사
+    private IEnumerator SpiralBullets(float rotationSpeed, float speed)
+    {
+        float angle = 0;
+        while (true)
+        {
+            foreach (var bullet in activeBullets)
+            {
+                if (bullet != null)
+                {
+                    float radians = angle * Mathf.Deg2Rad;
+                    Vector2 direction = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+                    bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
+                }
+            }
+            angle += rotationSpeed * Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    // 분리 패턴: 일정 거리 이동 후 여러 방향으로 분열
+    private IEnumerator SplitBullets(int splitCount, float speed)
+    {
+        yield return new WaitForSeconds(1.5f); // 일정 시간 후 분리
+        foreach (var bullet in activeBullets)
+        {
+            if (bullet != null)
+            {
+                Vector3 bulletPos = bullet.transform.position;
+                Destroy(bullet);
+                for (int i = 0; i < splitCount; i++)
+                {
+                    float angle = (360f / splitCount) * i;
+                    Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+                    GameObject newBullet = Instantiate(floweybulletprefab, bulletPos, Quaternion.identity);
+                    newBullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
+                    activeBullets.Add(newBullet);
+                }
+            }
+        }
+    }
+    #endregion
     private void HandleSpecialEvent(string eventType,string dialogue)
     {
         switch (eventType)
