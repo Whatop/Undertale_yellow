@@ -113,7 +113,8 @@
         },
         {
           "text": "공격을 피하려면\n우클릭으로 굴러!\n짧게 무적이 될 수 있어.",
-          "expression": "Talking"
+          "expression": "Talking",
+          "attack": "Attack6"
         },
         {
           "text": "자, 이제 사격 연습!\n좌클릭을 눌러 탄환을\n발사해봐!",
@@ -155,16 +156,19 @@
         },
         {
           "text": "좋아, 잘하고 있어!\n이제 어느 정도\n익숙해졌다면...",
+          "attack": "Attack3",
           "expression": "Default"
         },
         {
           "text": "출발해볼까?\n이 지하세계에는\n이야깃거리가 잔뜩\n준비되어 있거든!",
           "expression": "Smile",
-          "eventType": "EndDialogue"
+          "eventType": "EndDialogue",
+          "attack": "Attack4"
         },
         {
           "text": "나만 믿고 따라와.\n절대 후회는...\n하지 않을 거야.",
-          "expression": "CreepFace"
+          "expression": "CreepFace",
+          "attack": "Attack5"
         }
       ]
     }
