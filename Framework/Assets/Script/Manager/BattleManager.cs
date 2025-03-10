@@ -389,14 +389,14 @@ public class BattleManager : MonoBehaviour
             case "Attack4":
                 Debug.Log("유도");
                 SpawnAndMoveBullets();
-                StartCoroutine(HomingBullets(1, 6));
+                StartCoroutine(HomingBullets(1.5f, 8f));
 
                 break;
 
             case "Attack5":
                 Debug.Log("회오리");
                 SpawnAndMoveBullets();
-                StartCoroutine(SpiralBullets(10, 6f));
+                StartCoroutine(SpiralBullets(120, 2.5f));
 
                 break;
 
