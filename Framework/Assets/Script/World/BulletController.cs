@@ -1,43 +1,114 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+public enum BulletType
+{
+    Normal,     // 기본 총알
+    Homing,     // 유도 총알
+    Spiral,     // 회오리 총알
+    Split,      // 분열 총알
+    Directional,// 방향 지정 총알
+    FixedPoint  // 특정 위치로 이동하는 총알
+}
 
 public class BulletController : MonoBehaviour
 {
+    public BulletType bulletType = BulletType.Normal; // 총알의 타입
     public int damage;
     public float speed;
     public float accuracy;
-    public float maxrange = 10f;      // 총알의 최대 사정거리
+    public float maxrange = 10f;
     public bool isFreind = false;
 
-    private Vector2 initialPosition;  // 총알의 초기 위치
-    private Vector2 targetPosition;   // 총알의 목표 위치
-    private bool hasTarget = false;   // 목표 위치가 설정되었는지 여부
+    private float gravityEffect = 0.3f;  // 포물선 중력 효과
+    private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
+    private float homingDuration = 2f;  // 유도 지속 시간
 
-    // Start에서 초기 위치 설정
+    private float maxSpeed = 16f; // 최대 속도 제한
+    private float speedIncreaseRate = 4f; // 초당 속도 증가량
+    private bool isAccelerating = false;
+    private bool isSplitted = false; // 분열 여부 확인
+
+    private Vector2 initialPosition; // 총알의 초기 위치
+    private Vector2 targetPosition;  // 특정 위치로 이동할 경우 사용
+    private Transform target; // 유도 탄환의 타겟
+    private bool hasTarget = false; // 목표 위치 여부
+
+    private Rigidbody2D rb;
+
+    private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
+    {
+        { BulletType.Normal, Color.white },
+        { BulletType.Homing, Color.red },
+        { BulletType.Spiral, Color.blue },
+        { BulletType.Split, Color.green },
+        { BulletType.Directional, Color.yellow },
+        { BulletType.FixedPoint, Color.cyan }
+    };
+
     private void Start()
     {
-        initialPosition = transform.position;  // 총알의 초기 위치 설정
+        initialPosition = transform.position;
+
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
+        }
     }
 
-    // 총알 초기화 메서드
-    public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange, Transform target = null)
+    public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
+                                 BulletType type, bool accelerate = false, Transform target = null)
     {
-        // 방향에 정확도를 적용하여 조정된 방향 계산
         Vector2 adjustedDirection = ApplyAccuracy(direction);
-
-        // 총알의 속성 설정
         speed = bulletSpeed;
         damage = bulletDamage;
         accuracy = bulletAccuracy;
         maxrange = maxRange;
+        bulletType = type;
+        isAccelerating = accelerate;
 
         if (target != null)
         {
-            targetPosition = target.position; // 목표 위치 설정
-            hasTarget = true; // 목표가 설정됨
+            targetPosition = target.position;
+            hasTarget = true;
         }
 
-        // 총알 발사
-        Shoot(adjustedDirection);
+        switch (bulletType)
+        {
+            case BulletType.Directional:
+                GetComponent<Rigidbody2D>().velocity = adjustedDirection * speed;
+                break;
+            case BulletType.FixedPoint:
+                StartCoroutine(MoveToTargetPosition());
+                break;
+            case BulletType.Normal:
+                StartCoroutine(IncreaseSpeedOverTime());
+                break;
+        }
+    }
+
+    void Update()
+    {
+        switch (bulletType)
+        {
+            case BulletType.Homing:
+                HomingMove();
+                break;
+            case BulletType.Spiral:
+                SpiralMove();
+                break;
+            case BulletType.Split:
+                if (!isSplitted) StartCoroutine(SplitBullets(3));
+                break;
+            case BulletType.Directional:
+                DirectionalMove();
+                break;
+        }
+
+        if (Vector2.Distance(initialPosition, transform.position) >= maxrange)
+        {
+            DestroyBullet();
+        }
     }
 
     // 정확도를 적용하여 방향을 조정하는 메서드
@@ -48,63 +119,98 @@ public class BulletController : MonoBehaviour
         return rotation * direction;
     }
 
-    // 총알을 발사하는 메서드
-    private void Shoot(Vector2 direction)
+    // 특정 위치로 이동하는 총알
+    private IEnumerator MoveToTargetPosition()
     {
-        if (!hasTarget)
+        float speed = this.speed;
+        while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
-            GetComponent<Rigidbody2D>().velocity = direction * speed;
-        }
-    }
-
-    void Update()
-    {
-        // 목표 위치가 설정된 경우 해당 위치로 이동
-        if (hasTarget)
-        {
-            Vector2 currentPosition = transform.position;
-            Vector2 direction = (targetPosition - currentPosition).normalized;
+            Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
             transform.position += (Vector3)(direction * speed * Time.deltaTime);
-
-            // 목표 위치에 도달하면 소멸
-            if (Vector2.Distance(currentPosition, targetPosition) <= 0.1f)
-            {
-                DestroyBullet();
-            }
+            yield return null;
         }
-        else
+        DestroyBullet();
+    }
+
+    // 점점 빨라지는 총알
+    private IEnumerator IncreaseSpeedOverTime()
+    {
+        while (speed < maxSpeed)
         {
-            // 총알이 최대 사정거리를 초과하면 소멸
-            if (Vector2.Distance(initialPosition, transform.position) >= maxrange)
-            {
-                DestroyBullet();
-            }
+            speed += speedIncreaseRate * Time.deltaTime;
+            speed = Mathf.Clamp(speed, 0, maxSpeed);
+            yield return null;
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    // 상하좌우 및 대각선 방향 이동
+    void DirectionalMove()
     {
-        // 적과 충돌 시 처리
-        if (other.CompareTag("Enemy") && isFreind && other.GetComponent<EnemyController>().objectState != ObjectState.Roll)
+        GetComponent<Rigidbody2D>().velocity = transform.up * speed;
+    }
+
+    // 유도 탄환 동작
+    private IEnumerator HomingMove()
+    {
+        float timer = 0f;
+
+        while (timer < homingDuration && target != null)
         {
-            other.GetComponent<EnemyController>().TakeDamage(damage, other.transform.position);
-            DestroyBullet();
+            if (rb != null)
+            {
+                Vector2 currentVelocity = rb.velocity;
+                Vector2 targetDirection = ((Vector2)target.position - (Vector2)transform.position).normalized;
+
+                // 1. 포물선 효과: Y축 속도에 중력 적용
+                Vector2 gravity = new Vector2(0, -gravityEffect * Time.deltaTime);
+                currentVelocity += gravity;
+
+                // 2. 방향 제한을 두면서 부드럽게 회전
+                float currentAngle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg;
+                float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
+
+                // 현재 각도를 목표 각도 방향으로 부드럽게 회전 (각도 제한)
+                float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, maxTurnAngle * Time.deltaTime);
+
+                // 새로운 방향으로 속도 재설정
+                Vector2 newVelocity = new Vector2(Mathf.Cos(newAngle * Mathf.Deg2Rad), Mathf.Sin(newAngle * Mathf.Deg2Rad)) * speed;
+                rb.velocity = newVelocity;
+            }
+            timer += Time.deltaTime;
+            yield return null;
         }
-        // 플레이어와 충돌 시 처리
-       // else if (other.CompareTag("Player") && !isFreind && other.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
-       // {
-       //     other.GetComponent<PlayerMovement>().TakeDamage(damage, other.transform.position);
-       //     DestroyBullet();
-       // }
-        else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+
+        // 유도 종료 후 마지막 방향으로 직진
+        if (rb != null)
         {
-            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
-            DestroyBullet();
+            rb.velocity = rb.velocity.normalized * speed;
         }
-       //else if (other.CompareTag("Wall"))
-       //{
-       //    DestroyBullet();
-       //}
+    }
+
+    // 회오리 패턴
+    void SpiralMove()
+    {
+        float angle = Time.time * 200f;
+        Vector2 direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        GetComponent<Rigidbody2D>().velocity = direction * speed;
+
+
+    }
+
+    // 일정 거리 이동 후 분열
+    private IEnumerator SplitBullets(int splitCount)
+    {
+        isSplitted = true;
+        yield return new WaitForSeconds(1.5f);
+
+        for (int i = 0; i < splitCount; i++)
+        {
+            float angle = (360f / splitCount) * i;
+            Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+            GameObject newBullet = Instantiate(gameObject, transform.position, Quaternion.identity);
+            newBullet.GetComponent<BulletController>().InitializeBullet(direction, speed, accuracy, damage, maxrange, BulletType.Directional);
+        }
+        Destroy(gameObject);
     }
 
     void DestroyBullet()

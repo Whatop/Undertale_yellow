@@ -78,6 +78,10 @@ public class BattleManager : MonoBehaviour
 
     private BossBattleData currentBoss;
     private int currentDialogueIndex = 0;
+
+    public GameObject bulletPointPrefab; // 생성할 프리팹 (유니티 인스펙터에서 지정)
+    public Transform spawnParent;   // 생성된 오브젝트를 담을 부모 오브젝트 (정리용)
+
     public static BattleManager Instance
     {
         get
@@ -116,7 +120,36 @@ public class BattleManager : MonoBehaviour
         isFirstInteraction = true;
         isEvent = false;
         test_curboss = 0;
+        GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 7);
         LoadBossData();
+    }
+    private void GenerateGrid(float xStart, float xEnd, int xCount, float yStart, float yEnd, int yCount)
+    {
+        float[] xPositions = GeneratePositions(xStart, xEnd, xCount);
+        float[] yPositions = GeneratePositions(yStart, yEnd, yCount);
+
+        for (int i = 0; i < xCount; i++)
+        {
+            for (int j = 0; j < yCount; j++)
+            {
+                Vector3 spawnPosition =  new Vector3(xPositions[i], yPositions[j], 0);
+                GameObject obj = Instantiate(bulletPointPrefab, Vector3.zero, Quaternion.identity, spawnParent);
+                obj.transform.position = spawnPosition;  // 직접 위치 설정
+                obj.name = $"Bullet_{i}_{j}"; // 이름 설정
+            }
+        }
+    }
+
+    private float[] GeneratePositions(float start, float end, int count)
+    {
+        float[] positions = new float[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            positions[i] = Mathf.Lerp(start, end, (float)i / (count - 1));
+        }
+
+        return positions;
     }
     public void BattleSetting()
     {
@@ -359,7 +392,7 @@ public class BattleManager : MonoBehaviour
             }
         }
     }
-
+    #region Attack
     //MoveBulletsInDirection
     //HomingBullets
     //SpiralBullets
@@ -370,40 +403,40 @@ public class BattleManager : MonoBehaviour
         {
             case "Attack1":
                 Debug.Log("Executing Attack 1");
-                SpawnAndMoveBullets();
+               // SpawnAndMoveBullets();
                 break;
 
             case "Attack2":
                 Debug.Log("Executing Attack 2");
 
-                MoveBulletsToPlayer();
+              //  MoveBulletsToPlayer(true);  // accelerate = true
                 break;
 
             case "Attack3":
                 Debug.Log("왼쪽 공격");
-                SpawnAndMoveBullets();
-                MoveBulletsInDirection(Vector2.left,10);
+                //SpawnAndMoveBullets();
+               // MoveBulletsInDirection(Vector2.left,10);
                 break;
 
 
             case "Attack4":
                 Debug.Log("유도");
-                SpawnAndMoveBullets();
-                StartCoroutine(HomingBullets(1.5f, 8f));
+               // SpawnAndMoveBullets();
+                //StartCoroutine(HomingBullets(10.5f, 8f));
 
                 break;
 
             case "Attack5":
                 Debug.Log("회오리");
-                SpawnAndMoveBullets();
-                StartCoroutine(SpiralBullets(120, 2.5f));
+               // SpawnAndMoveBullets();
+               // StartCoroutine(SpiralBullets(120, 2.5f));
 
                 break;
 
             case "Attack6":
                 Debug.Log("분열");
-                SpawnAndMoveBullets();
-                StartCoroutine(SplitBullets(10, 6f));
+               // SpawnAndMoveBullets();
+               // StartCoroutine(SplitBullets(10, 8f));
 
                 break;
 
@@ -413,217 +446,53 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    #region Attacks
-    // 총알을 생성하고 각 위치로 이동시키는 메서드 (Attack1)
-    private void SpawnAndMoveBullets()
+    void SetAttack(string attack)
     {
-        if (bulletPoints == null || bulletPoints.Length == 0)
+        switch (attack)
         {
-            Debug.LogError("Bullet points not assigned!");
-            return;
-        }
-
-        for (int i = 0; i < bulletPoints.Length; i++)
-        {
-            // 총알 생성
-            GameObject bullet = Instantiate(floweybulletprefab, nonePoint.position, Quaternion.identity);
-
-            // 총알 리스트에 추가
-            activeBullets.Add(bullet);
-
-            // 생성된 총알을 목표 위치로 이동
-            StartCoroutine(MoveBulletToTarget(bullet, bulletPoints[i].position));
+            case "Directional":
+                SpawnBullets(BulletType.Directional);
+                break;
+            case "FixedPoint":
+                SpawnBullets(BulletType.FixedPoint);
+                break;
+            case "Normal":
+                SpawnBullets(BulletType.Normal);
+                break;
+            case "Homing":
+                SpawnBullets(BulletType.Homing);
+                break;
+            case "Spiral":
+                SpawnBullets(BulletType.Spiral);
+                break;
+            case "Split":
+                SpawnBullets(BulletType.Split);
+                break;
+            default:
+                Debug.LogWarning($"Unknown attack pattern: {attack}");
+                break;
         }
     }
-    // 총알을 목표 위치로 이동시키는 코루틴
-    private IEnumerator MoveBulletToTarget(GameObject bullet, Vector3 targetPosition)
+    // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
+    void SpawnBullets(BulletType bulletType)
     {
-        float speed = 4f; // 총알 이동 속도
-
-        while (bullet != null && Vector3.Distance(bullet.transform.position, targetPosition) > 0.1f)
+        foreach (Transform bulletSpawnPoint in bulletPoints)
         {
-            bullet.transform.position = Vector3.MoveTowards(bullet.transform.position, targetPosition, speed * Time.deltaTime);
-            yield return null; // 다음 프레임까지 대기
-        }
+            GameObject bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
+            BulletController bulletController = bullet.GetComponent<BulletController>();
 
-    }
-    // Attack2에서 플레이어 방향으로 총알 이동
-    private void MoveBulletsToPlayer()
-    {
-        if (activeBullets.Count == 0)
-        {
-            Debug.LogWarning("No active bullets to move.");
-            return;
-        }
-
-        Vector3 playerPosition = gameManager.GetPlayerData().position;
-
-        foreach (var bullet in activeBullets)
-        {
-            if (bullet != null)
+            if (bulletController != null)
             {
-                // BulletController를 이용하여 방향 재설정
-                BulletController bulletController = bullet.GetComponent<BulletController>();
-                if (bulletController != null)
-                {
-                    Vector2 direction = (playerPosition - bullet.transform.position).normalized;
-                    bulletController.InitializeBullet(direction, bulletController.speed, bulletController.accuracy, bulletController.damage, bulletController.maxrange);
-                }
-            }
-        }
-
-        // 총알을 이동 후 리스트 초기화 (필요하면 유지 가능)
-        activeBullets.Clear();
-    }
-    // 총알을 특정 방향으로 이동시키는 메서드 (상, 하, 좌, 우)
-    private void MoveBulletsInDirection(Vector2 direction, float speed)
-    {
-        foreach (var bullet in activeBullets)
-        {
-            if (bullet != null)
-            {
-                bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
+                Vector2 direction = (gameManager.GetPlayerData().position - bulletSpawnPoint.position).normalized;
+                bulletController.InitializeBullet(direction, 5f, 0f, 10, 15f, bulletType);
+                activeBullets.Add(bulletController.gameObject);
             }
         }
     }
 
-    // 유도 탄환 (HomingBullets)
-    private IEnumerator HomingBullets(float homingDuration, float speed)
-    {
-        if (activeBullets.Count == 0)
-        {
-            Debug.LogError("HomingBullets 실행 실패: activeBullets가 비어 있음.");
-            yield break;
-        }
-
-        Vector2 playerPos = gameManager.GetPlayerData().position;
-
-        // 1. 처음에는 플레이어 방향으로 발사
-        foreach (var bullet in activeBullets)
-        {
-            if (bullet != null)
-            {
-                Vector2 direction = (playerPos - (Vector2)bullet.transform.position).normalized;
-                bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
-            }
-        }
-
-        yield return new WaitForSeconds(0.5f); // 0.5초 후 유도 시작
-
-        // 2. 일정 시간 동안 유도
-        float timer = 0f;
-        while (timer < homingDuration)
-        {
-            foreach (var bullet in activeBullets)
-            {
-                if (bullet != null)
-                {
-                    Vector2 homingDir = (gameManager.GetPlayerData().position - bullet.transform.position).normalized;
-                    bullet.GetComponent<Rigidbody2D>().velocity = homingDir * speed;
-                }
-            }
-            timer += Time.deltaTime;
-            yield return null;
-        }
-    }
-
-    // 회오리 탄환 (SpiralBullets)
-    private IEnumerator SpiralBullets(float rotationSpeed, float speed)
-    {
-        if (activeBullets.Count == 0)
-        {
-            Debug.LogError("SpiralBullets 실행 실패: activeBullets가 비어 있음.");
-            yield break;
-        }
-
-        Vector2 playerPos = gameManager.GetPlayerData().position;
-        float angle = 0f;
-
-        // 1. 처음에는 플레이어 방향으로 발사
-        foreach (var bullet in activeBullets)
-        {
-            if (bullet != null)
-            {
-                Vector2 direction = (playerPos - (Vector2)bullet.transform.position).normalized;
-                bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
-            }
-        }
-
-        yield return new WaitForSeconds(0.5f); // 0.5초 후 회전 시작
-
-        // 2. 회전 시작
-        float spiralDuration = 3f;
-        float timer = 0f;
-
-        while (timer < spiralDuration)
-        {
-            foreach (var bullet in activeBullets)
-            {
-                if (bullet != null)
-                {
-                    float radians = angle * Mathf.Deg2Rad;
-                    Vector2 direction = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
-                    bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
-                }
-            }
-            angle += rotationSpeed * Time.deltaTime;
-            timer += Time.deltaTime;
-            yield return null;
-        }
-    }
-
-    // 분열 탄환 (SplitBullets)
-    private IEnumerator SplitBullets(int splitCount, float speed)
-    {
-        if (activeBullets.Count == 0)
-        {
-            Debug.LogError("SplitBullets 실행 실패: activeBullets가 비어 있음.");
-            yield break;
-        }
-
-        Vector2 playerPos = gameManager.GetPlayerData().position;
-
-        // 1. 처음에는 플레이어 방향으로 발사
-        foreach (var bullet in activeBullets)
-        {
-            if (bullet != null)
-            {
-                Vector2 direction = (playerPos - (Vector2)bullet.transform.position).normalized;
-                bullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
-            }
-        }
-
-        yield return new WaitForSeconds(1.5f); // 일정 시간 후 분열
-
-        List<GameObject> newBullets = new List<GameObject>(); // 새롭게 생성될 총알 리스트
-
-        for (int i = activeBullets.Count - 1; i >= 0; i--)
-        {
-            GameObject bullet = activeBullets[i];
-            if (bullet != null)
-            {
-                Vector3 bulletPos = bullet.transform.position;
-                activeBullets.RemoveAt(i);
-                Destroy(bullet);
-
-                // 분열된 총알 생성
-                for (int j = 0; j < splitCount; j++)
-                {
-                    float angle = (360f / splitCount) * j;
-                    Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-                    GameObject newBullet = Instantiate(floweybulletprefab, bulletPos, Quaternion.identity);
-                    newBullet.GetComponent<Rigidbody2D>().velocity = direction * speed;
-                    newBullets.Add(newBullet);
-                }
-            }
-        }
-
-        // 새로운 총알 추가
-        activeBullets.AddRange(newBullets);
-    }
 
 
-    #endregion
+#endregion
     private void HandleSpecialEvent(string eventType,string dialogue)
     {
         switch (eventType)
