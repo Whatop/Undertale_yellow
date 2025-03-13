@@ -73,6 +73,8 @@ public class BattleManager : MonoBehaviour
     //현재 적
     // 전투 중 등장하는 "현재 활성화된 적" 리스트
     public List<GameObject> curEnemies = new List<GameObject>();
+    [SerializeField]
+    private List<Vector3> bulletSpawnPositions = new List<Vector3>();
 
     private Vector2 prevPos;
 
@@ -133,6 +135,7 @@ public class BattleManager : MonoBehaviour
             for (int j = 0; j < yCount; j++)
             {
                 Vector3 spawnPosition =  new Vector3(xPositions[i], yPositions[j], 0);
+                bulletSpawnPositions.Add(spawnPosition); // 위치 저장
                 GameObject obj = Instantiate(bulletPointPrefab, Vector3.zero, Quaternion.identity, spawnParent);
                 obj.transform.position = spawnPosition;  // 직접 위치 설정
                 obj.name = $"Bullet_{i}_{j}"; // 이름 설정
