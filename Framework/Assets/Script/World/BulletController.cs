@@ -8,7 +8,8 @@ public enum BulletType
     Spiral,     // 회오리 총알
     Split,      // 분열 총알
     Directional,// 방향 지정 총알
-    FixedPoint  // 특정 위치로 이동하는 총알
+    FixedPoint,  // 특정 위치로 이동하는 총알
+    Speed // 점점 빨라지는
 }
 
 public class BulletController : MonoBehaviour
@@ -33,16 +34,16 @@ public class BulletController : MonoBehaviour
     private Vector2 targetPosition;  // 특정 위치로 이동할 경우 사용
     private Transform target; // 유도 탄환의 타겟
     private bool hasTarget = false; // 목표 위치 여부
-
     private Rigidbody2D rb;
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
         { BulletType.Normal, Color.white },
         { BulletType.Homing, Color.red },
-        { BulletType.Spiral, Color.blue },
+        { BulletType.Spiral, Color.yellow },
         { BulletType.Split, Color.green },
-        { BulletType.Directional, Color.yellow },
+        { BulletType.Directional, Color.white },
+        { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan }
     };
 
@@ -57,7 +58,7 @@ public class BulletController : MonoBehaviour
     }
 
     public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 BulletType type, bool accelerate = false, Transform target = null)
+                                 BulletType type = default, bool accelerate = false, Transform target = null)
     {
         Vector2 adjustedDirection = ApplyAccuracy(direction);
         speed = bulletSpeed;
@@ -71,20 +72,10 @@ public class BulletController : MonoBehaviour
         {
             targetPosition = target.position;
             hasTarget = true;
+            StartCoroutine(MoveAndNext(type));
+            //스폰 위치로 이동후
         }
 
-        switch (bulletType)
-        {
-            case BulletType.Directional:
-                GetComponent<Rigidbody2D>().velocity = adjustedDirection * speed;
-                break;
-            case BulletType.FixedPoint:
-                StartCoroutine(MoveToTargetPosition());
-                break;
-            case BulletType.Normal:
-                StartCoroutine(IncreaseSpeedOverTime());
-                break;
-        }
     }
 
     void Update()
@@ -92,7 +83,8 @@ public class BulletController : MonoBehaviour
         switch (bulletType)
         {
             case BulletType.Homing:
-                HomingMove();
+                StartCoroutine(HomingMove());
+              
                 break;
             case BulletType.Spiral:
                 SpiralMove();
@@ -102,6 +94,13 @@ public class BulletController : MonoBehaviour
                 break;
             case BulletType.Directional:
                 DirectionalMove();
+                break;
+            case BulletType.Normal:
+                StartCoroutine(MoveTargetPlayer());
+                break;
+            case BulletType.Speed:
+                StartCoroutine(MoveTargetPlayer());
+                StartCoroutine(IncreaseSpeedOverTime());
                 break;
         }
 
@@ -120,7 +119,7 @@ public class BulletController : MonoBehaviour
     }
 
     // 특정 위치로 이동하는 총알
-    private IEnumerator MoveToTargetPosition()
+    private IEnumerator MoveAndNext(BulletType type = default)
     {
         float speed = this.speed;
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
@@ -129,8 +128,53 @@ public class BulletController : MonoBehaviour
             transform.position += (Vector3)(direction * speed * Time.deltaTime);
             yield return null;
         }
+        if (type != default)
+        {
+            switch (bulletType)
+            {
+                case BulletType.Homing:
+                    HomingMove();
+                    break;
+                case BulletType.Spiral:
+                    SpiralMove();
+                    break;
+                case BulletType.Split:
+                    if (!isSplitted) StartCoroutine(SplitBullets(3));
+                    break;
+                case BulletType.Directional:
+                    DirectionalMove();
+                    break;
+                case BulletType.Normal:
+                    StartCoroutine(MoveTargetPlayer());
+                    break;
+                case BulletType.Speed:
+                    StartCoroutine(MoveTargetPlayer());
+                    StartCoroutine(IncreaseSpeedOverTime());
+                    break;
+            }
+        }
         DestroyBullet();
     }
+    // 처음 플레이어 방향으로 일정 시간 동안 이동한 후, 해당 방향 유지
+    private IEnumerator MoveTargetPlayer()
+    {
+        if (target == null)
+        {
+            target = GameManager.Instance.GetPlayerData().player.transform; // 플레이어를 타겟으로 설정
+        }
+
+        if (target != null)
+        {
+            Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // 플레이어 방향 계산
+            GetComponent<Rigidbody2D>().velocity = direction * speed; // 처음 속도 설정
+
+            yield return new WaitForSeconds(0.5f); // 0.5초 동안 플레이어 방향 유지
+
+            // 이후에는 해당 방향을 유지하면서 직진
+            GetComponent<Rigidbody2D>().velocity = direction * speed;
+        }
+    }
+
 
     // 점점 빨라지는 총알
     private IEnumerator IncreaseSpeedOverTime()

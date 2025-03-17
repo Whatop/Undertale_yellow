@@ -74,7 +74,7 @@ public class BattleManager : MonoBehaviour
     // 전투 중 등장하는 "현재 활성화된 적" 리스트
     public List<GameObject> curEnemies = new List<GameObject>();
     [SerializeField]
-    private List<Vector3> bulletSpawnPositions = new List<Vector3>();
+    private List<Transform> bulletSpawnTransforms = new List<Transform>();
 
     private Vector2 prevPos;
 
@@ -134,11 +134,12 @@ public class BattleManager : MonoBehaviour
         {
             for (int j = 0; j < yCount; j++)
             {
-                Vector3 spawnPosition =  new Vector3(xPositions[i], yPositions[j], 0);
-                bulletSpawnPositions.Add(spawnPosition); // 위치 저장
+                Vector3 spawnPosition = new Vector3(xPositions[i], yPositions[j], 0);
                 GameObject obj = Instantiate(bulletPointPrefab, Vector3.zero, Quaternion.identity, spawnParent);
-                obj.transform.position = spawnPosition;  // 직접 위치 설정
+                obj.transform.position = spawnPosition;  // 위치 설정
                 obj.name = $"Bullet_{i}_{j}"; // 이름 설정
+
+                bulletSpawnTransforms.Add(obj.transform); // Transform 저장
             }
         }
     }
@@ -406,7 +407,12 @@ public class BattleManager : MonoBehaviour
         {
             case "Attack1":
                 Debug.Log("Executing Attack 1");
-               // SpawnAndMoveBullets();
+                // SpawnAndMoveBullets();
+                SetAttack("Directional");//벙형
+                SetAttack("Spiral");//회오리
+                SetAttack("Split");//분열
+                SetAttack("Homing");//유도
+                SetAttack("Homing");
                 break;
 
             case "Attack2":
@@ -449,27 +455,27 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void SetAttack(string attack)
+    void SetAttack(string attack,int bulletpoint = 0)
     {
         switch (attack)
         {
             case "Directional":
-                SpawnBullets(BulletType.Directional);
+                SpawnBullets(BulletType.Directional, bulletpoint);
                 break;
             case "FixedPoint":
-                SpawnBullets(BulletType.FixedPoint);
+                SpawnBullets(BulletType.FixedPoint, bulletpoint);
                 break;
             case "Normal":
-                SpawnBullets(BulletType.Normal);
+                SpawnBullets(BulletType.Normal, bulletpoint);
                 break;
             case "Homing":
-                SpawnBullets(BulletType.Homing);
+                SpawnBullets(BulletType.Homing, bulletpoint);
                 break;
             case "Spiral":
-                SpawnBullets(BulletType.Spiral);
+                SpawnBullets(BulletType.Spiral, bulletpoint);
                 break;
             case "Split":
-                SpawnBullets(BulletType.Split);
+                SpawnBullets(BulletType.Split, bulletpoint);
                 break;
             default:
                 Debug.LogWarning($"Unknown attack pattern: {attack}");
@@ -477,7 +483,7 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType)
+    void SpawnBullets(BulletType bulletType,int n =0)
     {
         foreach (Transform bulletSpawnPoint in bulletPoints)
         {
@@ -487,7 +493,7 @@ public class BattleManager : MonoBehaviour
             if (bulletController != null)
             {
                 Vector2 direction = (gameManager.GetPlayerData().position - bulletSpawnPoint.position).normalized;
-                bulletController.InitializeBullet(direction, 5f, 0f, 10, 15f, bulletType);
+                bulletController.InitializeBullet(direction, 5f, 0f, 10, 15f, bulletType, bulletSpawnTransforms[n]);
                 activeBullets.Add(bulletController.gameObject);
             }
         }
