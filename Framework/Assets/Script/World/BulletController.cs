@@ -58,7 +58,7 @@ public class BulletController : MonoBehaviour
     }
 
     public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 BulletType type = default, bool accelerate = false, Transform target = null)
+                                 float delay = 0,BulletType type = default, bool accelerate = false, Transform target = null)
     {
         Vector2 adjustedDirection = ApplyAccuracy(direction);
         speed = bulletSpeed;
@@ -72,10 +72,9 @@ public class BulletController : MonoBehaviour
         {
             targetPosition = target.position;
             hasTarget = true;
-            StartCoroutine(MoveAndNext(type));
+            StartCoroutine(MoveAndNext(type, delay));
             //스폰 위치로 이동후
         }
-
     }
 
     void Update()
@@ -92,9 +91,7 @@ public class BulletController : MonoBehaviour
             case BulletType.Split:
                 if (!isSplitted) StartCoroutine(SplitBullets(3));
                 break;
-            case BulletType.Directional:
-                DirectionalMove();
-                break;
+          
             case BulletType.Normal:
                 StartCoroutine(MoveTargetPlayer());
                 break;
@@ -119,9 +116,10 @@ public class BulletController : MonoBehaviour
     }
 
     // 특정 위치로 이동하는 총알
-    private IEnumerator MoveAndNext(BulletType type = default)
+    private IEnumerator MoveAndNext(BulletType type = default, float delay =0)
     {
         float speed = this.speed;
+            yield return new WaitForSeconds(delay); 
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
             Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
@@ -165,6 +163,7 @@ public class BulletController : MonoBehaviour
 
         if (target != null)
         {
+
             Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // 플레이어 방향 계산
             GetComponent<Rigidbody2D>().velocity = direction * speed; // 처음 속도 설정
 
@@ -187,11 +186,21 @@ public class BulletController : MonoBehaviour
         }
     }
 
-    // 상하좌우 및 대각선 방향 이동
-    void DirectionalMove()
+    // 지정된 방향으로 일정 시간 이동 후, 해당 방향 유지
+    private IEnumerator DirectionalMove(Vector2 moveDirection = default)
     {
-        GetComponent<Rigidbody2D>().velocity = transform.up * speed;
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb == null) yield break;
+
+        moveDirection = moveDirection.normalized; // 방향 벡터 정규화
+        rb.velocity = moveDirection * speed;
+
+        yield return new WaitForSeconds(0.5f); // 0.5초 동안 이동 유지
+
+        // 이후에는 동일한 방향으로 계속 이동
+        rb.velocity = moveDirection * speed;
     }
+
 
     // 유도 탄환 동작
     private IEnumerator HomingMove()
@@ -252,7 +261,7 @@ public class BulletController : MonoBehaviour
             float angle = (360f / splitCount) * i;
             Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
             GameObject newBullet = Instantiate(gameObject, transform.position, Quaternion.identity);
-            newBullet.GetComponent<BulletController>().InitializeBullet(direction, speed, accuracy, damage, maxrange, BulletType.Directional);
+            newBullet.GetComponent<BulletController>().InitializeBullet(direction, speed, accuracy, damage, maxrange,0, BulletType.Directional);
         }
         Destroy(gameObject);
     }
@@ -261,4 +270,19 @@ public class BulletController : MonoBehaviour
     {
         Destroy(gameObject);
     }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"총알이 {other.gameObject.name}과 충돌");
+        if (other.CompareTag("Enemy") && isFreind && other.GetComponent<EnemyController>().objectState != ObjectState.Roll)
+        {
+            other.GetComponent<EnemyController>().TakeDamage(damage, other.transform.position);
+            DestroyBullet();
+        }
+        else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+        {
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
+            DestroyBullet();
+        }
+    }
+
 }

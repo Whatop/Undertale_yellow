@@ -26,15 +26,15 @@ public class DebugModing : MonoBehaviour
         if (!isDebugMode)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.F1))
             debugMode = 1;
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.F2))
             debugMode = 2;
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        else if (Input.GetKeyDown(KeyCode.F3))
             debugMode = 3;
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        else if (Input.GetKeyDown(KeyCode.F4))
             debugMode = 4;
-        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        else if (Input.GetKeyDown(KeyCode.F5))
             debugMode = 5;
 
         HandleDebugMode();

@@ -82,6 +82,7 @@ public class BattleManager : MonoBehaviour
     private int currentDialogueIndex = 0;
 
     public GameObject bulletPointPrefab; // 생성할 프리팹 (유니티 인스펙터에서 지정)
+    public GameObject[] bulletspawnPoint; // 생성할 프리팹 (유니티 인스펙터에서 지정)
     public Transform spawnParent;   // 생성된 오브젝트를 담을 부모 오브젝트 (정리용)
 
     public static BattleManager Instance
@@ -180,6 +181,38 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         HandleInteraction();
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SetAttack("Split", 0, 1f);//분열
+            SetAttack("Right", 0, 1f);
+            
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SetAttack("Spiral", 0, 1f);//회오리
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SetAttack("Homing", 0, 1f);//유도
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            SetAttack("Right", 0, 1f);
+            SetAttack("Right", 1, 1f);
+            SetAttack("Right", 2, 1f);
+            SetAttack("Right", 3, 1f);
+            SetAttack("Right", 4, 1f);
+            SetAttack("Right", 5, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            SetAttack("Left", 0, 1f);
+            SetAttack("Left", 1, 1f);
+            SetAttack("Left", 2, 1f);
+            SetAttack("Left", 3, 1f);
+            SetAttack("Left", 4, 1f);
+            SetAttack("Left", 5, 1f);
+        }
     }
     public void BattleStart(int eventNumber)
     {
@@ -207,7 +240,6 @@ public class BattleManager : MonoBehaviour
             Debug.LogError("Boss data JSON is not assigned.");
         }
     }
-
     public void StartBossBattle(int bossID)
     {
         if (battleDatabase == null || battleDatabase.bossBattles == null)
@@ -226,7 +258,6 @@ public class BattleManager : MonoBehaviour
         currentDialogueIndex = 0;
         DisplayNextDialogue();
     }
-
     private void HandleInteraction()
     {
 
@@ -285,7 +316,6 @@ public class BattleManager : MonoBehaviour
         // 첫 번째 대사 출력
         DisplayNextDialogue();
     }
-
     private void DisplayNextDialogue()
     {
         if (boss_sentences.Count == 0)
@@ -326,8 +356,6 @@ public class BattleManager : MonoBehaviour
             currentDialogueIndex++;
         }
     }
-
-
     private BossBattleData FindBossBattle(int bossID)
     {
         if (battleDatabase == null || battleDatabase.bossBattles == null)
@@ -347,7 +375,6 @@ public class BattleManager : MonoBehaviour
         Debug.LogWarning($"No boss battle found for Boss ID: {bossID}");
         return null;
     }
-
     private void OnSentenceComplete()
     {
         SetBossExpression("Default");
@@ -455,27 +482,49 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void SetAttack(string attack,int bulletpoint = 0)
+    void SetAttack(string attack,int bulletpoint = 0, float delay = 0f)
     {
         switch (attack)
         {
-            case "Directional":
-                SpawnBullets(BulletType.Directional, bulletpoint);
+
+            case "Left":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.left);
+                break;
+            case "Right":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.right);
+                break;
+            case "Up":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.up);
+                break;
+            case "Down":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.down);
+                break;
+            case "UpLeft":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, new Vector2(-1, 1).normalized);
+                break;
+            case "UpRight":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, new Vector2(1, 1).normalized);
+                break;
+            case "DownLeft":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, new Vector2(-1, -1).normalized);
+                break;
+            case "DownRight":
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, new Vector2(1, -1).normalized);
                 break;
             case "FixedPoint":
-                SpawnBullets(BulletType.FixedPoint, bulletpoint);
+                SpawnBullets(BulletType.FixedPoint, bulletpoint, delay);
                 break;
             case "Normal":
-                SpawnBullets(BulletType.Normal, bulletpoint);
+                SpawnBullets(BulletType.Normal, bulletpoint, delay);
                 break;
             case "Homing":
-                SpawnBullets(BulletType.Homing, bulletpoint);
+                SpawnBullets(BulletType.Homing, bulletpoint, delay);
                 break;
             case "Spiral":
-                SpawnBullets(BulletType.Spiral, bulletpoint);
+                SpawnBullets(BulletType.Spiral, bulletpoint, delay);
                 break;
             case "Split":
-                SpawnBullets(BulletType.Split, bulletpoint);
+                SpawnBullets(BulletType.Split, bulletpoint, delay);
                 break;
             default:
                 Debug.LogWarning($"Unknown attack pattern: {attack}");
@@ -483,17 +532,22 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType,int n =0)
+    void SpawnBullets(BulletType bulletType,int bulletpoint = -1,float delay = 0f, Vector2 dir = default)
     {
         foreach (Transform bulletSpawnPoint in bulletPoints)
         {
-            GameObject bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
+            GameObject bullet;
+            if (bulletpoint == -1)
+                bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
+           else
+                 bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
+
             BulletController bulletController = bullet.GetComponent<BulletController>();
 
             if (bulletController != null)
             {
-                Vector2 direction = (gameManager.GetPlayerData().position - bulletSpawnPoint.position).normalized;
-                bulletController.InitializeBullet(direction, 5f, 0f, 10, 15f, bulletType, bulletSpawnTransforms[n]);
+                Vector2 direction = (bulletSpawnTransforms[bulletpoint].position - bulletSpawnPoint.position).normalized;
+                bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
                 activeBullets.Add(bulletController.gameObject);
             }
         }
