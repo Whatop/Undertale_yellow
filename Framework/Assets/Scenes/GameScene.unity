@@ -404,7 +404,6 @@ GameObject:
   - component: {fileID: 18503573}
   - component: {fileID: 18503572}
   - component: {fileID: 18503571}
-  - component: {fileID: 18503570}
   - component: {fileID: 18503569}
   - component: {fileID: 18503568}
   m_Layer: 0
@@ -463,24 +462,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &18503570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 18503566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7f4aa710a154b94d965ab68b2806c0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  npcID: 100
-  dialogueManager: {fileID: 84828285}
-  isTalking: 0
-  isFirstInteraction: 1
-  outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
-  isEvent: 0
 --- !u!61 &18503571
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8393,7 +8374,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.46, y: -2.45}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &100938374
@@ -19004,11 +18985,11 @@ MonoBehaviour:
   currentTypeEffect: {fileID: 166177125}
   player: {fileID: 1239929339}
   curEnemies: []
-  bulletSpawnTransforms:
+  bulletSpawnTransforms: []
+  bulletPointPrefab: {fileID: 2475700955202721965, guid: c1dcf219eaed4734bae2d9c21506b5a2, type: 3}
+  bulletspawnPoint:
   - {fileID: 2097083109}
   - {fileID: 733600890}
-  bulletPointPrefab: {fileID: 2475700955202721965, guid: c1dcf219eaed4734bae2d9c21506b5a2, type: 3}
-  bulletspawnPoint: []
   spawnParent: {fileID: 356459343}
   isTalking: 0
   isEvent: 0
@@ -43170,7 +43151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575677067}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 50, y: 1, z: -10}
+  m_LocalPosition: {x: 17.52, y: -1.93, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 657703201}

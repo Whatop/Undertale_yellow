@@ -16,7 +16,7 @@ public class BulletController : MonoBehaviour
 {
     public BulletType bulletType = BulletType.Normal; // 총알의 타입
     public int damage;
-    public float speed;
+    public float speed = 5;
     public float accuracy;
     public float maxrange = 10f;
     public bool isFreind = false;
@@ -27,7 +27,7 @@ public class BulletController : MonoBehaviour
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
-    private bool isAccelerating = false;
+    private bool isActivated = false;
     private bool isSplitted = false; // 분열 여부 확인
 
     private Vector2 initialPosition; // 총알의 초기 위치
@@ -46,52 +46,35 @@ public class BulletController : MonoBehaviour
         { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan }
     };
-
     private void Start()
     {
         initialPosition = transform.position;
+        rb = GetComponent<Rigidbody2D>();
 
         if (GetComponent<SpriteRenderer>() != null)
         {
             GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
         }
+
+        StartPattern(); // 처음 시작할 때 실행
     }
-
-    public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 float delay = 0,BulletType type = default, bool accelerate = false, Transform target = null)
+    // 처음 한 번만 패턴을 실행
+    private void StartPattern()
     {
-        Vector2 adjustedDirection = ApplyAccuracy(direction);
-        speed = bulletSpeed;
-        damage = bulletDamage;
-        accuracy = bulletAccuracy;
-        maxrange = maxRange;
-        bulletType = type;
-        isAccelerating = accelerate;
+        if (isActivated) return; // 한 번만 실행되도록 제한
+        isActivated = true;
 
-        if (target != null)
-        {
-            targetPosition = target.position;
-            hasTarget = true;
-            StartCoroutine(MoveAndNext(type, delay));
-            //스폰 위치로 이동후
-        }
-    }
-
-    void Update()
-    {
         switch (bulletType)
         {
             case BulletType.Homing:
                 StartCoroutine(HomingMove());
-              
                 break;
             case BulletType.Spiral:
-                SpiralMove();
+                StartCoroutine(MoveTargetPlayer());
                 break;
             case BulletType.Split:
                 if (!isSplitted) StartCoroutine(SplitBullets(3));
                 break;
-          
             case BulletType.Normal:
                 StartCoroutine(MoveTargetPlayer());
                 break;
@@ -100,11 +83,44 @@ public class BulletController : MonoBehaviour
                 StartCoroutine(IncreaseSpeedOverTime());
                 break;
         }
+    }
+    public void InitializeBullet(Vector2 direction, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
+                                 float delay = 0,BulletType type = default, Transform target = null)
+    {
+        speed = bulletSpeed;
+        damage = bulletDamage;
+        accuracy = bulletAccuracy;
+        maxrange = maxRange;
+        bulletType = type;
 
-        if (Vector2.Distance(initialPosition, transform.position) >= maxrange)
+        if (target != null)
         {
-            DestroyBullet();
+            targetPosition = target.position;
+            hasTarget = true;
+            StartCoroutine(MoveAndNext(type, delay, direction));
+            //스폰 위치로 이동후
         }
+    }
+
+    void Update()
+    {
+        //if (Vector2.Distance(initialPosition, transform.position) >= maxrange)
+        //{
+        //    DestroyBullet();
+        //}
+    }
+    public void ChangeBulletType(BulletType newType)
+    {
+        bulletType = newType;
+        isActivated = false; // 새로운 타입이 설정되었으므로 다시 실행 가능하도록 변경
+
+        // 색상 변경
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            GetComponent<SpriteRenderer>().color = bulletColors[newType];
+        }
+
+        StartPattern(); // 새로운 패턴 실행
     }
 
     // 정확도를 적용하여 방향을 조정하는 메서드
@@ -115,44 +131,55 @@ public class BulletController : MonoBehaviour
         return rotation * direction;
     }
 
-    // 특정 위치로 이동하는 총알
-    private IEnumerator MoveAndNext(BulletType type = default, float delay =0)
+    // 특정 위치로 이동 후 패턴 실행
+    private IEnumerator MoveAndNext(BulletType type = default, float delay = 0,Vector2 dir = default)
     {
         float speed = this.speed;
-            yield return new WaitForSeconds(delay); 
+        bulletType = type;
+        //  목표 위치까지 이동
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
             Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
             transform.position += (Vector3)(direction * speed * Time.deltaTime);
             yield return null;
         }
-        if (type != default)
-        {
-            switch (bulletType)
-            {
-                case BulletType.Homing:
-                    HomingMove();
-                    break;
-                case BulletType.Spiral:
-                    SpiralMove();
-                    break;
-                case BulletType.Split:
-                    if (!isSplitted) StartCoroutine(SplitBullets(3));
-                    break;
-                case BulletType.Directional:
-                    DirectionalMove();
-                    break;
-                case BulletType.Normal:
-                    StartCoroutine(MoveTargetPlayer());
-                    break;
-                case BulletType.Speed:
-                    StartCoroutine(MoveTargetPlayer());
-                    StartCoroutine(IncreaseSpeedOverTime());
-                    break;
-            }
-        }
-        DestroyBullet();
+
+        //  이동 후, 패턴 실행 전에 대기 (필요할 경우)
+        if (delay > 0)
+            yield return new WaitForSeconds(delay);
+
+        //  이동 완료 후, 패턴 실행
+        ExecuteBulletPattern(type, dir);
     }
+
+    // 패턴 실행을 위한 분리된 메서드
+    private void ExecuteBulletPattern(BulletType type,Vector2 dir = default)
+    {
+        Debug.Log("패턴실행");
+        switch (type)
+        {
+            case BulletType.Homing:
+                StartCoroutine(HomingMove());
+                break;
+            case BulletType.Spiral:
+                StartCoroutine(SpiralBullets(dir));
+                break;
+            case BulletType.Split:
+                if (!isSplitted) StartCoroutine(SplitBullets(3));
+                break;
+            case BulletType.Directional:
+                StartCoroutine(DirectionalMove(dir));
+                break;
+            case BulletType.Normal:
+                StartCoroutine(MoveTargetPlayer());
+                break;
+            case BulletType.Speed:
+                StartCoroutine(MoveTargetPlayer());
+                StartCoroutine(IncreaseSpeedOverTime());
+                break;
+        }
+    }
+
     // 처음 플레이어 방향으로 일정 시간 동안 이동한 후, 해당 방향 유지
     private IEnumerator MoveTargetPlayer()
     {
@@ -186,73 +213,89 @@ public class BulletController : MonoBehaviour
         }
     }
 
-    // 지정된 방향으로 일정 시간 이동 후, 해당 방향 유지
+    //  해당 방향 유지
     private IEnumerator DirectionalMove(Vector2 moveDirection = default)
     {
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb == null) yield break;
 
-        moveDirection = moveDirection.normalized; // 방향 벡터 정규화
+        // 기본 방향이 설정되지 않았다면 기존 속도를 유지
+        if (moveDirection == Vector2.zero)
+            moveDirection = rb.velocity.normalized; // 기존 속도 유지
+
+        moveDirection = moveDirection.normalized;
         rb.velocity = moveDirection * speed;
 
-        yield return new WaitForSeconds(0.5f); // 0.5초 동안 이동 유지
+        yield return new WaitForSeconds(0.5f); // 일정 시간 동안 이동 유지 (필요 시 조정 가능)
 
-        // 이후에는 동일한 방향으로 계속 이동
-        rb.velocity = moveDirection * speed;
     }
 
 
-    // 유도 탄환 동작
+    // 개별 유도 탄환 동작
     private IEnumerator HomingMove()
     {
         float timer = 0f;
+        float gravityEffect = 0.3f;  // 포물선을 만들 중력 효과
+        float maxTurnAngle = 50f;     // 한 프레임당 최대 회전 각도 제한
+        Vector2 lastVelocity = rb.velocity;
 
-        while (timer < homingDuration && target != null)
+        while (timer < homingDuration)
         {
             if (rb != null)
             {
-                Vector2 currentVelocity = rb.velocity;
-                Vector2 targetDirection = ((Vector2)target.position - (Vector2)transform.position).normalized;
+                Vector2 targetDirection = ((Vector2)GameManager.Instance.GetPlayerData().position - (Vector2)transform.position).normalized;
 
-                // 1. 포물선 효과: Y축 속도에 중력 적용
-                Vector2 gravity = new Vector2(0, -gravityEffect * Time.deltaTime);
-                currentVelocity += gravity;
+                // 1. 포물선 효과 적용
+                rb.velocity += new Vector2(0, -gravityEffect * Time.deltaTime);
 
-                // 2. 방향 제한을 두면서 부드럽게 회전
-                float currentAngle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg;
+                // 2. 목표 방향으로 부드럽게 회전
+                float currentAngle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
                 float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-
-                // 현재 각도를 목표 각도 방향으로 부드럽게 회전 (각도 제한)
                 float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, maxTurnAngle * Time.deltaTime);
 
-                // 새로운 방향으로 속도 재설정
+                // 3. 새로운 방향으로 속도 재설정
                 Vector2 newVelocity = new Vector2(Mathf.Cos(newAngle * Mathf.Deg2Rad), Mathf.Sin(newAngle * Mathf.Deg2Rad)) * speed;
                 rb.velocity = newVelocity;
+
+                lastVelocity = newVelocity; // 마지막 속도 저장
             }
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // 유도 종료 후 마지막 방향으로 직진
+        //  유도 종료 후 마지막 방향 유지
         if (rb != null)
         {
-            rb.velocity = rb.velocity.normalized * speed;
+            rb.velocity = lastVelocity;
         }
     }
 
-    // 회오리 패턴
-    void SpiralMove()
+    private IEnumerator SpiralBullets(Vector2 moveDirection)
     {
-        float angle = Time.time * 200f;
-        Vector2 direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-        GetComponent<Rigidbody2D>().velocity = direction * speed;
+        float angle = 0;
 
+        // 초기 이동 방향을 설정
+        if (moveDirection == Vector2.zero)
+            moveDirection = Vector2.right; // 기본적으로 오른쪽으로 이동
 
+        while (true)
+        {
+            angle += 300 * Time.deltaTime; //  더 빠르게 회전 (값 조정 가능)
+
+            // 회전 벡터 계산 (원 운동)
+            Vector2 spiralDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+
+            // 기존 이동 방향에 회전 벡터를 더해서 나선형 이동
+            Vector2 finalDirection = (moveDirection + spiralDirection).normalized;
+
+            rb.velocity = finalDirection * speed;
+
+            yield return null;
+        }
     }
 
-    // 일정 거리 이동 후 분열
     private IEnumerator SplitBullets(int splitCount)
     {
+        if (isSplitted) yield break;
         isSplitted = true;
         yield return new WaitForSeconds(1.5f);
 
@@ -260,12 +303,18 @@ public class BulletController : MonoBehaviour
         {
             float angle = (360f / splitCount) * i;
             Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-            GameObject newBullet = Instantiate(gameObject, transform.position, Quaternion.identity);
-            newBullet.GetComponent<BulletController>().InitializeBullet(direction, speed, accuracy, damage, maxrange,0, BulletType.Directional);
-        }
-        Destroy(gameObject);
-    }
 
+            GameObject newBullet = Instantiate(gameObject, transform.position, Quaternion.identity);
+            BulletController bulletController = newBullet.GetComponent<BulletController>();
+
+            if (bulletController != null)
+            {
+                // 분열된 총알도 즉시 이동하도록 속도 적용
+                bulletController.InitializeBullet(direction, speed, accuracy, damage, maxrange, 0, bulletType);
+                bulletController.rb.velocity = direction * speed; //즉시 속도 설정
+            }
+        }
+    }
     void DestroyBullet()
     {
         Destroy(gameObject);

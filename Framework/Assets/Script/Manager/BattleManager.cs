@@ -82,7 +82,7 @@ public class BattleManager : MonoBehaviour
     private int currentDialogueIndex = 0;
 
     public GameObject bulletPointPrefab; // 생성할 프리팹 (유니티 인스펙터에서 지정)
-    public GameObject[] bulletspawnPoint; // 생성할 프리팹 (유니티 인스펙터에서 지정)
+    public Transform[] bulletspawnPoint; // 총알 생성위치
     public Transform spawnParent;   // 생성된 오브젝트를 담을 부모 오브젝트 (정리용)
 
     public static BattleManager Instance
@@ -184,7 +184,6 @@ public class BattleManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             SetAttack("Split", 0, 1f);//분열
-            SetAttack("Right", 0, 1f);
             
         }
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -206,12 +205,21 @@ public class BattleManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            SetAttack("Left", 0, 1f);
-            SetAttack("Left", 1, 1f);
-            SetAttack("Left", 2, 1f);
-            SetAttack("Left", 3, 1f);
-            SetAttack("Left", 4, 1f);
-            SetAttack("Left", 5, 1f);
+            SetAttack("Left", 29, 1f);
+            SetAttack("Left", 30, 1f);
+            SetAttack("Left", 31, 1f);
+            SetAttack("Left", 32, 1f);
+            SetAttack("Left", 33, 1f);
+            SetAttack("Left", 34, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            SetAttack("Normal", 29, 1f);
+            SetAttack("Normal", 30, 1f);
+            SetAttack("Normal", 31, 1f);
+            SetAttack("Normal", 32, 1f);
+            SetAttack("Normal", 33, 1f);
+            SetAttack("Normal", 34, 1f);
         }
     }
     public void BattleStart(int eventNumber)
@@ -428,6 +436,21 @@ public class BattleManager : MonoBehaviour
     //HomingBullets
     //SpiralBullets
     //SplitBullets
+    public void ChangeAllBulletTypes(BulletType newType)
+    {
+        foreach (var bullet in activeBullets)
+        {
+            if (bullet != null)
+            {
+                BulletController bulletController = bullet.GetComponent<BulletController>();
+                if (bulletController != null)
+                {
+                    bulletController.ChangeBulletType(newType);
+                }
+            }
+        }
+    }
+
     private void ExecuteAttack(string attack)
     {
         switch (attack)
@@ -532,22 +555,33 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType,int bulletpoint = -1,float delay = 0f, Vector2 dir = default)
+    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default)
     {
-        foreach (Transform bulletSpawnPoint in bulletPoints)
+        if (bulletpoint != -1)
         {
-            GameObject bullet;
-            if (bulletpoint == -1)
-                bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
-           else
-                 bullet = Instantiate(floweybulletprefab, bulletSpawnPoint.position, Quaternion.identity);
+            Transform spawnPoint;
 
+            // bulletpoint 값에 따라 왼쪽 또는 오른쪽에서 생성
+            if (bulletpoint >= 0 && bulletpoint <= 17)
+            {
+                spawnPoint = bulletspawnPoint[0]; // 왼쪽 스폰 위치
+            }
+            else if (bulletpoint >= 18 && bulletpoint <= 34)
+            {
+                spawnPoint = bulletspawnPoint[1]; // 오른쪽 스폰 위치
+            }
+            else
+            {
+                return; // 올바르지 않은 값이면 종료
+            }
+
+            GameObject bullet = Instantiate(floweybulletprefab, spawnPoint.position, spawnPoint.rotation);
             BulletController bulletController = bullet.GetComponent<BulletController>();
 
             if (bulletController != null)
             {
-                Vector2 direction = (bulletSpawnTransforms[bulletpoint].position - bulletSpawnPoint.position).normalized;
-                bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
+                Vector2 direction = (bulletSpawnTransforms[bulletpoint].position - spawnPoint.position).normalized;
+                bulletController.InitializeBullet(direction, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
                 activeBullets.Add(bulletController.gameObject);
             }
         }
@@ -555,7 +589,8 @@ public class BattleManager : MonoBehaviour
 
 
 
-#endregion
+
+    #endregion
     private void HandleSpecialEvent(string eventType,string dialogue)
     {
         switch (eventType)
