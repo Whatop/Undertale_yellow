@@ -221,6 +221,15 @@ public class BattleManager : MonoBehaviour
             SetAttack("Normal", 33, 1f);
             SetAttack("Normal", 34, 1f);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            SetAttack("Speed", 0, 1f);
+            SetAttack("Speed", 1, 1f);
+            SetAttack("Speed", 2, 1f);
+            SetAttack("Speed", 3, 1f);
+            SetAttack("Speed", 4, 1f);
+            SetAttack("Speed", 5, 1f);
+        }
     }
     public void BattleStart(int eventNumber)
     {
@@ -511,16 +520,16 @@ public class BattleManager : MonoBehaviour
         {
 
             case "Left":
-                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.left);
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.left.normalized);
                 break;
             case "Right":
-                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.right);
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.right.normalized);
                 break;
             case "Up":
-                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.up);
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.up.normalized);
                 break;
             case "Down":
-                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.down);
+                SpawnBullets(BulletType.Directional, bulletpoint, delay, Vector2.down.normalized);
                 break;
             case "UpLeft":
                 SpawnBullets(BulletType.Directional, bulletpoint, delay, new Vector2(-1, 1).normalized);
@@ -548,6 +557,9 @@ public class BattleManager : MonoBehaviour
                 break;
             case "Split":
                 SpawnBullets(BulletType.Split, bulletpoint, delay);
+                break;
+            case "Speed":
+                SpawnBullets(BulletType.Speed, bulletpoint, delay);
                 break;
             default:
                 Debug.LogWarning($"Unknown attack pattern: {attack}");
@@ -580,8 +592,7 @@ public class BattleManager : MonoBehaviour
 
             if (bulletController != null)
             {
-                Vector2 direction = (bulletSpawnTransforms[bulletpoint].position - spawnPoint.position).normalized;
-                bulletController.InitializeBullet(direction, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
+                 bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
                 activeBullets.Add(bulletController.gameObject);
             }
         }
