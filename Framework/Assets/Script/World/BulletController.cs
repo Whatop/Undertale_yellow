@@ -27,7 +27,6 @@ public class BulletController : MonoBehaviour
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
-    private bool isActivated = false;
     private bool isSplitted = false; // 분열 여부 확인
     private bool isHoming = false; // 추격 여부 확인
     private bool isSpiral = false; // 회전 여부 확인
@@ -65,37 +64,40 @@ public class BulletController : MonoBehaviour
         {
             GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
         }
-
-        StartPattern(); // 처음 시작할 때 실행
     }
-    // 처음 한 번만 패턴을 실행
     private void StartPattern()
     {
-        if (isActivated) return; // 한 번만 실행되도록 제한
-        isActivated = true;
 
-        switch (bulletType)
+        if (!isFreind)//적
         {
-            case BulletType.Homing:
-                StartCoroutine(HomingMove());
-                break;
-            case BulletType.Spiral:
-                StartCoroutine(MoveTargetPlayer());
-                break;
-            case BulletType.Split:
-                if (!isSplitted) StartCoroutine(SplitBullets(3));
-                break;
-            case BulletType.Normal:
-                StartCoroutine(MoveTargetPlayer());
-                break;
-            case BulletType.Speed:
-                StartCoroutine(MoveTargetPlayer());
-                StartCoroutine(IncreaseSpeedOverTime());
-                break;
+            switch (bulletType)
+            {
+                case BulletType.Homing:
+                    StartCoroutine(HomingMove());
+                    StartCoroutine(MoveTargetPlayer());
+                    break;
+                case BulletType.Spiral:
+                    StartCoroutine(SpiralBullets());
+                    break;
+                case BulletType.Split:
+                    if (!isSplitted) StartCoroutine(SplitBullets(3));
+                    break;
+                case BulletType.Normal:
+                    StartCoroutine(MoveTargetPlayer());
+                    break;
+                case BulletType.Speed:
+                    StartCoroutine(MoveTargetPlayer());
+                    StartCoroutine(IncreaseSpeedOverTime());
+                    break;
+            }
+        }
+        else //플레이어
+        {
+
         }
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 float delay = 0,BulletType type = default, Transform target = null)
+                                 float delay = 0, BulletType type = default, Transform target = null)
     {
         speed = bulletSpeed;
         damage = bulletDamage;
@@ -119,23 +121,22 @@ public class BulletController : MonoBehaviour
         }
     }
 
-  void Update()
-{
-    if (!isActivated) return;
-
-    switch (bulletType)
+    void Update()
     {
-        case BulletType.Homing:
-                if(isHoming)
-            UpdateHoming(); // ← 매 프레임 동작
-            break;
 
-        case BulletType.Spiral:
-                if(isSpiral)
-            UpdateSpiral(); // ← 회전 반경 커지도록 설정
+        switch (bulletType)
+        {
+            case BulletType.Homing:
+                if (isHoming)
+                    UpdateHoming(); // ← 매 프레임 동작
                 break;
+
+            case BulletType.Spiral:
+                if (isSpiral)
+                    UpdateSpiral(); // ← 회전 반경 커지도록 설정
+                break;
+        }
     }
-}
     // Homing 탄환 매 프레임 추적
     private void UpdateHoming()
     {
@@ -172,23 +173,27 @@ public class BulletController : MonoBehaviour
             isHoming = false;
         }
     }
-        private void UpdateSpiral()
+    private void UpdateSpiral()
     {
         if (rb == null) return;
 
-        spiralAngle += 300 * Time.deltaTime;
-        spiralRadius += 0.2f * Time.deltaTime; // ← 점점 커지는 반경
+        // 1) 각도를 '도'에서 '라디안'으로 변환하여 증가시키는 예시
+        spiralAngle += 300f * Mathf.Deg2Rad * Time.deltaTime; // 초당 300도 회전
+        spiralRadius = 1.75f; 
+     
+                                                                    // 3) 스파이럴 벡터 계산 (이미 라디안으로 cos/sin 사용)
+        Vector2 spiral = new Vector2(
+            Mathf.Cos(spiralAngle),
+            Mathf.Sin(spiralAngle)
+        ) * spiralRadius;
 
-        Vector2 spiral = new Vector2(Mathf.Cos(spiralAngle), Mathf.Sin(spiralAngle)) * spiralRadius;
-        Vector2 direction = spiral.normalized;
-
-        rb.velocity = direction * speed;
+        // 4) velocity 지정 (Time.deltaTime은 빼고 speed만 곱)
+        rb.velocity = spiral * speed;
     }
 
     public void ChangeBulletType(BulletType newType)
     {
         bulletType = newType;
-        isActivated = false; // 새로운 타입이 설정되었으므로 다시 실행 가능하도록 변경
 
         // 색상 변경
         if (GetComponent<SpriteRenderer>() != null)
@@ -236,21 +241,19 @@ public class BulletController : MonoBehaviour
 
 
     // 패턴 실행을 위한 분리된 메서드
-    private void ExecuteBulletPattern(BulletType type,Vector2 dir = default)
+    private void ExecuteBulletPattern(BulletType type, Vector2 dir = default)
     {
         switch (type)
         {
             case BulletType.Homing:
                 StartCoroutine(HomingMove());
+                StartCoroutine(MoveTargetPlayer());
                 break;
             case BulletType.Spiral:
-                StartCoroutine(SpiralBullets(dir));
+                StartCoroutine(SpiralBullets());
                 break;
             case BulletType.Split:
                 if (!isSplitted) StartCoroutine(SplitBullets(3));
-                break;
-            case BulletType.Directional:
-                StartCoroutine(DirectionalMove(dir));
                 break;
             case BulletType.Normal:
                 StartCoroutine(MoveTargetPlayer());
@@ -259,22 +262,25 @@ public class BulletController : MonoBehaviour
                 StartCoroutine(MoveTargetPlayer());
                 StartCoroutine(IncreaseSpeedOverTime());
                 break;
+            case BulletType.Directional:
+                StartCoroutine(DirectionalMove(dir));
+                break;
         }
     }
 
     // 처음 플레이어 방향으로 일정 시간 동안 이동한 후, 해당 방향 유지
     private IEnumerator MoveTargetPlayer()
     {
-            target = GameManager.Instance.GetPlayerData().player.transform; // 플레이어를 타겟으로 설정
+        target = GameManager.Instance.GetPlayerData().player.transform; // 플레이어를 타겟으로 설정
 
-            Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // 플레이어 방향 계산
-            GetComponent<Rigidbody2D>().velocity = direction * speed; // 처음 속도 설정
+        Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // 플레이어 방향 계산
+        GetComponent<Rigidbody2D>().velocity = direction * speed; // 처음 속도 설정
 
-            yield return new WaitForSeconds(0.5f); // 0.5초 동안 플레이어 방향 유지
+        yield return new WaitForSeconds(0.5f); // 0.5초 동안 플레이어 방향 유지
 
-            // 이후에는 해당 방향을 유지하면서 직진
-            GetComponent<Rigidbody2D>().velocity = direction * speed;
-        
+        // 이후에는 해당 방향을 유지하면서 직진
+        GetComponent<Rigidbody2D>().velocity = direction * speed;
+
     }
 
 
@@ -309,24 +315,13 @@ public class BulletController : MonoBehaviour
     private IEnumerator HomingMove()
     {
         isHoming = true;
-            yield return null;
-       }
+        yield return null;
+    }
 
-    private IEnumerator SpiralBullets(Vector2 moveDirection)
+    private IEnumerator SpiralBullets(Vector2 moveDirection = default)
     {
-        isSpiral = true;
-        float angle = 0f;
-        if (moveDirection == Vector2.zero)
-                moveDirection = ((Vector2)GameManager.Instance.GetPlayerData().player.transform.position - (Vector2)transform.position).normalized;
-       
-        while (true)
-        {
-            angle += 300 * Time.deltaTime;
-            Vector2 spiral = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-            Vector2 finalDir = (moveDirection + spiral).normalized;
-            rb.velocity = finalDir * speed;
-            yield return null;
-        }
+           isSpiral = true;
+        yield return null;
     }
 
 
@@ -345,7 +340,7 @@ public class BulletController : MonoBehaviour
             GameObject newBullet = Instantiate(gameObject, transform.position, Quaternion.identity);
             BulletController bulletController = newBullet.GetComponent<BulletController>();
             bulletController.InitializeBullet(direction, speed, accuracy, damage, maxrange, 0, BulletType.Directional);
-           
+
         }
         DestroyBullet();
     }

@@ -188,7 +188,8 @@ public class BattleManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SetAttack("Spiral", 0, 1f);//회오리
+            SetAttack("Spiral", 10, 1f);//회오리
+            SetAttack("Spiral", 24, 1f);//회오리
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
