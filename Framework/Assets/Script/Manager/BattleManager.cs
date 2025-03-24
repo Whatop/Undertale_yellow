@@ -123,7 +123,7 @@ public class BattleManager : MonoBehaviour
         isFirstInteraction = true;
         isEvent = false;
         test_curboss = 0;
-        GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 7);
+        GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 12);
         LoadBossData();
     }
     private void GenerateGrid(float xStart, float xEnd, int xCount, float yStart, float yEnd, int yCount)
@@ -188,8 +188,8 @@ public class BattleManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SetAttack("Spiral", 10, 1f);//회오리
-            SetAttack("Spiral", 24, 1f);//회오리
+            SetAttack("Spiral_S", 10, 1f);//회오리
+            SetAttack("Spiral_S", 24, 1f);//회오리
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -197,21 +197,11 @@ public class BattleManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            SetAttack("Right", 0, 1f);
-            SetAttack("Right", 1, 1f);
-            SetAttack("Right", 2, 1f);
-            SetAttack("Right", 3, 1f);
-            SetAttack("Right", 4, 1f);
-            SetAttack("Right", 5, 1f);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SetAttack("Left", 29, 1f);
-            SetAttack("Left", 30, 1f);
-            SetAttack("Left", 31, 1f);
-            SetAttack("Left", 32, 1f);
-            SetAttack("Left", 33, 1f);
-            SetAttack("Left", 34, 1f);
+            for(int i =0; 12>i; i++)
+                SetAttack("Right", i, 1f);
+
+            for (int i = 48; 60 > i; i++)
+                SetAttack("Left", i, 1f);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
@@ -230,6 +220,14 @@ public class BattleManager : MonoBehaviour
             SetAttack("Speed", 3, 1f);
             SetAttack("Speed", 4, 1f);
             SetAttack("Speed", 5, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            SetAttack("Spiral_M", 10, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            SetAttack("Spiral_R", 24, 1f);
         }
     }
     public void BattleStart(int eventNumber)
@@ -553,8 +551,14 @@ public class BattleManager : MonoBehaviour
             case "Homing":
                 SpawnBullets(BulletType.Homing, bulletpoint, delay);
                 break;
-            case "Spiral":
-                SpawnBullets(BulletType.Spiral, bulletpoint, delay);
+            case "Spiral_S":
+                SpawnBullets(BulletType.Spiral, bulletpoint, delay, default, 0);
+                break;
+            case "Spiral_M":
+                SpawnBullets(BulletType.Spiral, bulletpoint, delay, default, 1);
+                break;
+            case "Spiral_R":
+                SpawnBullets(BulletType.Spiral, bulletpoint, delay, default, 2);
                 break;
             case "Split":
                 SpawnBullets(BulletType.Split, bulletpoint, delay);
@@ -568,18 +572,18 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default)
+    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default,int size = 0)
     {
         if (bulletpoint != -1)
         {
             Transform spawnPoint;
 
             // bulletpoint 값에 따라 왼쪽 또는 오른쪽에서 생성
-            if (bulletpoint >= 0 && bulletpoint <= 17)
+            if (bulletpoint >= 0 && bulletpoint <= 29)
             {
                 spawnPoint = bulletspawnPoint[0]; // 왼쪽 스폰 위치
             }
-            else if (bulletpoint >= 18 && bulletpoint <= 34)
+            else if (bulletpoint >= 30 && bulletpoint <= 59)
             {
                 spawnPoint = bulletspawnPoint[1]; // 오른쪽 스폰 위치
             }
@@ -593,7 +597,7 @@ public class BattleManager : MonoBehaviour
 
             if (bulletController != null)
             {
-                 bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint]);
+                 bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint],size);
                 activeBullets.Add(bulletController.gameObject);
             }
         }

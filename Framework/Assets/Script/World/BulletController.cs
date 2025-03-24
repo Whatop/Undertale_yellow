@@ -9,7 +9,8 @@ public enum BulletType
     Split,      // 분열 총알
     Directional,// 방향 지정 총알
     FixedPoint,  // 특정 위치로 이동하는 총알
-    Speed // 점점 빨라지는
+    Speed, // 점점 빨라지는
+    None
 }
 
 public class BulletController : MonoBehaviour
@@ -40,6 +41,7 @@ public class BulletController : MonoBehaviour
     // Spiral 탄환 매 프레임 나선형 증가
     private float spiralAngle = 0f;
     private float spiralRadius = 0.5f;
+    private float bulletSize = 0;
 
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
@@ -50,7 +52,8 @@ public class BulletController : MonoBehaviour
         { BulletType.Split, Color.green },
         { BulletType.Directional, Color.white },
         { BulletType.Speed, Color.white },
-        { BulletType.FixedPoint, Color.cyan }
+        { BulletType.FixedPoint, Color.cyan },
+        { BulletType.None, Color.white }
     }
     ; private void Awake()
     {
@@ -97,7 +100,7 @@ public class BulletController : MonoBehaviour
         }
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 float delay = 0, BulletType type = default, Transform target = null)
+                                 float delay = 0, BulletType type = default, Transform target = null,int size = 0)
     {
         speed = bulletSpeed;
         damage = bulletDamage;
@@ -105,6 +108,7 @@ public class BulletController : MonoBehaviour
         maxrange = maxRange;
         bulletType = type;
         storedFireDirection = fireDirection;
+        bulletSize= size;
 
         if (target != null)
         {
@@ -179,7 +183,6 @@ public class BulletController : MonoBehaviour
 
         // 1) 각도를 '도'에서 '라디안'으로 변환하여 증가시키는 예시
         spiralAngle += 300f * Mathf.Deg2Rad * Time.deltaTime; // 초당 300도 회전
-        spiralRadius = 1.75f; 
      
                                                                     // 3) 스파이럴 벡터 계산 (이미 라디안으로 cos/sin 사용)
         Vector2 spiral = new Vector2(
@@ -221,8 +224,9 @@ public class BulletController : MonoBehaviour
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
             Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-            Vector2 newPos = rb.position + direction * speed * 5f * Time.deltaTime;
+            Vector2 newPos = rb.position + direction * speed * Time.deltaTime;
             rb.MovePosition(newPos); // ← 이걸로 이동
+            elapsed += Time.deltaTime; // 누락된 타이머 증가 코드
             yield return null;
         }
 
@@ -264,6 +268,10 @@ public class BulletController : MonoBehaviour
                 break;
             case BulletType.Directional:
                 StartCoroutine(DirectionalMove(dir));
+                break;
+
+            case BulletType.None:
+                Debug.Log("총알대기");
                 break;
         }
     }
@@ -318,9 +326,22 @@ public class BulletController : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator SpiralBullets(Vector2 moveDirection = default)
+    private IEnumerator SpiralBullets()
     {
            isSpiral = true;
+        switch (bulletSize)
+        {
+            case 0:
+                spiralRadius = 1.75f; // 작은원
+                break;
+            case 1:
+                spiralRadius = 2.75f; // 중간원
+                break;
+            case 2:
+                spiralRadius = 3.75f; // 큰원
+                break;
+        }
+
         yield return null;
     }
 
