@@ -28,6 +28,14 @@ public class BattleDatabase
 {
     public List<BossBattleData> bossBattles;
 }
+[System.Serializable]
+public class BulletPool
+{
+    public string bulletName;
+    public GameObject prefab;
+    public int poolSize;
+}
+
 
 public class BattleManager : MonoBehaviour
 {
@@ -84,6 +92,11 @@ public class BattleManager : MonoBehaviour
     public GameObject bulletPointPrefab; // 생성할 프리팹 (유니티 인스펙터에서 지정)
     public Transform[] bulletspawnPoint; // 총알 생성위치
     public Transform spawnParent;   // 생성된 오브젝트를 담을 부모 오브젝트 (정리용)
+   
+    [SerializeField]
+    private List<BulletPool> bulletPools;
+
+    private Dictionary<string, Queue<GameObject>> bulletPoolDict;
 
     public static BattleManager Instance
     {
@@ -118,6 +131,7 @@ public class BattleManager : MonoBehaviour
         battleObject.SetActive(true);
         boss_sentences = new Queue<BossDialogue>();
 
+        InitializeBulletPools();
         // 필수 상태 초기화
         isTalking = false;
         isFirstInteraction = true;
@@ -126,6 +140,29 @@ public class BattleManager : MonoBehaviour
         GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 12);
         LoadBossData();
     }
+
+    #region ObjectPool
+    private void InitializeBulletPools()
+    {
+        bulletPoolDict = new Dictionary<string, Queue<GameObject>>();
+
+        foreach (var pool in bulletPools)
+        {
+            Queue<GameObject> objectPool = new Queue<GameObject>();
+
+            for (int i = 0; i < pool.poolSize; i++)
+            {
+                GameObject obj = Instantiate(pool.prefab);
+                obj.SetActive(false);
+                objectPool.Enqueue(obj);
+            }
+
+            bulletPoolDict.Add(pool.bulletName, objectPool);
+        }
+    }
+
+    #endregion
+    #region BulletPoints
     private void GenerateGrid(float xStart, float xEnd, int xCount, float yStart, float yEnd, int yCount)
     {
         float[] xPositions = GeneratePositions(xStart, xEnd, xCount);
@@ -156,6 +193,7 @@ public class BattleManager : MonoBehaviour
 
         return positions;
     }
+    #endregion
     public void BattleSetting()
     {
         Boss_AllObject.SetActive(true);
@@ -572,36 +610,36 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default,int size = 0)
+    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default, int size = 0)
     {
         if (bulletpoint != -1)
         {
-            Transform spawnPoint;
+            Transform spawnPoint = bulletpoint >= 30 ? bulletspawnPoint[1] : bulletspawnPoint[0];
+            string poolKey = bulletType.ToString();
 
-            // bulletpoint 값에 따라 왼쪽 또는 오른쪽에서 생성
-            if (bulletpoint >= 0 && bulletpoint <= 29)
+            if (bulletPoolDict.ContainsKey(poolKey))
             {
-                spawnPoint = bulletspawnPoint[0]; // 왼쪽 스폰 위치
-            }
-            else if (bulletpoint >= 30 && bulletpoint <= 59)
-            {
-                spawnPoint = bulletspawnPoint[1]; // 오른쪽 스폰 위치
+                GameObject bullet = bulletPoolDict[poolKey].Dequeue();
+                bullet.transform.position = spawnPoint.position;
+                bullet.transform.rotation = spawnPoint.rotation;
+                bullet.SetActive(true);
+
+                BulletController bulletController = bullet.GetComponent<BulletController>();
+                if (bulletController != null)
+                {
+                    bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint], size);
+                    activeBullets.Add(bullet);
+                }
+
+                bulletPoolDict[poolKey].Enqueue(bullet); // 다시 넣어줌
             }
             else
             {
-                return; // 올바르지 않은 값이면 종료
-            }
-
-            GameObject bullet = Instantiate(floweybulletprefab, spawnPoint.position, spawnPoint.rotation);
-            BulletController bulletController = bullet.GetComponent<BulletController>();
-
-            if (bulletController != null)
-            {
-                 bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint],size);
-                activeBullets.Add(bulletController.gameObject);
+                Debug.LogWarning($"총알 풀 {poolKey}이 존재하지 않습니다.");
             }
         }
     }
+
 
 
 

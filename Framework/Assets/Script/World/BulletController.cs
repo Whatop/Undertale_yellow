@@ -22,6 +22,7 @@ public class BulletController : MonoBehaviour
     public float maxrange = 10f;
     public bool isFreind = false;
 
+    private float maxLifetime = 10f; 
     private float gravityEffect = 0.3f;  // 포물선 중력 효과
     private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
     private float homingDuration = 5f;  // 유도 지속 시간
@@ -68,6 +69,15 @@ public class BulletController : MonoBehaviour
             GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
         }
     }
+    private void OnEnable()
+    {
+        isHoming = false;
+        isSpiral = false;
+        isSplitted = false;
+        rb.velocity = Vector2.zero;
+        // 필요하다면 scale, rotation, 색상 초기화 등도 여기서
+    }
+
     private void StartPattern()
     {
 
@@ -101,7 +111,17 @@ public class BulletController : MonoBehaviour
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
                                  float delay = 0, BulletType type = default, Transform target = null,int size = 0)
-    {
+    {  // 기존 값 설정 외에...
+        isHoming = false;
+        isSpiral = false;
+        isSplitted = false;
+        rb.velocity = Vector2.zero;
+
+        // 색상 다시 설정
+        var renderer = GetComponent<SpriteRenderer>();
+        if (renderer != null)
+            renderer.color = bulletColors[bulletType];
+
         speed = bulletSpeed;
         damage = bulletDamage;
         accuracy = bulletAccuracy;
@@ -365,10 +385,6 @@ public class BulletController : MonoBehaviour
         }
         DestroyBullet();
     }
-    void DestroyBullet()
-    {
-        Destroy(gameObject);
-    }
     void OnTriggerEnter2D(Collider2D other)
     {
         //Debug.Log($"총알이 {other.gameObject.name}과 충돌");
@@ -382,6 +398,10 @@ public class BulletController : MonoBehaviour
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
             DestroyBullet();
         }
+    }
+    void DestroyBullet()
+    {
+        gameObject.SetActive(false);
     }
 
 }
