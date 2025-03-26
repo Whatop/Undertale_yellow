@@ -176,7 +176,7 @@ public class PlayerMovement : LivingObject
     private float distanceCovered = 0f;  // 누적 이동 거리
     public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
     private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
-  
+
     #region unity_code
     // Awake 메서드: 초기 설정
     protected override void Awake()
@@ -234,7 +234,7 @@ public class PlayerMovement : LivingObject
             // R키 입력 시 재장전
             if (Input.GetKeyDown(KeyCode.R) && !isReloading && curweaponData.current_magazine != curweaponData.magazine && !UIManager.Instance.isInventroy)
             {
-                if(isSoulActive)
+                if (isSoulActive)
                     SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
                 else
                     SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
@@ -277,7 +277,7 @@ public class PlayerMovement : LivingObject
                 }
 
 
-                if (objectState != ObjectState.Roll ) // 🔹 구르기 중에는 애니메이션 초기화 X
+                if (objectState != ObjectState.Roll) // 🔹 구르기 중에는 애니메이션 초기화 X
                 {
                     SetAnimatorBooleansFalse();
                     HandleObjectState(angle);
@@ -288,7 +288,7 @@ public class PlayerMovement : LivingObject
                 }
             }
 
-           
+
 
 
             if (isSoulActive)
@@ -494,12 +494,12 @@ public class PlayerMovement : LivingObject
             SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
 
         float reloadProgress = 0f;
-            while (reloadProgress < reloadTime)
-            {
-                reloadProgress += Time.deltaTime;
-                UIManager.Instance.SetReloadSliderValue(reloadProgress);
-                yield return null;
-            }
+        while (reloadProgress < reloadTime)
+        {
+            reloadProgress += Time.deltaTime;
+            UIManager.Instance.SetReloadSliderValue(reloadProgress);
+            yield return null;
+        }
         // 재장전 완료
         curweaponData.current_magazine = curweaponData.magazine;
         gameManager.SaveWeaponData(curweaponData);
@@ -548,7 +548,7 @@ public class PlayerMovement : LivingObject
             current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading && !tutorialDontShot)
         {
             Shoot();
-            if(!curweaponData.IsInfiniteAmmo())
+            if (!curweaponData.IsInfiniteAmmo())
                 curweaponData.current_Ammo -= 1;
 
             curweaponData.current_magazine -= 1;
@@ -569,32 +569,37 @@ public class PlayerMovement : LivingObject
     void Shoot()
     {
         // 현재 Soul 모드인지 확인하여 적절한 총알을 생성
-        GameObject bullet;
-        Transform spawnPoint;
-
+     
         if (!isSoulActive)
         {
-            bullet = Instantiate(bulletPrefab, shotpoint.position, WeaponTransform.rotation);
-            spawnPoint = shotpoint;
+            // 총알 스폰
+            BattleManager.Instance.SpawnBulletAtPosition(
+             BulletType.Directional,
+             shotpoint.position,
+             WeaponTransform.rotation,
+             WeaponTransform.up,
+             "Player_Normal", true);
+
+            // 총구 화염 이펙트 생성
+            StartCoroutine(ShowMuzzleFlash(shotpoint));
+            // 반동 효과 추가
+            StartCoroutine(ApplyRecoil());
         }
         else
         {
-            bullet = Instantiate(soulbulletPrefab, soulshotpoint.position, WeaponTransform.rotation);
-            spawnPoint = soulshotpoint;
+            BattleManager.Instance.SpawnBulletAtPosition(
+               BulletType.Directional,
+               soulshotpoint.position,
+               WeaponTransform.rotation,
+               WeaponTransform.up,
+              
+               "Player_Soul", true);
         }
 
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        bulletRb.velocity = WeaponTransform.up * bulletSpeed;
-
-        // 총구 화염 이펙트 생성
-        StartCoroutine(ShowMuzzleFlash(spawnPoint));
-
-        // 반동 효과 추가
-        StartCoroutine(ApplyRecoil());
 
         // 사운드 및 애니메이션 실행  
-        if(isSoulActive)
-            SoundManager.Instance.SFXPlay("soul_shot_01" , 124);
+        if (isSoulActive)
+            SoundManager.Instance.SFXPlay("soul_shot_01", 124);
         else
             SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
         WeaponsAnimator.SetTrigger("Shot");
@@ -743,14 +748,14 @@ public class PlayerMovement : LivingObject
             // 자연스러운 구르기 동작을 위해 속도를 일정하게 유지
             rigid.velocity = rollDirection * rollSpeed * Mathf.Lerp(1f, 0f, t);
 
-            if (!isSoulActive&&!effectPlayed && rollTime > rollDuration - 0.3f)
+            if (!isSoulActive && !effectPlayed && rollTime > rollDuration - 0.3f)
             {
                 EffectManager.Instance.SpawnEffect("rolleffect2", feetPoint.transform.position, Quaternion.identity);
                 effectPlayed = true;
             }
             if (isSoulActive && Time.time - lastSpawnTime >= soulEffectSpawnInterval)
             {
-                EffectManager.Instance.SpawnEffect("soul_rolleffect",transform.position, soulObject.transform.rotation);
+                EffectManager.Instance.SpawnEffect("soul_rolleffect", transform.position, soulObject.transform.rotation);
                 lastSpawnTime = Time.time;
             }
 
@@ -865,7 +870,7 @@ public class PlayerMovement : LivingObject
     public void UpdateWeaponUI(Weapon currentWeapon)
     {
         UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = currentWeapon.weaponColor;
-       // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
+        // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
     }
     void SelectWeapon(int index)
     {

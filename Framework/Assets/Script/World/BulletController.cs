@@ -110,7 +110,7 @@ public class BulletController : MonoBehaviour
         }
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
-                                 float delay = 0, BulletType type = default, Transform target = null,int size = 0)
+                                 float delay = 0, BulletType type = default, Transform target = null,int size = 0, bool isfreind = false)
     {  // 기존 값 설정 외에...
         isHoming = false;
         isSpiral = false;
@@ -129,6 +129,7 @@ public class BulletController : MonoBehaviour
         bulletType = type;
         storedFireDirection = fireDirection;
         bulletSize= size;
+        isFreind = isfreind;
 
         if (target != null)
         {

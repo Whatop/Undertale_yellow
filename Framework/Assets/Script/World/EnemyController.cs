@@ -99,23 +99,16 @@ public class EnemyController : LivingObject
 
     void Shoot()
     {
-       // weaponData.current_magazine = weaponData.magazine;
-       //
-       // GameObject bullet = BattleManager.Instance.GetBulletFromPool();
-       // if (bullet == null) return;
-       //
-       // bullet.transform.position = WeaponTransform.position;
-       // bullet.transform.rotation = WeaponTransform.rotation;
-       //
-       // Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-       // bulletRb.velocity = hand.up * bulletSpeed;
-       //
-       // BulletController bulletController = bullet.GetComponent<BulletController>();
-       // if (bulletController != null)
-       // {
-       //     bulletController.isFreind = false;
-       //     bulletController.InitializeBullet(hand.up, bulletSpeed, 0f, weaponData.damage, 15f); // 예시
-       // }
+       weaponData.current_magazine = weaponData.magazine;
+
+        BattleManager.Instance.SpawnBulletAtPosition(
+      BulletType.Normal,
+      WeaponTransform.position,
+      WeaponTransform.rotation,
+      hand.up,
+      "Enemy_None"
+  );
+
         // weaponData.current_magazine = weaponData.magazine;
         //
         // // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.

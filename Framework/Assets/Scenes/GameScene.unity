@@ -7150,7 +7150,7 @@ Transform:
   m_GameObject: {fileID: 80146885}
   m_LocalRotation: {x: -0, y: -0, z: 0.7090838, w: 0.70512426}
   m_LocalPosition: {x: -0.012000009, y: 0.058000006, z: 0}
-  m_LocalScale: {x: 0.7762502, y: 0.91250026, z: 0}
+  m_LocalScale: {x: 0.19, y: 0.19, z: 0}
   m_Children: []
   m_Father: {fileID: 848881821}
   m_RootOrder: 0
@@ -18991,6 +18991,19 @@ MonoBehaviour:
   - {fileID: 2097083109}
   - {fileID: 733600890}
   spawnParent: {fileID: 356459343}
+  bulletPools:
+  - bulletName: Player_Normal
+    prefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
+    poolSize: 6
+  - bulletName: Player_Soul
+    prefab: {fileID: 5549927540565692596, guid: 3fbde0282b2a573448de87287aeb1299, type: 3}
+    poolSize: 6
+  - bulletName: Flowey_Normal
+    prefab: {fileID: 920763300628505674, guid: 3985435fb051a344b9e89b6fa49cba8c, type: 3}
+    poolSize: 6
+  - bulletName: Enemy_None
+    prefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
+    poolSize: 6
   isTalking: 0
   isEvent: 0
   boss_id: 0

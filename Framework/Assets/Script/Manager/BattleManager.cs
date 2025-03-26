@@ -92,7 +92,8 @@ public class BattleManager : MonoBehaviour
     public GameObject bulletPointPrefab; // 생성할 프리팹 (유니티 인스펙터에서 지정)
     public Transform[] bulletspawnPoint; // 총알 생성위치
     public Transform spawnParent;   // 생성된 오브젝트를 담을 부모 오브젝트 (정리용)
-   
+
+
     [SerializeField]
     private List<BulletPool> bulletPools;
 
@@ -610,16 +611,16 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default, int size = 0)
+    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default, int size = 0, string prefab = "Flowey_Normal")
     {
         if (bulletpoint != -1)
         {
             Transform spawnPoint = bulletpoint >= 30 ? bulletspawnPoint[1] : bulletspawnPoint[0];
             string poolKey = bulletType.ToString();
 
-            if (bulletPoolDict.ContainsKey(poolKey))
+            if (bulletPoolDict.ContainsKey(prefab))
             {
-                GameObject bullet = bulletPoolDict[poolKey].Dequeue();
+                GameObject bullet = bulletPoolDict[prefab].Dequeue();
                 bullet.transform.position = spawnPoint.position;
                 bullet.transform.rotation = spawnPoint.rotation;
                 bullet.SetActive(true);
@@ -627,11 +628,11 @@ public class BattleManager : MonoBehaviour
                 BulletController bulletController = bullet.GetComponent<BulletController>();
                 if (bulletController != null)
                 {
-                    bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint], size);
+                    bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint], size, false);
                     activeBullets.Add(bullet);
                 }
 
-                bulletPoolDict[poolKey].Enqueue(bullet); // 다시 넣어줌
+                bulletPoolDict[prefab].Enqueue(bullet); // 다시 넣어줌
             }
             else
             {
@@ -640,6 +641,28 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public void SpawnBulletAtPosition(BulletType type, Vector2 position, Quaternion rotation, Vector2 dir, string prefab = "None",bool isfriends = false)
+    {
+        if (!bulletPoolDict.ContainsKey(prefab))
+        {
+            Debug.LogWarning($"총알 풀 '{prefab}'이 존재하지 않습니다.");
+            return;
+        }
+
+        GameObject bullet = bulletPoolDict[prefab].Dequeue();
+        bullet.transform.position = position;
+        bullet.transform.rotation = rotation;
+        bullet.SetActive(true);
+
+        BulletController bulletController = bullet.GetComponent<BulletController>();
+        if (bulletController != null)
+        {
+            bulletController.InitializeBullet(dir, bulletController.speed, 0f, bulletController.damage, 15f, 0, type, null,0, isfriends);
+            activeBullets.Add(bullet);
+        }
+
+        bulletPoolDict[prefab].Enqueue(bullet);
+    }
 
 
 
