@@ -107,6 +107,7 @@ public class EnemyController : LivingObject
       WeaponTransform.rotation,
       hand.up,
       "Enemy_None"
+      ,0,0,false
   );
 
         // weaponData.current_magazine = weaponData.magazine;

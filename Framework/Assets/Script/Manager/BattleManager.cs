@@ -97,7 +97,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField]
     private List<BulletPool> bulletPools;
 
-    private Dictionary<string, Queue<GameObject>> bulletPoolDict;
+    private Dictionary<string, List<GameObject>> bulletPoolDict;
 
     public static BattleManager Instance
     {
@@ -145,22 +145,51 @@ public class BattleManager : MonoBehaviour
     #region ObjectPool
     private void InitializeBulletPools()
     {
-        bulletPoolDict = new Dictionary<string, Queue<GameObject>>();
+        bulletPoolDict = new Dictionary<string, List<GameObject>>();
 
         foreach (var pool in bulletPools)
         {
-            Queue<GameObject> objectPool = new Queue<GameObject>();
+            List<GameObject> objectList = new List<GameObject>();
 
             for (int i = 0; i < pool.poolSize; i++)
             {
                 GameObject obj = Instantiate(pool.prefab);
                 obj.SetActive(false);
-                objectPool.Enqueue(obj);
+                objectList.Add(obj);
             }
 
-            bulletPoolDict.Add(pool.bulletName, objectPool);
+            bulletPoolDict.Add(pool.bulletName, objectList);
         }
     }
+    private GameObject GetBulletFromPool(string key)
+    {
+        if (!bulletPoolDict.ContainsKey(key))
+        {
+            Debug.LogWarning($"총알 풀 '{key}'이 존재하지 않습니다.");
+            return null;
+        }
+
+        var poolList = bulletPoolDict[key];
+        foreach (var obj in poolList)
+        {
+            if (!obj.activeInHierarchy)
+                return obj;
+        }
+
+        // 모두 사용 중이면 새로 생성
+        GameObject prefab = bulletPools.Find(p => p.bulletName == key)?.prefab;
+        if (prefab == null)
+        {
+            Debug.LogError($"'{key}'에 대한 프리팹을 찾을 수 없습니다.");
+            return null;
+        }
+
+        GameObject newObj = Instantiate(prefab);
+        newObj.SetActive(false);
+        poolList.Add(newObj);
+        return newObj;
+    }
+
 
     #endregion
     #region BulletPoints
@@ -269,6 +298,12 @@ public class BattleManager : MonoBehaviour
             SetAttack("Spiral_R", 24, 1f);
         }
     }
+    private void LateUpdate()
+    {
+        // 비활성화된 총알 제거
+        activeBullets.RemoveAll(b => b == null || !b.activeInHierarchy);
+    }
+
     public void BattleStart(int eventNumber)
     {
 
@@ -611,59 +646,66 @@ public class BattleManager : MonoBehaviour
         }
     }
     // 총알을 스폰하고 특정 타입의 패턴을 적용하는 메서드
-    void SpawnBullets(BulletType bulletType, int bulletpoint = -1, float delay = 0f, Vector2 dir = default, int size = 0, string prefab = "Flowey_Normal")
+    public void SpawnBullets(
+       BulletType bulletType,
+       int bulletpoint = -1,
+       float delay = 0f,
+       Vector2 dir = default,
+       int size = 0,
+       string prefab = "Flowey_Normal"
+   )
     {
-        if (bulletpoint != -1)
+        if (prefab == "None") return;
+
+        Transform spawnPoint = bulletpoint == -1
+            ? bulletspawnPoint[0]
+            : (bulletpoint < 30 ? bulletspawnPoint[0] : bulletspawnPoint[1]);
+
+        Vector3 spawnPos = spawnPoint.position;
+
+        GameObject bullet = GetBulletFromPool(prefab);
+        if (bullet == null) return;
+
+        bullet.transform.position = spawnPos;
+        bullet.transform.rotation = Quaternion.identity;
+        bullet.SetActive(true);
+
+        BulletController bc = bullet.GetComponent<BulletController>();
+        if (bc != null)
         {
-            Transform spawnPoint = bulletpoint >= 30 ? bulletspawnPoint[1] : bulletspawnPoint[0];
-            string poolKey = bulletType.ToString();
-
-            if (bulletPoolDict.ContainsKey(prefab))
-            {
-                GameObject bullet = bulletPoolDict[prefab].Dequeue();
-                bullet.transform.position = spawnPoint.position;
-                bullet.transform.rotation = spawnPoint.rotation;
-                bullet.SetActive(true);
-
-                BulletController bulletController = bullet.GetComponent<BulletController>();
-                if (bulletController != null)
-                {
-                    bulletController.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, bulletSpawnTransforms[bulletpoint], size, false);
-                    activeBullets.Add(bullet);
-                }
-
-                bulletPoolDict[prefab].Enqueue(bullet); // 다시 넣어줌
-            }
-            else
-            {
-                Debug.LogWarning($"총알 풀 {poolKey}이 존재하지 않습니다.");
-            }
+            Transform target = bulletpoint != -1 ? bulletSpawnTransforms[bulletpoint] : null;
+            bc.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, bulletType, target, size);
+            activeBullets.Add(bullet);
         }
     }
 
-    public void SpawnBulletAtPosition(BulletType type, Vector2 position, Quaternion rotation, Vector2 dir, string prefab = "None",bool isfriends = false)
+    public void SpawnBulletAtPosition(
+    BulletType type,
+    Vector2 position,
+    Quaternion rotation,
+    Vector2 dir,
+    string prefab = "None",
+    int size = 0,
+    float delay = 0f, 
+    bool isfriends = false
+)
     {
-        if (!bulletPoolDict.ContainsKey(prefab))
-        {
-            Debug.LogWarning($"총알 풀 '{prefab}'이 존재하지 않습니다.");
-            return;
-        }
+        if (prefab == "None") return;
 
-        GameObject bullet = bulletPoolDict[prefab].Dequeue();
+        GameObject bullet = GetBulletFromPool(prefab);
+        if (bullet == null) return;
+
         bullet.transform.position = position;
         bullet.transform.rotation = rotation;
         bullet.SetActive(true);
 
-        BulletController bulletController = bullet.GetComponent<BulletController>();
-        if (bulletController != null)
+        BulletController bc = bullet.GetComponent<BulletController>();
+        if (bc != null)
         {
-            bulletController.InitializeBullet(dir, bulletController.speed, 0f, bulletController.damage, 15f, 0, type, null,0, isfriends);
+            bc.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, type, null, size, isfriends);
             activeBullets.Add(bullet);
         }
-
-        bulletPoolDict[prefab].Enqueue(bullet);
     }
-
 
 
 

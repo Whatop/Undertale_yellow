@@ -26,6 +26,7 @@ public class BulletController : MonoBehaviour
     private float gravityEffect = 0.3f;  // 포물선 중력 효과
     private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
     private float homingDuration = 5f;  // 유도 지속 시간
+    private float lifeTime = 30f;
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
@@ -68,6 +69,7 @@ public class BulletController : MonoBehaviour
         {
             GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
         }
+        StartCoroutine(LifeTime());
     }
     private void OnEnable()
     {
@@ -240,19 +242,18 @@ public class BulletController : MonoBehaviour
     private IEnumerator MoveAndNext(BulletType type = default, float delay = 0)
     {
         float elapsed = 0f;
-        float timeout = 3f; // 최대 3초 동안만 이동 시도
+        float timeout = 3f;
+        float moveSpeed = speed *5; // 기존 speed 값 백업 후 독립적인 로컬 속도로 사용
 
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
             Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-            Vector2 newPos = rb.position + direction * speed * Time.deltaTime;
-            rb.MovePosition(newPos); // ← 이걸로 이동
-            elapsed += Time.deltaTime; // 누락된 타이머 증가 코드
+            Vector2 newPos = rb.position + direction * moveSpeed * Time.deltaTime;
+            rb.MovePosition(newPos);
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-
-        // 유도 실패 상황 예외 처리
         if (elapsed >= timeout)
         {
             Debug.LogWarning("MoveAndNext 타임아웃! 위치로 도달하지 못했어요.");
@@ -405,4 +406,9 @@ public class BulletController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private IEnumerator LifeTime()
+    {
+        yield return new WaitForSeconds(30f);
+        DestroyBullet();
+    }
 }

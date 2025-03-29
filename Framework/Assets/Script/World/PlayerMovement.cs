@@ -578,7 +578,7 @@ public class PlayerMovement : LivingObject
              shotpoint.position,
              WeaponTransform.rotation,
              WeaponTransform.up,
-             "Player_Normal", true);
+             "Player_Normal",0,0,true);
 
             // 총구 화염 이펙트 생성
             StartCoroutine(ShowMuzzleFlash(shotpoint));
@@ -593,7 +593,7 @@ public class PlayerMovement : LivingObject
                WeaponTransform.rotation,
                WeaponTransform.up,
               
-               "Player_Soul", true);
+               "Player_Soul", 0, 0, true);
         }
 
 
