@@ -249,54 +249,62 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         HandleInteraction();
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            SetAttack("Split", 0, 1f);//분열
+        //if (Input.GetKeyDown(KeyCode.Alpha0))
+        //{
+        //    SetAttack("Split", 0, 1f);//분열
             
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SetAttack("Spiral_S", 10, 1f);//회오리
-            SetAttack("Spiral_S", 24, 1f);//회오리
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SetAttack("Homing", 0, 1f);//유도
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            for(int i =0; 12>i; i++)
-                SetAttack("Right", i, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    SetAttack("Spiral_S", 10, 1f);//회오리
+        //    SetAttack("Spiral_S", 24, 1f);//회오리
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha2))
+        //{
+        //    SetAttack("Homing", 0, 1f);//유도
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha3))
+        //{
+        //    for(int i =0; 12>i; i++)
+        //        SetAttack("Right", i, 1f);
 
-            for (int i = 48; 60 > i; i++)
-                SetAttack("Left", i, 1f);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SetAttack("Normal", 29, 1f);
-            SetAttack("Normal", 30, 1f);
-            SetAttack("Normal", 31, 1f);
-            SetAttack("Normal", 32, 1f);
-            SetAttack("Normal", 33, 1f);
-            SetAttack("Normal", 34, 1f);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            SetAttack("Speed", 0, 1f);
-            SetAttack("Speed", 1, 1f);
-            SetAttack("Speed", 2, 1f);
-            SetAttack("Speed", 3, 1f);
-            SetAttack("Speed", 4, 1f);
-            SetAttack("Speed", 5, 1f);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            SetAttack("Spiral_M", 10, 1f);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            SetAttack("Spiral_R", 24, 1f);
-        }
+        //    for (int i = 48; 60 > i; i++)
+        //        SetAttack("Left", i, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha8))
+        //{
+        //    for (int i = 0; 12 > i; i++)
+        //        SetAttack("None", i, 1f);
+
+        //    for (int i = 48; 60 > i; i++)
+        //        SetAttack("None", i, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha4))
+        //{
+        //    SetAttack("Normal", 29, 1f);
+        //    SetAttack("Normal", 30, 1f);
+        //    SetAttack("Normal", 31, 1f);
+        //    SetAttack("Normal", 32, 1f);
+        //    SetAttack("Normal", 33, 1f);
+        //    SetAttack("Normal", 34, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha5))
+        //{
+        //    SetAttack("Speed", 0, 1f);
+        //    SetAttack("Speed", 1, 1f);
+        //    SetAttack("Speed", 2, 1f);
+        //    SetAttack("Speed", 3, 1f);
+        //    SetAttack("Speed", 4, 1f);
+        //    SetAttack("Speed", 5, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha6))
+        //{
+        //    SetAttack("Spiral_M", 10, 1f);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha7))
+        //{
+        //    SetAttack("Spiral_R", 24, 1f);
+        //}
     }
     private void LateUpdate()
     {
@@ -639,6 +647,9 @@ public class BattleManager : MonoBehaviour
                 break;
             case "Speed":
                 SpawnBullets(BulletType.Speed, bulletpoint, delay);
+                break;
+            case "None":
+                SpawnBullets(BulletType.None, bulletpoint, delay);
                 break;
             default:
                 Debug.LogWarning($"Unknown attack pattern: {attack}");

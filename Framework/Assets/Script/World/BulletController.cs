@@ -26,7 +26,7 @@ public class BulletController : MonoBehaviour
     private float gravityEffect = 0.3f;  // 포물선 중력 효과
     private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
     private float homingDuration = 5f;  // 유도 지속 시간
-    private float lifeTime = 30f;
+    private float lifeTime = 15f;
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
@@ -262,6 +262,7 @@ public class BulletController : MonoBehaviour
         if (delay > 0)
             yield return new WaitForSeconds(delay);
 
+        if(type !=BulletType.None)
         ExecuteBulletPattern(type, storedFireDirection);
     }
 
@@ -408,7 +409,7 @@ public class BulletController : MonoBehaviour
 
     private IEnumerator LifeTime()
     {
-        yield return new WaitForSeconds(30f);
+        yield return new WaitForSeconds(lifeTime);
         DestroyBullet();
     }
 }
