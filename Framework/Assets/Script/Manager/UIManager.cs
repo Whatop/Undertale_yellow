@@ -8,6 +8,26 @@ using UnityEngine.U2D;
 
 using UnityEngine.SceneManagement;
 using System;
+[System.Serializable]
+public class RadialSegment
+{
+    public string segmentName;
+    public Image icon;
+    public GameObject highlightObj;
+
+    public void SetHighlight(bool isOn)
+    {
+        if (highlightObj != null)
+            highlightObj.SetActive(isOn);
+        // 아이콘 크기/색상 변경 로직 등 가능
+    }
+
+    public void ExecuteAction()
+    {
+        // 감정표현 실행(애니메이션, 사운드 재생, 네트워크 전송 등)
+        Debug.Log($"감정표현 [{segmentName}] 실행");
+    }
+}
 
 public class UIManager : MonoBehaviour
 {
@@ -177,6 +197,17 @@ public class UIManager : MonoBehaviour
     public GameObject[] call_points;
     public GameObject[] interaction_points;
     public Image inventroy_soul;
+
+    [Header("Radial Menu References")]
+    public GameObject radialMenuPanel;      // 라디얼 메뉴 전체를 담고 있는 Panel
+    public RectTransform centerPoint;       // 라디얼 메뉴의 중심(마우스 기준점)
+    public List<RadialSegment> segments;    // 세그먼트 리스트 (감정표현/아이템 등)
+
+    [Header("Radial Menu Settings")]
+    public KeyCode toggleKey = KeyCode.G;   // 라디얼 메뉴 열기/닫기 키
+    public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
+
+    private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
 
     public static UIManager Instance
     {
@@ -467,8 +498,79 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
+        // 1) 라디얼 메뉴 토글 처리
+        if (Input.GetKeyDown(toggleKey))
+        {
+            ToggleRadialMenu();
+        }
 
+        // 2) 메뉴 활성 상태라면 마우스 위치와 클릭 여부 판단
+        if (isRadialMenuActive)
+        {
+            UpdateRadialSelection();
+
+            // 마우스 왼쪽 버튼 떼는 순간 해당 감정표현/아이템 선택 확정
+            if (Input.GetMouseButtonUp(0) && currentIndex >= 0)
+            {
+                OnSelectSegment(currentIndex);
+            }
+        }
     }
+    /// <summary>
+      /// 라디얼 메뉴 열기/닫기
+      /// </summary>
+    public void ToggleRadialMenu()
+    {
+        isRadialMenuActive = !isRadialMenuActive;
+        radialMenuPanel.SetActive(isRadialMenuActive);
+
+        // 열 때, 중앙 위치 설정 (마우스 위치 등에)
+        if (isRadialMenuActive)
+        {
+            Vector3 mousePos = Input.mousePosition;
+            centerPoint.position = mousePos;
+        }
+    }
+
+    /// <summary>
+    /// 마우스 각도에 따라 하이라이트할 세그먼트 계산
+    /// </summary>
+    private void UpdateRadialSelection()
+    {
+        Vector2 dir = Input.mousePosition - centerPoint.position;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        angle = (angle + 360f) % 360f; // 0~360 범위로 맞춤
+
+        float segmentAngle = 360f / segments.Count;
+        int newIndex = (int)(angle / segmentAngle);
+
+        if (newIndex != current_segment_Index)
+        {
+            // 이전 하이라이트 제거
+            if (current_segment_Index >= 0 && current_segment_Index < segments.Count)
+            {
+                segments[current_segment_Index].SetHighlight(false);
+            }
+
+            // 새 인덱스 하이라이트
+            current_segment_Index = newIndex;
+            segments[current_segment_Index].SetHighlight(true);
+        }
+    }
+
+    /// <summary>
+    /// 세그먼트 선택이 확정되었을 때 실행
+    /// </summary>
+    private void OnSelectSegment(int index)
+    {
+        RadialSegment seg = segments[index];
+        Debug.Log($"Segment {index} 선택됨 - {seg.segmentName}");
+        seg.ExecuteAction();
+
+        // 선택 후 메뉴 닫을 수도 있음
+        ToggleRadialMenu();
+    }
+
     #region InventroyUi
     void UpdateInventoryUI()
     {
