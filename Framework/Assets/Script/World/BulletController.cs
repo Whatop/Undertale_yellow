@@ -9,6 +9,7 @@ public enum BulletType
     Split,      // 분열 총알
     Directional,// 방향 지정 총알
     FixedPoint,  // 특정 위치로 이동하는 총알
+    Laser,
     Speed, // 점점 빨라지는
     None
 }
@@ -45,6 +46,10 @@ public class BulletController : MonoBehaviour
     private float spiralRadius = 0.5f;
     private float bulletSize = 0;
 
+    private bool isLaser = false;
+    public bool isPiercing = false; // 관통 여부
+    private Dictionary<GameObject, float> hitTimer = new Dictionary<GameObject, float>();
+    public float dotInterval = 0.2f; // 적당한 도트딜 간격
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -77,6 +82,8 @@ public class BulletController : MonoBehaviour
         isSpiral = false;
         isSplitted = false;
         rb.velocity = Vector2.zero;
+        hitTimer.Clear();
+
         // 필요하다면 scale, rotation, 색상 초기화 등도 여기서
     }
 
@@ -292,6 +299,9 @@ public class BulletController : MonoBehaviour
             case BulletType.Directional:
                 StartCoroutine(DirectionalMove(dir));
                 break;
+            case BulletType.Laser:
+                StartCoroutine(LaserBullet(1.5f)); // 예시: 1.5초 지속
+                break;
 
             case BulletType.None:
                 Debug.Log("총알대기");
@@ -368,7 +378,17 @@ public class BulletController : MonoBehaviour
         yield return null;
     }
 
+    private IEnumerator LaserBullet(float duration)
+    {
+        isLaser = true;
+        rb.velocity = storedFireDirection * speed;
 
+        // 컬라이더 활성화 + 궤적 유지 후 제거
+        yield return new WaitForSeconds(duration);
+
+        DestroyBullet();  // BattleManager의 activeBullets 리스트에서도 자동 제거됨
+        isLaser = false;
+    }
     private IEnumerator SplitBullets(int splitCount)
     {
         if (isSplitted) yield break;
@@ -391,15 +411,27 @@ public class BulletController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         //Debug.Log($"총알이 {other.gameObject.name}과 충돌");
-        if (other.CompareTag("Enemy") && isFreind && other.GetComponent<EnemyController>().objectState != ObjectState.Roll)
+        if (other.CompareTag("Enemy") && isFreind)
         {
-            other.GetComponent<EnemyController>().TakeDamage(damage, other.transform.position);
-            DestroyBullet();
+            GameObject enemy = other.gameObject;
+
+            if (!hitTimer.ContainsKey(enemy))
+            {
+                hitTimer[enemy] = Time.time;
+                enemy.GetComponent<EnemyController>().TakeDamage(damage);
+            }
+            else
+            {
+                if (Time.time - hitTimer[enemy] >= dotInterval)
+                {
+                    hitTimer[enemy] = Time.time;
+                    enemy.GetComponent<EnemyController>().TakeDamage(damage);
+                }
+            }
         }
         else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
         {
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
-            DestroyBullet();
         }
     }
     void DestroyBullet()
