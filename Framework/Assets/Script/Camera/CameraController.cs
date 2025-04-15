@@ -13,6 +13,30 @@ public class CameraController : MonoBehaviour
     public CinemachineVirtualCamera[] virtualCameras;
     public CinemachineVirtualCamera virtualBattleCamera;
 
+    public float shakeAmount = 0.1f;  // 흔들림 강도
+    public float shakeDuration = 0.5f;  // 흔들림 지속 시간
+    private float shakeTimer = 0f;  // 흔들림 타이머
+    private Vector3 originalPosition;  // 원래 카메라 위치
+
+    private static CameraController instance;
+
+    // 싱글톤 패턴을 위한 프로퍼티
+    public static CameraController Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<CameraController>();
+                if (instance == null)
+                {
+                    GameObject obj = new GameObject("CameraController");
+                    instance = obj.AddComponent<CameraController>();
+                }
+            }
+            return instance;
+        }
+    }
     private void Awake()
     {
         gameManager = GameManager.Instance;
@@ -20,10 +44,23 @@ public class CameraController : MonoBehaviour
         pixelPerfectCamera = GetComponent<CinemachinePixelPerfect>(); // CinemachinePixelPerfect 컴포넌트 가져오기
     }
 
-    private void Update()
+    void Update()
     {
+        if (shakeTimer > 0)
+        {
+            // 흔들림이 남아 있을 경우
+            transform.position = originalPosition + Random.insideUnitSphere * shakeAmount;
+            shakeTimer -= Time.deltaTime;
+        }
+        else
+        {
+            // 흔들림이 끝났으면 원래 위치로 돌아가도록
+            transform.position = originalPosition;
+        }
+
         UpdateCameraSize();
     }
+
 
     void UpdateCameraSize()
     {
@@ -66,6 +103,11 @@ public class CameraController : MonoBehaviour
         {
             virtualBattleCamera.Priority = 6;
         }
+    }
+    public void ShakeCamera()
+    {
+        originalPosition = transform.position;  // 원래 위치 저장
+        shakeTimer = shakeDuration;  // 흔들림 지속 시간 설정
     }
 
 }

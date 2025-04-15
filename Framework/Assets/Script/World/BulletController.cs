@@ -408,6 +408,27 @@ public class BulletController : MonoBehaviour
         }
         DestroyBullet();
     }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy") && isFreind)
+        {
+            GameObject enemy = other.gameObject;
+
+            if (!hitTimer.ContainsKey(enemy))
+            {
+                hitTimer[enemy] = Time.time;
+                enemy.GetComponent<EnemyController>().TakeDamage(damage);
+            }
+            else
+            {
+                if (Time.time - hitTimer[enemy] >= dotInterval)
+                {
+                    hitTimer[enemy] = Time.time;
+                    enemy.GetComponent<EnemyController>().TakeDamage(damage);
+                }
+            }
+        }
+    }
     void OnTriggerEnter2D(Collider2D other)
     {
         //Debug.Log($"총알이 {other.gameObject.name}과 충돌");

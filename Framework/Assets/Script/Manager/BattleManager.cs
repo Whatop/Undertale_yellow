@@ -249,11 +249,21 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         HandleInteraction();
-        //if (Input.GetKeyDown(KeyCode.Alpha0))
-        //{
-        //    SetAttack("Split", 0, 1f);//분열
-            
-        //}
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            //SetAttack("Split", 0, 1f);//분열
+            BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Laser,
+            bulletPoints[28].position,
+            Quaternion.identity,
+            Vector2.right, // 또는 원하는 방향
+            "Gaster_Laser",
+            0,
+            0f,
+        false
+    );
+
+        }
         //if (Input.GetKeyDown(KeyCode.Alpha1))
         //{
         //    SetAttack("Spiral_S", 10, 1f);//회오리
