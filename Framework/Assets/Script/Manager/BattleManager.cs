@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
     private List<GameObject> activeBullets = new List<GameObject>(); // 현재 활성화된 총알 목록
 
     public TypeEffect currentTypeEffect;
-    
+
     //플레이어
     public PlayerMovement player;
     //현재 적
@@ -239,7 +239,7 @@ public class BattleManager : MonoBehaviour
     public void BattleReSetting()
     {
         Boss_AllObject.SetActive(false);
-       // player.TeleportPlayer(prevPos);
+        // player.TeleportPlayer(prevPos);
         Boss_Text.gameObject.SetActive(false);
         gameManager.ChangeGameState(GameState.None);
         Boss_Textbar.SetActive(false);
@@ -252,69 +252,61 @@ public class BattleManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             //SetAttack("Split", 0, 1f);//분열
-            BattleManager.Instance.SpawnBulletAtPosition(
-            BulletType.Laser,
-            bulletPoints[28].position,
-            Quaternion.identity,
-            Vector2.right, // 또는 원하는 방향
-            "Gaster_Laser",
-            0,
-            0f,
-        false
-    );
+           SetAttack("GasterBlaster", 30, 1f);//회오리
+            
 
         }
-        //if (Input.GetKeyDown(KeyCode.Alpha1))
-        //{
-        //    SetAttack("Spiral_S", 10, 1f);//회오리
-        //    SetAttack("Spiral_S", 24, 1f);//회오리
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha2))
-        //{
-        //    SetAttack("Homing", 0, 1f);//유도
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha3))
-        //{
-        //    for(int i =0; 12>i; i++)
-        //        SetAttack("Right", i, 1f);
+       if (Input.GetKeyDown(KeyCode.Alpha1))
+       {
+           SetAttack("Spiral_S", 10, 1f);//회오리
+           SetAttack("Spiral_S", 24, 1f);//회오리
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha2))
+       {
+           SetAttack("Homing", 0, 1f);//유도
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha3))
+       {
+           for(int i =0; 12>i; i++)
+               SetAttack("Right", i, 1f);
 
-        //    for (int i = 48; 60 > i; i++)
-        //        SetAttack("Left", i, 1f);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha8))
-        //{
-        //    for (int i = 0; 12 > i; i++)
-        //        SetAttack("None", i, 1f);
+           for (int i = 48; 60 > i; i++)
+               SetAttack("Left", i, 1f);
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha8))
+       {
+           for (int i = 0; 12 > i; i++)
+               SetAttack("None", i, 1f);
 
-        //    for (int i = 48; 60 > i; i++)
-        //        SetAttack("None", i, 1f);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha4))
-        //{
-        //    SetAttack("Normal", 29, 1f);
-        //    SetAttack("Normal", 30, 1f);
-        //    SetAttack("Normal", 31, 1f);
-        //    SetAttack("Normal", 32, 1f);
-        //    SetAttack("Normal", 33, 1f);
-        //    SetAttack("Normal", 34, 1f);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha5))
-        //{
-        //    SetAttack("Speed", 0, 1f);
-        //    SetAttack("Speed", 1, 1f);
-        //    SetAttack("Speed", 2, 1f);
-        //    SetAttack("Speed", 3, 1f);
-        //    SetAttack("Speed", 4, 1f);
-        //    SetAttack("Speed", 5, 1f);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha6))
-        //{
-        //    SetAttack("Spiral_M", 10, 1f);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha7))
-        //{
-        //    SetAttack("Spiral_R", 24, 1f);
-        //}
+           for (int i = 48; 60 > i; i++)
+               SetAttack("None", i, 1f);
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha4))
+       {
+           SetAttack("Normal", 29, 1f);
+           SetAttack("Normal", 30, 1f);
+           SetAttack("Normal", 31, 1f);
+           SetAttack("Normal", 32, 1f);
+           SetAttack("Normal", 33, 1f);
+           SetAttack("Normal", 34, 1f);
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha5))
+       {
+           SetAttack("Speed", 0, 1f);
+           SetAttack("Speed", 1, 1f);
+           SetAttack("Speed", 2, 1f);
+           SetAttack("Speed", 3, 1f);
+           SetAttack("Speed", 4, 1f);
+           SetAttack("Speed", 5, 1f);
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha6))
+       {
+           SetAttack("Spiral_M", 10, 1f);
+       }
+       if (Input.GetKeyDown(KeyCode.Alpha7))
+       {
+           SetAttack("Spiral_R", 24, 1f);
+       }
     }
     private void LateUpdate()
     {
@@ -333,7 +325,7 @@ public class BattleManager : MonoBehaviour
 
         // 코루틴으로 전투를 지연시켜 시작
         prevPos = player.transform.position;
-        
+
         player.TeleportPlayer(battlePoint.transform.position);
         StartCoroutine(StartBattleAfterDelay(eventNumber, 1.5f));
     }
@@ -451,7 +443,7 @@ public class BattleManager : MonoBehaviour
             ExecuteAttack(dialogue.attack);
         }
 
-       
+
 
         // 특정 대사로 건너뛰기 처리
         if (currentBoss.dialogues[currentDialogueIndex].skipToDialogue > 0)
@@ -508,7 +500,7 @@ public class BattleManager : MonoBehaviour
             currentTypeEffect.Skip();
         }
     }
-  
+
     private void SetBossExpression(string expression) //@@@ test 용
     {
         Debug.Log($"보스 표정 : {expression}");
@@ -568,34 +560,34 @@ public class BattleManager : MonoBehaviour
             case "Attack2":
                 Debug.Log("Executing Attack 2");
 
-              //  MoveBulletsToPlayer(true);  // accelerate = true
+                //  MoveBulletsToPlayer(true);  // accelerate = true
                 break;
 
             case "Attack3":
                 Debug.Log("왼쪽 공격");
                 //SpawnAndMoveBullets();
-               // MoveBulletsInDirection(Vector2.left,10);
+                // MoveBulletsInDirection(Vector2.left,10);
                 break;
 
 
             case "Attack4":
                 Debug.Log("유도");
-               // SpawnAndMoveBullets();
+                // SpawnAndMoveBullets();
                 //StartCoroutine(HomingBullets(10.5f, 8f));
 
                 break;
 
             case "Attack5":
                 Debug.Log("회오리");
-               // SpawnAndMoveBullets();
-               // StartCoroutine(SpiralBullets(120, 2.5f));
+                // SpawnAndMoveBullets();
+                // StartCoroutine(SpiralBullets(120, 2.5f));
 
                 break;
 
             case "Attack6":
                 Debug.Log("분열");
-               // SpawnAndMoveBullets();
-               // StartCoroutine(SplitBullets(10, 8f));
+                // SpawnAndMoveBullets();
+                // StartCoroutine(SplitBullets(10, 8f));
 
                 break;
 
@@ -605,7 +597,8 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void SetAttack(string attack,int bulletpoint = 0, float delay = 0f)
+    
+    void SetAttack(string attack, int bulletpoint = 0, float delay = 0f)
     {
         switch (attack)
         {
@@ -658,6 +651,9 @@ public class BattleManager : MonoBehaviour
             case "Speed":
                 SpawnBullets(BulletType.Speed, bulletpoint, delay);
                 break;
+            case "GasterBlaster":
+                SpawnBullets(BulletType.GasterBlaster, bulletpoint, delay,default,0, "GasterBlaster");
+                break;
             case "None":
                 SpawnBullets(BulletType.None, bulletpoint, delay);
                 break;
@@ -707,7 +703,7 @@ public class BattleManager : MonoBehaviour
     Vector2 dir,
     string prefab = "None",
     int size = 0,
-    float delay = 0f, 
+    float delay = 0f,
     bool isfriends = false
 )
     {
@@ -731,7 +727,7 @@ public class BattleManager : MonoBehaviour
 
 
     #endregion
-    private void HandleSpecialEvent(string eventType,string dialogue)
+    private void HandleSpecialEvent(string eventType, string dialogue)
     {
         switch (eventType)
         {
@@ -744,7 +740,7 @@ public class BattleManager : MonoBehaviour
                 Boss_Face_UI.SetActive(true);
                 SetBossExpression("Appear");
                 //ingame sink 키고, ui 키기
-                StartCoroutine(FloweyAnimationThenNextDialogue(dialogue,1.5f));
+                StartCoroutine(FloweyAnimationThenNextDialogue(dialogue, 1.5f));
 
                 break;
 

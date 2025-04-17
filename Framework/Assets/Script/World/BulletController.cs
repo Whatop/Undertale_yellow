@@ -9,7 +9,7 @@ public enum BulletType
     Split,      // 분열 총알
     Directional,// 방향 지정 총알
     FixedPoint,  // 특정 위치로 이동하는 총알
-    Laser,
+    GasterBlaster,
     Speed, // 점점 빨라지는
     None
 }
@@ -27,7 +27,7 @@ public class BulletController : MonoBehaviour
     private float gravityEffect = 0.3f;  // 포물선 중력 효과
     private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
     private float homingDuration = 5f;  // 유도 지속 시간
-    private float lifeTime = 15f;
+    private float lifeTime = 1115f;
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
@@ -60,6 +60,7 @@ public class BulletController : MonoBehaviour
         { BulletType.Directional, Color.white },
         { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan },
+        { BulletType.GasterBlaster, Color.white },
         { BulletType.None, Color.white }
     }
     ; private void Awake()
@@ -250,7 +251,13 @@ public class BulletController : MonoBehaviour
     {
         float elapsed = 0f;
         float timeout = 3f;
-        float moveSpeed = speed *5; // 기존 speed 값 백업 후 독립적인 로컬 속도로 사용
+        float moveSpeed = speed * 5;
+        bool rotated = false;
+        if (bulletType == BulletType.GasterBlaster)
+        {
+            moveSpeed = speed * 10;
+           
+        }
 
         while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
@@ -258,6 +265,17 @@ public class BulletController : MonoBehaviour
             Vector2 newPos = rb.position + direction * moveSpeed * Time.deltaTime;
             rb.MovePosition(newPos);
             elapsed += Time.deltaTime;
+            if(bulletType == BulletType.GasterBlaster)
+            {
+                // 회전은 오직 한번
+                if (!rotated && Vector2.Distance(transform.position, targetPosition) < 1f)
+                {
+                    float angle = Mathf.Atan2(storedFireDirection.y, storedFireDirection.x) * Mathf.Rad2Deg;
+                    transform.rotation = Quaternion.Euler(0, 0, angle - 90); // 위쪽이 앞일 때 -90도 보정
+                    rotated = true;
+                }
+
+            }
             yield return null;
         }
 
@@ -266,11 +284,21 @@ public class BulletController : MonoBehaviour
             Debug.LogWarning("MoveAndNext 타임아웃! 위치로 도달하지 못했어요.");
         }
 
-        if (delay > 0)
-            yield return new WaitForSeconds(delay);
+        // 도착 후 Shot() 호출
 
-        if(type !=BulletType.None)
-        ExecuteBulletPattern(type, storedFireDirection);
+        if (type == BulletType.GasterBlaster)
+        {
+            float angle = Mathf.Atan2(storedFireDirection.y, storedFireDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+
+            GetComponent<GasterBlaster>()?.Shot();
+        }
+
+        if (delay > 0)
+            yield return new WaitForSeconds(delay + 0.2f);
+
+        if (type != BulletType.None)
+            ExecuteBulletPattern(type, storedFireDirection);
     }
 
 
@@ -299,8 +327,8 @@ public class BulletController : MonoBehaviour
             case BulletType.Directional:
                 StartCoroutine(DirectionalMove(dir));
                 break;
-            case BulletType.Laser:
-                StartCoroutine(LaserBullet(1.5f)); // 예시: 1.5초 지속
+            case BulletType.GasterBlaster:
+                StartCoroutine(LaserBullet());
                 break;
 
             case BulletType.None:
@@ -378,15 +406,13 @@ public class BulletController : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator LaserBullet(float duration)
+    private IEnumerator LaserBullet()
     {
         isLaser = true;
-        rb.velocity = storedFireDirection * speed;
+        //rb.velocity = storedFireDirection * speed;
 
-        // 컬라이더 활성화 + 궤적 유지 후 제거
-        yield return new WaitForSeconds(duration);
+        yield return null;
 
-        DestroyBullet();  // BattleManager의 activeBullets 리스트에서도 자동 제거됨
         isLaser = false;
     }
     private IEnumerator SplitBullets(int splitCount)

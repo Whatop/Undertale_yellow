@@ -8,30 +8,29 @@ public class GasterBlaster : MonoBehaviour
     public GameObject laserPrefab;               // 레이저 프리팹
     public Transform laserSpawnPoint;            // 레이저 시작 위치
     private bool laserFired = false;
+    public Vector2 targetDirection = Vector2.down; // BattleManager에서 설정
+    public bool trackPlayer = true; // true면 플레이어 방향, false면 targetDirection 사용
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
     }
 
+
     private void OnEnable()
     {
         laserFired = false;
-        animator.Play("Idle");       // 초기 상태
-        Invoke(nameof(Shot), 0.3f);  // 등장 후 약간의 텀을 두고 공격 시작
-        Invoke(nameof(DeactiveDelay), 10f); // 혹시 못 사라질 경우 대비
+        animator.Play("Idle");
     }
-
     private void OnDisable()
     {
         CancelInvoke();
     }
 
-    void Shot()
+    public void Shot()
     {
         animator.SetTrigger("OpenMouth");
         SoundManager.Instance.SFXPlay("gasterblaster", 225); // 충전/발사 사운드
-        CameraController.Instance.ShakeCamera();
     }
 
     // 애니메이션에서 호출
@@ -42,18 +41,32 @@ public class GasterBlaster : MonoBehaviour
 
         GameObject laser = Instantiate(laserPrefab, laserSpawnPoint.position, laserSpawnPoint.rotation);
         laser.transform.SetParent(transform); // 부모로 붙여 연동
+        CameraController.Instance.ShakeCamera();
+        EndAttack();
     }
+    private void Update()
+    {
+        Vector2 targetPos = GameManager.Instance.GetPlayerData().player.transform.position;
+        Vector2 myPos = transform.position;
 
-    // 애니메이션에서 호출
+        Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle +90); // Sprite의 위쪽이 forward면 -90 보정
+
+    }
     public void EndAttack()
     {
-        StartCoroutine(MoveBackAndDisable());
+        StartCoroutine(MoveBackAndDisable(1f));
     }
 
-    IEnumerator MoveBackAndDisable()
+    IEnumerator MoveBackAndDisable(float delay)
     {
+        yield return new WaitForSeconds(delay + 0.2f);
+
+        Vector3 backDir = -transform.up; // 현재 바라보는 방향의 반대
         Vector3 start = transform.position;
-        Vector3 end = transform.position + Vector3.down * 3f;
+        Vector3 end = start + backDir * 3f;
+
         float duration = 0.5f;
         float t = 0f;
 
@@ -67,6 +80,7 @@ public class GasterBlaster : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+
     void DeactiveDelay()
     {
         gameObject.SetActive(false);
@@ -77,7 +91,7 @@ public class GasterBlaster : MonoBehaviour
         {
             GameObject player = other.gameObject;
 
-            player.GetComponent<EnemyController>().TakeDamage(1);
+            player.GetComponent<PlayerMovement>().TakeDamage(1);
           
         }
     }
@@ -87,7 +101,7 @@ public class GasterBlaster : MonoBehaviour
         {
             GameObject player = other.gameObject;
 
-            player.GetComponent<EnemyController>().TakeDamage(1);
+            player.GetComponent<PlayerMovement>().TakeDamage(1);
              
         }
     }
