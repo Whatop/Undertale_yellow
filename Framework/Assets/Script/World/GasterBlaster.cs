@@ -30,6 +30,13 @@ public class GasterBlaster : MonoBehaviour
     public void Shot()
     {
         animator.SetTrigger("OpenMouth");
+         Vector2 targetPos = GameManager.Instance.GetPlayerData().player.transform.position;
+         Vector2 myPos = transform.position;
+         
+         Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
+         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+         transform.rotation = Quaternion.Euler(0, 0, angle +90); // Sprite의 위쪽이 forward면 -90 보정
+
         SoundManager.Instance.SFXPlay("gasterblaster", 225); // 충전/발사 사운드
     }
 
@@ -44,30 +51,18 @@ public class GasterBlaster : MonoBehaviour
         CameraController.Instance.ShakeCamera();
         EndAttack();
     }
-    private void Update()
-    {
-        Vector2 targetPos = GameManager.Instance.GetPlayerData().player.transform.position;
-        Vector2 myPos = transform.position;
-
-        Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle +90); // Sprite의 위쪽이 forward면 -90 보정
-
-    }
     public void EndAttack()
     {
-        StartCoroutine(MoveBackAndDisable(1f));
+        StartCoroutine(MoveBackAndDisable());
     }
 
-    IEnumerator MoveBackAndDisable(float delay)
+    IEnumerator MoveBackAndDisable()
     {
-        yield return new WaitForSeconds(delay + 0.2f);
-
-        Vector3 backDir = -transform.up; // 현재 바라보는 방향의 반대
+        Vector3 backDir = transform.up;
         Vector3 start = transform.position;
-        Vector3 end = start + backDir * 3f;
+        Vector3 end = start + backDir * 40f; // 거리 2배로 증가
 
-        float duration = 0.5f;
+        float duration = 5f; // 기존 2.5f의 2배로 증가
         float t = 0f;
 
         while (t < duration)
@@ -77,7 +72,7 @@ public class GasterBlaster : MonoBehaviour
             yield return null;
         }
 
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // 필요하다면 종료 처리
     }
 
 
@@ -91,8 +86,9 @@ public class GasterBlaster : MonoBehaviour
         {
             GameObject player = other.gameObject;
 
-            player.GetComponent<PlayerMovement>().TakeDamage(1);
-          
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
+
+
         }
     }
     void OnTriggerEnter2D(Collider2D other)
@@ -101,8 +97,9 @@ public class GasterBlaster : MonoBehaviour
         {
             GameObject player = other.gameObject;
 
-            player.GetComponent<PlayerMovement>().TakeDamage(1);
-             
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
+
+
         }
     }
 }

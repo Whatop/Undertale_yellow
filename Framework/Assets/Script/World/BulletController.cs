@@ -1,22 +1,22 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 public enum BulletType
 {
-    Normal,     // ±âº» ÃÑ¾Ë
-    Homing,     // À¯µµ ÃÑ¾Ë
-    Spiral,     // È¸¿À¸® ÃÑ¾Ë
-    Split,      // ºĞ¿­ ÃÑ¾Ë
-    Directional,// ¹æÇâ ÁöÁ¤ ÃÑ¾Ë
-    FixedPoint,  // Æ¯Á¤ À§Ä¡·Î ÀÌµ¿ÇÏ´Â ÃÑ¾Ë
+    Normal,     // ê¸°ë³¸ ì´ì•Œ
+    Homing,     // ìœ ë„ ì´ì•Œ
+    Spiral,     // íšŒì˜¤ë¦¬ ì´ì•Œ
+    Split,      // ë¶„ì—´ ì´ì•Œ
+    Directional,// ë°©í–¥ ì§€ì • ì´ì•Œ
+    FixedPoint,  // íŠ¹ì • ìœ„ì¹˜ë¡œ ì´ë™í•˜ëŠ” ì´ì•Œ
     GasterBlaster,
-    Speed, // Á¡Á¡ »¡¶óÁö´Â
+    Speed, // ì ì  ë¹¨ë¼ì§€ëŠ”
     None
 }
 
 public class BulletController : MonoBehaviour
 {
-    public BulletType bulletType = BulletType.Normal; // ÃÑ¾ËÀÇ Å¸ÀÔ
+    public BulletType bulletType = BulletType.Normal; // ì´ì•Œì˜ íƒ€ì…
     public int damage;
     public float speed = 5;
     public float accuracy;
@@ -24,32 +24,37 @@ public class BulletController : MonoBehaviour
     public bool isFreind = false;
 
     private float maxLifetime = 10f; 
-    private float gravityEffect = 0.3f;  // Æ÷¹°¼± Áß·Â È¿°ú
-    private float maxTurnAngle = 150f;  // ÃÖ´ë È¸Àü °¢µµ Á¦ÇÑ
-    private float homingDuration = 5f;  // À¯µµ Áö¼Ó ½Ã°£
+    private float gravityEffect = 0.3f;  // í¬ë¬¼ì„  ì¤‘ë ¥ íš¨ê³¼
+    private float maxTurnAngle = 150f;  // ìµœëŒ€ íšŒì „ ê°ë„ ì œí•œ
+    private float homingDuration = 5f;  // ìœ ë„ ì§€ì† ì‹œê°„
     private float lifeTime = 1115f;
 
-    private float maxSpeed = 16f; // ÃÖ´ë ¼Óµµ Á¦ÇÑ
-    private float speedIncreaseRate = 4f; // ÃÊ´ç ¼Óµµ Áõ°¡·®
-    private bool isSplitted = false; // ºĞ¿­ ¿©ºÎ È®ÀÎ
-    private bool isHoming = false; // Ãß°İ ¿©ºÎ È®ÀÎ
-    private bool isSpiral = false; // È¸Àü ¿©ºÎ È®ÀÎ
+    private float maxSpeed = 16f; // ìµœëŒ€ ì†ë„ ì œí•œ
+    private float speedIncreaseRate = 4f; // ì´ˆë‹¹ ì†ë„ ì¦ê°€ëŸ‰
+    private bool isSplitted = false; // ë¶„ì—´ ì—¬ë¶€ í™•ì¸
+    private bool isHoming = false; // ì¶”ê²© ì—¬ë¶€ í™•ì¸
+    private bool isSpiral = false; // íšŒì „ ì—¬ë¶€ í™•ì¸
 
-    private Vector2 initialPosition; // ÃÑ¾ËÀÇ ÃÊ±â À§Ä¡
-    private Vector2 targetPosition;  // Æ¯Á¤ À§Ä¡·Î ÀÌµ¿ÇÒ °æ¿ì »ç¿ë
+    private Vector2 initialPosition; // ì´ì•Œì˜ ì´ˆê¸° ìœ„ì¹˜
+    private Vector2 targetPosition;  // íŠ¹ì • ìœ„ì¹˜ë¡œ ì´ë™í•  ê²½ìš° ì‚¬ìš©
     private Vector2 storedFireDirection;
-    private Transform target; // À¯µµ ÅºÈ¯ÀÇ Å¸°Ù
-    private bool hasTarget = false; // ¸ñÇ¥ À§Ä¡ ¿©ºÎ
+    private Transform target; // ìœ ë„ íƒ„í™˜ì˜ íƒ€ê²Ÿ
+    private bool hasTarget = false; // ëª©í‘œ ìœ„ì¹˜ ì—¬ë¶€
     private Rigidbody2D rb;
-    // Spiral ÅºÈ¯ ¸Å ÇÁ·¹ÀÓ ³ª¼±Çü Áõ°¡
+    // Spiral íƒ„í™˜ ë§¤ í”„ë ˆì„ ë‚˜ì„ í˜• ì¦ê°€
     private float spiralAngle = 0f;
     private float spiralRadius = 0.5f;
     private float bulletSize = 0;
 
     private bool isLaser = false;
-    public bool isPiercing = false; // °üÅë ¿©ºÎ
+    public bool isPiercing = false; // ê´€í†µ ì—¬ë¶€
     private Dictionary<GameObject, float> hitTimer = new Dictionary<GameObject, float>();
-    public float dotInterval = 0.2f; // Àû´çÇÑ µµÆ®µô °£°İ
+    public float dotInterval = 0.2f; // ì ë‹¹í•œ ë„íŠ¸ë”œ ê°„ê²©
+
+    // ì¶”ê°€: ì›í•˜ëŠ” ì´ë™ ì‹œê°„(ì´ˆ)ì™€ íšŒì „ ì†ë„ ê³„ìˆ˜(ë°°ìœ¨)
+    public float travelTime = 1.2f;      // ì´ ì´ë™ì— ê±¸ë¦´ ì‹œê°„(ê±°ë¦¬ ë¬´ê´€) â€“ ëŠ˜ë¦´ìˆ˜ë¡ ëŠë ¤ì§
+    public float rotationMultiplier = 0.8f; // 1 = í•œ ë°”í€´, 0.5 = ë°˜ ë°”í€´, 2 = ë‘ ë°”í€´
+
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -85,13 +90,13 @@ public class BulletController : MonoBehaviour
         rb.velocity = Vector2.zero;
         hitTimer.Clear();
 
-        // ÇÊ¿äÇÏ´Ù¸é scale, rotation, »ö»ó ÃÊ±âÈ­ µîµµ ¿©±â¼­
+        // í•„ìš”í•˜ë‹¤ë©´ scale, rotation, ìƒ‰ìƒ ì´ˆê¸°í™” ë“±ë„ ì—¬ê¸°ì„œ
     }
 
     private void StartPattern()
     {
 
-        if (!isFreind)//Àû
+        if (!isFreind)//ì 
         {
             switch (bulletType)
             {
@@ -114,20 +119,20 @@ public class BulletController : MonoBehaviour
                     break;
             }
         }
-        else //ÇÃ·¹ÀÌ¾î
+        else //í”Œë ˆì´ì–´
         {
 
         }
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
                                  float delay = 0, BulletType type = default, Transform target = null,int size = 0, bool isfreind = false)
-    {  // ±âÁ¸ °ª ¼³Á¤ ¿Ü¿¡...
+    {  // ê¸°ì¡´ ê°’ ì„¤ì • ì™¸ì—...
         isHoming = false;
         isSpiral = false;
         isSplitted = false;
         rb.velocity = Vector2.zero;
 
-        // »ö»ó ´Ù½Ã ¼³Á¤
+        // ìƒ‰ìƒ ë‹¤ì‹œ ì„¤ì •
         var renderer = GetComponent<SpriteRenderer>();
         if (renderer != null)
             renderer.color = bulletColors[bulletType];
@@ -145,10 +150,10 @@ public class BulletController : MonoBehaviour
         {
             targetPosition = target.position;
             hasTarget = true;
-            Debug.Log($"{bulletType} bullet ´ë±â À§Ä¡: {targetPosition} / target ÀÌ¸§: {target.name}");
+            Debug.Log($"{bulletType} bullet ëŒ€ê¸° ìœ„ì¹˜: {targetPosition} / target ì´ë¦„: {target.name}");
 
             StartCoroutine(MoveAndNext(type, delay));
-            //½ºÆù À§Ä¡·Î ÀÌµ¿ÈÄ
+            //ìŠ¤í° ìœ„ì¹˜ë¡œ ì´ë™í›„
         }
         else
         {
@@ -163,20 +168,20 @@ public class BulletController : MonoBehaviour
         {
             case BulletType.Homing:
                 if (isHoming)
-                    UpdateHoming(); // ¡ç ¸Å ÇÁ·¹ÀÓ µ¿ÀÛ
+                    UpdateHoming(); // â† ë§¤ í”„ë ˆì„ ë™ì‘
                 break;
 
             case BulletType.Spiral:
                 if (isSpiral)
-                    UpdateSpiral(); // ¡ç È¸Àü ¹İ°æ Ä¿Áöµµ·Ï ¼³Á¤
+                    UpdateSpiral(); // â† íšŒì „ ë°˜ê²½ ì»¤ì§€ë„ë¡ ì„¤ì •
                 break;
         }
     }
-    // Homing ÅºÈ¯ ¸Å ÇÁ·¹ÀÓ ÃßÀû
+    // Homing íƒ„í™˜ ë§¤ í”„ë ˆì„ ì¶”ì 
     private void UpdateHoming()
     {
-        float gravityEffect = 0.3f;  // Æ÷¹°¼±À» ¸¸µé Áß·Â È¿°ú
-        float maxTurnAngle = 50f;     // ÇÑ ÇÁ·¹ÀÓ´ç ÃÖ´ë È¸Àü °¢µµ Á¦ÇÑ (°ªÀÌ Å©¸é ±Ş°İÈ÷ È¸Àü)
+        float gravityEffect = 0.3f;  // í¬ë¬¼ì„ ì„ ë§Œë“¤ ì¤‘ë ¥ íš¨ê³¼
+        float maxTurnAngle = 50f;     // í•œ í”„ë ˆì„ë‹¹ ìµœëŒ€ íšŒì „ ê°ë„ ì œí•œ (ê°’ì´ í¬ë©´ ê¸‰ê²©íˆ íšŒì „)
         float timer = 0f;
 
         if (timer < homingDuration)
@@ -186,17 +191,17 @@ public class BulletController : MonoBehaviour
                 Vector2 currentVelocity = rb.velocity;
                 Vector2 targetDirection = ((Vector2)GameManager.Instance.GetPlayerData().position - (Vector2)transform.position).normalized;
 
-                // 1. Æ÷¹°¼± È¿°ú: YÃà ¼Óµµ¿¡ Áß·Â Àû¿ë
+                // 1. í¬ë¬¼ì„  íš¨ê³¼: Yì¶• ì†ë„ì— ì¤‘ë ¥ ì ìš©
                 Vector2 gravity = new Vector2(0, -gravityEffect * Time.deltaTime);
                 currentVelocity += gravity;
 
-                // 2. ¹æÇâ Á¦ÇÑÀ» µÎ¸é¼­ ºÎµå·´°Ô È¸Àü
+                // 2. ë°©í–¥ ì œí•œì„ ë‘ë©´ì„œ ë¶€ë“œëŸ½ê²Œ íšŒì „
                 float currentAngle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg;
                 float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-                // ÇöÀç °¢µµ¸¦ ¸ñÇ¥ °¢µµ ¹æÇâÀ¸·Î ºÎµå·´°Ô È¸Àü (°¢µµ Á¦ÇÑ)
+                // í˜„ì¬ ê°ë„ë¥¼ ëª©í‘œ ê°ë„ ë°©í–¥ìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ íšŒì „ (ê°ë„ ì œí•œ)
                 float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, maxTurnAngle * Time.deltaTime);
 
-                // »õ·Î¿î ¹æÇâÀ¸·Î ¼Óµµ Àç¼³Á¤
+                // ìƒˆë¡œìš´ ë°©í–¥ìœ¼ë¡œ ì†ë„ ì¬ì„¤ì •
                 Vector2 newVelocity = new Vector2(Mathf.Cos(newAngle * Mathf.Deg2Rad), Mathf.Sin(newAngle * Mathf.Deg2Rad)) * speed;
                 rb.velocity = newVelocity;
             }
@@ -204,7 +209,7 @@ public class BulletController : MonoBehaviour
         }
         else
         {
-            rb.velocity = rb.velocity.normalized * speed; // ¸¶Áö¸· ¹æÇâÀ¸·Î À¯Áö
+            rb.velocity = rb.velocity.normalized * speed; // ë§ˆì§€ë§‰ ë°©í–¥ìœ¼ë¡œ ìœ ì§€
             isHoming = false;
         }
     }
@@ -212,16 +217,16 @@ public class BulletController : MonoBehaviour
     {
         if (rb == null) return;
 
-        // 1) °¢µµ¸¦ 'µµ'¿¡¼­ '¶óµğ¾È'À¸·Î º¯È¯ÇÏ¿© Áõ°¡½ÃÅ°´Â ¿¹½Ã
-        spiralAngle += 300f * Mathf.Deg2Rad * Time.deltaTime; // ÃÊ´ç 300µµ È¸Àü
+        // 1) ê°ë„ë¥¼ 'ë„'ì—ì„œ 'ë¼ë””ì•ˆ'ìœ¼ë¡œ ë³€í™˜í•˜ì—¬ ì¦ê°€ì‹œí‚¤ëŠ” ì˜ˆì‹œ
+        spiralAngle += 300f * Mathf.Deg2Rad * Time.deltaTime; // ì´ˆë‹¹ 300ë„ íšŒì „
      
-                                                                    // 3) ½ºÆÄÀÌ·² º¤ÅÍ °è»ê (ÀÌ¹Ì ¶óµğ¾ÈÀ¸·Î cos/sin »ç¿ë)
+                                                                    // 3) ìŠ¤íŒŒì´ëŸ´ ë²¡í„° ê³„ì‚° (ì´ë¯¸ ë¼ë””ì•ˆìœ¼ë¡œ cos/sin ì‚¬ìš©)
         Vector2 spiral = new Vector2(
             Mathf.Cos(spiralAngle),
             Mathf.Sin(spiralAngle)
         ) * spiralRadius;
 
-        // 4) velocity ÁöÁ¤ (Time.deltaTimeÀº »©°í speed¸¸ °ö)
+        // 4) velocity ì§€ì • (Time.deltaTimeì€ ë¹¼ê³  speedë§Œ ê³±)
         rb.velocity = spiral * speed;
     }
 
@@ -229,16 +234,16 @@ public class BulletController : MonoBehaviour
     {
         bulletType = newType;
 
-        // »ö»ó º¯°æ
+        // ìƒ‰ìƒ ë³€ê²½
         if (GetComponent<SpriteRenderer>() != null)
         {
             GetComponent<SpriteRenderer>().color = bulletColors[newType];
         }
 
-        StartPattern(); // »õ·Î¿î ÆĞÅÏ ½ÇÇà
+        StartPattern(); // ìƒˆë¡œìš´ íŒ¨í„´ ì‹¤í–‰
     }
 
-    // Á¤È®µµ¸¦ Àû¿ëÇÏ¿© ¹æÇâÀ» Á¶Á¤ÇÏ´Â ¸Ş¼­µå
+    // ì •í™•ë„ë¥¼ ì ìš©í•˜ì—¬ ë°©í–¥ì„ ì¡°ì •í•˜ëŠ” ë©”ì„œë“œ
     private Vector2 ApplyAccuracy(Vector2 direction)
     {
         float randomAngle = Random.Range(-accuracy, accuracy);
@@ -246,63 +251,56 @@ public class BulletController : MonoBehaviour
         return rotation * direction;
     }
 
-    // Æ¯Á¤ À§Ä¡·Î ÀÌµ¿ ÈÄ ÆĞÅÏ ½ÇÇà
+    // íŠ¹ì • ìœ„ì¹˜ë¡œ ì´ë™ í›„ íŒ¨í„´ ì‹¤í–‰
     private IEnumerator MoveAndNext(BulletType type = default, float delay = 0)
     {
+        // 1) ì‹œì‘ ìœ„ì¹˜Â·ë„ì°© ìœ„ì¹˜Â·ì´ˆê¸° Zê°ë„ ìºì‹±
+        Vector3 startPos = transform.position;
+        Vector3 endPos = targetPosition;
+        float initialZ = transform.eulerAngles.z;
+
+        // 2) travelTime ë™ì•ˆ ì´ë™í•˜ë„ë¡ ì‹œê°„ ê³ ì •
         float elapsed = 0f;
-        float timeout = 3f;
-        float moveSpeed = speed * 5;
-        bool rotated = false;
-        if (bulletType == BulletType.GasterBlaster)
-        {
-            moveSpeed = speed * 10;
-           
-        }
+        if (type == BulletType.GasterBlaster)
+            travelTime = 0.5f;
 
-        while (hasTarget && Vector2.Distance(transform.position, targetPosition) > 0.1f)
+        while (elapsed < travelTime)
         {
-            Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-            Vector2 newPos = rb.position + direction * moveSpeed * Time.deltaTime;
-            rb.MovePosition(newPos);
-            elapsed += Time.deltaTime;
-            if(bulletType == BulletType.GasterBlaster)
+            float progress = elapsed / travelTime;              // 0 â†’ 1, ì„ í˜• ì§„í–‰
+            transform.position = Vector3.Lerp(startPos, endPos, progress);
+
+            if (type == BulletType.GasterBlaster)
             {
-                // È¸ÀüÀº ¿ÀÁ÷ ÇÑ¹ø
-                if (!rotated && Vector2.Distance(transform.position, targetPosition) < 1f)
-                {
-                    float angle = Mathf.Atan2(storedFireDirection.y, storedFireDirection.x) * Mathf.Rad2Deg;
-                    transform.rotation = Quaternion.Euler(0, 0, angle - 90); // À§ÂÊÀÌ ¾ÕÀÏ ¶§ -90µµ º¸Á¤
-                    rotated = true;
-                }
-
+                // 3) ì´ë™í•˜ë©´ì„œ íšŒì „
+                float newZ = initialZ + 360f * rotationMultiplier * progress;
+                transform.rotation = Quaternion.Euler(0f, 0f, newZ);
             }
+
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        if (elapsed >= timeout)
-        {
-            Debug.LogWarning("MoveAndNext Å¸ÀÓ¾Æ¿ô! À§Ä¡·Î µµ´ŞÇÏÁö ¸øÇß¾î¿ä.");
-        }
+        // 4) ìµœì¢… ìœ„ì¹˜Â·ê°ë„ ë³´ì •
+        transform.position = endPos;
+        if (type == BulletType.GasterBlaster)
+            transform.rotation = Quaternion.Euler(0f, 0f, initialZ + 360f * rotationMultiplier);
 
-        // µµÂø ÈÄ Shot() È£Ãâ
+        // 5) ì´í›„ ë¡œì§
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
 
         if (type == BulletType.GasterBlaster)
-        {
-            float angle = Mathf.Atan2(storedFireDirection.y, storedFireDirection.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle - 90);
-
             GetComponent<GasterBlaster>()?.Shot();
-        }
-
-        if (delay > 0)
-            yield return new WaitForSeconds(delay + 0.2f);
 
         if (type != BulletType.None)
             ExecuteBulletPattern(type, storedFireDirection);
     }
 
 
-    // ÆĞÅÏ ½ÇÇàÀ» À§ÇÑ ºĞ¸®µÈ ¸Ş¼­µå
+
+
+
+    // íŒ¨í„´ ì‹¤í–‰ì„ ìœ„í•œ ë¶„ë¦¬ëœ ë©”ì„œë“œ
     private void ExecuteBulletPattern(BulletType type, Vector2 dir = default)
     {
         switch (type)
@@ -332,28 +330,28 @@ public class BulletController : MonoBehaviour
                 break;
 
             case BulletType.None:
-                Debug.Log("ÃÑ¾Ë´ë±â");
+                Debug.Log("ì´ì•ŒëŒ€ê¸°");
                 break;
         }
     }
 
-    // Ã³À½ ÇÃ·¹ÀÌ¾î ¹æÇâÀ¸·Î ÀÏÁ¤ ½Ã°£ µ¿¾È ÀÌµ¿ÇÑ ÈÄ, ÇØ´ç ¹æÇâ À¯Áö
+    // ì²˜ìŒ í”Œë ˆì´ì–´ ë°©í–¥ìœ¼ë¡œ ì¼ì • ì‹œê°„ ë™ì•ˆ ì´ë™í•œ í›„, í•´ë‹¹ ë°©í–¥ ìœ ì§€
     private IEnumerator MoveTargetPlayer()
     {
-        target = GameManager.Instance.GetPlayerData().player.transform; // ÇÃ·¹ÀÌ¾î¸¦ Å¸°ÙÀ¸·Î ¼³Á¤
+        target = GameManager.Instance.GetPlayerData().player.transform; // í”Œë ˆì´ì–´ë¥¼ íƒ€ê²Ÿìœ¼ë¡œ ì„¤ì •
 
-        Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // ÇÃ·¹ÀÌ¾î ¹æÇâ °è»ê
-        GetComponent<Rigidbody2D>().velocity = direction * speed; // Ã³À½ ¼Óµµ ¼³Á¤
+        Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // í”Œë ˆì´ì–´ ë°©í–¥ ê³„ì‚°
+        GetComponent<Rigidbody2D>().velocity = direction * speed; // ì²˜ìŒ ì†ë„ ì„¤ì •
 
-        yield return new WaitForSeconds(0.5f); // 0.5ÃÊ µ¿¾È ÇÃ·¹ÀÌ¾î ¹æÇâ À¯Áö
+        yield return new WaitForSeconds(0.5f); // 0.5ì´ˆ ë™ì•ˆ í”Œë ˆì´ì–´ ë°©í–¥ ìœ ì§€
 
-        // ÀÌÈÄ¿¡´Â ÇØ´ç ¹æÇâÀ» À¯ÁöÇÏ¸é¼­ Á÷Áø
+        // ì´í›„ì—ëŠ” í•´ë‹¹ ë°©í–¥ì„ ìœ ì§€í•˜ë©´ì„œ ì§ì§„
         GetComponent<Rigidbody2D>().velocity = direction * speed;
 
     }
 
 
-    // Á¡Á¡ »¡¶óÁö´Â ÃÑ¾Ë
+    // ì ì  ë¹¨ë¼ì§€ëŠ” ì´ì•Œ
     private IEnumerator IncreaseSpeedOverTime()
     {
         while (speed < maxSpeed)
@@ -364,12 +362,12 @@ public class BulletController : MonoBehaviour
         }
     }
 
-    //  ÇØ´ç ¹æÇâ À¯Áö
+    //  í•´ë‹¹ ë°©í–¥ ìœ ì§€
     private IEnumerator DirectionalMove(Vector2 moveDirection)
     {
         if (rb == null) yield break;
 
-        // ¾ÈÀüÀåÄ¡: ¹æÇâÀÌ ¾ø´Ù¸é ±âÁ¸ ¼Óµµ À¯Áö or ±âº»°ª
+        // ì•ˆì „ì¥ì¹˜: ë°©í–¥ì´ ì—†ë‹¤ë©´ ê¸°ì¡´ ì†ë„ ìœ ì§€ or ê¸°ë³¸ê°’
         if (moveDirection == Vector2.zero)
             moveDirection = rb.velocity != Vector2.zero ? rb.velocity.normalized : Vector2.right;
 
@@ -380,7 +378,7 @@ public class BulletController : MonoBehaviour
     }
 
 
-    // °³º° À¯µµ ÅºÈ¯ µ¿ÀÛ
+    // ê°œë³„ ìœ ë„ íƒ„í™˜ ë™ì‘
     private IEnumerator HomingMove()
     {
         isHoming = true;
@@ -393,13 +391,13 @@ public class BulletController : MonoBehaviour
         switch (bulletSize)
         {
             case 0:
-                spiralRadius = 1.75f; // ÀÛÀº¿ø
+                spiralRadius = 1.75f; // ì‘ì€ì›
                 break;
             case 1:
-                spiralRadius = 2.75f; // Áß°£¿ø
+                spiralRadius = 2.75f; // ì¤‘ê°„ì›
                 break;
             case 2:
-                spiralRadius = 3.75f; // Å«¿ø
+                spiralRadius = 3.75f; // í°ì›
                 break;
         }
 
@@ -457,7 +455,7 @@ public class BulletController : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log($"ÃÑ¾ËÀÌ {other.gameObject.name}°ú Ãæµ¹");
+        //Debug.Log($"ì´ì•Œì´ {other.gameObject.name}ê³¼ ì¶©ëŒ");
         if (other.CompareTag("Enemy") && isFreind)
         {
             GameObject enemy = other.gameObject;

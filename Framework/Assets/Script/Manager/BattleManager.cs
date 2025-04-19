@@ -252,7 +252,8 @@ public class BattleManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             //SetAttack("Split", 0, 1f);//분열
-           SetAttack("GasterBlaster", 30, 1f);//회오리
+            int value = UnityEngine.Random.Range(0, 59);
+            SetAttack("GasterBlaster", value);//회오리
             
 
         }

@@ -42,4 +42,26 @@ public class LaserFadeOut : MonoBehaviour
 
         Destroy(gameObject);
     }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Soul"))
+        {
+            GameObject player = other.gameObject;
+
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
+
+
+        }
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Soul"))
+        {
+            GameObject player = other.gameObject;
+
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
+
+
+        }
+    }
 }
