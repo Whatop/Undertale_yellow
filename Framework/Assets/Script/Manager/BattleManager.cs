@@ -315,6 +315,13 @@ public class BattleManager : MonoBehaviour
         activeBullets.RemoveAll(b => b == null || !b.activeInHierarchy);
     }
 
+    public void DestroyActiveBullets()
+    {
+        foreach (var a in activeBullets)
+        {
+            a.gameObject.SetActive(false);
+        }
+    }
     public void BattleStart(int eventNumber)
     {
 

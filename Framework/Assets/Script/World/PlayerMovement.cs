@@ -207,7 +207,7 @@ public class PlayerMovement : LivingObject
 
         curweaponData.weaponType = WeaponType.Justice;
         curweaponData.UpdateColor();
-        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = curweaponData.weaponColor;
+        soulObject.GetComponent<SpriteRenderer>().color = curweaponData.weaponColor;
 
         originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
     }
@@ -869,7 +869,7 @@ public class PlayerMovement : LivingObject
     }
     public void UpdateWeaponUI(Weapon currentWeapon)
     {
-        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = currentWeapon.weaponColor;
+       soulObject.GetComponent<SpriteRenderer>().color = currentWeapon.weaponColor;
         // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
     }
     void SelectWeapon(int index)
@@ -877,7 +877,7 @@ public class PlayerMovement : LivingObject
         currentWeaponIndex = index;
 
         // UI 업데이트
-        UIManager.Instance.ui_weaponImage.GetComponent<Image>().color = playerWeapons[currentWeaponIndex].weaponColor;
+        soulObject.GetComponent<SpriteRenderer>().color = playerWeapons[currentWeaponIndex].weaponColor;
 
         Debug.Log($"Selected Weapon: {playerWeapons[currentWeaponIndex].WeaponName}");
     }

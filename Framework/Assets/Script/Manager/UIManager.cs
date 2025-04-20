@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,13 +19,13 @@ public class RadialSegment
     {
         if (highlightObj != null)
             highlightObj.SetActive(isOn);
-        // ¾ÆÀÌÄÜ Å©±â/»ö»ó º¯°æ ·ÎÁ÷ µî °¡´É
+        // ì•„ì´ì½˜ í¬ê¸°/ìƒ‰ìƒ ë³€ê²½ ë¡œì§ ë“± ê°€ëŠ¥
     }
 
     public void ExecuteAction()
     {
-        // °¨Á¤Ç¥Çö ½ÇÇà(¾Ö´Ï¸ŞÀÌ¼Ç, »ç¿îµå Àç»ı, ³×Æ®¿öÅ© Àü¼Û µî)
-        Debug.Log($"°¨Á¤Ç¥Çö [{segmentName}] ½ÇÇà");
+        // ê°ì •í‘œí˜„ ì‹¤í–‰(ì• ë‹ˆë©”ì´ì…˜, ì‚¬ìš´ë“œ ì¬ìƒ, ë„¤íŠ¸ì›Œí¬ ì „ì†¡ ë“±)
+        Debug.Log($"ê°ì •í‘œí˜„ [{segmentName}] ì‹¤í–‰");
     }
 }
 
@@ -33,7 +33,8 @@ public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
     DialogueManager dialogueManager;
-    private SoundManager soundManager; // SoundManager ÀÎ½ºÅÏ½º¸¦ ÇÊµå·Î Ãß°¡
+    private SoundManager soundManager; // SoundManager ì¸ìŠ¤í„´ìŠ¤ë¥¼ í•„ë“œë¡œ ì¶”ê°€
+    private BattleManager BattleManager; // BattleManager ì¸ìŠ¤í„´ìŠ¤ë¥¼ í•„ë“œë¡œ ì¶”ê°€
 
     private static UIManager instance;
     public GameObject[] ui_positions; // Weapon : 0
@@ -45,11 +46,10 @@ public class UIManager : MonoBehaviour
     private GameObject ammos_td;
     private GameObject[] ui_ammo;
     public GameObject[] pedestal;
-    public Image ui_weaponImage;
     public TextMeshProUGUI ui_ammoText;
     public Canvas uicanvas;
     public Camera mainCamera;
-    public TextMeshProUGUI damageTextPrefab; // DamageText ÇÁ¸®ÆÕ
+    public TextMeshProUGUI damageTextPrefab; // DamageText í”„ë¦¬íŒ¹
 
     // Option
     public GameObject optionPanel;
@@ -57,7 +57,7 @@ public class UIManager : MonoBehaviour
     public GameObject keyChangePanel;
     public GameObject YN_ResetPanel;
     public GameObject KeyCheckPanel;
-    public Slider hpBar; // Ã¼·Â¹Ù
+    public Slider hpBar; // ì²´ë ¥ë°”
     public TextMeshProUGUI hpBar_text;
 
     public Button[] mainButtons;
@@ -93,7 +93,7 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private int currentIndex = 0;
 
-    //Camera °ü·Ã
+    //Camera ê´€ë ¨
     [SerializeField]
     private int curRIndex = 6; // curResolutionsIndex
     private List<Resolution> predefinedResolutions;
@@ -114,20 +114,23 @@ public class UIManager : MonoBehaviour
     /// 7 : Inventroy
     /// 8 : Map
     /// </summary>
-    private KeyCode[] keyBindings = new KeyCode[9]; // 9°³ÀÇ Å° ¼³Á¤À» À§ÇÑ ¹è¿­
-    private bool isWaitingForKey = false; // Å° ÀÔ·Â ´ë±â »óÅÂ¸¦ ³ªÅ¸³»´Â ÇÃ·¡±×
-    private int currentKeyIndex = 0; // ÇöÀç ¼³Á¤ ÁßÀÎ Å°ÀÇ ÀÎµ¦½º
+    private KeyCode[] keyBindings = new KeyCode[9]; // 9ê°œì˜ í‚¤ ì„¤ì •ì„ ìœ„í•œ ë°°ì—´
+    private bool isWaitingForKey = false; // í‚¤ ì…ë ¥ ëŒ€ê¸° ìƒíƒœë¥¼ ë‚˜íƒ€ë‚´ëŠ” í”Œë˜ê·¸
+    private int currentKeyIndex = 0; // í˜„ì¬ ì„¤ì • ì¤‘ì¸ í‚¤ì˜ ì¸ë±ìŠ¤
 
-    //PlayerUI
-    public Slider reloadSlider; // ÀçÀåÀü ½½¶óÀÌ´õ UI
+    [SerializeField] float baseBarWidth = 100f;   // MaxHP 20 ê¸°ì¤€ ê¸°ë³¸ ë„“ì´
+    [SerializeField] float extraWidthPerHp = 10f;    // 21 ì´ìƒë¶€í„° HP 1ì¹¸ë‹¹ ì¶”ê°€ë  í”½ì…€
+
+    RectTransform hpRect;
+    public Slider reloadSlider; // ì¬ì¥ì „ ìŠ¬ë¼ì´ë” UI
 
     public RectTransform crosshairTransform;
 
     public TextMeshProUGUI currentResolutionText;
 
     [SerializeField]
-    private string currentPanel = "Default"; // ÇöÀç ÆĞ³ÎÀ» ÃßÀû
-    private string prevPanel = "Default"; // ÀÌÀü ÆĞ³ÎÀ» ÃßÀû
+    private string currentPanel = "Default"; // í˜„ì¬ íŒ¨ë„ì„ ì¶”ì 
+    private string prevPanel = "Default"; // ì´ì „ íŒ¨ë„ì„ ì¶”ì 
 
     //panel
     /// <summary>
@@ -147,19 +150,19 @@ public class UIManager : MonoBehaviour
     public Sprite[] soul_sprites;
     // heartbreak sound 87->89
     // heartbreak_c sound 88->90
-    // 4,5,6,7 -> ÇÏÆ® Á¶°¢
-    // 3-> ºÎ¼­Áø 
+    // 4,5,6,7 -> í•˜íŠ¸ ì¡°ê°
+    // 3-> ë¶€ì„œì§„ 
 
     // Save UI
     public GameObject savePanel;
     /// <summary>
-    /// 0. ÀúÀå¿Ï·á
-    /// 1. ÀÌ¸§
-    /// 2. ·¹º§
-    /// 3. ½Ã°£
-    /// 4. Àå¼Ò
-    /// 5. µ¹¾Æ°¡±â
-    /// 6. ÀúÀå
+    /// 0. ì €ì¥ì™„ë£Œ
+    /// 1. ì´ë¦„
+    /// 2. ë ˆë²¨
+    /// 3. ì‹œê°„
+    /// 4. ì¥ì†Œ
+    /// 5. ëŒì•„ê°€ê¸°
+    /// 6. ì €ì¥
     /// </summary>
     public TextMeshProUGUI[] savePanel_texts;
     public GameObject savePanel_soul;
@@ -169,10 +172,10 @@ public class UIManager : MonoBehaviour
     public bool isSaveDelay = false;
     //inventory panel
     /// <summary>
-    /// 0. ÀÎº¥Åä¸®
-    /// 1. ¾ÆÀÌÅÛ
-    /// 2. ½ºÅİ 
-    /// 3. ÀüÈ­
+    /// 0. ì¸ë²¤í† ë¦¬
+    /// 1. ì•„ì´í…œ
+    /// 2. ìŠ¤í…Ÿ 
+    /// 3. ì „í™”
     /// </summary>
     public int inventroy_panelNum = 0;
     private int item_prevNum = 0;
@@ -199,15 +202,15 @@ public class UIManager : MonoBehaviour
     public Image inventroy_soul;
 
     [Header("Radial Menu References")]
-    public GameObject radialMenuPanel;      // ¶óµğ¾ó ¸Ş´º ÀüÃ¼¸¦ ´ã°í ÀÖ´Â Panel
-    public RectTransform centerPoint;       // ¶óµğ¾ó ¸Ş´ºÀÇ Áß½É(¸¶¿ì½º ±âÁØÁ¡)
-    public List<RadialSegment> segments;    // ¼¼±×¸ÕÆ® ¸®½ºÆ® (°¨Á¤Ç¥Çö/¾ÆÀÌÅÛ µî)
+    public GameObject radialMenuPanel;      // ë¼ë””ì–¼ ë©”ë‰´ ì „ì²´ë¥¼ ë‹´ê³  ìˆëŠ” Panel
+    public RectTransform centerPoint;       // ë¼ë””ì–¼ ë©”ë‰´ì˜ ì¤‘ì‹¬(ë§ˆìš°ìŠ¤ ê¸°ì¤€ì )
+    public List<RadialSegment> segments;    // ì„¸ê·¸ë¨¼íŠ¸ ë¦¬ìŠ¤íŠ¸ (ê°ì •í‘œí˜„/ì•„ì´í…œ ë“±)
 
     [Header("Radial Menu Settings")]
-    public KeyCode toggleKey = KeyCode.G;   // ¶óµğ¾ó ¸Ş´º ¿­±â/´İ±â Å°
-    public bool isRadialMenuActive = false; // ÇöÀç ¶óµğ¾ó ¸Ş´º È°¼ºÈ­ ¿©ºÎ
+    public KeyCode toggleKey = KeyCode.G;   // ë¼ë””ì–¼ ë©”ë‰´ ì—´ê¸°/ë‹«ê¸° í‚¤
+    public bool isRadialMenuActive = false; // í˜„ì¬ ë¼ë””ì–¼ ë©”ë‰´ í™œì„±í™” ì—¬ë¶€
 
-    private int current_segment_Index = -1;          // ÇöÀç ÇÏÀÌ¶óÀÌÆ®µÈ ¼¼±×¸ÕÆ® ÀÎµ¦½º
+    private int current_segment_Index = -1;          // í˜„ì¬ í•˜ì´ë¼ì´íŠ¸ëœ ì„¸ê·¸ë¨¼íŠ¸ ì¸ë±ìŠ¤
 
     public static UIManager Instance
     {
@@ -240,6 +243,7 @@ public class UIManager : MonoBehaviour
 
         gameManager = GameManager.Instance;
         soundManager = SoundManager.Instance;
+        BattleManager = BattleManager.Instance;
         dialogueManager = DialogueManager.Instance;
     }
 
@@ -276,25 +280,25 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < mainButtons.Length; i++)
         {
-            int index = i;  // Å¬·ÎÀú¸¦ À§ÇÑ ·ÎÄÃ º¹»çº»
+            int index = i;  // í´ë¡œì €ë¥¼ ìœ„í•œ ë¡œì»¬ ë³µì‚¬ë³¸
             mainButtons[i].onClick.AddListener(() => OnButtonClick(index));
             AddEventTriggerListener(mainButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
         for (int i = 0; i < optionButtons.Length; i++)
         {
-            int index = i;  // Å¬·ÎÀú¸¦ À§ÇÑ ·ÎÄÃ º¹»çº»
+            int index = i;  // í´ë¡œì €ë¥¼ ìœ„í•œ ë¡œì»¬ ë³µì‚¬ë³¸
             optionButtons[i].onClick.AddListener(() => OnButtonClick(index));
             AddEventTriggerListener(optionButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
         for (int i = 0; i < keyChangeButtons.Length; i++)
         {
-            int index = i;  // Å¬·ÎÀú¸¦ À§ÇÑ ·ÎÄÃ º¹»çº»
+            int index = i;  // í´ë¡œì €ë¥¼ ìœ„í•œ ë¡œì»¬ ë³µì‚¬ë³¸
             keyChangeButtons[i].onClick.AddListener(() => OnButtonClick(index));
             AddEventTriggerListener(keyChangeButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
         for (int i = 0; i < YNButtons.Length; i++)
         {
-            int index = i;  // Å¬·ÎÀú¸¦ À§ÇÑ ·ÎÄÃ º¹»çº»
+            int index = i;  // í´ë¡œì €ë¥¼ ìœ„í•œ ë¡œì»¬ ë³µì‚¬ë³¸
             YNButtons[i].onClick.AddListener(() => OnButtonClick(index));
             AddEventTriggerListener(YNButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
@@ -304,7 +308,10 @@ public class UIManager : MonoBehaviour
         OptionInput();
         UpdateUI();
         SaveOff();
-        OffPlayerUI(); // ºñÀüÅõ »óÅÂ¿¡¼­´Â UI¸¦ ¼û±è
+        OffPlayerUI(); // ë¹„ì „íˆ¬ ìƒíƒœì—ì„œëŠ” UIë¥¼ ìˆ¨ê¹€
+
+        hpRect = hpBar.GetComponent<RectTransform>();
+        ResizeHpBar(gameManager.GetPlayerData().Maxhealth);
     }
 
     #region savePanel
@@ -338,7 +345,7 @@ public class UIManager : MonoBehaviour
     public void SaveComplete()
     {
         savePanel_soul.SetActive(false);
-        saveNum = -1; //¾ß¸Ş
+        saveNum = -1; //ì•¼ë©”
         isSavePanel = false;
         isSaveDelay = true;
        
@@ -364,28 +371,28 @@ public class UIManager : MonoBehaviour
     #endregion
     public void SetTextBar()
     {
-        // ÇÃ·¹ÀÌ¾î À§Ä¡ °¡Á®¿À±â
+        // í”Œë ˆì´ì–´ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
         Vector3 playerPosition = gameManager.GetPlayerData().position;
         Vector3 none = inventroy_simple_panel.gameObject.transform.localPosition;
 
-        // À½ Ãß°¡·Î 
+        // ìŒ ì¶”ê°€ë¡œ 
         inventroy_simple_texts[0].text = gameManager.GetPlayerData().player_Name;
         inventroy_simple_texts[1].text = "HP " + gameManager.GetPlayerData().health + "/" + gameManager.GetPlayerData().Maxhealth;
         inventroy_simple_texts[2].text = "G  " + gameManager.GetPlayerData().GOLD;
         inventroy_simple_texts[3].text = "LV " + gameManager.GetPlayerData().LEVEL;
 
-        // Ä«¸Ş¶ó À§Ä¡ °¡Á®¿À±â
+        // ì¹´ë©”ë¼ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
         Vector3 cameraPosition = Camera.main.transform.position;
         if (playerPosition.y > cameraPosition.y)
         {
-            // ÇÃ·¹ÀÌ¾î°¡ Ä«¸Ş¶óº¸´Ù ³ôÀÌ ÀÖ´Â °æ¿ì
+            // í”Œë ˆì´ì–´ê°€ ì¹´ë©”ë¼ë³´ë‹¤ ë†’ì´ ìˆëŠ” ê²½ìš°
             textbar.transform.position = textbarPos[1].transform.position;
             inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, 320);
 
         }
         else
         {
-            // ÇÃ·¹ÀÌ¾î°¡ Ä«¸Ş¶óº¸´Ù ³·°Ô ÀÖ´Â °æ¿ì
+            // í”Œë ˆì´ì–´ê°€ ì¹´ë©”ë¼ë³´ë‹¤ ë‚®ê²Œ ìˆëŠ” ê²½ìš°
             textbar.transform.position = textbarPos[0].transform.position;
             inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, -220);
         }
@@ -451,7 +458,7 @@ public class UIManager : MonoBehaviour
                 saveNum--;
                 if (saveNum < 0)
                 {
-                    saveNum = save_points.Length - 1; // ¹è¿­ÀÇ ¸¶Áö¸· ÀÎµ¦½º·Î ¼øÈ¯
+                    saveNum = save_points.Length - 1; // ë°°ì—´ì˜ ë§ˆì§€ë§‰ ì¸ë±ìŠ¤ë¡œ ìˆœí™˜
                 }
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -460,7 +467,7 @@ public class UIManager : MonoBehaviour
                 saveNum++;
                 if (saveNum >= save_points.Length)
                 {
-                    saveNum = 0; // ¹è¿­ÀÇ Ã³À½À¸·Î ¼øÈ¯
+                    saveNum = 0; // ë°°ì—´ì˜ ì²˜ìŒìœ¼ë¡œ ìˆœí™˜
                 }
             }
 
@@ -498,18 +505,18 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
-        // 1) ¶óµğ¾ó ¸Ş´º Åä±Û Ã³¸®
+        // 1) ë¼ë””ì–¼ ë©”ë‰´ í† ê¸€ ì²˜ë¦¬
         if (Input.GetKeyDown(toggleKey))
         {
             ToggleRadialMenu();
         }
 
-        // 2) ¸Ş´º È°¼º »óÅÂ¶ó¸é ¸¶¿ì½º À§Ä¡¿Í Å¬¸¯ ¿©ºÎ ÆÇ´Ü
+        // 2) ë©”ë‰´ í™œì„± ìƒíƒœë¼ë©´ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì™€ í´ë¦­ ì—¬ë¶€ íŒë‹¨
         if (isRadialMenuActive)
         {
             UpdateRadialSelection();
 
-            // ¸¶¿ì½º ¿ŞÂÊ ¹öÆ° ¶¼´Â ¼ø°£ ÇØ´ç °¨Á¤Ç¥Çö/¾ÆÀÌÅÛ ¼±ÅÃ È®Á¤
+            // ë§ˆìš°ìŠ¤ ì™¼ìª½ ë²„íŠ¼ ë–¼ëŠ” ìˆœê°„ í•´ë‹¹ ê°ì •í‘œí˜„/ì•„ì´í…œ ì„ íƒ í™•ì •
             if (Input.GetMouseButtonUp(0) && currentIndex >= 0)
             {
                 OnSelectSegment(currentIndex);
@@ -517,14 +524,14 @@ public class UIManager : MonoBehaviour
         }
     }
     /// <summary>
-      /// ¶óµğ¾ó ¸Ş´º ¿­±â/´İ±â
+      /// ë¼ë””ì–¼ ë©”ë‰´ ì—´ê¸°/ë‹«ê¸°
       /// </summary>
     public void ToggleRadialMenu()
     {
         isRadialMenuActive = !isRadialMenuActive;
         radialMenuPanel.SetActive(isRadialMenuActive);
 
-        // ¿­ ¶§, Áß¾Ó À§Ä¡ ¼³Á¤ (¸¶¿ì½º À§Ä¡ µî¿¡)
+        // ì—´ ë•Œ, ì¤‘ì•™ ìœ„ì¹˜ ì„¤ì • (ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ë“±ì—)
         if (isRadialMenuActive)
         {
             Vector3 mousePos = Input.mousePosition;
@@ -533,48 +540,48 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸¶¿ì½º °¢µµ¿¡ µû¶ó ÇÏÀÌ¶óÀÌÆ®ÇÒ ¼¼±×¸ÕÆ® °è»ê
+    /// ë§ˆìš°ìŠ¤ ê°ë„ì— ë”°ë¼ í•˜ì´ë¼ì´íŠ¸í•  ì„¸ê·¸ë¨¼íŠ¸ ê³„ì‚°
     /// </summary>
     private void UpdateRadialSelection()
     {
         Vector2 dir = Input.mousePosition - centerPoint.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        angle = (angle + 360f) % 360f; // 0~360 ¹üÀ§·Î ¸ÂÃã
+        angle = (angle + 360f) % 360f; // 0~360 ë²”ìœ„ë¡œ ë§ì¶¤
 
         float segmentAngle = 360f / segments.Count;
         int newIndex = (int)(angle / segmentAngle);
 
         if (newIndex != current_segment_Index)
         {
-            // ÀÌÀü ÇÏÀÌ¶óÀÌÆ® Á¦°Å
+            // ì´ì „ í•˜ì´ë¼ì´íŠ¸ ì œê±°
             if (current_segment_Index >= 0 && current_segment_Index < segments.Count)
             {
                 segments[current_segment_Index].SetHighlight(false);
             }
 
-            // »õ ÀÎµ¦½º ÇÏÀÌ¶óÀÌÆ®
+            // ìƒˆ ì¸ë±ìŠ¤ í•˜ì´ë¼ì´íŠ¸
             current_segment_Index = newIndex;
             segments[current_segment_Index].SetHighlight(true);
         }
     }
 
     /// <summary>
-    /// ¼¼±×¸ÕÆ® ¼±ÅÃÀÌ È®Á¤µÇ¾úÀ» ¶§ ½ÇÇà
+    /// ì„¸ê·¸ë¨¼íŠ¸ ì„ íƒì´ í™•ì •ë˜ì—ˆì„ ë•Œ ì‹¤í–‰
     /// </summary>
     private void OnSelectSegment(int index)
     {
         RadialSegment seg = segments[index];
-        Debug.Log($"Segment {index} ¼±ÅÃµÊ - {seg.segmentName}");
+        Debug.Log($"Segment {index} ì„ íƒë¨ - {seg.segmentName}");
         seg.ExecuteAction();
 
-        // ¼±ÅÃ ÈÄ ¸Ş´º ´İÀ» ¼öµµ ÀÖÀ½
+        // ì„ íƒ í›„ ë©”ë‰´ ë‹«ì„ ìˆ˜ë„ ìˆìŒ
         ToggleRadialMenu();
     }
 
     #region InventroyUi
     void UpdateInventoryUI()
     {
-        // ÀÎº¥Åä¸®ÀÇ Ã¹ ¹øÂ° ÅØ½ºÆ® ºñÈ°¼ºÈ­ ¹× »ö»ó º¯°æ ·ÎÁ÷
+        // ì¸ë²¤í† ë¦¬ì˜ ì²« ë²ˆì§¸ í…ìŠ¤íŠ¸ ë¹„í™œì„±í™” ë° ìƒ‰ìƒ ë³€ê²½ ë¡œì§
         if (gameManager.GetPlayerData().inventory.Count == 0)
         {
             inventroy_texts[0].color = Color.gray;
@@ -584,7 +591,7 @@ public class UIManager : MonoBehaviour
             inventroy_texts[0].color = Color.white;
         }
         inventroy_texts[2].gameObject.SetActive(gameManager.GetPlayerData().isPhone);
-        // ¾ÆÀÌÅÛ ¾øÀ»¶§ µ¹¾Æ°¡´Â ÄÚµå
+        // ì•„ì´í…œ ì—†ì„ë•Œ ëŒì•„ê°€ëŠ” ì½”ë“œ
         if ((inventroy_panelNum == 4 || inventroy_panelNum == 1) && gameManager.GetPlayerData().inventory.Count == 0)
         {
             OnPanel(-1);
@@ -627,16 +634,16 @@ public class UIManager : MonoBehaviour
 
                     foreach (var r in item_texts)
                     {
-                        r.gameObject.SetActive(false); // ¸ğµç item_texts ºñÈ°¼ºÈ­
+                        r.gameObject.SetActive(false); // ëª¨ë“  item_texts ë¹„í™œì„±í™”
                     }
 
                     int inventoryCount = gameManager.GetPlayerData().inventory.Count;
-                    int maxDisplayCount = Mathf.Min(inventoryCount, item_texts.Length); // ÃÖ´ë item_texts ¹è¿­ Å©±â¸¸Å­ Ç¥½Ã
+                    int maxDisplayCount = Mathf.Min(inventoryCount, item_texts.Length); // ìµœëŒ€ item_texts ë°°ì—´ í¬ê¸°ë§Œí¼ í‘œì‹œ
 
                     for (int c = 0; c < maxDisplayCount; c++)
                     {
-                        item_texts[c].gameObject.SetActive(true); // ÇÃ·¹ÀÌ¾î ÀÎº¥Åä¸® Å©±â¸¸Å­ item_texts È°¼ºÈ­
-                        item_texts[c].text = gameManager.GetPlayerData().inventory[c].itemName; // ¾ÆÀÌÅÛ ÀÌ¸§ Ç¥½Ã
+                        item_texts[c].gameObject.SetActive(true); // í”Œë ˆì´ì–´ ì¸ë²¤í† ë¦¬ í¬ê¸°ë§Œí¼ item_texts í™œì„±í™”
+                        item_texts[c].text = gameManager.GetPlayerData().inventory[c].itemName; // ì•„ì´í…œ ì´ë¦„ í‘œì‹œ
                     }
                 }
                 break;
@@ -655,7 +662,7 @@ public class UIManager : MonoBehaviour
                 inventroy_panelNum = 3;
                 break;
 
-            case 3: // ¼±ÅÃÃ¢
+            case 3: // ì„ íƒì°½
                 soundManager.SFXPlay("select_sound", 173);
                 item_panel.SetActive(true);
                 inventroy_panelNum = 4;
@@ -680,8 +687,8 @@ public class UIManager : MonoBehaviour
         stat_texts[4].text = "DF " + gameManager.GetPlayerData().DF_level + " (" + gameManager.GetPlayerData().DF + ")";
         stat_texts[5].text = "EXP: " + gameManager.GetPlayerData().EXP;
         stat_texts[6].text = "NEXT: " + gameManager.GetPlayerData().NextEXP;
-        stat_texts[7].text = "¹«±â: " + gameManager.GetPlayerData().curWeapon.itemName;
-        stat_texts[8].text = "°©¿Ê: " + gameManager.GetPlayerData().curAmmor.itemName;
+        stat_texts[7].text = "ë¬´ê¸°: " + gameManager.GetPlayerData().curWeapon.itemName;
+        stat_texts[8].text = "ê°‘ì˜·: " + gameManager.GetPlayerData().curAmmor.itemName;
         stat_texts[9].text = "GOLD: " + gameManager.GetPlayerData().GOLD;
 
     }
@@ -689,7 +696,7 @@ public class UIManager : MonoBehaviour
     {
         if (!isInventroy || isUserInterface)
             return;
-        // W ÀÔ·Â ½Ã inventroy_curNum °¨¼Ò
+        // W ì…ë ¥ ì‹œ inventroy_curNum ê°ì†Œ
         if (inventroy_panelNum != 4)
         {
             if (Input.GetKeyDown(KeyCode.W))
@@ -698,18 +705,18 @@ public class UIManager : MonoBehaviour
                 soundManager.SFXPlay("move_sound", 185);
                 if (inventroy_curNum < 0)
                 {
-                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // ÇöÀç ÆĞ³ÎÀÇ ³¡À¸·Î ÀÌµ¿
+                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // í˜„ì¬ íŒ¨ë„ì˜ ëìœ¼ë¡œ ì´ë™
                 }
             }
 
-            // S ÀÔ·Â ½Ã inventroy_curNum Áõ°¡
+            // S ì…ë ¥ ì‹œ inventroy_curNum ì¦ê°€
             if (Input.GetKeyDown(KeyCode.S))
             {
                 soundManager.SFXPlay("move_sound", 185);
                 inventroy_curNum++;
                 if (inventroy_curNum >= GetCurrentPanelTextLength())
                 {
-                    inventroy_curNum = 0; // ÇöÀç ÆĞ³ÎÀÇ Ã³À½À¸·Î ÀÌµ¿
+                    inventroy_curNum = 0; // í˜„ì¬ íŒ¨ë„ì˜ ì²˜ìŒìœ¼ë¡œ ì´ë™
                 }
             }
         }
@@ -721,18 +728,18 @@ public class UIManager : MonoBehaviour
                 soundManager.SFXPlay("move_sound", 185);
                 if (inventroy_curNum < 0)
                 {
-                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // ÇöÀç ÆĞ³ÎÀÇ ³¡À¸·Î ÀÌµ¿
+                    inventroy_curNum = GetCurrentPanelTextLength() - 1; // í˜„ì¬ íŒ¨ë„ì˜ ëìœ¼ë¡œ ì´ë™
                 }
             }
 
-            // S ÀÔ·Â ½Ã inventroy_curNum Áõ°¡
+            // S ì…ë ¥ ì‹œ inventroy_curNum ì¦ê°€
             if (Input.GetKeyDown(KeyCode.D))
             {
                 soundManager.SFXPlay("move_sound", 185);
                 inventroy_curNum++;
                 if (inventroy_curNum >= GetCurrentPanelTextLength())
                 {
-                    inventroy_curNum = 0; // ÇöÀç ÆĞ³ÎÀÇ Ã³À½À¸·Î ÀÌµ¿
+                    inventroy_curNum = 0; // í˜„ì¬ íŒ¨ë„ì˜ ì²˜ìŒìœ¼ë¡œ ì´ë™
                 }
             }
         }
@@ -741,31 +748,31 @@ public class UIManager : MonoBehaviour
             if (!item_panel.activeSelf)
                 OnPanel(inventroy_curNum);
 
-            // ÀÎº¥Åä¸®/¾ÆÀÌÅÛ
+            // ì¸ë²¤í† ë¦¬/ì•„ì´í…œ
             else if (inventroy_panelNum == 1)
             {
                 item_prevNum = inventroy_curNum;
                 OnPanel(3);
             }
-            // ¼±ÅÃ
+            // ì„ íƒ
             else if (inventroy_panelNum == 4)
             {
-                // ¾ÆÀÌÅÛ »ç¿ë
+                // ì•„ì´í…œ ì‚¬ìš©
                 switch (inventroy_curNum)
                 {
                     case 0:
-                        //»ç¿ë
+                        //ì‚¬ìš©
                         gameManager.UseItem(item_prevNum);
                         OnPanel(-1);
                         break;
 
                     case 1:
-                        // Á¤º¸
+                        // ì •ë³´
                         gameManager.InfoItem(item_prevNum);
                         OnPanel(-1);
                         break;
                     case 2:
-                        //¹ö¸®±â
+                        //ë²„ë¦¬ê¸°
                         Debug.Log(inventroy_curNum);
                         gameManager.DropItem(item_prevNum);
                         OnPanel(-1);
@@ -795,14 +802,14 @@ public class UIManager : MonoBehaviour
 
         switch (inventroy_panelNum)
         {
-            case 0: // ÀÎº¥Åä¸® ÆĞ³Î
+            case 0: // ì¸ë²¤í† ë¦¬ íŒ¨ë„
                 return inventroy_texts.Length - phoneValue;
-            case 1: // ¾ÆÀÌÅÛ ÆĞ³Î
+            case 1: // ì•„ì´í…œ íŒ¨ë„
                 return Mathf.Min(result, item_texts.Length);
-            case 3: // ÀüÈ­ ÆĞ³Î
+            case 3: // ì „í™” íŒ¨ë„
                 return call_texts.Length;
 
-            case 4: // ¼±ÅÃ ÆĞ³Î
+            case 4: // ì„ íƒ íŒ¨ë„
                 return interaction_texts.Length;
             default:
                 return 0;
@@ -813,7 +820,7 @@ public class UIManager : MonoBehaviour
     {
         GameObject[] currentPoints = null;
 
-        // ÆĞ³Î¿¡ ¸Â´Â Æ÷ÀÎÆ® ¹è¿­À» ¼±ÅÃ
+        // íŒ¨ë„ì— ë§ëŠ” í¬ì¸íŠ¸ ë°°ì—´ì„ ì„ íƒ
         switch (inventroy_panelNum)
         {
             case 0:
@@ -822,15 +829,15 @@ public class UIManager : MonoBehaviour
             case 1:
                 currentPoints = item_points;
                 break;
-            case 3: // ½ºÅÈ Á¦¿Ü
+            case 3: // ìŠ¤íƒ¯ ì œì™¸
                 currentPoints = call_points;
                 break;
-            case 4: // ¼±ÅØ
+            case 4: // ì„ í…
                 currentPoints = interaction_points;
                 break;
         }
 
-        // ÇöÀç ¼±ÅÃµÈ Æ÷ÀÎÆ® À§Ä¡·Î inventroy_soul ÀÌµ¿
+        // í˜„ì¬ ì„ íƒëœ í¬ì¸íŠ¸ ìœ„ì¹˜ë¡œ inventroy_soul ì´ë™
         if (currentPoints != null && currentPoints.Length > 0 && inventroy_curNum < currentPoints.Length)
         {
             inventroy_soul.transform.position = currentPoints[inventroy_curNum].transform.position;
@@ -856,19 +863,19 @@ public class UIManager : MonoBehaviour
             {
                 if (keyCode == KeyCode.Escape)
                 {
-                    // ESC¸¦ ´­·¶À» ¶§ ÀÔ·Â Ãë¼Ò
+                    // ESCë¥¼ ëˆŒë €ì„ ë•Œ ì…ë ¥ ì·¨ì†Œ
                     isWaitingForKey = false;
                     Debug.Log("Key binding cancelled.");
                 }
                 else
                 {
-                    // ´Ù¸¥ Å°¸¦ ´­·¶À» ¶§ ÇØ´ç Å°·Î ÀúÀå
-                    // µ¿ÀÏÇÑ Å°°¡ ÀÖ´ÂÁö È®ÀÎ
+                    // ë‹¤ë¥¸ í‚¤ë¥¼ ëˆŒë €ì„ ë•Œ í•´ë‹¹ í‚¤ë¡œ ì €ì¥
+                    // ë™ì¼í•œ í‚¤ê°€ ìˆëŠ”ì§€ í™•ì¸
                     for (int i = 0; i < keyBindings.Length; i++)
                     {
                         if (keyBindings[i] == keyCode)
                         {
-                            keyBindings[i] = KeyCode.None; // ±âÁ¸ Å°¸¦ NoneÀ¸·Î ¼³Á¤
+                            keyBindings[i] = KeyCode.None; // ê¸°ì¡´ í‚¤ë¥¼ Noneìœ¼ë¡œ ì„¤ì •
                             break;
                         }
                     }
@@ -941,19 +948,37 @@ public class UIManager : MonoBehaviour
 
     #region playerUi
 
-    void InitHeart() // Ã¼·Â »õÆÃ
+    public void ResizeHpBar(int maxHealth)
     {
-        // Ã¼·ÂÀÌ ¸¹¾ÆÁú¼ö·Ï Á¡Á¡´õ ±æ¾îÁöµµ·Ï
+        // ì•ˆì „ì¥ì¹˜ (Null ì˜ˆì™¸ ë°©ì§€)
+        if (hpBar == null)
+        {
+            Debug.LogWarning("UIManager : hpBar reference missing!");
+            return;
+        }
+        if (hpRect == null) hpRect = hpBar.GetComponent<RectTransform>();
+        if (hpRect == null) return;
+
+        // â”€â”€ ê°€ë¡œ ê¸¸ì´ ê³„ì‚° â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        float newWidth = baseBarWidth +
+                         Mathf.Max(0, maxHealth - 20) * extraWidthPerHp;
+
+        Vector2 size = hpRect.sizeDelta;       // ê¸°ì¡´ ë†’ì´ ê·¸ëŒ€ë¡œ ë‘ê³ 
+        hpRect.sizeDelta = new Vector2(newWidth, size.y);   // ê°€ë¡œ(x)ë§Œ ì¡°ì •
+    }
+    void InitHeart() // ì²´ë ¥ ìƒˆíŒ…
+    {
+        // ì²´ë ¥ì´ ë§ì•„ì§ˆìˆ˜ë¡ ì ì ë” ê¸¸ì–´ì§€ë„ë¡
         PlayerData player = gameManager.GetPlayerData();
         int currentHealth = player.health;
         int maxHealth = player.Maxhealth;
 
-        // Ã¼·Â ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        // ì²´ë ¥ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸
         hpBar.value = Mathf.Clamp((float)currentHealth / (float)maxHealth, 0, 1);
         hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
     }
 
-    void InitWeapon() // ÃÑ »õÆÃ
+    void InitWeapon() // ì´ ìƒˆíŒ…
     {
         Weapon weapon = gameManager.GetWeaponData();
 
@@ -967,11 +992,11 @@ public class UIManager : MonoBehaviour
 
             float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
             Vector3 newPosition = instance.transform.position;
-            newPosition.x = ui_positions[0].transform.position.x + i * sizeY * 1.25f; // ¼¼·Î ¹æÇâÀ¸·Î À§Ä¡ ¼³Á¤
+            newPosition.x = ui_positions[0].transform.position.x + i * sizeY * 1.25f; // ì„¸ë¡œ ë°©í–¥ìœ¼ë¡œ ìœ„ì¹˜ ì„¤ì •
             instance.transform.position = newPosition;
             if(ammo_count == i + 1)
             {
-            newPosition.x *= 1.05f; // ¼¼·Î ¹æÇâÀ¸·Î À§Ä¡ ¼³Á¤
+            newPosition.x *= 1.05f; // ì„¸ë¡œ ë°©í–¥ìœ¼ë¡œ ìœ„ì¹˜ ì„¤ì •
                 top.transform.position = newPosition;
             }
             ui_ammo[i] = instance;
@@ -979,13 +1004,13 @@ public class UIManager : MonoBehaviour
     }
 
     public void ShowDamageText(Vector3 worldPosition, int damageAmount)
-    { // ¿ùµå ÁÂÇ¥¸¦ ½ºÅ©¸° ÁÂÇ¥·Î º¯È¯
+    { // ì›”ë“œ ì¢Œí‘œë¥¼ ìŠ¤í¬ë¦° ì¢Œí‘œë¡œ ë³€í™˜
         Vector2 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 
-        // ½ºÅ©¸° ÁÂÇ¥¸¦ Canvas ¾È¿¡¼­ »ç¿ë °¡´ÉÇÑ À§Ä¡·Î º¯È¯
+        // ìŠ¤í¬ë¦° ì¢Œí‘œë¥¼ Canvas ì•ˆì—ì„œ ì‚¬ìš© ê°€ëŠ¥í•œ ìœ„ì¹˜ë¡œ ë³€í™˜
         RectTransformUtility.ScreenPointToLocalPointInRectangle(uicanvas.transform as RectTransform, screenPosition, uicanvas.worldCamera, out Vector2 canvasPosition);
 
-        // ÅØ½ºÆ® »ı¼º
+        // í…ìŠ¤íŠ¸ ìƒì„±
         TextMeshProUGUI damageText = Instantiate(damageTextPrefab, uicanvas.transform);
         damageText.rectTransform.localPosition = canvasPosition;
         damageText.text = damageAmount.ToString();
@@ -998,26 +1023,28 @@ public class UIManager : MonoBehaviour
         int currentHealth = player.health;
         int maxHealth = player.Maxhealth;
 
-        // Ã¼·Â ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        ResizeHpBar(maxHealth);
+
+        // ì²´ë ¥ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸
         hpBar.value = Mathf.Clamp((float)currentHealth / (float)maxHealth, 0, 1);
 
         hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
 
-        // ¹«±â µ¥ÀÌÅÍ °¡Á®¿À±â ¹× ÃÑ¾Ë ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        // ë¬´ê¸° ë°ì´í„° ê°€ì ¸ì˜¤ê¸° ë° ì´ì•Œ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸
         Weapon weapon = gameManager.GetWeaponData();
         int current_magazine = weapon.current_magazine;
 
-        // ÃÑ¾Ë ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        // ì´ì•Œ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸
         for (int i = 0; i < ui_ammo.Length; i++)
         {
-            int spriteIndex = (i < current_magazine) ? 0 : 1; // ÃÑ¾Ë °³¼ö¿¡ µû¸¥ ½ºÇÁ¶óÀÌÆ® ÀÎµ¦½º °è»ê
+            int spriteIndex = (i < current_magazine) ? 0 : 1; // ì´ì•Œ ê°œìˆ˜ì— ë”°ë¥¸ ìŠ¤í”„ë¼ì´íŠ¸ ì¸ë±ìŠ¤ ê³„ì‚°
             ui_ammo[i].GetComponent<ImageScript>().SetImage(spriteIndex);
         }
 
-        // ¹«±â Åº¾à ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+        // ë¬´ê¸° íƒ„ì•½ í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
         if (weapon.current_Ammo == -1)
         {
-            ui_ammoText.text = "¡Ä";
+            ui_ammoText.text = "âˆ";
             ui_ammoText.fontSize = 80;
         }
         else
@@ -1028,7 +1055,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-        // Ã¼·Â, ¹«±â µîÀÇ UI¸¦ ²ô´Â ÇÔ¼ö
+        // ì²´ë ¥, ë¬´ê¸° ë“±ì˜ UIë¥¼ ë„ëŠ” í•¨ìˆ˜
         public void OffPlayerUI()
     {
         foreach (var ui in ui_ammo)
@@ -1039,13 +1066,12 @@ public class UIManager : MonoBehaviour
         {
             ui.gameObject.SetActive(false);
         }
-        ui_weaponImage.gameObject.SetActive(false);
         ui_ammoText.gameObject.SetActive(false);
         hpBar.gameObject.SetActive(false);
         ammos_td.gameObject.SetActive(false);
     }
 
-    // Ã¼·Â, ¹«±â µîÀÇ UI¸¦ ÄÑ´Â ÇÔ¼ö
+    // ì²´ë ¥, ë¬´ê¸° ë“±ì˜ UIë¥¼ ì¼œëŠ” í•¨ìˆ˜
     public void OnPlayerUI()
     {
         foreach (var ui in ui_ammo)
@@ -1056,7 +1082,6 @@ public class UIManager : MonoBehaviour
         {
             ui.gameObject.SetActive(true);
         }
-        ui_weaponImage.gameObject.SetActive(true);
         ui_ammoText.gameObject.SetActive(true);
         hpBar.gameObject.SetActive(true);
         ammos_td.gameObject.SetActive(true);
@@ -1078,41 +1103,41 @@ public class UIManager : MonoBehaviour
 
     public void SaveSettings()
     {
-        // º¼·ı ¼³Á¤ ÀúÀå
+        // ë³¼ë¥¨ ì„¤ì • ì €ì¥
         PlayerPrefs.SetFloat("BGMVolume", bgmScrollbar.value);
         PlayerPrefs.SetFloat("SFXVolume", sfxScrollbar.value);
 
-        // ÀüÃ¼È­¸é ¼³Á¤ ÀúÀå
+        // ì „ì²´í™”ë©´ ì„¤ì • ì €ì¥
         PlayerPrefs.SetInt("IsFullScreen", isFullScreen ? 1 : 0);
 
-        // VSync ¼³Á¤ ÀúÀå
+        // VSync ì„¤ì • ì €ì¥
         PlayerPrefs.SetInt("IsVSyncOn", isVSyncOn ? 1 : 0);
 
-        // Ä¿¼­ ¼³Á¤ ÀúÀå
+        // ì»¤ì„œ ì„¤ì • ì €ì¥
         PlayerPrefs.SetInt("IsCursorVisible", isCursorVisible ? 1 : 0);
 
-        // ¸¶¿ì½º Á¶ÁØ »ç¿ë
+        // ë§ˆìš°ìŠ¤ ì¡°ì¤€ ì‚¬ìš©
         PlayerPrefs.SetInt("IsMouseShot", isMouseShot? 1 : 0);
 
-        // ¸¶¿ì½º·Î µ¹Áø
+        // ë§ˆìš°ìŠ¤ë¡œ ëŒì§„
         PlayerPrefs.SetInt("isMouseRoll", isMouseRoll ? 1 : 0);
 
 
-        // ¹à±â ¼³Á¤ ÀúÀå
+        // ë°ê¸° ì„¤ì • ì €ì¥
         PlayerPrefs.SetFloat("Brightness", brightnessScrollbar.value);
 
-        // ±âÅ¸ ¼³Á¤ ÀúÀå
+        // ê¸°íƒ€ ì„¤ì • ì €ì¥
         PlayerPrefs.SetFloat("CameraShake", cameraShakeScrollbar.value);
         PlayerPrefs.SetFloat("MiniMapSize", miniMapSizeScrollbar.value);
 
-        // ÇØ»óµµ ÀÎµ¦½º ÀúÀå
+        // í•´ìƒë„ ì¸ë±ìŠ¤ ì €ì¥
         PlayerPrefs.SetInt("ResolutionIndex", curRIndex);
 
         PlayerPrefs.Save();
     }
     public void LoadSettings()
     {
-        // º¼·ı ¼³Á¤ ºÒ·¯¿À±â
+        // ë³¼ë¥¨ ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("BGMVolume"))
         {
             bgmScrollbar.value = PlayerPrefs.GetFloat("BGMVolume");
@@ -1123,7 +1148,7 @@ public class UIManager : MonoBehaviour
             sfxScrollbar.value = PlayerPrefs.GetFloat("SFXVolume");
         }
 
-        // ÀüÃ¼È­¸é ¼³Á¤ ºÒ·¯¿À±â
+        // ì „ì²´í™”ë©´ ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("IsFullScreen"))
         {
             isFullScreen = PlayerPrefs.GetInt("IsFullScreen") == 1;
@@ -1131,7 +1156,7 @@ public class UIManager : MonoBehaviour
             fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
         }
 
-        // VSync ¼³Á¤ ºÒ·¯¿À±â
+        // VSync ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("IsVSyncOn"))
         {
             isVSyncOn = PlayerPrefs.GetInt("IsVSyncOn") == 1;
@@ -1139,35 +1164,35 @@ public class UIManager : MonoBehaviour
             vSyncToggle.image.sprite = isVSyncOn ? onSprite : offSprite;
         }
 
-        // Ä¿¼­ ¼³Á¤ ºÒ·¯¿À±â
+        // ì»¤ì„œ ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("IsCursorVisible"))
         {
             isCursorVisible = PlayerPrefs.GetInt("IsCursorVisible") == 1;
             Cursor.visible = isCursorVisible;
             cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
         }
-        // ¸¶¿ì½º·Î ½î±â ºÒ·¯¿À±â
+        // ë§ˆìš°ìŠ¤ë¡œ ì˜ê¸° ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("isMouseShot"))
         {
             isMouseShot = PlayerPrefs.GetInt("isMouseShot") == 1;
             mouseShotToggle.image.sprite = isMouseShot ? onSprite : offSprite;
         }
 
-        // ¸¶¿ì½º·Î ±¸¸£±â
+        // ë§ˆìš°ìŠ¤ë¡œ êµ¬ë¥´ê¸°
         if (PlayerPrefs.HasKey("isMouseRoll"))
         {
             isMouseRoll = PlayerPrefs.GetInt("isMouseRoll") == 1;
             mouseRollToggle.image.sprite = isMouseRoll ? onSprite : offSprite;
         }
 
-        // ¹à±â ¼³Á¤ ºÒ·¯¿À±â
+        // ë°ê¸° ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("Brightness"))
         {
             brightnessScrollbar.value = PlayerPrefs.GetFloat("Brightness");
-            // ¿©±â¼­ ¹à±â Á¶Á¤ ÄÚµå¸¦ Ãß°¡ÇÏ¼¼¿ä
+            // ì—¬ê¸°ì„œ ë°ê¸° ì¡°ì • ì½”ë“œë¥¼ ì¶”ê°€í•˜ì„¸ìš”
         }
 
-        // ±âÅ¸ ¼³Á¤ ºÒ·¯¿À±â
+        // ê¸°íƒ€ ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("CameraShake"))
         {
             cameraShakeScrollbar.value = PlayerPrefs.GetFloat("CameraShake");
@@ -1178,28 +1203,28 @@ public class UIManager : MonoBehaviour
             miniMapSizeScrollbar.value = PlayerPrefs.GetFloat("MiniMapSize");
         }
 
-        // ÇØ»óµµ ÀÎµ¦½º ºÒ·¯¿À±â
+        // í•´ìƒë„ ì¸ë±ìŠ¤ ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey("ResolutionIndex"))
         {
             curRIndex = PlayerPrefs.GetInt("ResolutionIndex");
-            // ÇØ»óµµ ¼³Á¤ º¯°æ ÄÚµå Ãß°¡
+            // í•´ìƒë„ ì„¤ì • ë³€ê²½ ì½”ë“œ ì¶”ê°€
         }
     }
     public void ResetSettings()
     {
         PlayerPrefs.DeleteAll();
-        // ±âº»°ª ¼³Á¤
-        bgmScrollbar.value = 0.5f; // ±âº» º¼·ı °ª
-        sfxScrollbar.value = 0.5f;  // ±âº» º¼·ı °ª
+        // ê¸°ë³¸ê°’ ì„¤ì •
+        bgmScrollbar.value = 0.5f; // ê¸°ë³¸ ë³¼ë¥¨ ê°’
+        sfxScrollbar.value = 0.5f;  // ê¸°ë³¸ ë³¼ë¥¨ ê°’
         isFullScreen = true;
         isVSyncOn = true;
         isCursorVisible = true;
         isMouseRoll = true;
         isMouseShot = true;
-        brightnessScrollbar.value = 0.5f; // ±âº» ¹à±â °ª
-        cameraShakeScrollbar.value = 0.5f;  // ±âº» Ä«¸Ş¶ó Èçµé¸² °ª
-        miniMapSizeScrollbar.value = 0.5f;  // ±âº» ¹Ì´Ï¸Ê Å©±â °ª
-        curRIndex = 0; // ±âº» ÇØ»óµµ ÀÎµ¦½º
+        brightnessScrollbar.value = 0.5f; // ê¸°ë³¸ ë°ê¸° ê°’
+        cameraShakeScrollbar.value = 0.5f;  // ê¸°ë³¸ ì¹´ë©”ë¼ í”ë“¤ë¦¼ ê°’
+        miniMapSizeScrollbar.value = 0.5f;  // ê¸°ë³¸ ë¯¸ë‹ˆë§µ í¬ê¸° ê°’
+        curRIndex = 0; // ê¸°ë³¸ í•´ìƒë„ ì¸ë±ìŠ¤
 
         keyBindings[0] = KeyCode.W;
         keyBindings[1] = KeyCode.S;
@@ -1210,7 +1235,7 @@ public class UIManager : MonoBehaviour
         keyBindings[6] = KeyCode.F;
         keyBindings[7] = KeyCode.E;
         keyBindings[8] = KeyCode.Tab;
-        // UI ¾÷µ¥ÀÌÆ®
+        // UI ì—…ë°ì´íŠ¸
         Screen.fullScreen = isFullScreen;
         fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
         QualitySettings.vSyncCount = isVSyncOn ? 1 : 0;
@@ -1220,7 +1245,7 @@ public class UIManager : MonoBehaviour
 
         mouseRollToggle.image.sprite = isMouseRoll ? onSprite : offSprite;
         mouseShotToggle.image.sprite = isMouseShot? onSprite : offSprite;
-        // ÀúÀå
+        // ì €ì¥
         SaveSettings();
     }
     public void exitGame()
@@ -1274,7 +1299,7 @@ public class UIManager : MonoBehaviour
                 keyChangePanel.SetActive(false);
                 break;
         }
-        currentIndex = 0; // ÆĞ³Î º¯°æ ½Ã ÀÎµ¦½º ÃÊ±âÈ­
+        currentIndex = 0; // íŒ¨ë„ ë³€ê²½ ì‹œ ì¸ë±ìŠ¤ ì´ˆê¸°í™”
         UpdateSelection();
     }
     void Navigate(int direction)
@@ -1351,7 +1376,7 @@ public class UIManager : MonoBehaviour
                     if (currentPanel == "Option")
                     {
                         if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
-                            ToggleValue();  // ToggleValue È£Ãâ
+                            ToggleValue();  // ToggleValue í˜¸ì¶œ
                         else
                         {
                             currentButtons[currentIndex].onClick.Invoke();
@@ -1378,35 +1403,35 @@ public class UIManager : MonoBehaviour
     {
         switch (currentIndex)
         {
-            case 2: // ¹à±â Á¶Àı
+            case 2: // ë°ê¸° ì¡°ì ˆ
                 brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 5: // BGM º¼·ı Á¶Àı
+            case 5: // BGM ë³¼ë¥¨ ì¡°ì ˆ
                 bgmScrollbar.value = Mathf.Clamp(bgmScrollbar.value + direction * 0.1f, 0, 1);
                 soundManager.BGSoundVolume(bgmScrollbar.value);
                 break;
-            case 6: // SFX º¼·ı Á¶Àı
+            case 6: // SFX ë³¼ë¥¨ ì¡°ì ˆ
                 sfxScrollbar.value = Mathf.Clamp(sfxScrollbar.value + direction * 0.1f, 0, 1);
                 soundManager.SFXSoundVolume(sfxScrollbar.value);
                 break;
-            case 7: // Ä«¸Ş¶ó Èçµé¸² Á¶Àı
+            case 7: // ì¹´ë©”ë¼ í”ë“¤ë¦¼ ì¡°ì ˆ
                 cameraShakeScrollbar.value = Mathf.Clamp(cameraShakeScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 8: // ¹Ì´Ï¸Ê Å©±â Á¶Àı
+            case 8: // ë¯¸ë‹ˆë§µ í¬ê¸° ì¡°ì ˆ
                 miniMapSizeScrollbar.value = Mathf.Clamp(miniMapSizeScrollbar.value + direction * 0.1f, 0, 1);
                 break;
-            case 0: // ÇØ»óµµ º¯°æ
+            case 0: // í•´ìƒë„ ë³€ê²½
                 ChangeResolution(direction);
                 break;
         }
     }
     void UpdateResolution(int width, int height)
     {
-        // Pixel Perfect Ä«¸Ş¶ó ÇØ»óµµ ¼³Á¤
+        // Pixel Perfect ì¹´ë©”ë¼ í•´ìƒë„ ì„¤ì •
         pixelPerfectCamera.refResolutionX = width;
         pixelPerfectCamera.refResolutionY = height;
 
-        // Canvas Scaler¿Í ¿¬µ¿
+        // Canvas Scalerì™€ ì—°ë™
         CanvasScaler scaler = uicanvas.GetComponent<CanvasScaler>();
         if (scaler != null)
         {
@@ -1434,13 +1459,13 @@ public class UIManager : MonoBehaviour
     {
         switch (currentIndex)
         {
-            case 1: // ÀüÃ¼ È­¸é Åä±Û
+            case 1: // ì „ì²´ í™”ë©´ í† ê¸€
                 ToggleFullScreen();
                 break;
-            case 3: // ¼öÁ÷ µ¿±âÈ­ Åä±Û
+            case 3: // ìˆ˜ì§ ë™ê¸°í™” í† ê¸€
                 ToggleVSync();
                 break;
-            case 4: // Ä¿¼­ Åä±Û
+            case 4: // ì»¤ì„œ í† ê¸€
                 ToggleCursorVisibility();
                 break;
         }
@@ -1451,13 +1476,13 @@ public class UIManager : MonoBehaviour
     {
         switch (currentIndex)
         {
-            case 9: // ¸¶¿ì½º Á¶ÁØ
+            case 9: // ë§ˆìš°ìŠ¤ ì¡°ì¤€
                 ToggleMouseShot();
-                Debug.Log("¸¶¿ì½º Á¶ÁØ ¸¸µé¾î");
+                Debug.Log("ë§ˆìš°ìŠ¤ ì¡°ì¤€ ë§Œë“¤ì–´");
                 break;
-            case 10: // ¸¶¿ì½º·Î µ¹Áø
+            case 10: // ë§ˆìš°ìŠ¤ë¡œ ëŒì§„
                 ToggleMouseRoll();
-                Debug.Log("¸¶¿ì½º·Î µ¹Áø ¸¸µé¾î");
+                Debug.Log("ë§ˆìš°ìŠ¤ë¡œ ëŒì§„ ë§Œë“¤ì–´");
                 break;
         }
         soundManager.SFXPlay("select_sound", 173);
@@ -1531,17 +1556,17 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < currentButtons.Length; i++)
         {
             ColorBlock colors = currentButtons[i].colors;
-            colors.normalColor = Color.white; // ±âº» »ö»ó
-            colors.highlightedColor = Color.white; // °­Á¶ »ö»ó
-            colors.pressedColor = Color.gray; // Å¬¸¯ ½Ã »ö»ó
-            colors.selectedColor = (i == currentIndex) ? Color.white : Color.white; // ¼±ÅÃµÈ »ö»ó
+            colors.normalColor = Color.white; // ê¸°ë³¸ ìƒ‰ìƒ
+            colors.highlightedColor = Color.white; // ê°•ì¡° ìƒ‰ìƒ
+            colors.pressedColor = Color.gray; // í´ë¦­ ì‹œ ìƒ‰ìƒ
+            colors.selectedColor = (i == currentIndex) ? Color.white : Color.white; // ì„ íƒëœ ìƒ‰ìƒ
             currentButtons[i].colors = colors;
 
-            // ÅØ½ºÆ® »ö»ó º¯°æ
+            // í…ìŠ¤íŠ¸ ìƒ‰ìƒ ë³€ê²½
             TextMeshProUGUI buttonText = currentButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = (i == currentIndex) ? Color.white : Color.gray; // °­Á¶ »ö»ó
+                buttonText.color = (i == currentIndex) ? Color.white : Color.gray; // ê°•ì¡° ìƒ‰ìƒ
             }
         }
     }
@@ -1559,7 +1584,7 @@ public class UIManager : MonoBehaviour
         Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen);
         Debug.Log("Resolution changed to: " + selectedResolution.width + " x " + selectedResolution.height);
 
-        // ÇöÀç ÇØ»óµµ ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+        // í˜„ì¬ í•´ìƒë„ í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
         UpdateCurrentResolutionText();
     }
 
@@ -1568,7 +1593,7 @@ public class UIManager : MonoBehaviour
         currentResolutionText.text = Screen.width + " x " + Screen.height;
     }
 
-    //¸¶¿ì½º È£¹ö ÀÌº¥Æ® ¸®½º³Ê
+    //ë§ˆìš°ìŠ¤ í˜¸ë²„ ì´ë²¤íŠ¸ ë¦¬ìŠ¤ë„ˆ
     void AddEventTriggerListener(GameObject target, EventTriggerType eventType, System.Action action)
     {
         EventTrigger trigger = target.GetComponent<EventTrigger>();
@@ -1582,7 +1607,7 @@ public class UIManager : MonoBehaviour
         trigger.triggers.Add(entry);
     }
     ///<summary>
-    /// OnClickEvnet¿Í ¶È°°Àº ÄÚµåÁö¸¸ , ÀÌÄ£±¸´Â ¸¶¿ì½º°¡ À§¿¡ ¿Ã·ÁÁ³À»¶§ ÀÛµ¿µÊ
+    /// OnClickEvnetì™€ ë˜‘ê°™ì€ ì½”ë“œì§€ë§Œ , ì´ì¹œêµ¬ëŠ” ë§ˆìš°ìŠ¤ê°€ ìœ„ì— ì˜¬ë ¤ì¡Œì„ë•Œ ì‘ë™ë¨
     ///</summary>
 
     void OnButtonHover(int index)
@@ -1620,13 +1645,13 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public KeyCode GetKeyCode(int i)
     {
-        // ÀÎµ¦½º ¹üÀ§¸¦ È®ÀÎÇÏ¿© À¯È¿ÇÑ °æ¿ì¿¡¸¸ ¹İÈ¯
+        // ì¸ë±ìŠ¤ ë²”ìœ„ë¥¼ í™•ì¸í•˜ì—¬ ìœ íš¨í•œ ê²½ìš°ì—ë§Œ ë°˜í™˜
         if (i >= 0 && i < keyBindings.Length)
         {
             return keyBindings[i];
         }
 
-        // À¯È¿ÇÏÁö ¾ÊÀº ÀÎµ¦½ºÀÏ °æ¿ì ±âº»°ª(KeyCode.None) ¹İÈ¯
+        // ìœ íš¨í•˜ì§€ ì•Šì€ ì¸ë±ìŠ¤ì¼ ê²½ìš° ê¸°ë³¸ê°’(KeyCode.None) ë°˜í™˜
         return KeyCode.None;
     }
 
@@ -1637,6 +1662,8 @@ public class UIManager : MonoBehaviour
         gameover_Object.SetActive(true);
         soundManager.StopBGSound();
         soundManager.BGSoundPlayDelayed(4, 3);
+        OffPlayerUI(); // ë¹„ì „íˆ¬ ìƒíƒœì—ì„œëŠ” UIë¥¼ ìˆ¨ê¹€
+
         //gameover_Object;
         //gameover_text;
         //gameover_image;
@@ -1644,14 +1671,14 @@ public class UIManager : MonoBehaviour
         StartCoroutine(Okdso());
         StartCoroutine(FadeIn());
         StartCoroutine(gameoverTextOn());
-
+        BattleManager.DestroyActiveBullets();
 
     }
     public void End_And_Load()
     {
         StartCoroutine(FadeOut());
         StartCoroutine(Load_SavePoint());
-        SoundManager.Instance.FadeOutBGSound(3f);  // °ÔÀÓ¿À¹ö ºê±İ ²ô±â
+        soundManager.FadeOutBGSound(3f);  // ê²Œì„ì˜¤ë²„ ë¸Œê¸ˆ ë„ê¸°
         // Off gameover
         // last load -> go!
 
@@ -1701,27 +1728,27 @@ public class UIManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.8f);
         gameover_text.gameObject.SetActive(false);
-        float duration = 2f; // 2ÃÊ µ¿¾È ÁøÇà
+        float duration = 2f; // 2ì´ˆ ë™ì•ˆ ì§„í–‰
         float currentTime = 0f;
 
-        // ÇöÀç ÀÌ¹ÌÁö »ö»ó °¡Á®¿À±â
+        // í˜„ì¬ ì´ë¯¸ì§€ ìƒ‰ìƒ ê°€ì ¸ì˜¤ê¸°
         Color color = gameover_image.color;
-        color.a = 1f; // ½ÃÀÛÇÒ ¶§ ¾ËÆÄ°ªÀ» 1·Î ¼³Á¤
+        color.a = 1f; // ì‹œì‘í•  ë•Œ ì•ŒíŒŒê°’ì„ 1ë¡œ ì„¤ì •
         gameover_image.color = color;
 
         while (currentTime < duration)
         {
             currentTime += Time.deltaTime;
-            float alpha = Mathf.Clamp01(1 - (currentTime / duration)); // ¾ËÆÄ °ªÀ» 1¿¡¼­ 0À¸·Î
+            float alpha = Mathf.Clamp01(1 - (currentTime / duration)); // ì•ŒíŒŒ ê°’ì„ 1ì—ì„œ 0ìœ¼ë¡œ
 
-            // ÀÌ¹ÌÁö »ö»óÀÇ ¾ËÆÄ°ª ¾÷µ¥ÀÌÆ®
+            // ì´ë¯¸ì§€ ìƒ‰ìƒì˜ ì•ŒíŒŒê°’ ì—…ë°ì´íŠ¸
             color.a = alpha;
             gameover_image.color = color;
 
             yield return null;
         }
 
-        // ¹İº¹¹®ÀÌ ³¡³­ ÈÄ ¾ËÆÄ °ªÀ» 0À¸·Î ¿ÏÀüÈ÷ ¼³Á¤
+        // ë°˜ë³µë¬¸ì´ ëë‚œ í›„ ì•ŒíŒŒ ê°’ì„ 0ìœ¼ë¡œ ì™„ì „íˆ ì„¤ì •
         color.a = 0f;
         gameover_image.color = color;
     }
