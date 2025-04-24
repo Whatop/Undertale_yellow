@@ -12,22 +12,26 @@ using System;
 public class RadialSegment
 {
     public string segmentName;
-    public Image icon;
-    public GameObject highlightObj;
+    public Transform segmentTransform; // 세그먼트 전체 Transform (자기 자신)
+
+    private Vector3 defaultScale = Vector3.one;
+    private Vector3 highlightScale = new Vector3(1.2f, 1.2f, 1f);
 
     public void SetHighlight(bool isOn)
     {
-        if (highlightObj != null)
-            highlightObj.SetActive(isOn);
-        // 아이콘 크기/색상 변경 로직 등 가능
+        if (segmentTransform == null) return;
+
+        segmentTransform.localScale = isOn ? new Vector3(1.2f, 1.2f, 1f) : Vector3.one;
     }
+
 
     public void ExecuteAction()
     {
-        // 감정표현 실행(애니메이션, 사운드 재생, 네트워크 전송 등)
-        Debug.Log($"감정표현 [{segmentName}] 실행");
+        Debug.Log($"[{segmentName}] 감정표현 실행!");
+        // 이후 감정 애니메이션 호출 같은 로직 넣으면 됨
     }
 }
+
 
 public class UIManager : MonoBehaviour
 {
@@ -531,39 +535,50 @@ public class UIManager : MonoBehaviour
         isRadialMenuActive = !isRadialMenuActive;
         radialMenuPanel.SetActive(isRadialMenuActive);
 
-        // 열 때, 중앙 위치 설정 (마우스 위치 등에)
-        if (isRadialMenuActive)
-        {
-            Vector3 mousePos = Input.mousePosition;
-            centerPoint.position = mousePos;
-        }
+      //  // 열 때, 중앙 위치 설정 (마우스 위치 등에)
+      //  if (isRadialMenuActive)
+      //  {
+      //      Vector3 mousePos = Input.mousePosition;
+      //      centerPoint.position = mousePos;
+      //  }
     }
 
     /// <summary>
     /// 마우스 각도에 따라 하이라이트할 세그먼트 계산
     /// </summary>
+    // 감정별 중심 각도 (위쪽부터 시계 방향, 자비가 0도 기준)
+    private readonly float[] customAngles = { 0f, 60f, 120f, 180f, 240f, 300f };
+
+    // 감정 순서: 자비, 긍정, 무시, 유혹, 분노, 부정
+
     private void UpdateRadialSelection()
     {
         Vector2 dir = Input.mousePosition - centerPoint.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        angle = (angle + 360f) % 360f; // 0~360 범위로 맞춤
+        angle = (360f - angle + 90f) % 360f;
 
-        float segmentAngle = 360f / segments.Count;
-        int newIndex = (int)(angle / segmentAngle);
-
-        if (newIndex != current_segment_Index)
+        // 가장 가까운 custom angle을 찾아서 index 결정
+        float minDiff = 999f;
+        int closestIndex = 0;
+        for (int i = 0; i < customAngles.Length; i++)
         {
-            // 이전 하이라이트 제거
-            if (current_segment_Index >= 0 && current_segment_Index < segments.Count)
+            float diff = Mathf.Abs(Mathf.DeltaAngle(angle, customAngles[i]));
+            if (diff < minDiff)
             {
-                segments[current_segment_Index].SetHighlight(false);
+                minDiff = diff;
+                closestIndex = i;
             }
-
-            // 새 인덱스 하이라이트
-            current_segment_Index = newIndex;
-            segments[current_segment_Index].SetHighlight(true);
         }
+
+        // 하이라이트 갱신
+        for (int i = 0; i < segments.Count; i++)
+        {
+            segments[i].SetHighlight(i == closestIndex);
+        }
+
+        currentIndex = closestIndex;
     }
+
 
     /// <summary>
     /// 세그먼트 선택이 확정되었을 때 실행
