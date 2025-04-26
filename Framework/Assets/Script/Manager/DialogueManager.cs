@@ -38,7 +38,8 @@ public class DialogueManager : MonoBehaviour
 {
     public Queue<SentenceData> sentences;
     public Queue<SentenceData> gameover_sentences;
-    public ItemDatabase itemDatabase;
+    public ItemDatabase itemDatabase { get; private set; }
+
     public NPC currentNPC;
     public TypeEffect typeEffect;
     public TypeEffect gameOvertypeEffect;
@@ -61,6 +62,7 @@ public class DialogueManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+        
         }
         else
         {
@@ -73,7 +75,6 @@ public class DialogueManager : MonoBehaviour
         sentences = new Queue<SentenceData>();
         gameover_sentences = new Queue<SentenceData>();
         itemDatabase = new ItemDatabase();
-
         LoadDialogueData();
         LoadItemData();
     }
@@ -90,18 +91,33 @@ public class DialogueManager : MonoBehaviour
             Debug.LogError("Failed to load dialogue data.");
         }
     }
-    private void LoadItemData()
+    public void LoadItemData()
     {
         TextAsset jsonFile = Resources.Load<TextAsset>("items"); // 'items.json' 파일을 불러옴
         if (jsonFile != null)
         {
             itemDatabase = JsonUtility.FromJson<ItemDatabase>(jsonFile.text);
+
+            if (itemDatabase != null && itemDatabase.items != null)
+            {
+                Debug.Log($"[LoadItemData] 아이템 {itemDatabase.items.Count}개 로드 완료");
+
+                foreach (var item in itemDatabase.items)
+                {
+                    Debug.Log($"[LoadItemData] id: {item.id}, 이름: {item.itemName}, 타입: {item.itemType}");
+                }
+            }
+            else
+            {
+                Debug.LogError("[LoadItemData] itemDatabase나 itemDatabase.items가 null입니다.");
+            }
         }
         else
         {
-            Debug.LogError("Failed to load item data.");
+            Debug.LogError("[LoadItemData] items.json 파일 로드 실패");
         }
     }
+
     private GameOverDialogueData FindGameOverDialogue(int id)
     {
         foreach (var dialogue in dialogueDatabase.gameOverDialogues)

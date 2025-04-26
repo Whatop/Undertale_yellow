@@ -203,19 +203,14 @@ public class GameManager : MonoBehaviour
             LoadGameTime();
             PortalManager.Instance.LoadLastCamera();
             //UIManager.Instance.ResetSettings();
-
             Item fristWaepon = new Item(49, "리볼버", "* 골동품 리볼버다.", ItemType.Weapon);
-            Item fristIAmmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
-            GetPlayerData().EquipWeapon(fristWaepon);
-            GetPlayerData().EquipAmmor(fristIAmmor);
-
+           Item fristIAmmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+           GetPlayerData().EquipWeapon(fristWaepon);
+           GetPlayerData().EquipAmmor(fristIAmmor);
+      
         }
         else
         {
-            //AddItem(0);
-            //AddItem(0);
-            //AddItem(52);
-            //AddItem(61);
             //Item fristWaepon = new Item(51, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
             //Item fristIAmmor = new Item(48,"카우보이 모자", "* 전투로 낡은 이 모자엔 \n    * 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
             //GetPlayerData().EquipWeapon(fristWaepon);
@@ -245,6 +240,13 @@ public class GameManager : MonoBehaviour
 
             // 변환된 좌표를 gameoverSoul의 localPosition으로 설정
             gameoverSoul.GetComponent<RectTransform>().localPosition = localPosition;
+        }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+               AddItem(0);
+           AddItem(0);
+           AddItem(52);
+           AddItem(61);
         }
 }
     #region Savepoint
@@ -465,6 +467,21 @@ public class GameManager : MonoBehaviour
     }
     public void AddItem(int id)
     {
+        if (DialogueManager.Instance == null)
+        {
+            Debug.LogError("DialogueManager.Instance가 null입니다.");
+            return;
+        }
+        if (DialogueManager.Instance.itemDatabase == null)
+        {
+            Debug.LogError("itemDatabase가 null입니다.");
+            return;
+        }
+        if (DialogueManager.Instance.itemDatabase.items == null)
+        {
+            Debug.LogError("itemDatabase.items가 null입니다.");
+            return;
+        }
         // 인벤토리가 가득 차지 않았는지 확인
         if (GetPlayerData().inventory.Count >= 9)
         {
@@ -473,29 +490,34 @@ public class GameManager : MonoBehaviour
         }
 
         // JSON 데이터에서 해당 id의 아이템을 찾기
-        Item itemToAdd = dialogueManager.itemDatabase.items.Find(item => item.id == id);
-        if (itemToAdd != null)
+        Item originItem = DialogueManager.Instance.itemDatabase.items.Find(item => item.id == id);
+        if (originItem != null)
         {
-            // ID 범위에 따라 아이템 타입 설정
-            if (itemToAdd.id >= 0 && itemToAdd.id <= 50)
+            // ★ 여기 추가 ★ 복제본 생성
+            Item copiedItem = new Item(originItem.id, originItem.itemName, originItem.description);
+
+            // 타입 설정
+            switch (originItem.itemType)
             {
-                itemToAdd.itemType = ItemType.HealingItem;
-            }
-            else if (itemToAdd.id >= 51 && itemToAdd.id <= 60)
-            {
-                itemToAdd.itemType = ItemType.Ammor;
-            }
-            else if (itemToAdd.id >= 61 && itemToAdd.id <= 70)
-            {
-                itemToAdd.itemType = ItemType.Weapon;
-            }
-            else
-            {
-                itemToAdd.itemType = ItemType.None;
+                case ItemType.HealingItem:
+                    copiedItem.itemType = ItemType.HealingItem;
+                    break;
+                case ItemType.Weapon:
+                    copiedItem.itemType = ItemType.Weapon;
+                    break;
+                case ItemType.Ammor:
+                    copiedItem.itemType = ItemType.Ammor;
+                    break;
+                default:
+                    copiedItem.itemType = ItemType.None;
+                    break;
             }
 
-            // 설정된 타입과 함께 아이템을 인벤토리에 추가
-            GetPlayerData().inventory.Add(itemToAdd);
+            GetPlayerData().inventory.Add(copiedItem);
+        }
+        else
+        {
+            Debug.LogWarning($"ID {id}에 해당하는 아이템을 찾지 못했습니다.");
         }
     }
 

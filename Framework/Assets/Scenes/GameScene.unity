@@ -7316,8 +7316,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02869bd0fe348e34992407190974c972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDatabase:
-    items: []
   currentNPC: {fileID: 0}
   typeEffect: {fileID: 352131537}
   gameOvertypeEffect: {fileID: 528046422}
@@ -10967,7 +10965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcID: -1
-  dialogueManager: {fileID: 84828285}
+  dialogueManager: {fileID: 0}
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
@@ -32567,7 +32565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcID: 0
-  dialogueManager: {fileID: 84828285}
+  dialogueManager: {fileID: 0}
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
@@ -38936,7 +38934,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcID: 0
-  dialogueManager: {fileID: 84828285}
+  dialogueManager: {fileID: 0}
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
@@ -39597,7 +39595,10 @@ MonoBehaviour:
   - {fileID: 1802080724}
   - {fileID: 779208146}
   inventroy_soul: {fileID: 1519236390}
-  radialMenuPanel: {fileID: 1608266035}
+  currentRadialMenu: 0
+  emotionRadialPanel: {fileID: 1608266035}
+  itemRadialPanel: {fileID: 0}
+  soulRadialPanel: {fileID: 0}
   centerPoint: {fileID: 887247060}
   segments:
   - segmentName: M
@@ -39612,7 +39613,9 @@ MonoBehaviour:
     segmentTransform: {fileID: 1924056482}
   - segmentName: N
     segmentTransform: {fileID: 1069657808}
-  toggleKey: 116
+  emotionToggleKey: 116
+  itemToggleKey: 113
+  soulToggleKey: 103
   isRadialMenuActive: 0
 --- !u!4 &1307026764
 Transform:
@@ -44019,7 +44022,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 67ba9eb896232e5479679e4749634982, type: 3}
+  m_Sprite: {fileID: 384010219008374103, guid: d533afe0e67f4f74ea70c93dce16809f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -45542,12 +45545,12 @@ GameObject:
   - component: {fileID: 1608266038}
   - component: {fileID: 1608266037}
   m_Layer: 5
-  m_Name: RadialMenuPanel_Soul
+  m_Name: RadialMenuPanel_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1608266036
 RectTransform:
   m_ObjectHideFlags: 0
@@ -53940,7 +53943,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcID: 100
-  dialogueManager: {fileID: 84828285}
+  dialogueManager: {fileID: 0}
   isTalking: 0
   isFirstInteraction: 1
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}

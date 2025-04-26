@@ -31,6 +31,14 @@ public class RadialSegment
         // 이후 감정 애니메이션 호출 같은 로직 넣으면 됨
     }
 }
+public enum RadialMenuType
+{
+    None,
+    Emotion,
+    Item,
+    Soul
+}
+
 
 
 public class UIManager : MonoBehaviour
@@ -206,12 +214,18 @@ public class UIManager : MonoBehaviour
     public Image inventroy_soul;
 
     [Header("Radial Menu References")]
-    public GameObject radialMenuPanel;      // 라디얼 메뉴 전체를 담고 있는 Panel
+    public RadialMenuType currentRadialMenu = RadialMenuType.None;
+    public GameObject emotionRadialPanel;
+    public GameObject itemRadialPanel;
+    public GameObject soulRadialPanel;
     public RectTransform centerPoint;       // 라디얼 메뉴의 중심(마우스 기준점)
     public List<RadialSegment> segments;    // 세그먼트 리스트 (감정표현/아이템 등)
 
     [Header("Radial Menu Settings")]
-    public KeyCode toggleKey = KeyCode.G;   // 라디얼 메뉴 열기/닫기 키
+    public KeyCode emotionToggleKey = KeyCode.T;  // 감정 표현
+    public KeyCode itemToggleKey = KeyCode.Q;     // 아이템 선택 (예정)
+    public KeyCode soulToggleKey = KeyCode.G;     // 영혼 선택 (예정)
+
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
 
     private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
@@ -400,6 +414,7 @@ public class UIManager : MonoBehaviour
             textbar.transform.position = textbarPos[0].transform.position;
             inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, -220);
         }
+        inventroy_soul.gameObject.SetActive(true);
     }
     public void TextBarOpen()
     {
@@ -508,9 +523,9 @@ public class UIManager : MonoBehaviour
                     StartCoroutine(SaveDalay());
                 }
             }
-        }
+        }   
         // 1) 라디얼 메뉴 토글 처리
-        if (Input.GetKeyDown(toggleKey))
+        if (Input.GetKeyDown(emotionToggleKey))
         {
             ToggleRadialMenu();
         }
@@ -533,7 +548,7 @@ public class UIManager : MonoBehaviour
     public void ToggleRadialMenu()
     {
         isRadialMenuActive = !isRadialMenuActive;
-        radialMenuPanel.SetActive(isRadialMenuActive);
+        emotionRadialPanel.SetActive(isRadialMenuActive);
 
       //  // 열 때, 중앙 위치 설정 (마우스 위치 등에)
       //  if (isRadialMenuActive)
