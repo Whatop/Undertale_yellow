@@ -124,7 +124,7 @@ public class PlayerMovement : LivingObject
     public GameObject shellPrefab;   // 탄피 프리팹
     public Transform shellEjectPoint;// 탄피 배출 위치(권총 옆이나 탄창 부분)
 
-    List<Weapon> playerWeapons = new List<Weapon>();
+    public List<Weapon> playerWeapons = new List<Weapon>();
     private int currentWeaponIndex = 0;
 
     public Weapon curweaponData;
@@ -299,7 +299,7 @@ public class PlayerMovement : LivingObject
                 Hands.gameObject.SetActive(false);
             }
 
-            if (Input.GetKeyDown(KeyCode.C) &&
+            if (Input.GetKeyDown(UIManager.Instance.GetKeyCode(7)) &&
                 !UIManager.Instance.savePanel.activeSelf
                 && gameManager.GetPlayerData().currentState == GameState.None)
             {

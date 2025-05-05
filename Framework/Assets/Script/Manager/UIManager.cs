@@ -12,25 +12,42 @@ using System;
 public class RadialSegment
 {
     public string segmentName;
-    public Transform segmentTransform; // 세그먼트 전체 Transform (자기 자신)
+    public Transform segmentTransform;
 
     private Vector3 defaultScale = Vector3.one;
     private Vector3 highlightScale = new Vector3(1.2f, 1.2f, 1f);
 
+    public RadialMenuType menuType; // 추가: 어떤 메뉴인지
+
     public void SetHighlight(bool isOn)
     {
         if (segmentTransform == null) return;
-
-        segmentTransform.localScale = isOn ? new Vector3(1.2f, 1.2f, 1f) : Vector3.one;
+        segmentTransform.localScale = isOn ? highlightScale : defaultScale;
     }
-
 
     public void ExecuteAction()
     {
-        Debug.Log($"[{segmentName}] 감정표현 실행!");
-        // 이후 감정 애니메이션 호출 같은 로직 넣으면 됨
+        switch (menuType)
+        {
+            case RadialMenuType.Emotion:
+                Debug.Log($"[감정] {segmentName} 표현 실행");
+                // 감정 애니메이션 재생
+                UIManager.Instance.PlayEmotionAnimation(segmentName);
+                break;
+
+            case RadialMenuType.Item:
+                Debug.Log($"[아이템] {segmentName} 사용 시도");
+                UIManager.Instance.UseQuickItem(segmentName);
+                break;
+
+            case RadialMenuType.Soul:
+                Debug.Log($"[영혼] {segmentName} 선택");
+                UIManager.Instance.ChangeSoulType(segmentName);
+                break;
+        }
     }
 }
+
 public enum RadialMenuType
 {
     None,
@@ -114,19 +131,20 @@ public class UIManager : MonoBehaviour
 
     public GameObject[] Interface;
     public bool isUserInterface = false;
-
     /// <summary>
-    /// 0 : Up
-    /// 1 : Down
-    /// 2 : Left
-    /// 3 : Right
-    /// 4 : Shot
-    /// 5 : Roll
-    /// 6 : Check
-    /// 7 : Inventroy
-    /// 8 : Map
+    /// Up: 0 
+    /// Down: 1 
+    /// Left: 2 
+    /// Right: 3 
+    /// Shot: 4 
+    /// Roll: 5 
+    /// Check: 6 
+    /// Inventroy: 7 
+    /// Quick Soul: 8 
+    /// Quick Item: 9 
+    ///  Quick Emotion: 10
     /// </summary>
-    private KeyCode[] keyBindings = new KeyCode[9]; // 9개의 키 설정을 위한 배열
+    private KeyCode[] keyBindings = new KeyCode[11]; // 11개의 키 설정을 위한 배열
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
 
@@ -219,12 +237,12 @@ public class UIManager : MonoBehaviour
     public GameObject itemRadialPanel;
     public GameObject soulRadialPanel;
     public RectTransform centerPoint;       // 라디얼 메뉴의 중심(마우스 기준점)
-    public List<RadialSegment> segments;    // 세그먼트 리스트 (감정표현/아이템 등)
 
-    [Header("Radial Menu Settings")]
-    public KeyCode emotionToggleKey = KeyCode.T;  // 감정 표현
-    public KeyCode itemToggleKey = KeyCode.Q;     // 아이템 선택 (예정)
-    public KeyCode soulToggleKey = KeyCode.G;     // 영혼 선택 (예정)
+    public List<RadialSegment> emotionSegments;
+    public List<RadialSegment> itemSegments;
+    public List<RadialSegment> soulSegments;
+
+
 
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
 
@@ -287,8 +305,11 @@ public class UIManager : MonoBehaviour
         keyBindings[4] = KeyCode.Mouse0;
         keyBindings[5] = KeyCode.Mouse1;
         keyBindings[6] = KeyCode.F;
-        keyBindings[7] = KeyCode.E;
+        keyBindings[7] = KeyCode.C; 
         keyBindings[8] = KeyCode.Tab;
+        keyBindings[9] = KeyCode.Q;
+        keyBindings[10] = KeyCode.E;
+
         int screenWidth = 1920;
         int screenHeight = 1080;
         float screenRatio = (float)screenWidth / screenHeight;
@@ -523,12 +544,23 @@ public class UIManager : MonoBehaviour
                     StartCoroutine(SaveDalay());
                 }
             }
-        }   
-        // 1) 라디얼 메뉴 토글 처리
-        if (Input.GetKeyDown(emotionToggleKey))
-        {
-            ToggleRadialMenu();
         }
+        // Quick Emotion (기본 E)
+        if (Input.GetKeyDown(GetKeyCode(10)))
+        {
+            ToggleRadialMenu(RadialMenuType.Emotion);
+        }
+        // Quick Item (Q)
+        else if (Input.GetKeyDown(GetKeyCode(9)))
+        {
+            ToggleRadialMenu(RadialMenuType.Item);
+        }
+        // Quick Soul (Tab)
+        else if (Input.GetKeyDown(GetKeyCode(8)))
+        {
+            ToggleRadialMenu(RadialMenuType.Soul);
+        }
+
 
         // 2) 메뉴 활성 상태라면 마우스 위치와 클릭 여부 판단
         if (isRadialMenuActive)
@@ -542,21 +574,99 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-    /// <summary>
-      /// 라디얼 메뉴 열기/닫기
-      /// </summary>
-    public void ToggleRadialMenu()
-    {
-        isRadialMenuActive = !isRadialMenuActive;
-        emotionRadialPanel.SetActive(isRadialMenuActive);
 
-      //  // 열 때, 중앙 위치 설정 (마우스 위치 등에)
-      //  if (isRadialMenuActive)
-      //  {
-      //      Vector3 mousePos = Input.mousePosition;
-      //      centerPoint.position = mousePos;
-      //  }
+    /// <summary>
+    /// 라디얼 메뉴 열기/닫기
+    /// </summary>
+    public void ToggleRadialMenu(RadialMenuType type)
+    {
+        // 이미 같은 타입이면 닫기
+        if (isRadialMenuActive && currentRadialMenu == type)
+        {
+            CloseAllRadialMenus();
+            return;
+        }
+
+        CloseAllRadialMenus();
+        currentRadialMenu = type;
+
+        switch (type)
+        {
+            case RadialMenuType.Emotion:
+                emotionRadialPanel.SetActive(true);
+                SetSegmentActive(emotionSegments);
+                break;
+            case RadialMenuType.Item:
+                itemRadialPanel.SetActive(true);
+                SetSegmentActive(itemSegments);
+                break;
+            case RadialMenuType.Soul:
+                soulRadialPanel.SetActive(true);
+                SetSegmentActive(soulSegments);
+                break;
+        }
+
+        isRadialMenuActive = true;
     }
+
+    private void SetSegmentActive(List<RadialSegment> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            bool isOn = ShouldBeVisible(list[i]); // 예: 인벤토리 수 등 조건
+            list[i].segmentTransform.gameObject.SetActive(isOn);
+        }
+    }
+    private bool ShouldBeVisible(RadialSegment segment)
+    {
+        switch (segment.menuType)
+        {
+           // case RadialMenuType.Item:
+           //     return GameManager.Instance.GetPlayerData().HasItem(segment.segmentName);
+           //
+           // case RadialMenuType.Soul:
+           //     return GameManager.Instance.GetPlayerData().HasSoul(segment.segmentName);
+           //
+           // case RadialMenuType.Emotion:
+           //     return CheckEmotionUnlocked(segment.segmentName); // 예: 이벤트 해금 여부
+
+            default:
+                return true;
+        }
+    }
+
+    private void CloseAllRadialMenus()
+    {
+        emotionRadialPanel.SetActive(false);
+        itemRadialPanel.SetActive(false);
+        soulRadialPanel.SetActive(false);
+
+        isRadialMenuActive = false;
+        currentRadialMenu = RadialMenuType.None;
+    }
+    public void PlayEmotionAnimation(string emotionName)
+    {
+        // 애니메이터 트리거나 이펙트 실행 등
+        Debug.Log($"[감정 표현] {emotionName} 애니메이션 실행");
+    }
+
+    public void UseQuickItem(string itemName)
+    {
+        var item = gameManager.GetPlayerData().inventory.Find(i => i.itemName == itemName);
+        if (item != null)
+        {
+            gameManager.UseItem(item.id);
+            Debug.Log($"[빠른 사용] {itemName} 아이템 사용 완료");
+        }
+    }
+
+    public void ChangeSoulType(string soulName)
+    {
+        // soulName에 따라 Enum 혹은 Index 매칭 후 소울 상태 변경
+        Debug.Log($"[소울] {soulName} 타입으로 변경");
+     //   gameManager.SetSoulTypeByName(soulName);
+    }
+
 
     /// <summary>
     /// 마우스 각도에 따라 하이라이트할 세그먼트 계산
@@ -572,27 +682,52 @@ public class UIManager : MonoBehaviour
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         angle = (360f - angle + 90f) % 360f;
 
-        // 가장 가까운 custom angle을 찾아서 index 결정
+        List<RadialSegment> activeSegments = null;
+
+        switch (currentRadialMenu)
+        {
+            case RadialMenuType.Emotion:
+                activeSegments = emotionSegments;
+                break;
+            case RadialMenuType.Item:
+                activeSegments = itemSegments;
+                break;
+            case RadialMenuType.Soul:
+                activeSegments = soulSegments;
+                break;
+        }
+
+        if (activeSegments == null || activeSegments.Count == 0) return;
+
+        int closestIndex = GetClosestIndex(angle, activeSegments.Count);
+
+        for (int i = 0; i < activeSegments.Count; i++)
+        {
+            activeSegments[i].SetHighlight(i == closestIndex);
+        }
+
+        currentIndex = closestIndex;
+    }
+
+    private int GetClosestIndex(float angle, int count)
+    {
+        float segmentSize = 360f / count;
         float minDiff = 999f;
         int closestIndex = 0;
-        for (int i = 0; i < customAngles.Length; i++)
+
+        for (int i = 0; i < count; i++)
         {
-            float diff = Mathf.Abs(Mathf.DeltaAngle(angle, customAngles[i]));
+            float centerAngle = i * segmentSize;
+            float diff = Mathf.Abs(Mathf.DeltaAngle(angle, centerAngle));
             if (diff < minDiff)
             {
                 minDiff = diff;
                 closestIndex = i;
             }
         }
-
-        // 하이라이트 갱신
-        for (int i = 0; i < segments.Count; i++)
-        {
-            segments[i].SetHighlight(i == closestIndex);
-        }
-
-        currentIndex = closestIndex;
+        return closestIndex;
     }
+
 
 
     /// <summary>
@@ -600,13 +735,29 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void OnSelectSegment(int index)
     {
-        RadialSegment seg = segments[index];
-        Debug.Log($"Segment {index} 선택됨 - {seg.segmentName}");
-        seg.ExecuteAction();
+        RadialSegment seg = null;
+        switch (currentRadialMenu)
+        {
+            case RadialMenuType.Emotion:
+                seg = emotionSegments[index];
+                break;
+            case RadialMenuType.Item:
+                seg = itemSegments[index];
+                break;
+            case RadialMenuType.Soul:
+                seg = soulSegments[index];
+                break;
+        }
 
-        // 선택 후 메뉴 닫을 수도 있음
-        ToggleRadialMenu();
+        if (seg != null)
+        {
+            Debug.Log($"[{currentRadialMenu}] Segment {index} 선택됨 - {seg.segmentName}");
+            seg.ExecuteAction();
+        }
+
+        ToggleRadialMenu(currentRadialMenu); // 닫기
     }
+
 
     #region InventroyUi
     void UpdateInventoryUI()
@@ -1263,8 +1414,10 @@ public class UIManager : MonoBehaviour
         keyBindings[4] = KeyCode.Mouse0;
         keyBindings[5] = KeyCode.Mouse1;
         keyBindings[6] = KeyCode.F;
-        keyBindings[7] = KeyCode.E;
+        keyBindings[7] = KeyCode.C;
         keyBindings[8] = KeyCode.Tab;
+        keyBindings[9] = KeyCode.Q;
+        keyBindings[10] = KeyCode.E;
         // UI 업데이트
         Screen.fullScreen = isFullScreen;
         fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
@@ -1504,13 +1657,14 @@ public class UIManager : MonoBehaviour
     }
     public void ToggleKeyValue()
     {
+       
         switch (currentIndex)
         {
-            case 9: // 마우스 조준
+            case 11: // 활성화 : 마우스 조준, 비활성화 : 가장 가까운적 조준
                 ToggleMouseShot();
                 Debug.Log("마우스 조준 만들어");
                 break;
-            case 10: // 마우스로 돌진
+            case 12: // 활성화 : 마우스로 돌진, 비활성화 : 방향키로 이동
                 ToggleMouseRoll();
                 Debug.Log("마우스로 돌진 만들어");
                 break;
@@ -1663,15 +1817,17 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 0 : Up
-    /// 1 : Down
-    /// 2 : Left
-    /// 3 : Right
-    /// 4 : Shot
-    /// 5 : Roll
-    /// 6 : Check
-    /// 7 : Inventory
-    /// 8 : Map
+    /// Up: 0 
+    /// Down: 1 
+    /// Left: 2 
+    /// Right: 3 
+    /// Shot: 4 
+    /// Roll: 5 
+    /// Check: 6 
+    /// Inventroy: 7 
+    /// Quick Soul: 8 
+    /// Quick Item: 9 
+    ///  Quick Emotion: 10
     /// </summary>
     public KeyCode GetKeyCode(int i)
     {

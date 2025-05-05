@@ -30,7 +30,8 @@ public class PlayerData
     public Animator playerAnimator;
     public bool isInvincible;
     public bool isDie;
-    public bool isPhone;
+    public bool isPhone; 
+
 
     public int LEVEL = 1;
     public int AT = 0;
@@ -58,7 +59,8 @@ public class PlayerData
         currentState = GameState.None; // 초기 상태 설정
         playerAnimator = null;
         isDie = false;
-        isPhone = false;
+        isPhone = false; 
+
         // 추가 데이터 초기화
     }
 
@@ -125,6 +127,12 @@ public class GameManager : MonoBehaviour
     public GameObject savePrefab; // SavePoint Prefab
     public Transform[] savePointTransforms; // SavePoint 위치 배열
     private List<GameObject> instantiatedSavePoints = new List<GameObject>(); // 생성된 SavePoint 리스트
+
+
+    // 감정 표현이 해금되었는지 확인할 리스트
+    private List<string> unlockedEmotions = new List<string>();  // 예: "기쁨", "슬픔", "분노" 등
+
+
 
     /// <summary>
     /// 전투 확인용
@@ -249,6 +257,47 @@ public class GameManager : MonoBehaviour
            AddItem(61);
         }
 }
+    #region RadialMenuType_method
+
+    /// 아이템 보유 여부 확인 (Linq 없이 수동 루프)
+    public bool HasItem(string itemName)
+    {
+        foreach (Item item in playerData.inventory)
+        {
+            if (item.itemName == itemName)
+                return true;
+        }
+        return false;
+    }
+
+    /// 영혼 보유 여부 확인 - PlayerMovement에서 curWeaponType과 비교
+    public bool HasSoul(string soulName)
+    {
+        // 문자열 → WeaponType 변환 시도
+       //if (Enum.TryParse<WeaponType>(soulName, out var parsed))
+       //{
+       //    var current = playerData.player.GetComponent<PlayerMovement>().playerWeapons;
+       //    return current == parsed;
+       //}
+       //
+        return false;
+    }
+
+    /// 감정 표현 해금 여부 확인
+    public bool CheckEmotionUnlocked(string emotionName)
+    {
+        return unlockedEmotions.Contains(emotionName);
+    }
+
+    /// 감정 해금 함수 (예: 이벤트 클리어 시 호출)
+    public void UnlockEmotion(string emotionName)
+    {
+        if (!unlockedEmotions.Contains(emotionName))
+            unlockedEmotions.Add(emotionName);
+    }
+
+
+    #endregion
     #region Savepoint
     void InitializePlayerData()
     {
