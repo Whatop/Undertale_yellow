@@ -242,6 +242,11 @@ public class UIManager : MonoBehaviour
     public List<RadialSegment> itemSegments;
     public List<RadialSegment> soulSegments;
 
+    [Header("Radial Segment Prefabs")]
+    public GameObject emotionSegmentPrefab;
+    public GameObject itemSegmentPrefab;
+    public GameObject soulSegmentPrefab;
+
 
 
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
@@ -580,7 +585,6 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void ToggleRadialMenu(RadialMenuType type)
     {
-        // 이미 같은 타입이면 닫기
         if (isRadialMenuActive && currentRadialMenu == type)
         {
             CloseAllRadialMenus();
@@ -590,50 +594,102 @@ public class UIManager : MonoBehaviour
         CloseAllRadialMenus();
         currentRadialMenu = type;
 
+        GameObject targetPanel = null;
+
         switch (type)
         {
             case RadialMenuType.Emotion:
-                emotionRadialPanel.SetActive(true);
-                SetSegmentActive(emotionSegments);
+                targetPanel = emotionRadialPanel;
                 break;
             case RadialMenuType.Item:
-                itemRadialPanel.SetActive(true);
-                SetSegmentActive(itemSegments);
+                targetPanel = itemRadialPanel;
                 break;
             case RadialMenuType.Soul:
-                soulRadialPanel.SetActive(true);
-                SetSegmentActive(soulSegments);
+                targetPanel = soulRadialPanel;
                 break;
+        }
+
+        if (targetPanel != null)
+        {
+            targetPanel.SetActive(true);
+            StartCoroutine(ScaleIn(targetPanel.transform));
         }
 
         isRadialMenuActive = true;
     }
-
-    private void SetSegmentActive(List<RadialSegment> list)
+    private IEnumerator ScaleIn(Transform panelTransform)
     {
-        for (int i = 0; i < list.Count; i++)
-        {
-            bool isOn = ShouldBeVisible(list[i]); // 예: 인벤토리 수 등 조건
-            list[i].segmentTransform.gameObject.SetActive(isOn);
-        }
-    }
-    private bool ShouldBeVisible(RadialSegment segment)
-    {
-        switch (segment.menuType)
-        {
-           // case RadialMenuType.Item:
-           //     return GameManager.Instance.GetPlayerData().HasItem(segment.segmentName);
-           //
-           // case RadialMenuType.Soul:
-           //     return GameManager.Instance.GetPlayerData().HasSoul(segment.segmentName);
-           //
-           // case RadialMenuType.Emotion:
-           //     return CheckEmotionUnlocked(segment.segmentName); // 예: 이벤트 해금 여부
+        panelTransform.localScale = Vector3.zero;
+        float duration = 0.15f;
+        float elapsed = 0f;
 
-            default:
-                return true;
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            panelTransform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
+            elapsed += Time.deltaTime;
+            yield return null;
         }
+
+        panelTransform.localScale = Vector3.one;
     }
+
+    private void ClearSegments(RadialMenuType type)
+    {
+        List<RadialSegment> list = GetSegmentList(type);
+        foreach (var seg in list)
+        {
+            if (seg.segmentTransform != null)
+                Destroy(seg.segmentTransform.gameObject);
+        }
+        list.Clear();
+    }
+
+    private List<RadialSegment> GetSegmentList(RadialMenuType type)
+    {
+        return type switch
+        {
+            RadialMenuType.Item => itemSegments,
+            RadialMenuType.Soul => soulSegments,
+            RadialMenuType.Emotion => emotionSegments,
+            _ => new List<RadialSegment>()
+        };
+    }
+
+    private RadialSegment CreateSegment(string label, Transform parent)
+    {
+        GameObject prefabToUse = null;
+
+        switch (currentRadialMenu)
+        {
+            case RadialMenuType.Emotion:
+                prefabToUse = emotionSegmentPrefab;
+                break;
+            case RadialMenuType.Item:
+                prefabToUse = itemSegmentPrefab;
+                break;
+            case RadialMenuType.Soul:
+                prefabToUse = soulSegmentPrefab;
+                break;
+        }
+
+        if (prefabToUse == null)
+        {
+            Debug.LogWarning("세그먼트 프리팹이 설정되지 않았습니다.");
+            return null;
+        }
+
+        GameObject go = Instantiate(prefabToUse, parent);
+        go.GetComponentInChildren<TextMeshProUGUI>().text = label;
+
+        return new RadialSegment
+        {
+            segmentName = label,
+            segmentTransform = go.transform,
+            menuType = currentRadialMenu
+        };
+    }
+
 
     private void CloseAllRadialMenus()
     {
