@@ -12,7 +12,7 @@ using System;
 public class RadialSegment
 {
     public string segmentName;
-    public Transform segmentTransform;
+    public RectTransform segmentTransform;
 
     private Vector3 defaultScale = Vector3.one;
     private Vector3 highlightScale = new Vector3(1.2f, 1.2f, 1f);
@@ -585,6 +585,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void ToggleRadialMenu(RadialMenuType type)
     {
+     
         if (isRadialMenuActive && currentRadialMenu == type)
         {
             CloseAllRadialMenus();
@@ -634,17 +635,6 @@ public class UIManager : MonoBehaviour
         panelTransform.localScale = Vector3.one;
     }
 
-    private void ClearSegments(RadialMenuType type)
-    {
-        List<RadialSegment> list = GetSegmentList(type);
-        foreach (var seg in list)
-        {
-            if (seg.segmentTransform != null)
-                Destroy(seg.segmentTransform.gameObject);
-        }
-        list.Clear();
-    }
-
     private List<RadialSegment> GetSegmentList(RadialMenuType type)
     {
         return type switch
@@ -656,38 +646,21 @@ public class UIManager : MonoBehaviour
         };
     }
 
-    private RadialSegment CreateSegment(string label, Transform parent)
+    private void BindSegment(RadialSegment segment, string label)
     {
-        GameObject prefabToUse = null;
-
-        switch (currentRadialMenu)
+        // 텍스트 설정
+        TextMeshProUGUI textComponent = segment.segmentTransform.GetComponentInChildren<TextMeshProUGUI>();
+        if (textComponent != null)
         {
-            case RadialMenuType.Emotion:
-                prefabToUse = emotionSegmentPrefab;
-                break;
-            case RadialMenuType.Item:
-                prefabToUse = itemSegmentPrefab;
-                break;
-            case RadialMenuType.Soul:
-                prefabToUse = soulSegmentPrefab;
-                break;
+            textComponent.text = label;
         }
 
-        if (prefabToUse == null)
+        // 이미지 설정
+        Image imageComponent = segment.segmentTransform.GetComponentInChildren<Image>();
+        if (imageComponent != null)
         {
-            Debug.LogWarning("세그먼트 프리팹이 설정되지 않았습니다.");
-            return null;
+            imageComponent.gameObject.SetActive(!string.IsNullOrEmpty(label));
         }
-
-        GameObject go = Instantiate(prefabToUse, parent);
-        go.GetComponentInChildren<TextMeshProUGUI>().text = label;
-
-        return new RadialSegment
-        {
-            segmentName = label,
-            segmentTransform = go.transform,
-            menuType = currentRadialMenu
-        };
     }
 
 
