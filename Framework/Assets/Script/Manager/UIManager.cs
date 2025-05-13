@@ -585,7 +585,6 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void ToggleRadialMenu(RadialMenuType type)
     {
-     
         if (isRadialMenuActive && currentRadialMenu == type)
         {
             CloseAllRadialMenus();
@@ -595,20 +594,15 @@ public class UIManager : MonoBehaviour
         CloseAllRadialMenus();
         currentRadialMenu = type;
 
-        GameObject targetPanel = null;
+        UpdateSegmentValues(type); // **여기 추가**
 
-        switch (type)
+        GameObject targetPanel = type switch
         {
-            case RadialMenuType.Emotion:
-                targetPanel = emotionRadialPanel;
-                break;
-            case RadialMenuType.Item:
-                targetPanel = itemRadialPanel;
-                break;
-            case RadialMenuType.Soul:
-                targetPanel = soulRadialPanel;
-                break;
-        }
+            RadialMenuType.Emotion => emotionRadialPanel,
+            RadialMenuType.Item => itemRadialPanel,
+            RadialMenuType.Soul => soulRadialPanel,
+            _ => null
+        };
 
         if (targetPanel != null)
         {
@@ -618,6 +612,7 @@ public class UIManager : MonoBehaviour
 
         isRadialMenuActive = true;
     }
+
     private IEnumerator ScaleIn(Transform panelTransform)
     {
         panelTransform.localScale = Vector3.zero;
@@ -656,10 +651,47 @@ public class UIManager : MonoBehaviour
         }
 
         // 이미지 설정
-        Image imageComponent = segment.segmentTransform.GetComponentInChildren<Image>();
-        if (imageComponent != null)
+        Image[] images = segment.segmentTransform.GetComponentsInChildren<Image>(true);
+        foreach (var img in images)
         {
-            imageComponent.gameObject.SetActive(!string.IsNullOrEmpty(label));
+            if (img.gameObject.name == "IconImage") // 자식 아이콘만 제어
+            {
+                img.gameObject.SetActive(!string.IsNullOrEmpty(label));
+            }
+        }
+    }
+    private void UpdateSegmentValues(RadialMenuType type)
+    {
+        var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
+        switch (type)
+        {
+            case RadialMenuType.Item:
+                var inventory = GameManager.Instance.GetPlayerData().inventory;
+                for (int i = 0; i < itemSegments.Count; i++)
+                {
+                    string label = i < inventory.Count ? inventory[i].itemName : "";
+                    BindSegment(itemSegments[i], label);
+                }
+                break;
+
+            case RadialMenuType.Soul:
+                playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
+                var playerWeapons = playerMovement.playerWeapons;
+                for (int i = 0; i < soulSegments.Count; i++)
+                {
+                    string label = i < playerWeapons.Count ? playerWeapons[i].ToString() : "";
+                    BindSegment(soulSegments[i], label);
+                }
+                break;
+
+            case RadialMenuType.Emotion:
+                var emotions = playerMovement.GetUnlockedEmotions();
+                for (int i = 0; i < emotionSegments.Count; i++)
+                {
+                    string label = i < emotions.Count ? emotions[i] : "";
+                    BindSegment(emotionSegments[i], label);
+                }
+                break;
         }
     }
 
