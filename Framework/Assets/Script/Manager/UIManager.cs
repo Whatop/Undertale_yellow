@@ -15,7 +15,7 @@ public class RadialSegment
     public RectTransform segmentTransform;
 
     private Vector3 defaultScale = Vector3.one;
-    private Vector3 highlightScale = new Vector3(1.2f, 1.2f, 1f);
+    private Vector3 highlightScale = new Vector3(1.1f, 1.1f, 1f);
 
     public RadialMenuType menuType; // 추가: 어떤 메뉴인지
 
@@ -247,10 +247,12 @@ public class UIManager : MonoBehaviour
     public GameObject itemSegmentPrefab;
     public GameObject soulSegmentPrefab;
 
+    [SerializeField] private float cancelRadius = 50f; // 중앙 취소 반경
+    [SerializeField] private float confirmCooldown = 0.3f;
+    private float lastConfirmTime = -999f;
 
 
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
-
     private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
 
     public static UIManager Instance
@@ -550,22 +552,34 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
-        // Quick Emotion (기본 E)
+        // 감정 표현 (E 키 홀드)
         if (Input.GetKeyDown(GetKeyCode(10)))
-        {
             ToggleRadialMenu(RadialMenuType.Emotion);
-        }
-        // Quick Item (Q)
-        else if (Input.GetKeyDown(GetKeyCode(9)))
-        {
-            ToggleRadialMenu(RadialMenuType.Item);
-        }
-        // Quick Soul (Tab)
-        else if (Input.GetKeyDown(GetKeyCode(8)))
-        {
-            ToggleRadialMenu(RadialMenuType.Soul);
-        }
+        if (Input.GetKeyUp(GetKeyCode(10)))
+            ConfirmRadialSelectionAndClose();
 
+        // 아이템 (Q 키 홀드)
+        if (Input.GetKeyDown(GetKeyCode(9)))
+            ToggleRadialMenu(RadialMenuType.Item);
+        if (Input.GetKeyUp(GetKeyCode(9)))
+            ConfirmRadialSelectionAndClose();
+
+        // 소울 (Tab 키 홀드)
+        if (Input.GetKeyDown(GetKeyCode(8)))
+            ToggleRadialMenu(RadialMenuType.Soul);
+        if (Input.GetKeyUp(GetKeyCode(8)))
+            ConfirmRadialSelectionAndClose();
+
+        // 라디얼 메뉴가 열려 있을 때 마우스 선택 처리
+        if (isRadialMenuActive)
+        {
+            UpdateRadialSelection();
+
+            if (Input.GetMouseButtonUp(0) && currentIndex >= 0)
+            {
+                OnSelectSegment(currentIndex);
+            }
+        }
 
         // 2) 메뉴 활성 상태라면 마우스 위치와 클릭 여부 판단
         if (isRadialMenuActive)
@@ -817,6 +831,31 @@ public class UIManager : MonoBehaviour
         }
 
         ToggleRadialMenu(currentRadialMenu); // 닫기
+    }
+    private void ConfirmRadialSelectionAndClose()
+    {
+        // 쿨타임 검사
+        if (Time.unscaledTime - lastConfirmTime < confirmCooldown)
+            return;
+
+        lastConfirmTime = Time.unscaledTime;
+
+        // 중앙에서 놓으면 취소
+        float dist = Vector2.Distance(Input.mousePosition, centerPoint.position);
+        if (dist < cancelRadius)
+        {
+            Debug.Log("중앙에서 놓았으므로 취소됨");
+            CloseAllRadialMenus();
+            return;
+        }
+
+        // 세그먼트 확정
+        if (isRadialMenuActive && currentIndex >= 0)
+        {
+            OnSelectSegment(currentIndex);
+        }
+
+        CloseAllRadialMenus();
     }
 
 

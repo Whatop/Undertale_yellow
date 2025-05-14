@@ -5,7 +5,7 @@ public class RadialMenuHelper : MonoBehaviour
     [Header("기본 설정")]
     public GameObject segmentPrefab;    // 생성할 세그먼트 프리팹
     public int count = 8;               // 세그먼트 개수
-    public float radius = 220f;         // 중심에서 거리
+    public float radius;         // 중심에서 거리
     public bool faceOutward = true;     // 세그먼트를 바깥 방향으로 회전시킬지 여부
 
     [ContextMenu("Generate Segments")]
@@ -31,7 +31,7 @@ public class RadialMenuHelper : MonoBehaviour
             float rad = angle * Mathf.Deg2Rad;
 
             Vector2 pos = new Vector2(
-                Mathf.Cos(rad) * radius,
+                Mathf.Cos(rad) * radius,  // 추천 radius
                 Mathf.Sin(rad) * radius
             );
 
@@ -40,12 +40,17 @@ public class RadialMenuHelper : MonoBehaviour
 
             if (faceOutward)
             {
-                segment.transform.localRotation = Quaternion.Euler(0f, 0f, angle - 90f); // 회전 정렬
+                segment.transform.localRotation = Quaternion.Euler(0f, 0f, angle - 90f);
             }
+
+            // 스케일 조정
+            segment.transform.localScale = Vector3.one * 0.85f;
 
             segment.name = $"Segment_{i}";
         }
 
         Debug.Log($"{count}개의 세그먼트를 생성했습니다.");
     }
+
+
 }
