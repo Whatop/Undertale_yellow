@@ -693,7 +693,7 @@ public class UIManager : MonoBehaviour
                 var playerWeapons = playerMovement.playerWeapons;
                 for (int i = 0; i < soulSegments.Count; i++)
                 {
-                    string label = i < playerWeapons.Count ? playerWeapons[i].ToString() : "";
+                    string label = i < playerWeapons.Count ? playerWeapons[i].WeaponName.ToString() : "";
                     BindSegment(soulSegments[i], label);
                 }
                 break;
@@ -737,11 +737,20 @@ public class UIManager : MonoBehaviour
 
     public void ChangeSoulType(string soulName)
     {
-        // soulName에 따라 Enum 혹은 Index 매칭 후 소울 상태 변경
-        Debug.Log($"[소울] {soulName} 타입으로 변경");
-     //   gameManager.SetSoulTypeByName(soulName);
-    }
+        if (Enum.TryParse<WeaponType>(soulName, out var newWeaponType))
+        {
+            var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
+            playerMovement.curweaponData.weaponType = newWeaponType;
 
+            Debug.Log($"[소울] {newWeaponType} 으로 변경됨");
+
+            // 필요 시 여기서 UI, 이펙트, 사운드 추가 가능
+        }
+        else
+        {
+            Debug.LogWarning($"[소울] {soulName} 을 WeaponType 으로 변환 실패");
+        }
+    }
 
     /// <summary>
     /// 마우스 각도에 따라 하이라이트할 세그먼트 계산

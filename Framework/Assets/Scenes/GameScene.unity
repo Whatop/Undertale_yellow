@@ -1131,7 +1131,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCD08\uB85D"
+  m_text: "\uC8FC\uD669\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
   m_sharedMaterial: {fileID: 4401728063144910687, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
@@ -1140,8 +1140,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278255372
-  m_fontColor: {r: 0.048508644, g: 1, b: 0, a: 1}
+    rgba: 4278223103
+  m_fontColor: {r: 1, g: 0.5, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -15993,7 +15993,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.04705883, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.5, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -33514,7 +33514,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBE68\uAC15"
+  m_text: "\uB178\uB791"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
   m_sharedMaterial: {fileID: 4401728063144910687, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
@@ -33523,8 +33523,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190335
-  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
+    rgba: 4278255615
+  m_fontColor: {r: 1, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -35531,7 +35531,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.003921569, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -39880,7 +39880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.627451, b: 0.2509804, a: 1}
+  m_Color: {r: 0.04705883, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -42174,6 +42174,7 @@ MonoBehaviour:
   shellPrefab: {fileID: 4178406006009708905, guid: 0b7784e704766c04595eff212b1dbf51, type: 3}
   shellEjectPoint: {fileID: 2005543311}
   playerWeapons: []
+  playerWeaponTypes: 
   curweaponData:
     id: 0
     WeaponName: None
@@ -43753,16 +43754,16 @@ MonoBehaviour:
     segmentTransform: {fileID: 2132655165}
     menuType: 2
   soulSegments:
-  - segmentName: red
+  - segmentName: yellow
     segmentTransform: {fileID: 606139944}
     menuType: 3
-  - segmentName: yellow
+  - segmentName: skyblue
     segmentTransform: {fileID: 700143370}
     menuType: 3
-  - segmentName: green
+  - segmentName: orange
     segmentTransform: {fileID: 1744094671}
     menuType: 3
-  - segmentName: orange
+  - segmentName: green
     segmentTransform: {fileID: 1142198717}
     menuType: 3
   - segmentName: purple
@@ -43771,7 +43772,7 @@ MonoBehaviour:
   - segmentName: blue
     segmentTransform: {fileID: 1919263026}
     menuType: 3
-  - segmentName: skyblue
+  - segmentName: red
     segmentTransform: {fileID: 346662553}
     menuType: 3
   emotionSegmentPrefab: {fileID: 3773442702856913115, guid: 87af4066284d0764d912f4eb3ad9da11, type: 3}
@@ -44609,7 +44610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 0.10196079, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -47937,7 +47938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 0, a: 1}
+  m_Color: {r: 0.003921569, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -53990,7 +53991,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC8FC\uD669"
+  m_text: "\uCD08\uB85D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
   m_sharedMaterial: {fileID: 4401728063144910687, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
@@ -53999,8 +54000,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282425599
-  m_fontColor: {r: 1, g: 0.627451, b: 0.2509804, a: 1}
+    rgba: 4278255372
+  m_fontColor: {r: 0.04705883, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -55025,7 +55026,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD558\uB298"
+  m_text: "\uBE68\uAC15\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
   m_sharedMaterial: {fileID: 4401728063144910687, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
@@ -55034,8 +55035,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967041
-  m_fontColor: {r: 0.003921569, g: 1, b: 1, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -57439,7 +57440,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB178\uB791"
+  m_text: "\uD558\uB298\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
   m_sharedMaterial: {fileID: 4401728063144910687, guid: 97af45d953d578c4a8a0d190685df78a, type: 2}
@@ -57448,8 +57449,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278255615
-  m_fontColor: {r: 1, g: 1, b: 0, a: 1}
+    rgba: 4294967041
+  m_fontColor: {r: 0.003921569, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -59355,7 +59356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2076746629
 RectTransform:
   m_ObjectHideFlags: 0

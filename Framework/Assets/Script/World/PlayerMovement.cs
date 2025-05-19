@@ -12,17 +12,30 @@ using UnityEngine.UI;
 //Perseverance 끈기(보라) : 213 53 217
 //Kindness 친절(초록) : 0 192 0
 //Justice 정의(노랑) : 255 255 0
+
+/// <summary>
+///  Determination, // 의지 (빨강) - 강력 일격
+/// Patience,      // 인내 (하늘) - 연사 총
+/// Bravery,       // 용기 (주황) - 산탄 총
+/// Integrity,     // 고결 (파랑) - 레이저
+/// Perseverance,  // 끈기 (보라) - 유도 미사일
+/// Kindness,      // 친절 (초록) - 방어벽 발사
+/// Justice,       // 정의 (노랑) - 기본 총
+/// None           // 기본값
+/// </summary>
+
 public enum WeaponType
 {
-    Determination, // 의지 (빨강)
-    Patience,      // 인내 (하늘)
-    Bravery,       // 용기 (주황)
-    Integrity,     // 고결 (파랑)
-    Perseverance,  // 끈기 (보라)
-    Kindness,      // 친절 (초록)
-    Justice,       // 정의 (노랑)
+    Revolver,          // 정의 (노랑) - 기본 총 
+    NeedleGun,         // 인내 (하늘) - 연사 총 / 넵스타블룩 폐허
+    Shotgun,           // 용기 (주황) - 산탄 총 / 파피루스? 스노우딘 
+    BarrierEmitter,     // 친절 (초록) - 방어벽 발사 / 언다인? 워터폴
+    HomingMissile,     // 끈기 (보라) - 유도 미사일 / 머펫? 
+    LaserGun,          // 고결 (파랑) - 레이저 / 메타톤?알피스? 핫랜드
+    Blaster,           // 의지 (빨강) - 샌즈? 강력 일격
     None           // 기본값
 }
+
 // 각 총의 특성을 나타내는 클래스
 [System.Serializable]
 public class Weapon
@@ -66,19 +79,19 @@ public class Weapon
     {
         switch (type)
         {
-            case WeaponType.Determination:
+            case WeaponType.Blaster:
                 return new Color(1f, 0f, 0f); // 빨강
-            case WeaponType.Patience:
+            case WeaponType.NeedleGun:
                 return new Color(66f / 255f, 252f / 255f, 255f / 255f); // 하늘색
-            case WeaponType.Bravery:
+            case WeaponType.Shotgun:
                 return new Color(252f / 255f, 166f / 255f, 0f); // 주황
-            case WeaponType.Integrity:
+            case WeaponType.LaserGun:
                 return new Color(0f, 60f / 255f, 1f); // 파랑
-            case WeaponType.Perseverance:
+            case WeaponType.HomingMissile:
                 return new Color(213f / 255f, 53f / 255f, 217f / 255f); // 보라
-            case WeaponType.Kindness:
+            case WeaponType.BarrierEmitter:
                 return new Color(0f, 192f / 255f, 0f); // 초록
-            case WeaponType.Justice:
+            case WeaponType.Revolver:
                 return new Color(1f, 1f, 0f); // 노랑
             default:
                 return new Color(0.5f, 0.5f, 0.5f); // 기본 회색
@@ -124,7 +137,11 @@ public class PlayerMovement : LivingObject
     public GameObject shellPrefab;   // 탄피 프리팹
     public Transform shellEjectPoint;// 탄피 배출 위치(권총 옆이나 탄창 부분)
 
+    // 모든 무기 정의 (게임 시작 시 세팅)
+    private List<Weapon> databaseWeapons = new List<Weapon>();
     public List<Weapon> playerWeapons = new List<Weapon>();
+    public List<WeaponType> playerWeaponTypes = new List<WeaponType>();
+
     private int currentWeaponIndex = 0;
 
     public Weapon curweaponData;
@@ -139,17 +156,9 @@ public class PlayerMovement : LivingObject
     public float recoilVerticalOffset = 0.05f; // 반동 시 위쪽으로 밀리는 정도
     private Vector3 originalWeaponPosition; // 원래 총의 위치
 
-    //Determination 의지, 불명(빨강) : 255 0 0
-    //Patience 인내(하늘) : 66 252 255
-    //Bravery 용기(주황) : 252 166 0
-    //Integrity 고결(파랑) : 0 60 255
-    //Perseverance 끈기(보라) : 213 53 217
-    //Kindness 친절(초록) : 0 192 0
-    //Justice 정의(노랑) : 255 255 0
 
     public GameObject feetPoint;
     private bool isEffectSpawning = false; // 이펙트 생성 중 여부 확인 변수
-
 
     private Vector2 rollDirection;
     private float rollSpeed = 16f;      // 구르기 속도
@@ -191,7 +200,6 @@ public class PlayerMovement : LivingObject
         previousPosition = transform.position; // 초기 위치 설정
     }
 
-    // Start 메서드: 게임 시작 시 초기화
     void Start()
     {
         playerData = gameManager.GetPlayerData();
@@ -205,13 +213,13 @@ public class PlayerMovement : LivingObject
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
 
-        curweaponData.weaponType = WeaponType.Justice;
+        curweaponData.weaponType = WeaponType.Revolver;
         curweaponData.UpdateColor();
         soulObject.GetComponent<SpriteRenderer>().color = curweaponData.weaponColor;
 
         originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
+        InitializeWeapons();
     }
-
     protected override void Update()
     {
         if (isDie)
@@ -468,7 +476,7 @@ public class PlayerMovement : LivingObject
     }
     #endregion soul_code
 
-    #region shot_code
+    #region shot_human_code
     // 총알 발사 입력 처리
     IEnumerator Reload()
     {
@@ -668,7 +676,128 @@ public class PlayerMovement : LivingObject
         yield return new WaitForSeconds(muzzleFlashDuration);
         Destroy(muzzleFlash);
     }
+
+
     #endregion shot_code
+    #region shot_soul_code
+    public void AddWeapon(Weapon weapon)
+    {
+        if (!playerWeapons.Contains(weapon))
+        {
+            playerWeapons.Add(weapon);
+            Debug.Log($"무기 추가됨: {weapon.WeaponName}");
+        }
+    }
+
+    public void HandleWeaponSpecificMovement()
+    {
+        switch (curweaponData.weaponType)
+        {
+            case WeaponType.Revolver:
+                HandleRevolverMovement();
+                break;
+
+            case WeaponType.Blaster:
+                HandleBlasterMovement();
+                break;
+
+            case WeaponType.NeedleGun:
+                HandleNeedleGunMovement();
+                break;
+
+            case WeaponType.Shotgun:
+                HandleShotgunMovement();
+                break;
+
+            case WeaponType.LaserGun:
+                HandleLaserGunMovement();
+                break;
+
+            case WeaponType.HomingMissile:
+                HandleHomingMissileMovement();
+                break;
+
+            case WeaponType.BarrierEmitter:
+                HandleBarrierEmitterMovement();
+                break;
+
+            default:
+                HandleDefaultMovement(); // isSoul 아닐때 어차피 해놈 
+                break;
+        }
+    }
+
+    private void HandleRevolverMovement() { 
+        Debug.Log("Revolver: 표준 속도, 표준 회피");
+    }
+    private void HandleBlasterMovement() {
+        Debug.Log("Blaster: 무겁고 느리지만 일격이 강력"); 
+    }
+    private void HandleNeedleGunMovement() { 
+        Debug.Log("NeedleGun: 빠르고 연속적인 회피 가능"); 
+    }
+    private void HandleShotgunMovement() { 
+        Debug.Log("Shotgun: 근거리 집중, 대쉬 짧음"); 
+    }
+    private void HandleLaserGunMovement() { 
+        Debug.Log("LaserGun: 느리지만 조준이 정밀"); 
+    }
+    private void HandleHomingMissileMovement() { 
+        Debug.Log("HomingMissile: 이동 느림, 유도탄 발사 준비 시간 필요");
+    }
+    private void HandleBarrierEmitterMovement() {
+        Debug.Log("BarrierEmitter: 이동 제한적, 방어벽 유지"); 
+    }
+    private void HandleDefaultMovement() { 
+        Debug.Log("기본 휴먼 모드"); 
+    }
+
+    public void OpenSoulUnlockShop()
+    {
+        List<WeaponType> lockedWeapons = GetLockedWeapons();
+        foreach (var weapon in lockedWeapons)
+        {
+            Debug.Log($"{weapon} - {GetUnlockCost(weapon)}G");
+        }
+
+        // UI 표시 로직은 이후 작성
+    }
+
+    private List<WeaponType> GetLockedWeapons()
+    {
+        List<WeaponType> allWeapons = new List<WeaponType>
+    {
+        WeaponType.Blaster,
+        WeaponType.NeedleGun,
+        WeaponType.Shotgun,
+        WeaponType.LaserGun,
+        WeaponType.HomingMissile,
+        WeaponType.BarrierEmitter
+    };
+
+        List<WeaponType> unlockedWeapons = GameManager.Instance.GetPlayerData()
+            .player.GetComponent<PlayerMovement>().playerWeaponTypes;
+
+        return allWeapons.FindAll(w => !unlockedWeapons.Contains(w));
+    }
+
+    private int GetUnlockCost(WeaponType weapon)
+    {
+        // 무기별 비용 설정
+        return weapon switch
+        {
+            WeaponType.Blaster => 100,
+            WeaponType.NeedleGun => 120,
+            WeaponType.Shotgun => 130,
+            WeaponType.LaserGun => 140,
+            WeaponType.HomingMissile => 150,
+            WeaponType.BarrierEmitter => 160,
+            _ => 999
+        };
+    }
+
+
+    #endregion
 
     #region roll_code
     // 쿨타임 시작
@@ -828,17 +957,24 @@ public class PlayerMovement : LivingObject
     #region weapon_code
     void InitializeWeapons()
     {
-        // 7가지 무기를 초기화
-        playerWeapons.Add(new Weapon { WeaponName = "Determination", weaponType = WeaponType.Determination });
-        playerWeapons.Add(new Weapon { WeaponName = "Patience", weaponType = WeaponType.Patience });
-        playerWeapons.Add(new Weapon { WeaponName = "Bravery", weaponType = WeaponType.Bravery });
-        playerWeapons.Add(new Weapon { WeaponName = "Integrity", weaponType = WeaponType.Integrity });
-        playerWeapons.Add(new Weapon { WeaponName = "Perseverance", weaponType = WeaponType.Perseverance });
-        playerWeapons.Add(new Weapon { WeaponName = "Kindness", weaponType = WeaponType.Kindness });
-        playerWeapons.Add(new Weapon { WeaponName = "Justice", weaponType = WeaponType.Justice });
 
+        // 7가지 무기를 초기화
+        databaseWeapons.Add(new Weapon { WeaponName = "Justice", weaponType = WeaponType.Revolver, id = 0});
+        databaseWeapons.Add(new Weapon { WeaponName = "Patience", weaponType = WeaponType.NeedleGun, id = 1 });
+        databaseWeapons.Add(new Weapon { WeaponName = "Bravery", weaponType = WeaponType.Shotgun, id = 2 });
+        databaseWeapons.Add(new Weapon { WeaponName = "Kindness", weaponType = WeaponType.BarrierEmitter, id = 3 });
+        databaseWeapons.Add(new Weapon { WeaponName = "Perseverance", weaponType = WeaponType.HomingMissile, id = 4});
+        databaseWeapons.Add(new Weapon { WeaponName = "Integrity", weaponType = WeaponType.LaserGun, id = 5});
+        databaseWeapons.Add(new Weapon { WeaponName = "Determination", weaponType = WeaponType.Blaster, id = 6});
+        AddWeapon(databaseWeapons[0]);
+        AddWeapon(databaseWeapons[1]);
+        AddWeapon(databaseWeapons[2]);
+        AddWeapon(databaseWeapons[3]);
+        AddWeapon(databaseWeapons[4]);
+        AddWeapon(databaseWeapons[5]);
+        AddWeapon(databaseWeapons[6]);
         // 각 무기의 색상 업데이트
-        foreach (var weapon in playerWeapons)
+        foreach (var weapon in databaseWeapons)
         {
             weapon.UpdateColor();
         }
