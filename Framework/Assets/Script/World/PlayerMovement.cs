@@ -173,6 +173,7 @@ public class PlayerMovement : LivingObject
     public GameObject shadowObject;     // Player의 스프라이트 (흐림 효과 적용)
     public float playerTransparency = 0f; // Player 투명도 값 (흐릿한 효과)
 
+    [SerializeField]
     private bool isSoulActive = false; // Soul 모드 활성화 여부
 
     public int walkingSoundStartIndex = 220; // 걷는 효과음 시작 인덱스
@@ -185,6 +186,7 @@ public class PlayerMovement : LivingObject
     private float distanceCovered = 0f;  // 누적 이동 거리
     public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
     private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
+
 
     #region unity_code
     // Awake 메서드: 초기 설정
@@ -219,6 +221,8 @@ public class PlayerMovement : LivingObject
 
         originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
         InitializeWeapons();
+        gameManager.SaveWeaponData(curweaponData);
+
     }
     protected override void Update()
     {
@@ -305,14 +309,22 @@ public class PlayerMovement : LivingObject
                 SyncSoulWithPlayer(); // 플레이어와 Soul의 위치 동기화
                 Weapons.SetActive(false);
                 Hands.gameObject.SetActive(false);
-            }
 
-            if (Input.GetKeyDown(UIManager.Instance.GetKeyCode(7)) &&
-                !UIManager.Instance.savePanel.activeSelf
-                && gameManager.GetPlayerData().currentState == GameState.None)
+                // 소울 (Tab 키 홀드)
+                if (Input.GetKeyDown(UIManager.Instance.GetKeyCode(7)))
+                    UIManager.Instance.ToggleRadialMenu(RadialMenuType.Item);
+                if (Input.GetKeyUp(UIManager.Instance.GetKeyCode(7)))
+                    UIManager.Instance.ConfirmRadialSelectionAndClose();
+            }
+            else
             {
-                UIManager.Instance.SetTextBar();
-                UIManager.Instance.ChangeInventroy();
+                if (Input.GetKeyDown(UIManager.Instance.GetKeyCode(7)) &&
+                    !UIManager.Instance.savePanel.activeSelf
+                    && gameManager.GetPlayerData().currentState == GameState.None)
+                {
+                    UIManager.Instance.SetTextBar();
+                    UIManager.Instance.ChangeInventroy();
+                }
             }
         }
         else
@@ -679,6 +691,7 @@ public class PlayerMovement : LivingObject
 
 
     #endregion shot_code
+
     #region shot_soul_code
     public void AddWeapon(Weapon weapon)
     {
@@ -884,7 +897,7 @@ public class PlayerMovement : LivingObject
             }
             if (isSoulActive && Time.time - lastSpawnTime >= soulEffectSpawnInterval)
             {
-                EffectManager.Instance.SpawnEffect("soul_rolleffect", transform.position, soulObject.transform.rotation);
+                EffectManager.Instance.SpawnEffect("soul_rolleffect", transform.position, soulObject.transform.rotation, soulObject.GetComponent<SpriteRenderer>().color); ;
                 lastSpawnTime = Time.time;
             }
 
@@ -957,15 +970,14 @@ public class PlayerMovement : LivingObject
     #region weapon_code
     void InitializeWeapons()
     {
-
         // 7가지 무기를 초기화
-        databaseWeapons.Add(new Weapon { WeaponName = "Justice", weaponType = WeaponType.Revolver, id = 0});
-        databaseWeapons.Add(new Weapon { WeaponName = "Patience", weaponType = WeaponType.NeedleGun, id = 1 });
-        databaseWeapons.Add(new Weapon { WeaponName = "Bravery", weaponType = WeaponType.Shotgun, id = 2 });
-        databaseWeapons.Add(new Weapon { WeaponName = "Kindness", weaponType = WeaponType.BarrierEmitter, id = 3 });
-        databaseWeapons.Add(new Weapon { WeaponName = "Perseverance", weaponType = WeaponType.HomingMissile, id = 4});
-        databaseWeapons.Add(new Weapon { WeaponName = "Integrity", weaponType = WeaponType.LaserGun, id = 5});
-        databaseWeapons.Add(new Weapon { WeaponName = "Determination", weaponType = WeaponType.Blaster, id = 6});
+        databaseWeapons.Add(new Weapon { WeaponName = "노랑", weaponType = WeaponType.Revolver, id = 0});
+        databaseWeapons.Add(new Weapon { WeaponName = "하늘", weaponType = WeaponType.NeedleGun, id = 1 });
+        databaseWeapons.Add(new Weapon { WeaponName = "주황", weaponType = WeaponType.Shotgun, id = 2 });
+        databaseWeapons.Add(new Weapon { WeaponName = "초록", weaponType = WeaponType.BarrierEmitter, id = 3 });
+        databaseWeapons.Add(new Weapon { WeaponName = "보라", weaponType = WeaponType.HomingMissile, id = 4});
+        databaseWeapons.Add(new Weapon { WeaponName = "파랑", weaponType = WeaponType.LaserGun, id = 5});
+        databaseWeapons.Add(new Weapon { WeaponName = "빨강", weaponType = WeaponType.Blaster, id = 6});
         AddWeapon(databaseWeapons[0]);
         AddWeapon(databaseWeapons[1]);
         AddWeapon(databaseWeapons[2]);
@@ -1016,6 +1028,47 @@ public class PlayerMovement : LivingObject
         soulObject.GetComponent<SpriteRenderer>().color = playerWeapons[currentWeaponIndex].weaponColor;
 
         Debug.Log($"Selected Weapon: {playerWeapons[currentWeaponIndex].WeaponName}");
+    }
+    public void SetWeaponData(Weapon weapon)
+    {
+        if (weapon == null)
+        {
+            Debug.LogWarning("무기 데이터가 null입니다.");
+            return;
+        }
+
+        curweaponData = weapon;
+
+        // 무기 색상 UI 적용
+        UIManager.Instance.UpdateSoulUIColor();
+
+        // 총알 수, 탄창 수 등 UI 갱신
+        UIManager.Instance.UpdateUI();
+
+        // 필요시 무기 사운드/이펙트 초기화 가능
+        // soundManager.PlayWeaponEquipSound(weapon.weaponType);
+        // effectManager.PlayWeaponEquipEffect(weapon.weaponType);
+
+        Debug.Log($"무기 설정됨: {weapon.WeaponName}");
+    }
+
+    public void EquipWeapon(WeaponType weaponType)
+    {
+        Weapon weaponToEquip = databaseWeapons.Find(w => w.weaponType == weaponType);
+
+        if (weaponToEquip == null)
+        {
+            Debug.LogWarning($"{weaponType} 무기를 데이터베이스에서 찾을 수 없습니다.");
+            return;
+        }
+
+        curweaponData = weaponToEquip;
+
+        SetWeaponData(curweaponData);
+        GameManager.Instance.SaveWeaponData(curweaponData);
+        UIManager.Instance.UpdateSoulUIColor();
+
+        Debug.Log($"[무기 전환] {weaponToEquip.WeaponName} 무기로 교체 완료");
     }
 
     #endregion

@@ -68,5 +68,28 @@ public class EffectManager : MonoBehaviour
 
         return objectToSpawn;
     }
+    public GameObject SpawnEffect(string effectName, Vector3 position, Quaternion rotation, Color color)
+    {
+        if (!poolDictionary.ContainsKey(effectName))
+        {
+            Debug.LogWarning($"Effect '{effectName}' not found in the pool!");
+            return null;
+        }
+
+        var obj = poolDictionary[effectName].Dequeue();
+        obj.transform.position = position;
+        obj.transform.rotation = rotation;
+
+        var soulEffect = obj.GetComponent<SoulEffectObject>();
+        if (soulEffect != null)
+        {
+            soulEffect.SetColor(color);
+        }
+        obj.SetActive(true);
+
+        poolDictionary[effectName].Enqueue(obj);
+        return obj;
+
+    }
 
 }

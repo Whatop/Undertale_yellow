@@ -56,8 +56,6 @@ public enum RadialMenuType
     Soul
 }
 
-
-
 public class UIManager : MonoBehaviour
 {
     GameManager gameManager;
@@ -120,7 +118,10 @@ public class UIManager : MonoBehaviour
     public bool isMouseRoll= true;
 
     [SerializeField]
-    private int currentIndex = 0;
+    private int currentButtonIndex  = 0;
+    
+    [SerializeField]
+    private int currentRadialIndex = -1;
 
     //Camera 관련
     [SerializeField]
@@ -139,12 +140,11 @@ public class UIManager : MonoBehaviour
     /// Shot: 4 
     /// Roll: 5 
     /// Check: 6 
-    /// Inventroy: 7 
+    /// Inventroy, Quick Item: 7 
     /// Quick Soul: 8 
-    /// Quick Item: 9 
-    ///  Quick Emotion: 10
+    ///  Quick Emotion: 9
     /// </summary>
-    private KeyCode[] keyBindings = new KeyCode[11]; // 11개의 키 설정을 위한 배열
+    private KeyCode[] keyBindings = new KeyCode[10]; // 10개의 키 설정을 위한 배열
     private bool isWaitingForKey = false; // 키 입력 대기 상태를 나타내는 플래그
     private int currentKeyIndex = 0; // 현재 설정 중인 키의 인덱스
 
@@ -230,7 +230,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] call_points;
     public GameObject[] interaction_points;
     public Image inventroy_soul;
-
+    
     [Header("Radial Menu References")]
     public RadialMenuType currentRadialMenu = RadialMenuType.None;
     public GameObject emotionRadialPanel;
@@ -255,6 +255,7 @@ public class UIManager : MonoBehaviour
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
     private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
 
+    #region unity_code
     public static UIManager Instance
     {
         get
@@ -314,8 +315,7 @@ public class UIManager : MonoBehaviour
         keyBindings[6] = KeyCode.F;
         keyBindings[7] = KeyCode.C; 
         keyBindings[8] = KeyCode.Tab;
-        keyBindings[9] = KeyCode.Q;
-        keyBindings[10] = KeyCode.E;
+        keyBindings[9] = KeyCode.E;
 
         int screenWidth = 1920;
         int screenHeight = 1080;
@@ -358,100 +358,12 @@ public class UIManager : MonoBehaviour
 
         hpRect = hpBar.GetComponent<RectTransform>();
         ResizeHpBar(gameManager.GetPlayerData().Maxhealth);
-    }
 
-    #region savePanel
-    public void SaveOpen()
-    {
-        saveNum = 0;
-        isSavePanel = true;
-        isSaveDelay = false;
-        savePanel.SetActive(true);
-        savePanel_soul.SetActive(true);
-
-        savePanel_texts[1].color = new Color(255, 255, 255);
-        savePanel_texts[2].color = new Color(255, 255, 255);
-        savePanel_texts[3].color = new Color(255, 255, 255);
-        savePanel_texts[4].color = new Color(255, 255, 255);
-
-        savePanel_texts[1].text = gameManager.GetPlayerData().player_Name;
-        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes();
-        savePanel_texts[0].gameObject.SetActive(false);
-        savePanel_texts[5].gameObject.SetActive(true);
-        savePanel_texts[6].gameObject.SetActive(true);
-    }
-
-    public void SaveOff()
-    {
-        saveNum = 0;
-        isSavePanel = false;
-        savePanel.SetActive(false);
-    }
-
-    public void SaveComplete()
-    {
-        savePanel_soul.SetActive(false);
-        saveNum = -1; //야메
-        isSavePanel = false;
-        isSaveDelay = true;
-       
-        TextYellow();
-        SoundManager.Instance.SFXPlay("save_sound", 171);
-
-        savePanel_texts[5].gameObject.SetActive(false);
-        savePanel_texts[6].gameObject.SetActive(false);
-        savePanel_texts[0].gameObject.SetActive(true);
-        gameManager.Save();
-        gameManager.SaveGameTime();
-    }
-    public void TextYellow()
-    {
-        savePanel_texts[1].color = new Color(255, 255, 0);
-        savePanel_texts[2].color = new Color(255, 255, 0);
-        savePanel_texts[3].color = new Color(255, 255, 0);
-        savePanel_texts[4].color = new Color(255, 255, 0);
-
-        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes().ToString();
-        savePanel_texts[4].text = gameManager.GetMapName();
-    }
-    #endregion
-    public void SetTextBar()
-    {
-        // 플레이어 위치 가져오기
-        Vector3 playerPosition = gameManager.GetPlayerData().position;
-        Vector3 none = inventroy_simple_panel.gameObject.transform.localPosition;
-
-        // 음 추가로 
-        inventroy_simple_texts[0].text = gameManager.GetPlayerData().player_Name;
-        inventroy_simple_texts[1].text = "HP " + gameManager.GetPlayerData().health + "/" + gameManager.GetPlayerData().Maxhealth;
-        inventroy_simple_texts[2].text = "G  " + gameManager.GetPlayerData().GOLD;
-        inventroy_simple_texts[3].text = "LV " + gameManager.GetPlayerData().LEVEL;
-
-        // 카메라 위치 가져오기
-        Vector3 cameraPosition = Camera.main.transform.position;
-        if (playerPosition.y > cameraPosition.y)
+        for (int i = 0; i < soulSegments.Count; i++)
         {
-            // 플레이어가 카메라보다 높이 있는 경우
-            textbar.transform.position = textbarPos[1].transform.position;
-            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, 320);
+            Debug.Log($"soulSegments[{i}] = {soulSegments[i].segmentName}");
+        }
 
-        }
-        else
-        {
-            // 플레이어가 카메라보다 낮게 있는 경우
-            textbar.transform.position = textbarPos[0].transform.position;
-            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, -220);
-        }
-        inventroy_soul.gameObject.SetActive(true);
-    }
-    public void TextBarOpen()
-    {
-        SetTextBar();
-        textbar.SetActive(true);
-    }
-    public void CloseTextbar()
-    {
-        textbar.SetActive(false);
     }
     private void Update()
     {
@@ -472,7 +384,7 @@ public class UIManager : MonoBehaviour
             gameManager.ResumeGame();
         }
 
-        if (currentIndex > currentButtons.Length)
+        if (currentButtonIndex  > currentButtons.Length)
         {
             OnButtonHover(0);
         }
@@ -553,16 +465,16 @@ public class UIManager : MonoBehaviour
             }
         }
         // 감정 표현 (E 키 홀드)
-        if (Input.GetKeyDown(GetKeyCode(10)))
-            ToggleRadialMenu(RadialMenuType.Emotion);
-        if (Input.GetKeyUp(GetKeyCode(10)))
-            ConfirmRadialSelectionAndClose();
-
-        // 아이템 (Q 키 홀드)
         if (Input.GetKeyDown(GetKeyCode(9)))
-            ToggleRadialMenu(RadialMenuType.Item);
+            ToggleRadialMenu(RadialMenuType.Emotion);
         if (Input.GetKeyUp(GetKeyCode(9)))
             ConfirmRadialSelectionAndClose();
+
+        //// 아이템 (Q 키 홀드)
+        //if (Input.GetKeyDown(GetKeyCode(9)))
+        //    ToggleRadialMenu(RadialMenuType.Item);
+        //if (Input.GetKeyUp(GetKeyCode(9)))
+        //    ConfirmRadialSelectionAndClose();
 
         // 소울 (Tab 키 홀드)
         if (Input.GetKeyDown(GetKeyCode(8)))
@@ -575,9 +487,9 @@ public class UIManager : MonoBehaviour
         {
             UpdateRadialSelection();
 
-            if (Input.GetMouseButtonUp(0) && currentIndex >= 0)
+            if (Input.GetMouseButtonUp(0) && currentRadialIndex >= 0)
             {
-                OnSelectSegment(currentIndex);
+                OnSelectSegment(currentRadialIndex);
             }
         }
 
@@ -587,13 +499,113 @@ public class UIManager : MonoBehaviour
             UpdateRadialSelection();
 
             // 마우스 왼쪽 버튼 떼는 순간 해당 감정표현/아이템 선택 확정
-            if (Input.GetMouseButtonUp(0) && currentIndex >= 0)
+            if (Input.GetMouseButtonUp(0) && currentRadialIndex >= 0)
             {
-                OnSelectSegment(currentIndex);
+                OnSelectSegment(currentRadialIndex);
             }
         }
     }
 
+    #endregion
+
+    #region savePanel
+    public void SaveOpen()
+    {
+        saveNum = 0;
+        isSavePanel = true;
+        isSaveDelay = false;
+        savePanel.SetActive(true);
+        savePanel_soul.SetActive(true);
+
+        savePanel_texts[1].color = new Color(255, 255, 255);
+        savePanel_texts[2].color = new Color(255, 255, 255);
+        savePanel_texts[3].color = new Color(255, 255, 255);
+        savePanel_texts[4].color = new Color(255, 255, 255);
+
+        savePanel_texts[1].text = gameManager.GetPlayerData().player_Name;
+        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes();
+        savePanel_texts[0].gameObject.SetActive(false);
+        savePanel_texts[5].gameObject.SetActive(true);
+        savePanel_texts[6].gameObject.SetActive(true);
+    }
+
+    public void SaveOff()
+    {
+        saveNum = 0;
+        isSavePanel = false;
+        savePanel.SetActive(false);
+    }
+
+    public void SaveComplete()
+    {
+        savePanel_soul.SetActive(false);
+        saveNum = -1; //야메
+        isSavePanel = false;
+        isSaveDelay = true;
+       
+        TextYellow();
+        SoundManager.Instance.SFXPlay("save_sound", 171);
+
+        savePanel_texts[5].gameObject.SetActive(false);
+        savePanel_texts[6].gameObject.SetActive(false);
+        savePanel_texts[0].gameObject.SetActive(true);
+        gameManager.Save();
+        gameManager.SaveGameTime();
+    }
+    public void TextYellow()
+    {
+        savePanel_texts[1].color = new Color(255, 255, 0);
+        savePanel_texts[2].color = new Color(255, 255, 0);
+        savePanel_texts[3].color = new Color(255, 255, 0);
+        savePanel_texts[4].color = new Color(255, 255, 0);
+
+        savePanel_texts[3].text = gameManager.GetElapsedTimeInMinutes().ToString();
+        savePanel_texts[4].text = gameManager.GetMapName();
+    }
+    #endregion
+
+    #region textBar
+    public void SetTextBar()
+    {
+        // 플레이어 위치 가져오기
+        Vector3 playerPosition = gameManager.GetPlayerData().position;
+        Vector3 none = inventroy_simple_panel.gameObject.transform.localPosition;
+
+        // 음 추가로 
+        inventroy_simple_texts[0].text = gameManager.GetPlayerData().player_Name;
+        inventroy_simple_texts[1].text = "HP " + gameManager.GetPlayerData().health + "/" + gameManager.GetPlayerData().Maxhealth;
+        inventroy_simple_texts[2].text = "G  " + gameManager.GetPlayerData().GOLD;
+        inventroy_simple_texts[3].text = "LV " + gameManager.GetPlayerData().LEVEL;
+
+        // 카메라 위치 가져오기
+        Vector3 cameraPosition = Camera.main.transform.position;
+        if (playerPosition.y > cameraPosition.y)
+        {
+            // 플레이어가 카메라보다 높이 있는 경우
+            textbar.transform.position = textbarPos[1].transform.position;
+            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, 320);
+
+        }
+        else
+        {
+            // 플레이어가 카메라보다 낮게 있는 경우
+            textbar.transform.position = textbarPos[0].transform.position;
+            inventroy_simple_panel.gameObject.transform.localPosition = new Vector3(none.x, -220);
+        }
+        inventroy_soul.gameObject.SetActive(true);
+    }
+    public void TextBarOpen()
+    {
+        SetTextBar();
+        textbar.SetActive(true);
+    }
+    public void CloseTextbar()
+    {
+        textbar.SetActive(false);
+    }
+    #endregion
+
+    #region ToggleRadialMenu
     /// <summary>
     /// 라디얼 메뉴 열기/닫기
     /// </summary>
@@ -741,10 +753,11 @@ public class UIManager : MonoBehaviour
         {
             var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
             playerMovement.curweaponData.weaponType = newWeaponType;
+            gameManager.SaveWeaponData(playerMovement.curweaponData);
 
             Debug.Log($"[소울] {newWeaponType} 으로 변경됨");
 
-            // 필요 시 여기서 UI, 이펙트, 사운드 추가 가능
+            UpdateSoulUIColor(); // 색상 동기화
         }
         else
         {
@@ -790,7 +803,7 @@ public class UIManager : MonoBehaviour
             activeSegments[i].SetHighlight(i == closestIndex);
         }
 
-        currentIndex = closestIndex;
+        currentRadialIndex = closestIndex;
     }
 
     private int GetClosestIndex(float angle, int count)
@@ -841,7 +854,7 @@ public class UIManager : MonoBehaviour
 
         ToggleRadialMenu(currentRadialMenu); // 닫기
     }
-    private void ConfirmRadialSelectionAndClose()
+    public void ConfirmRadialSelectionAndClose()
     {
         // 쿨타임 검사
         if (Time.unscaledTime - lastConfirmTime < confirmCooldown)
@@ -859,14 +872,14 @@ public class UIManager : MonoBehaviour
         }
 
         // 세그먼트 확정
-        if (isRadialMenuActive && currentIndex >= 0)
+        if (isRadialMenuActive && currentRadialIndex >= 0)
         {
-            OnSelectSegment(currentIndex);
+            OnSelectSegment(currentRadialIndex);
         }
 
         CloseAllRadialMenus();
     }
-
+    #endregion
 
     #region InventroyUi
     void UpdateInventoryUI()
@@ -1144,6 +1157,24 @@ public class UIManager : MonoBehaviour
     {
         SceneManager.LoadScene("IntroScene");
     }
+    public void UpdateSoulUIColor()
+    {
+        var weapon = GameManager.Instance.GetWeaponData();
+        Color soulColor = weapon.GetColor(weapon.weaponType);
+        var soul = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().soulObject.GetComponent<SpriteRenderer>();
+
+        if (gameover_soul != null)
+            gameover_soul.GetComponent<Image>().color = soulColor;
+
+        if (inventroy_soul != null)
+            inventroy_soul.GetComponent<Image>().color = soulColor;
+
+        if (savePanel_soul != null)
+            savePanel_soul.GetComponent<Image>().color = soulColor;
+
+        soul.color = soulColor;
+    }
+
     #region KeyBoardUi
     private void DetectKeyInput()
     {
@@ -1376,6 +1407,22 @@ public class UIManager : MonoBehaviour
         hpBar.gameObject.SetActive(true);
         ammos_td.gameObject.SetActive(true);
     }
+    //player UI
+    public void ShowReloadSlider(bool show)
+    {
+        reloadSlider.gameObject.SetActive(show);
+    }
+
+    public void SetReloadSliderMaxValue(float maxValue)
+    {
+        reloadSlider.maxValue = maxValue;
+    }
+
+    public void SetReloadSliderValue(float value)
+    {
+        reloadSlider.value = value;
+    }
+
     #endregion
 
     #region optionUI
@@ -1525,8 +1572,7 @@ public class UIManager : MonoBehaviour
         keyBindings[6] = KeyCode.F;
         keyBindings[7] = KeyCode.C;
         keyBindings[8] = KeyCode.Tab;
-        keyBindings[9] = KeyCode.Q;
-        keyBindings[10] = KeyCode.E;
+        keyBindings[9] = KeyCode.E;
         // UI 업데이트
         Screen.fullScreen = isFullScreen;
         fullScreenToggle.image.sprite = isFullScreen ? onSprite : offSprite;
@@ -1591,12 +1637,12 @@ public class UIManager : MonoBehaviour
                 keyChangePanel.SetActive(false);
                 break;
         }
-        currentIndex = 0; // 패널 변경 시 인덱스 초기화
+        currentButtonIndex  = 0; // 패널 변경 시 인덱스 초기화
         UpdateSelection();
     }
     void Navigate(int direction)
     {
-        currentIndex = (currentIndex + direction + currentButtons.Length) % currentButtons.Length;
+        currentButtonIndex  = (currentButtonIndex  + direction + currentButtons.Length) % currentButtons.Length;
         UpdateSelection();
     }
 
@@ -1667,19 +1713,19 @@ public class UIManager : MonoBehaviour
                 {
                     if (currentPanel == "Option")
                     {
-                        if (currentIndex == 1 || currentIndex == 3 || currentIndex == 4)
+                        if (currentButtonIndex  == 1 || currentButtonIndex  == 3 || currentButtonIndex  == 4)
                             ToggleValue();  // ToggleValue 호출
                         else
                         {
-                            currentButtons[currentIndex].onClick.Invoke();
+                            currentButtons[currentButtonIndex ].onClick.Invoke();
                             
-                         if(currentIndex != 2&& currentIndex != 5 && currentIndex != 6 && currentIndex != 7 && currentIndex != 8 && currentIndex != 0)
+                         if(currentButtonIndex  != 2&& currentButtonIndex  != 5 && currentButtonIndex  != 6 && currentButtonIndex  != 7 && currentButtonIndex  != 8 && currentButtonIndex  != 0)
                             soundManager.SFXPlay("select_sound", 173);
                         }
                     }
                     else
                     {
-                        currentButtons[currentIndex].onClick.Invoke();
+                        currentButtons[currentButtonIndex ].onClick.Invoke();
                         soundManager.SFXPlay("select_sound", 173);
                     }
                 }
@@ -1693,7 +1739,7 @@ public class UIManager : MonoBehaviour
     }
     public void AdjustValue(int direction)
     {
-        switch (currentIndex)
+        switch (currentButtonIndex )
         {
             case 2: // 밝기 조절
                 brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + direction * 0.1f, 0, 1);
@@ -1749,7 +1795,7 @@ public class UIManager : MonoBehaviour
     //
     public void ToggleValue()
     {
-        switch (currentIndex)
+        switch (currentButtonIndex )
         {
             case 1: // 전체 화면 토글
                 ToggleFullScreen();
@@ -1767,7 +1813,7 @@ public class UIManager : MonoBehaviour
     public void ToggleKeyValue()
     {
        
-        switch (currentIndex)
+        switch (currentButtonIndex )
         {
             case 11: // 활성화 : 마우스 조준, 비활성화 : 가장 가까운적 조준
                 ToggleMouseShot();
@@ -1842,7 +1888,7 @@ public class UIManager : MonoBehaviour
     {
         yield return null; // Wait for one frame
         EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(currentButtons[currentIndex].gameObject);
+        EventSystem.current.SetSelectedGameObject(currentButtons[currentButtonIndex ].gameObject);
     }
     void UpdateSelection()
     {
@@ -1852,21 +1898,21 @@ public class UIManager : MonoBehaviour
             colors.normalColor = Color.white; // 기본 색상
             colors.highlightedColor = Color.white; // 강조 색상
             colors.pressedColor = Color.gray; // 클릭 시 색상
-            colors.selectedColor = (i == currentIndex) ? Color.white : Color.white; // 선택된 색상
+            colors.selectedColor = (i == currentButtonIndex ) ? Color.white : Color.white; // 선택된 색상
             currentButtons[i].colors = colors;
 
             // 텍스트 색상 변경
             TextMeshProUGUI buttonText = currentButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = (i == currentIndex) ? Color.white : Color.gray; // 강조 색상
+                buttonText.color = (i == currentButtonIndex ) ? Color.white : Color.gray; // 강조 색상
             }
         }
     }
 
     public void OnButtonClick(int index)
     {
-        currentIndex = index;
+        currentButtonIndex  = index;
         UpdateSelection();
     }
     public void ChangeResolution(int direction)
@@ -1905,25 +1951,10 @@ public class UIManager : MonoBehaviour
 
     void OnButtonHover(int index)
     {
-        currentIndex = index;
+        currentButtonIndex  = index;
         UpdateSelection();
     }
     #endregion
-    //player UI
-    public void ShowReloadSlider(bool show)
-    {
-        reloadSlider.gameObject.SetActive(show);
-    }
-
-    public void SetReloadSliderMaxValue(float maxValue)
-    {
-        reloadSlider.maxValue = maxValue;
-    }
-
-    public void SetReloadSliderValue(float value)
-    {
-        reloadSlider.value = value;
-    }
 
     /// <summary>
     /// Up: 0 
@@ -1933,10 +1964,9 @@ public class UIManager : MonoBehaviour
     /// Shot: 4 
     /// Roll: 5 
     /// Check: 6 
-    /// Inventroy: 7 
+    /// Inventroy, Quick Item: 7 
     /// Quick Soul: 8 
-    /// Quick Item: 9 
-    ///  Quick Emotion: 10
+    ///  Quick Emotion: 9
     /// </summary>
     public KeyCode GetKeyCode(int i)
     {

@@ -10096,7 +10096,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 226, y: -189}
+  m_AnchoredPosition: {x: 226, y: -203}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &175730085
@@ -23108,7 +23108,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: c64b2b645cf72174c88210e17905a72d, type: 3}
-  m_Color: {r: 1, g: 0.98165107, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -32631,7 +32631,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 228, y: -300}
+  m_AnchoredPosition: {x: 228, y: -272}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &783639607
@@ -40757,7 +40757,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 228, y: -360}
+  m_AnchoredPosition: {x: 228, y: -332}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1192920349
@@ -42201,6 +42201,7 @@ MonoBehaviour:
   playerSprite: {fileID: 1239929335}
   shadowObject: {fileID: 1734803355}
   playerTransparency: 0
+  isSoulActive: 0
   walkingSoundStartIndex: 220
   walkingSoundCount: 3
   walkingSoundInterval: 0.3
@@ -43568,7 +43569,8 @@ MonoBehaviour:
   isCursorVisible: 1
   isMouseShot: 1
   isMouseRoll: 1
-  currentIndex: 0
+  currentButtonIndex: 0
+  currentRadialIndex: -1
   curRIndex: 0
   pixelPerfectCamera: {fileID: 1575677075}
   Interface:
@@ -43754,25 +43756,25 @@ MonoBehaviour:
     segmentTransform: {fileID: 2132655165}
     menuType: 2
   soulSegments:
-  - segmentName: yellow
+  - segmentName: Revolver
     segmentTransform: {fileID: 606139944}
     menuType: 3
-  - segmentName: skyblue
+  - segmentName: NeedleGun
     segmentTransform: {fileID: 700143370}
     menuType: 3
-  - segmentName: orange
+  - segmentName: Shotgun
     segmentTransform: {fileID: 1744094671}
     menuType: 3
-  - segmentName: green
+  - segmentName: BarrierEmitter
     segmentTransform: {fileID: 1142198717}
     menuType: 3
-  - segmentName: purple
+  - segmentName: HomingMissile
     segmentTransform: {fileID: 1278324239}
     menuType: 3
-  - segmentName: blue
+  - segmentName: LaserGun
     segmentTransform: {fileID: 1919263026}
     menuType: 3
-  - segmentName: red
+  - segmentName: Blaster
     segmentTransform: {fileID: 346662553}
     menuType: 3
   emotionSegmentPrefab: {fileID: 3773442702856913115, guid: 87af4066284d0764d912f4eb3ad9da11, type: 3}
@@ -43984,7 +43986,7 @@ MonoBehaviour:
     poolSize: 5
   - effectName: soul_rolleffect
     prefab: {fileID: 22627275028735740, guid: b9dd363db5a03ed4792a9b2158216448, type: 3}
-    poolSize: 20
+    poolSize: 10
 --- !u!1 &1325549912
 GameObject:
   m_ObjectHideFlags: 0
@@ -48000,7 +48002,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -240, y: -189}
+  m_AnchoredPosition: {x: -240, y: -203}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1528368794
@@ -48864,7 +48866,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -240, y: -361}
+  m_AnchoredPosition: {x: -240, y: -333}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1548184384
@@ -50361,7 +50363,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1613332816
 RectTransform:
   m_ObjectHideFlags: 0
@@ -51593,7 +51595,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -240, y: -300}
+  m_AnchoredPosition: {x: -240, y: -272}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1680171642
@@ -57111,7 +57113,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1974539849
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59356,7 +59358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2076746629
 RectTransform:
   m_ObjectHideFlags: 0
