@@ -10,6 +10,8 @@ public enum BulletType
     Directional,// 방향 지정 총알
     FixedPoint,  // 특정 위치로 이동하는 총알
     GasterBlaster,
+    Laser,
+    Barrier,
     Speed, // 점점 빨라지는
     None
 }

@@ -184,10 +184,11 @@ public class GameManager : MonoBehaviour
         // 플레이어 데이터 초기화
         playerData = new PlayerData();
         weaponData = new Weapon();
-        dialogueManager = DialogueManager.Instance;
     }
     private void Start()
     {
+        dialogueManager = DialogueManager.Instance;
+
         savePrefab = gameConfig.savePrefab;
         // GameConfigSO의 위치 데이터로 SavePointTransforms 초기화
         if (gameConfig != null && gameConfig.savePointPositions != null)
@@ -643,9 +644,8 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Invalid item ID.");
             return;
         }
-
         Item itemToEquip = GetPlayerData().inventory[Id];
-        
+
         dialogueManager.StartInfoDialogue(itemToEquip); // 이벤트 대사처럼 처리
 
     }

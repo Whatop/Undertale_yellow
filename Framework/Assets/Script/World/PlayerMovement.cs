@@ -50,6 +50,7 @@ public class Weapon
     public int maxRange;       // 사거리
     public float bulletSpeed;  // 총알 속도
     public float accuracy;     // 총의 정확도
+    public float reloadTime;     // 재장전 속도
     public Transform firePoint; // 총알이 발사될 위치
     public WeaponType weaponType;// 무기 타입
     public Color weaponColor;    // 무기 색상
@@ -65,6 +66,7 @@ public class Weapon
         current_magazine = magazine;
         bulletSpeed = 1;
         accuracy = 1;
+        reloadTime = 1.5f;
         weaponType = WeaponType.None;
         // 추가 데이터 초기화
     }
@@ -103,6 +105,8 @@ public class Weapon
     {
         weaponColor = GetColor(weaponType);
     }
+
+  
 }
 
 public class PlayerMovement : LivingObject
@@ -187,6 +191,28 @@ public class PlayerMovement : LivingObject
     public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
     private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
 
+    #region Test_code
+
+    // Soul 모드 처리 테스트 용도입니다
+    private void HandleSoulMode()
+    {
+        if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
+        {
+            isSoulActive = !isSoulActive; // Soul 모드 전환
+
+            if (isSoulActive)
+            {
+                tutorialDontShot = false;
+                EnableSoul();
+            }
+            else
+            {
+                DisableSoul();
+            }
+        }
+    }
+
+    #endregion 
 
     #region unity_code
     // Awake 메서드: 초기 설정
@@ -226,11 +252,14 @@ public class PlayerMovement : LivingObject
     }
     protected override void Update()
     {
+        HandleSoulMode();//테스트 용도 @@
+
         if (isDie)
             return;
         base.Update();
 
         HandleWeaponSwitchInput();
+        // HandleMouseWheelInput();
         playerData.isInvincible = isInvincible;
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
@@ -402,24 +431,7 @@ public class PlayerMovement : LivingObject
     #endregion
 
     #region soul_code
-    // Soul 모드 처리 테스트 용도입니다
-    private void HandleSoulMode()
-    {
-        if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
-        {
-            isSoulActive = !isSoulActive; // Soul 모드 전환
-
-            if (isSoulActive)
-            {
-                EnableSoul();
-            }
-            else
-            {
-                DisableSoul();
-            }
-        }
-    }
-
+  
     // Soul 모드 활성화: 투명도 끄기
     public void EnableSoul()
     {
@@ -486,16 +498,16 @@ public class PlayerMovement : LivingObject
         // 오브젝트 회전 적용
         soulObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
     }
-    #endregion soul_code
+    #endregion 
 
-    #region shot_human_code
+    #region shot_code
     // 총알 발사 입력 처리
     IEnumerator Reload()
     {
         isReloading = true;
         WeaponsAnimator.SetTrigger("Reload");
         UIManager.Instance.ShowReloadSlider(true); // 슬라이더 활성화
-        UIManager.Instance.SetReloadSliderMaxValue(reloadTime);
+        UIManager.Instance.SetReloadSliderMaxValue(curweaponData.reloadTime);
 
         UIManager.Instance.SetReloadSliderValue(0);
         if (!isSoulActive)
@@ -508,18 +520,20 @@ public class PlayerMovement : LivingObject
             // -------------------------------------------
         }
 
+
+        // 사운드 및 애니메이션 실행  
         if (isSoulActive)
             SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
         else
             SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
-
         float reloadProgress = 0f;
-        while (reloadProgress < reloadTime)
+        while (reloadProgress < curweaponData.reloadTime)
         {
             reloadProgress += Time.deltaTime;
             UIManager.Instance.SetReloadSliderValue(reloadProgress);
             yield return null;
         }
+
         // 재장전 완료
         curweaponData.current_magazine = curweaponData.magazine;
         gameManager.SaveWeaponData(curweaponData);
@@ -565,16 +579,57 @@ public class PlayerMovement : LivingObject
         WeaponTransform.up = direction;
 
         if (Input.GetMouseButtonDown(0) &&
-            current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading && !tutorialDontShot)
+       current_magazine > 0 && (curweaponData.IsInfiniteAmmo() || curweaponData.current_Ammo > 0) && !isReloading && !tutorialDontShot)
         {
             Shoot();
-            if (!curweaponData.IsInfiniteAmmo())
-                curweaponData.current_Ammo -= 1;
+
+            // 무기별 탄약 소모 분리
+            switch (curweaponData.weaponType)
+            {
+                case WeaponType.Revolver: // 정의
+                    if (!curweaponData.IsInfiniteAmmo())
+                        curweaponData.current_Ammo -= 1;
+                    break;
+
+                case WeaponType.NeedleGun: // 인내 - 1발씩 연사지만 총 3발이므로 3 소모
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 3;
+                    break;
+
+                case WeaponType.Shotgun: // 용기 - 산탄 다발 5발로 계산
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 1;
+                    break;
+
+                case WeaponType.BarrierEmitter: // 친절 - 방어벽 1개 생성
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 1;
+                    break;
+
+                case WeaponType.HomingMissile: // 끈기 - 1개 유도탄
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 1;
+                    break;
+
+                case WeaponType.LaserGun: // 고결 - 광역 1발 (추후 UI 별도)
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 1;
+                    break;
+
+                case WeaponType.Blaster: // 의지 - 대형 강탄, 1소모
+                    if (!curweaponData.IsInfiniteAmmo())
+                    curweaponData.current_Ammo -= 1;
+                    break;
+
+                default:
+                    curweaponData.current_Ammo -= 1;
+                    break;
+            }
 
             curweaponData.current_magazine -= 1;
-
             gameManager.SaveWeaponData(curweaponData);
         }
+
         else if (current_magazine == 0 && !isReloading)
         {
 
@@ -607,21 +662,13 @@ public class PlayerMovement : LivingObject
         }
         else
         {
-            BattleManager.Instance.SpawnBulletAtPosition(
-               BulletType.Directional,
-               soulshotpoint.position,
-               WeaponTransform.rotation,
-               WeaponTransform.up,
-              
-               "Player_Soul", 0, 0, true);
+            //타입에 따른 총알생성
+            HandleWeaponSpecificMovement();
         }
 
 
         // 사운드 및 애니메이션 실행  
-        if (isSoulActive)
-            SoundManager.Instance.SFXPlay("soul_shot_01", 124);
-        else
-            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
+        ShotSounds();
         WeaponsAnimator.SetTrigger("Shot");
     }
     // 🔥 반동 효과 적용
@@ -690,9 +737,6 @@ public class PlayerMovement : LivingObject
     }
 
 
-    #endregion shot_code
-
-    #region shot_soul_code
     public void AddWeapon(Weapon weapon)
     {
         if (!playerWeapons.Contains(weapon))
@@ -701,69 +745,155 @@ public class PlayerMovement : LivingObject
             Debug.Log($"무기 추가됨: {weapon.WeaponName}");
         }
     }
+    void ShotSounds()
+    {
+        if (!isSoulActive)
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
+        else
+        {
+            switch (curweaponData.weaponType)
+            {
+                case WeaponType.Revolver:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
 
+                case WeaponType.Blaster:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                case WeaponType.NeedleGun:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                case WeaponType.Shotgun:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                case WeaponType.LaserGun:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                case WeaponType.HomingMissile:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                case WeaponType.BarrierEmitter:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+
+                default:
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    break;
+            }
+        }
+    }
     public void HandleWeaponSpecificMovement()
     {
         switch (curweaponData.weaponType)
         {
             case WeaponType.Revolver:
-                HandleRevolverMovement();
-                break;
-
-            case WeaponType.Blaster:
-                HandleBlasterMovement();
-                break;
+                ShootBasic(); break;
 
             case WeaponType.NeedleGun:
-                HandleNeedleGunMovement();
-                break;
+                StartCoroutine(ShootNeedleGun()); break;
 
             case WeaponType.Shotgun:
-                HandleShotgunMovement();
-                break;
-
-            case WeaponType.LaserGun:
-                HandleLaserGunMovement();
-                break;
-
-            case WeaponType.HomingMissile:
-                HandleHomingMissileMovement();
-                break;
+                ShootShotgun(); break;
 
             case WeaponType.BarrierEmitter:
-                HandleBarrierEmitterMovement();
-                break;
+                ShootBarrier(); break;
 
-            default:
-                HandleDefaultMovement(); // isSoul 아닐때 어차피 해놈 
-                break;
+            case WeaponType.HomingMissile:
+                ShootHoming(); break;
+
+            case WeaponType.LaserGun:
+                ShootLaser(); break;
+
+            case WeaponType.Blaster:
+                ShootBlaster(); break;
+        }
+
+    }
+
+    void ShootBasic()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Directional,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Player_Normal", 0, 0, true);
+    }
+
+    IEnumerator ShootNeedleGun()
+    {
+        int count = 3;
+        float delay = 0.1f;
+
+        for (int i = 0; i < count; i++)
+        {
+            ShootBasic();
+            yield return new WaitForSeconds(delay);
         }
     }
 
-    private void HandleRevolverMovement() { 
-        Debug.Log("Revolver: 표준 속도, 표준 회피");
+    void ShootShotgun()
+    {
+        float spread = 15f;
+        for (int i = -2; i <= 2; i++)
+        {
+            Quaternion rot = Quaternion.Euler(0, 0, WeaponTransform.eulerAngles.z + i * spread);
+            Vector2 dir = rot * Vector2.up;
+
+            BattleManager.Instance.SpawnBulletAtPosition(
+                BulletType.Directional,
+                soulshotpoint.position,
+                rot,
+                dir,
+                "Player_Normal", 0, 0, true);
+        }
     }
-    private void HandleBlasterMovement() {
-        Debug.Log("Blaster: 무겁고 느리지만 일격이 강력"); 
+
+    void ShootBarrier()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Barrier, // 별도 타입 필요
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Player_Barrier", 0, 0, true);
     }
-    private void HandleNeedleGunMovement() { 
-        Debug.Log("NeedleGun: 빠르고 연속적인 회피 가능"); 
+
+    void ShootHoming()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Homing,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Player_Homing", 0, 0, true);
     }
-    private void HandleShotgunMovement() { 
-        Debug.Log("Shotgun: 근거리 집중, 대쉬 짧음"); 
+
+    void ShootLaser()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Laser,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Player_Laser", 0, 0, true);
     }
-    private void HandleLaserGunMovement() { 
-        Debug.Log("LaserGun: 느리지만 조준이 정밀"); 
+
+    void ShootBlaster()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.GasterBlaster,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Player_Blaster", 0, 0, true);
     }
-    private void HandleHomingMissileMovement() { 
-        Debug.Log("HomingMissile: 이동 느림, 유도탄 발사 준비 시간 필요");
-    }
-    private void HandleBarrierEmitterMovement() {
-        Debug.Log("BarrierEmitter: 이동 제한적, 방어벽 유지"); 
-    }
-    private void HandleDefaultMovement() { 
-        Debug.Log("기본 휴먼 모드"); 
-    }
+
 
     public void OpenSoulUnlockShop()
     {
@@ -808,8 +938,6 @@ public class PlayerMovement : LivingObject
             _ => 999
         };
     }
-
-
     #endregion
 
     #region roll_code
@@ -971,12 +1099,103 @@ public class PlayerMovement : LivingObject
     void InitializeWeapons()
     {
         // 7가지 무기를 초기화
-        databaseWeapons.Add(new Weapon { WeaponName = "노랑", weaponType = WeaponType.Revolver, id = 0});
-        databaseWeapons.Add(new Weapon { WeaponName = "하늘", weaponType = WeaponType.NeedleGun, id = 1 });
-        databaseWeapons.Add(new Weapon { WeaponName = "주황", weaponType = WeaponType.Shotgun, id = 2 });
-        databaseWeapons.Add(new Weapon { WeaponName = "초록", weaponType = WeaponType.BarrierEmitter, id = 3 });
-        databaseWeapons.Add(new Weapon { WeaponName = "보라", weaponType = WeaponType.HomingMissile, id = 4});
-        databaseWeapons.Add(new Weapon { WeaponName = "파랑", weaponType = WeaponType.LaserGun, id = 5});
+        databaseWeapons.Add(new Weapon
+        {
+            id = 0,
+            WeaponName = "노랑",
+            weaponType = WeaponType.Revolver,
+            damage = 2,
+            magazine = 6,
+            current_magazine = 6,
+            maxAmmo = -1,
+            current_Ammo = 60,
+            bulletSpeed = 8f,
+            accuracy = 1f,
+            reloadTime = 1.5f
+        }); databaseWeapons.Add(new Weapon
+        {
+            id = 1,
+            WeaponName = "하늘",
+            weaponType = WeaponType.NeedleGun,
+            damage = 1,
+            magazine = 15,
+            current_magazine = 15,
+            maxAmmo = 90,
+            current_Ammo = 90,
+            bulletSpeed = 9f,
+            accuracy = 1.2f,
+            reloadTime = 1.2f
+        })
+            ; databaseWeapons.Add(new Weapon
+        {
+            id = 2,
+            WeaponName = "주황",
+            weaponType = WeaponType.Shotgun,
+            damage = 3,
+            magazine = 2,
+            current_magazine = 2,
+            maxAmmo = 30,
+            current_Ammo = 30,
+            bulletSpeed = 6f,
+            accuracy = 0.6f,
+            reloadTime = 2.0f
+        }); 
+        databaseWeapons.Add(new Weapon
+        {
+            id = 3,
+            WeaponName = "초록",
+            weaponType = WeaponType.BarrierEmitter,
+            damage = 0,
+            magazine = 3,
+            current_magazine = 3,
+            maxAmmo = 15,
+            current_Ammo = 15,
+            bulletSpeed = 0f,
+            accuracy = 1f,
+            reloadTime = 3.0f
+        });
+        databaseWeapons.Add(new Weapon
+        {
+            id = 4,
+            WeaponName = "보라",
+            weaponType = WeaponType.HomingMissile,
+            damage = 2,
+            magazine = 3,
+            current_magazine = 3,
+            maxAmmo = 20,
+            current_Ammo = 20,
+            bulletSpeed = 5f,
+            accuracy = 1f,
+            reloadTime = 2.5f
+        });
+        databaseWeapons.Add(new Weapon
+        {
+            id = 5,
+            WeaponName = "파랑",
+            weaponType = WeaponType.LaserGun,
+            damage = 5,
+            magazine = 1,
+            current_magazine = 1,
+            maxAmmo = 10,
+            current_Ammo = 10,
+            bulletSpeed = 0f,
+            accuracy = 1f,
+            reloadTime = 3.5f
+        });
+        databaseWeapons.Add(new Weapon
+        {
+            id = 6,
+            WeaponName = "빨강",
+            weaponType = WeaponType.Blaster,
+            damage = 7,
+            magazine = 1,
+            current_magazine = 1,
+            maxAmmo = 5,
+            current_Ammo = 5,
+            bulletSpeed = 0f,
+            accuracy = 1f,
+            reloadTime = 4.0f
+        });
         databaseWeapons.Add(new Weapon { WeaponName = "빨강", weaponType = WeaponType.Blaster, id = 6});
         AddWeapon(databaseWeapons[0]);
         AddWeapon(databaseWeapons[1]);
@@ -1020,7 +1239,7 @@ public class PlayerMovement : LivingObject
        soulObject.GetComponent<SpriteRenderer>().color = currentWeapon.weaponColor;
         // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
     }
-    void SelectWeapon(int index)
+    public void SelectWeapon(int index)
     {
         currentWeaponIndex = index;
 
@@ -1028,6 +1247,8 @@ public class PlayerMovement : LivingObject
         soulObject.GetComponent<SpriteRenderer>().color = playerWeapons[currentWeaponIndex].weaponColor;
 
         Debug.Log($"Selected Weapon: {playerWeapons[currentWeaponIndex].WeaponName}");
+        curweaponData = playerWeapons[currentWeaponIndex];
+        gameManager.SaveWeaponData(curweaponData);
     }
     public void SetWeaponData(Weapon weapon)
     {

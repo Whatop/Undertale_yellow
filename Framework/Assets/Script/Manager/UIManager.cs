@@ -255,6 +255,8 @@ public class UIManager : MonoBehaviour
     public bool isRadialMenuActive = false; // 현재 라디얼 메뉴 활성화 여부
     private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
 
+    public int save_segment_index;
+
     #region unity_code
     public static UIManager Instance
     {
@@ -285,14 +287,14 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        gameManager = GameManager.Instance;
-        soundManager = SoundManager.Instance;
-        BattleManager = BattleManager.Instance;
-        dialogueManager = DialogueManager.Instance;
     }
 
     private void Start()
     {
+        gameManager = GameManager.Instance;
+        soundManager = SoundManager.Instance;
+        BattleManager = BattleManager.Instance;
+        dialogueManager = DialogueManager.Instance;
         gameover_Object.SetActive(false);
         LoadSettings();
         predefinedResolutions = new List<Resolution>
@@ -752,8 +754,8 @@ public class UIManager : MonoBehaviour
         if (Enum.TryParse<WeaponType>(soulName, out var newWeaponType))
         {
             var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
-            playerMovement.curweaponData.weaponType = newWeaponType;
-            gameManager.SaveWeaponData(playerMovement.curweaponData);
+
+            playerMovement.SelectWeapon(save_segment_index);
 
             Debug.Log($"[소울] {newWeaponType} 으로 변경됨");
 
@@ -843,6 +845,8 @@ public class UIManager : MonoBehaviour
                 break;
             case RadialMenuType.Soul:
                 seg = soulSegments[index];
+                save_segment_index = index;
+
                 break;
         }
 
