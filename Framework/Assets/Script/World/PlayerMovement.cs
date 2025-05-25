@@ -1108,7 +1108,7 @@ public class PlayerMovement : LivingObject
             magazine = 6,
             current_magazine = 6,
             maxAmmo = -1,
-            current_Ammo = 60,
+            current_Ammo = -1,
             bulletSpeed = 8f,
             accuracy = 1f,
             reloadTime = 1.5f
