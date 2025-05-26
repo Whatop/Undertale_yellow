@@ -57,6 +57,8 @@ public class BulletController : MonoBehaviour
     public float travelTime = 1.2f;      // 총 이동에 걸릴 시간(거리 무관) – 늘릴수록 느려짐
     public float rotationMultiplier = 0.8f; // 1 = 한 바퀴, 0.5 = 반 바퀴, 2 = 두 바퀴
 
+    private bool isBlockedByBarrier = false;
+
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -64,6 +66,7 @@ public class BulletController : MonoBehaviour
         { BulletType.Homing, Color.red },
         { BulletType.Spiral, Color.yellow },
         { BulletType.Split, Color.green },
+        { BulletType.Barrier, Color.green },
         { BulletType.Directional, Color.white },
         { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan },
@@ -328,6 +331,12 @@ public class BulletController : MonoBehaviour
                 StartCoroutine(DirectionalMove(dir));
                 break;
             case BulletType.GasterBlaster:
+                StartCoroutine(LaserCheck());
+                break;
+            case BulletType.Barrier:
+                StartCoroutine(BarrierMoveAndStay());
+                break;
+            case BulletType.Laser:
                 StartCoroutine(LaserBullet());
                 break;
 
@@ -406,7 +415,7 @@ public class BulletController : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator LaserBullet()
+    private IEnumerator LaserCheck()
     {
         isLaser = true;
         //rb.velocity = storedFireDirection * speed;
@@ -491,4 +500,115 @@ public class BulletController : MonoBehaviour
         yield return new WaitForSeconds(lifeTime);
         DestroyBullet();
     }
+    private IEnumerator BarrierMoveAndStay()
+    {
+        // 1) 초기 속도 설정
+        Vector2 direction = storedFireDirection.normalized;
+        rb.velocity = direction * speed;
+
+        float moveDuration = 0.3f;  // 이동 시간
+        float slowDownDuration = 0.4f; // 감속 시간
+        float stayDuration = 2.5f; // 멈춘 뒤 존재 시간
+
+        // 2) 일정 시간 동안 일정 속도 유지
+        yield return new WaitForSeconds(moveDuration);
+
+        // 3) 점점 느려지기
+        float elapsed = 0f;
+        Vector2 currentVelocity = rb.velocity;
+        while (elapsed < slowDownDuration)
+        {
+            rb.velocity = Vector2.Lerp(currentVelocity, Vector2.zero, elapsed / slowDownDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // 4) 정지 후 유지
+        rb.velocity = Vector2.zero;
+        yield return new WaitForSeconds(stayDuration);
+
+        // 5) 비활성화
+        gameObject.SetActive(false);
+    }
+    private IEnumerator LaserBullet()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        Vector3 startScale = transform.localScale;
+
+        float growDuration = 0.15f;
+        float holdDuration = 0.4f;
+
+        float maxLaserLength = 6f; // 최대 길이
+
+        // 방향
+        Vector2 laserDir = transform.up;
+        Vector2 startPos = transform.position;
+
+        // 커지기
+        float t = 0f;
+        while (t < growDuration)
+        {
+            t += Time.deltaTime;
+
+            // 🔷 충돌 거리 계산
+            RaycastHit2D hit = Physics2D.Raycast(startPos, laserDir, maxLaserLength, LayerMask.GetMask("Barrier"));
+            float hitDistance = hit.collider ? hit.distance : maxLaserLength;
+
+            // 길이 조절 (0 → hit 지점까지)
+            float length = Mathf.Lerp(0f, hitDistance, t / growDuration);
+
+            transform.localScale = new Vector3(startScale.x, length, 1f);
+
+            if (hit.collider)
+            {
+                // 🔷 방패 반응
+                EffectManager.Instance.SpawnEffect("barrier_flash", hit.point, Quaternion.identity);
+            }
+
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(holdDuration);
+        gameObject.SetActive(false);
+    }
+
+    public void OnHitByShield()
+    {
+        if (isBlockedByBarrier) return;
+        isBlockedByBarrier = true;
+
+        switch (bulletType)
+        {
+            case BulletType.Normal:
+            case BulletType.Directional:
+            case BulletType.Speed:
+            case BulletType.Spiral:
+            case BulletType.Split:
+            case BulletType.Homing:
+                SoundManager.Instance.SFXPlay("barrier_block", 156);
+                gameObject.SetActive(false); break;
+
+            case BulletType.Laser:
+            case BulletType.GasterBlaster:
+                // 방어막 막힘 처리 (파괴는 하지 않음)
+                break;
+            default:
+                gameObject.SetActive(false); break;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Bullet")&&bulletType ==BulletType.Barrier)
+        {
+            var bullet = other.gameObject.GetComponent<BulletController>();
+            if (bullet != null && !bullet.isFreind)
+            {
+                bullet.OnHitByShield(); // laser 포함
+                EffectManager.Instance.SpawnEffect("barrier_block_flash", other.contacts[0].point, Quaternion.identity);
+            }
+        }
+    }
+
 }
