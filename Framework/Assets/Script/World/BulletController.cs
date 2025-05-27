@@ -66,7 +66,7 @@ public class BulletController : MonoBehaviour
         { BulletType.Homing, Color.red },
         { BulletType.Spiral, Color.yellow },
         { BulletType.Split, Color.green },
-        { BulletType.Barrier, Color.green },
+        { BulletType.Barrier, Color.white },
         { BulletType.Directional, Color.white },
         { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan },
@@ -92,6 +92,7 @@ public class BulletController : MonoBehaviour
         isHoming = false;
         isSpiral = false;
         isSplitted = false;
+        isBlockedByBarrier = false;
         rb.velocity = Vector2.zero;
         hitTimer.Clear();
 
@@ -489,6 +490,19 @@ public class BulletController : MonoBehaviour
         {
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
         }
+
+        if (other.CompareTag("Bullet") && bulletType == BulletType.Barrier)
+        {
+            var bullet = other.GetComponent<BulletController>();
+            if (bullet != null && !bullet.isFreind)
+            {
+                bullet.OnHitByShield(); // laser 포함
+
+                // 충돌 지점 계산: 이 방어막 오브젝트 기준 가장 가까운 위치
+                Vector2 hitPoint = other.ClosestPoint(transform.position);
+                EffectManager.Instance.SpawnEffect("barrier_block_flash", hitPoint, Quaternion.identity);
+            }
+        }
     }
     void DestroyBullet()
     {
@@ -586,7 +600,7 @@ public class BulletController : MonoBehaviour
             case BulletType.Spiral:
             case BulletType.Split:
             case BulletType.Homing:
-                SoundManager.Instance.SFXPlay("barrier_block", 156);
+                SoundManager.Instance.SFXPlay("barrier_block", 97);
                 gameObject.SetActive(false); break;
 
             case BulletType.Laser:
@@ -598,17 +612,6 @@ public class BulletController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Bullet")&&bulletType ==BulletType.Barrier)
-        {
-            var bullet = other.gameObject.GetComponent<BulletController>();
-            if (bullet != null && !bullet.isFreind)
-            {
-                bullet.OnHitByShield(); // laser 포함
-                EffectManager.Instance.SpawnEffect("barrier_block_flash", other.contacts[0].point, Quaternion.identity);
-            }
-        }
-    }
+
 
 }

@@ -861,7 +861,7 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Player_Barrier", 0, 0, true);
+            "Barrier", 0, 0, true);
     }
 
     void ShootHoming()
@@ -871,7 +871,7 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Player_Homing", 0, 0, true);
+            "Homing", 0, 0, true);
     }
 
     void ShootLaser()
@@ -881,7 +881,7 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Player_Laser", 0, 0, true);
+            "Laser", 0, 0, true);
     }
 
     void ShootBlaster()
@@ -891,7 +891,9 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Player_Blaster", 0, 0, true);
+            "Blaster", 0, 0, true);
+
+
     }
 
 

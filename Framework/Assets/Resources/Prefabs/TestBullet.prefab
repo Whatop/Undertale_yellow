@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -7374648677070449088}
   m_Layer: 0
   m_Name: TestBullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -134,8 +134,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c288d888e5beebf41bc209b7580d7e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletType: 0
   damage: 1
   speed: 1
   accuracy: 1
   maxrange: 30
   isFreind: 1
+  isPiercing: 0
+  dotInterval: 0.2
+  travelTime: 1.2
+  rotationMultiplier: 0.8
