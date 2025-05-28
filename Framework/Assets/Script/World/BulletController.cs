@@ -71,6 +71,7 @@ public class BulletController : MonoBehaviour
         { BulletType.Speed, Color.white },
         { BulletType.FixedPoint, Color.cyan },
         { BulletType.GasterBlaster, Color.white },
+        { BulletType.Laser, Color.white },
         { BulletType.None, Color.white }
     }
     ; private void Awake()
@@ -504,7 +505,7 @@ public class BulletController : MonoBehaviour
             }
         }
     }
-    void DestroyBullet()
+    public  void DestroyBullet()
     {
         gameObject.SetActive(false);
     }
@@ -551,41 +552,33 @@ public class BulletController : MonoBehaviour
         Vector3 startScale = transform.localScale;
 
         float growDuration = 0.15f;
-        float holdDuration = 0.4f;
+        float maxLaserLength = 6f;
 
-        float maxLaserLength = 6f; // 최대 길이
-
-        // 방향
         Vector2 laserDir = transform.up;
         Vector2 startPos = transform.position;
 
-        // 커지기
         float t = 0f;
         while (t < growDuration)
         {
             t += Time.deltaTime;
 
-            // 🔷 충돌 거리 계산
             RaycastHit2D hit = Physics2D.Raycast(startPos, laserDir, maxLaserLength, LayerMask.GetMask("Barrier"));
             float hitDistance = hit.collider ? hit.distance : maxLaserLength;
 
-            // 길이 조절 (0 → hit 지점까지)
             float length = Mathf.Lerp(0f, hitDistance, t / growDuration);
-
             transform.localScale = new Vector3(startScale.x, length, 1f);
 
             if (hit.collider)
             {
-                // 🔷 방패 반응
                 EffectManager.Instance.SpawnEffect("barrier_flash", hit.point, Quaternion.identity);
             }
 
             yield return null;
         }
 
-        yield return new WaitForSeconds(holdDuration);
-        gameObject.SetActive(false);
+        // 여기서 끝. 자동 SetActive(false) 제거!
     }
+
 
     public void OnHitByShield()
     {

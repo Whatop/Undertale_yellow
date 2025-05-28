@@ -51,7 +51,7 @@ public class EnemyController : LivingObject
                 StopMoving();
             }
 
-            int curmagazine = weaponData.current_magazine;
+            float curmagazine = weaponData.current_magazine;
 
             Vector3 playerPosition = gameManager.GetPlayerData().position;
             Vector2 direction = (playerPosition - WeaponTransform.position).normalized;

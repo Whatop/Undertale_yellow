@@ -15,8 +15,8 @@ public enum ObjectState
 
 public class LivingObject : MonoBehaviour
 {
-    protected int health;
-    protected int maxHealth;
+    protected float health;
+    protected float maxHealth;
     protected float speed;
     protected bool isnpc; // ∫Ò¿¸≈ı!
     protected bool isDie = false;

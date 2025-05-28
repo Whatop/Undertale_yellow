@@ -42,12 +42,12 @@ public class Weapon
 {
     public int id;             // 총의 고유한 ID
     public string WeaponName;  // 총의 이름
-    public int damage;         // 총의 공격력
-    public int current_Ammo;   // 현재 탄알집에 남아있는 총알 수
-    public int magazine;       // 탄창 최대 총알수  
-    public int current_magazine; // 현재 남아있는 총알 수
-    public int maxAmmo;        // 최대 총알 수
-    public int maxRange;       // 사거리
+    public float damage;         // 총의 공격력
+    public float current_Ammo;   // 현재 탄알집에 남아있는 총알 수
+    public float magazine;       // 탄창 최대 총알수  
+    public float current_magazine; // 현재 남아있는 총알 수
+    public float maxAmmo;        // 최대 총알 수
+    public float maxRange;       // 사거리
     public float bulletSpeed;  // 총알 속도
     public float accuracy;     // 총의 정확도
     public float reloadTime;     // 재장전 속도
@@ -191,6 +191,9 @@ public class PlayerMovement : LivingObject
     public float distanceThreshold = 1f; // 소리 및 이펙트 발생 거리 기준
     private const float positionTolerance = 0.01f; // 위치 변화 허용 오차 (벽 비빔 방지)
 
+    private GameObject currentLaser;
+    private bool isLaserFiring = false;
+
     #region Test_code
 
     // Soul 모드 처리 테스트 용도입니다
@@ -290,6 +293,7 @@ public class PlayerMovement : LivingObject
                 StartCoroutine(Roll());
             }
 
+          
             // 쿨다운 시간 감소
             if (isCooldown)
             {
@@ -309,7 +313,19 @@ public class PlayerMovement : LivingObject
                 if (!tutorialDontShot)
                 {
                     Weapons.SetActive(true);
-                    ShootInput();
+                    if (curweaponData.weaponType == WeaponType.LaserGun)
+                    {
+                        UIManager.Instance.SetAmmoUIVisible(false);
+                        UIManager.Instance.laserAmmoSlider.gameObject.SetActive(true); // 레이저 슬라이더 표시
+                        UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, curweaponData.maxAmmo);
+                        UpdateLaserWeapon(); // ← 레이저 전용 로직 따로
+                    }
+                    else
+                    {
+                        UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
+                        UIManager.Instance.SetAmmoUIVisible(true);
+                        ShootInput(); // ← 나머지 무기들 처리
+                    }
                 }
                 else
                 {
@@ -572,7 +588,7 @@ public class PlayerMovement : LivingObject
     void ShootInput()
     {
         curweaponData = gameManager.GetWeaponData();
-        int current_magazine = curweaponData.current_magazine;
+        float current_magazine = curweaponData.current_magazine;
 
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePosition - WeaponTransform.position).normalized;
@@ -611,10 +627,6 @@ public class PlayerMovement : LivingObject
                     curweaponData.current_Ammo -= 1;
                     break;
 
-                case WeaponType.LaserGun: // 고결 - 광역 1발 (추후 UI 별도)
-                    if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 1;
-                    break;
 
                 case WeaponType.Blaster: // 의지 - 대형 강탄, 1소모
                     if (!curweaponData.IsInfiniteAmmo())
@@ -641,6 +653,28 @@ public class PlayerMovement : LivingObject
             StartCoroutine(Reload());
         }
     }
+    void UpdateLaserWeapon()
+    {
+        Weapon weapon = curweaponData; // 캐싱
+
+        if (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
+        {
+            if (!isLaserFiring)
+                StartLaser();
+
+            curweaponData.current_Ammo -= Mathf.RoundToInt(10 * Time.deltaTime);
+            curweaponData.current_Ammo = Mathf.Clamp(curweaponData.current_Ammo, 0, weapon.maxAmmo);
+
+            UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, weapon.maxAmmo);
+        }
+        else
+        {
+            if (isLaserFiring)
+                StopLaser();
+        }
+    }
+
+
     void Shoot()
     {
         // 현재 Soul 모드인지 확인하여 적절한 총알을 생성
@@ -806,8 +840,6 @@ public class PlayerMovement : LivingObject
             case WeaponType.HomingMissile:
                 ShootHoming(); break;
 
-            case WeaponType.LaserGun:
-                ShootLaser(); break;
 
             case WeaponType.Blaster:
                 ShootBlaster(); break;
@@ -874,15 +906,40 @@ public class PlayerMovement : LivingObject
             "Homing", 0, 0, true);
     }
 
-    void ShootLaser()
+    void StartLaser()
     {
-        BattleManager.Instance.SpawnBulletAtPosition(
+        if (isLaserFiring) return;
+
+        isLaserFiring = true;
+
+        currentLaser = BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.Laser,
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
             "Laser", 0, 0, true);
+
+        currentLaser.transform.SetParent(soulshotpoint);
+        currentLaser.transform.localPosition = Vector3.zero;
+        currentLaser.transform.localRotation = Quaternion.identity;
+
+        // ✅ 초기 scale 설정 방지 (이미 커졌을 수 있음)
+        currentLaser.transform.localScale = new Vector3(0.2f, 1f, 1f); // 적당한 크기로 시작
     }
+
+
+    void StopLaser()
+    {
+        isLaserFiring = false;
+
+        if (currentLaser != null)
+        {
+            currentLaser.transform.SetParent(null);
+            currentLaser.GetComponent<BulletController>()?.DestroyBullet();
+            currentLaser = null;
+        }
+    }
+
 
     void ShootBlaster()
     {
@@ -1175,11 +1232,11 @@ public class PlayerMovement : LivingObject
             id = 5,
             WeaponName = "파랑",
             weaponType = WeaponType.LaserGun,
-            damage = 5,
-            magazine = 1,
-            current_magazine = 1,
-            maxAmmo = 10,
-            current_Ammo = 10,
+            damage = 3,
+            magazine = 700,
+            current_magazine = 700,
+            maxAmmo = 500,
+            current_Ammo = 500,
             bulletSpeed = 0f,
             accuracy = 1f,
             reloadTime = 3.5f

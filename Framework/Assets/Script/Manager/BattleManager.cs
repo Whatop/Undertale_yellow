@@ -704,7 +704,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void SpawnBulletAtPosition(
+    public GameObject SpawnBulletAtPosition(
     BulletType type,
     Vector2 position,
     Quaternion rotation,
@@ -715,10 +715,10 @@ public class BattleManager : MonoBehaviour
     bool isfriends = false
 )
     {
-        if (prefab == "None") return;
+        if (prefab == "None") return null;
 
         GameObject bullet = GetBulletFromPool(prefab);
-        if (bullet == null) return;
+        if (bullet == null) return null;
 
         bullet.transform.position = position;
         bullet.transform.rotation = rotation;
@@ -730,6 +730,7 @@ public class BattleManager : MonoBehaviour
             bc.InitializeBullet(dir, 5f, 0f, 1, 15f, delay, type, null, size, isfriends);
             activeBullets.Add(bullet);
         }
+        return bullet;
     }
 
 

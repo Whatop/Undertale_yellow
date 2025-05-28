@@ -20,8 +20,8 @@ public enum ItemType
 public class PlayerData
 {
     public GameObject player;
-    public int Maxhealth;
-    public int health;
+    public float Maxhealth;
+    public float health;
     public Vector3 position;
     public string player_Name;
     public List<Item> inventory;
@@ -680,8 +680,8 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetFloat("PlayerPosZ", playerData.position.z);
 
         // 체력 및 기타 플레이어 데이터 저장
-        PlayerPrefs.SetInt("PlayerHealth", playerData.Maxhealth);  // 최대 체력으로 회복
-        PlayerPrefs.SetInt("PlayerMaxHealth", playerData.Maxhealth);
+        PlayerPrefs.SetFloat("PlayerHealth", playerData.Maxhealth);  // 최대 체력으로 회복
+        PlayerPrefs.SetFloat("PlayerMaxHealth", playerData.Maxhealth);
         PlayerPrefs.SetString("PlayerName", playerData.player_Name);
 
         PlayerPrefs.SetInt("MyBoolValue", isSave ? 1 : 0);

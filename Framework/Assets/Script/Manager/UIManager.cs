@@ -247,6 +247,8 @@ public class UIManager : MonoBehaviour
     public GameObject itemSegmentPrefab;
     public GameObject soulSegmentPrefab;
 
+    public Slider laserAmmoSlider;
+
     [SerializeField] private float cancelRadius = 50f; // 중앙 취소 반경
     [SerializeField] private float confirmCooldown = 0.3f;
     private float lastConfirmTime = -999f;
@@ -1179,6 +1181,14 @@ public class UIManager : MonoBehaviour
         soul.color = soulColor;
     }
 
+    public void UpdateLaserSlider(float current, float max)
+    {
+        if (laserAmmoSlider != null)
+        {
+            laserAmmoSlider.maxValue = max;
+            laserAmmoSlider.value = current;
+        }
+    }
     #region KeyBoardUi
     private void DetectKeyInput()
     {
@@ -1273,7 +1283,7 @@ public class UIManager : MonoBehaviour
 
     #region playerUi
 
-    public void ResizeHpBar(int maxHealth)
+    public void ResizeHpBar(float maxHealth)
     {
         // 안전장치 (Null 예외 방지)
         if (hpBar == null)
@@ -1295,19 +1305,19 @@ public class UIManager : MonoBehaviour
     {
         // 체력이 많아질수록 점점더 길어지도록
         PlayerData player = gameManager.GetPlayerData();
-        int currentHealth = player.health;
-        int maxHealth = player.Maxhealth;
+        float currentHealth = player.health;
+        float maxHealth = player.Maxhealth;
 
         // 체력 이미지 업데이트
         hpBar.value = Mathf.Clamp((float)currentHealth / (float)maxHealth, 0, 1);
-        hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
+        hpBar_text.text = ((int)currentHealth).ToString() + " / " + ((int)maxHealth).ToString();
     }
 
     void InitWeapon() // 총 새팅
     {
         Weapon weapon = gameManager.GetWeaponData();
 
-        int ammo_count = weapon.magazine;
+        int ammo_count = ((int)weapon.magazine);
         ui_ammo = new GameObject[ammo_count];
 
         for (int i = 0; i < ammo_count; i++)
@@ -1345,8 +1355,8 @@ public class UIManager : MonoBehaviour
     public void UpdateUI()
     {
         PlayerData player = gameManager.GetPlayerData();
-        int currentHealth = player.health;
-        int maxHealth = player.Maxhealth;
+        float currentHealth = player.health;
+        float maxHealth = player.Maxhealth;
 
         ResizeHpBar(maxHealth);
 
@@ -1357,7 +1367,7 @@ public class UIManager : MonoBehaviour
 
         // 무기 데이터 가져오기 및 총알 이미지 업데이트
         Weapon weapon = gameManager.GetWeaponData();
-        int current_magazine = weapon.current_magazine;
+        float current_magazine = weapon.current_magazine;
 
         // 총알 이미지 업데이트
         for (int i = 0; i < ui_ammo.Length; i++)
@@ -1425,6 +1435,15 @@ public class UIManager : MonoBehaviour
     public void SetReloadSliderValue(float value)
     {
         reloadSlider.value = value;
+    }
+    public void SetAmmoUIVisible(bool isVisible)
+    {
+        foreach (var ammo in ui_ammo)
+        {
+            ammo?.SetActive(isVisible);
+        }
+        ui_ammoText?.gameObject.SetActive(isVisible);
+        ammos_td?.SetActive(isVisible);
     }
 
     #endregion
