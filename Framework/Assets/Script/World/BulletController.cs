@@ -58,7 +58,7 @@ public class BulletController : MonoBehaviour
     public float rotationMultiplier = 0.8f; // 1 = 한 바퀴, 0.5 = 반 바퀴, 2 = 두 바퀴
 
     private bool isBlockedByBarrier = false;
-
+    private bool laserInitialized = false;
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -549,12 +549,17 @@ public class BulletController : MonoBehaviour
     {
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         BoxCollider2D col = GetComponent<BoxCollider2D>();
-        Vector3 startScale = transform.localScale;
+
+        if (!laserInitialized)
+        {
+            transform.localScale = new Vector3(0.2f,7, 1f); // 초기 크기 고정
+            laserInitialized = true;
+        }
 
         float growDuration = 0.15f;
-        float maxLaserLength = 6f;
+        float maxLaserLength = 12f;
 
-        Vector2 laserDir = transform.up;
+        Vector2 laserDir = transform.right;
         Vector2 startPos = transform.position;
 
         float t = 0f;
@@ -565,8 +570,17 @@ public class BulletController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(startPos, laserDir, maxLaserLength, LayerMask.GetMask("Barrier"));
             float hitDistance = hit.collider ? hit.distance : maxLaserLength;
 
-            float length = Mathf.Lerp(0f, hitDistance, t / growDuration);
-            transform.localScale = new Vector3(startScale.x, length, 1f);
+            float currentLength = transform.localScale.x;
+            float targetLength = Mathf.Lerp(currentLength, hitDistance, t / growDuration);
+            float fixedThickness = 7.25f;
+
+            transform.localScale = new Vector3(Mathf.Max(currentLength, targetLength), fixedThickness, 1f);
+
+            if (col != null)
+            {
+                col.size = new Vector2(transform.localScale.x, fixedThickness);
+                col.offset = new Vector2(transform.localScale.x / 2f, 0f);
+            }
 
             if (hit.collider)
             {
@@ -575,8 +589,6 @@ public class BulletController : MonoBehaviour
 
             yield return null;
         }
-
-        // 여기서 끝. 자동 SetActive(false) 제거!
     }
 
 
