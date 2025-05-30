@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 1175165634145871452}
   - component: {fileID: 4401680431133178324}
   - component: {fileID: 4966827461191458999}
-  - component: {fileID: 6576290217837462126}
+  - component: {fileID: 3160291951825505961}
   m_Layer: 0
   m_Name: Laser 1
-  m_TagString: Laser
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1175165634145871427}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.33, y: 0.26, z: 0}
-  m_LocalScale: {x: 3, y: 10, z: 1}
+  m_LocalScale: {x: 0.3, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -53,7 +53,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a6cdb66c68dcce8499fe01297bc5057d, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 0dbffe5c87e6e6740b49c23db5c4609c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletType: 7
   damage: 1
-  speed: 5
+  speed: 7
   accuracy: 1
   maxrange: 30
   isFreind: 1
@@ -128,7 +128,7 @@ MonoBehaviour:
   dotInterval: 0.2
   travelTime: 1.2
   rotationMultiplier: 0.8
---- !u!61 &6576290217837462126
+--- !u!61 &3160291951825505961
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,16 +141,16 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.5, y: 0}
+  m_Offset: {x: -0.05859375, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 1, y: 0.5}
-    oldSize: {x: 1, y: 0.125}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 1, y: 0.25}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.125}
+  m_Size: {x: 0.1171875, y: 0.15625}
   m_EdgeRadius: 0

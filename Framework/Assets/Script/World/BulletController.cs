@@ -29,7 +29,7 @@ public class BulletController : MonoBehaviour
     private float gravityEffect = 0.3f;  // 포물선 중력 효과
     private float maxTurnAngle = 150f;  // 최대 회전 각도 제한
     private float homingDuration = 5f;  // 유도 지속 시간
-    private float lifeTime = 1115f;
+    private float lifeTime = 30f;
 
     private float maxSpeed = 16f; // 최대 속도 제한
     private float speedIncreaseRate = 4f; // 초당 속도 증가량
@@ -59,6 +59,7 @@ public class BulletController : MonoBehaviour
 
     private bool isBlockedByBarrier = false;
     private bool laserInitialized = false;
+    private float traveledDistance = 0f;
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -152,6 +153,7 @@ public class BulletController : MonoBehaviour
         storedFireDirection = fireDirection;
         bulletSize= size;
         isFreind = isfreind;
+        initialPosition = transform.position;
 
         if (target != null)
         {
@@ -171,6 +173,12 @@ public class BulletController : MonoBehaviour
     void Update()
     {
 
+        // 거리 누적
+        traveledDistance = Vector2.Distance(transform.position, initialPosition);
+        if (traveledDistance >= maxrange)
+        {
+            DestroyBullet(); // 또는 gameObject.SetActive(false);
+        }
         switch (bulletType)
         {
             case BulletType.Homing:
@@ -339,8 +347,9 @@ public class BulletController : MonoBehaviour
                 StartCoroutine(BarrierMoveAndStay());
                 break;
             case BulletType.Laser:
-                StartCoroutine(LaserBullet());
+                StartCoroutine(MoveStraight());
                 break;
+
 
             case BulletType.None:
                 Debug.Log("총알대기");
@@ -545,52 +554,21 @@ public class BulletController : MonoBehaviour
         // 5) 비활성화
         gameObject.SetActive(false);
     }
-    private IEnumerator LaserBullet()
+    private IEnumerator MoveStraight()
     {
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        Vector2 direction = storedFireDirection.normalized;
+        float traveledDistance = 0f;
 
-        if (!laserInitialized)
+        while (traveledDistance < maxrange)
         {
-            transform.localScale = new Vector3(0.2f,7, 1f); // 초기 크기 고정
-            laserInitialized = true;
-        }
-
-        float growDuration = 0.15f;
-        float maxLaserLength = 12f;
-
-        Vector2 laserDir = transform.right;
-        Vector2 startPos = transform.position;
-
-        float t = 0f;
-        while (t < growDuration)
-        {
-            t += Time.deltaTime;
-
-            RaycastHit2D hit = Physics2D.Raycast(startPos, laserDir, maxLaserLength, LayerMask.GetMask("Barrier"));
-            float hitDistance = hit.collider ? hit.distance : maxLaserLength;
-
-            float currentLength = transform.localScale.x;
-            float targetLength = Mathf.Lerp(currentLength, hitDistance, t / growDuration);
-            float fixedThickness = 7.25f;
-
-            transform.localScale = new Vector3(Mathf.Max(currentLength, targetLength), fixedThickness, 1f);
-
-            if (col != null)
-            {
-                col.size = new Vector2(transform.localScale.x, fixedThickness);
-                col.offset = new Vector2(transform.localScale.x / 2f, 0f);
-            }
-
-            if (hit.collider)
-            {
-                EffectManager.Instance.SpawnEffect("barrier_flash", hit.point, Quaternion.identity);
-            }
-
+            Vector2 movement = direction * speed * Time.deltaTime;
+            rb.MovePosition(rb.position + movement);
+            traveledDistance += movement.magnitude;
             yield return null;
         }
-    }
 
+        gameObject.SetActive(false); // 혹은 오브젝트 풀에 반환
+    }
 
     public void OnHitByShield()
     {

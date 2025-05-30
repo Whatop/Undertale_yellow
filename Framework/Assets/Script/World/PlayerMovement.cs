@@ -193,6 +193,11 @@ public class PlayerMovement : LivingObject
 
     private GameObject currentLaser;
     private bool isLaserFiring = false;
+    public GameObject laserCoreObject;
+
+    private Coroutine pressFireCoroutine;
+    private bool isPressFiring = false;
+
 
     #region Test_code
 
@@ -251,6 +256,7 @@ public class PlayerMovement : LivingObject
         originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
         InitializeWeapons();
         gameManager.SaveWeaponData(curweaponData);
+        laserCoreObject.SetActive(false);
 
     }
     protected override void Update()
@@ -318,14 +324,13 @@ public class PlayerMovement : LivingObject
                         UIManager.Instance.SetAmmoUIVisible(false);
                         UIManager.Instance.laserAmmoSlider.gameObject.SetActive(true); // 레이저 슬라이더 표시
                         UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, curweaponData.maxAmmo);
-                        UpdateLaserWeapon(); // ← 레이저 전용 로직 따로
                     }
                     else
                     {
                         UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
                         UIManager.Instance.SetAmmoUIVisible(true);
-                        ShootInput(); // ← 나머지 무기들 처리
                     }
+                        ShootInput();
                 }
                 else
                 {
@@ -371,6 +376,13 @@ public class PlayerMovement : LivingObject
                     UIManager.Instance.ChangeInventroy();
                 }
             }
+            if (Input.GetMouseButtonUp(0) && curweaponData.weaponType == WeaponType.LaserGun && pressFireCoroutine != null)
+            {
+                StopCoroutine(pressFireCoroutine);
+                pressFireCoroutine = null;
+                isPressFiring = false;
+            }
+
         }
         else
         {
@@ -653,26 +665,7 @@ public class PlayerMovement : LivingObject
             StartCoroutine(Reload());
         }
     }
-    void UpdateLaserWeapon()
-    {
-        Weapon weapon = curweaponData; // 캐싱
-
-        if (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
-        {
-            if (!isLaserFiring)
-                StartLaser();
-
-            curweaponData.current_Ammo -= Mathf.RoundToInt(10 * Time.deltaTime);
-            curweaponData.current_Ammo = Mathf.Clamp(curweaponData.current_Ammo, 0, weapon.maxAmmo);
-
-            UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, weapon.maxAmmo);
-        }
-        else
-        {
-            if (isLaserFiring)
-                StopLaser();
-        }
-    }
+   
 
 
     void Shoot()
@@ -840,9 +833,13 @@ public class PlayerMovement : LivingObject
             case WeaponType.HomingMissile:
                 ShootHoming(); break;
 
-
             case WeaponType.Blaster:
                 ShootBlaster(); break;
+
+            case WeaponType.LaserGun:
+                if (!isPressFiring)
+                    pressFireCoroutine = StartCoroutine(PressFireLoop()); 
+                break; // ✅ 추가
         }
 
     }
@@ -926,20 +923,32 @@ public class PlayerMovement : LivingObject
         // ✅ 초기 scale 설정 방지 (이미 커졌을 수 있음)
         currentLaser.transform.localScale = new Vector3(0.2f, 1f, 1f); // 적당한 크기로 시작
     }
-
-
-    void StopLaser()
+    private IEnumerator PressFireLoop()
     {
-        isLaserFiring = false;
+        isPressFiring = true;
 
-        if (currentLaser != null)
+        // Core 활성화
+        laserCoreObject.SetActive(true);
+
+        while (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
         {
-            currentLaser.transform.SetParent(null);
-            currentLaser.GetComponent<BulletController>()?.DestroyBullet();
-            currentLaser = null;
-        }
-    }
 
+            BattleManager.Instance.SpawnBulletAtPosition(
+                BulletType.Directional,
+                soulshotpoint.position,
+                WeaponTransform.rotation,
+                WeaponTransform.up,
+                "Laser", 0, 0, true, curweaponData.maxRange);
+
+            curweaponData.current_Ammo -= 1;
+            gameManager.SaveWeaponData(curweaponData);
+
+            yield return new WaitForSeconds(0.01f); // 연사 간격 짧게
+        }
+
+        isPressFiring = false;
+        laserCoreObject.SetActive(false);
+    }
 
     void ShootBlaster()
     {
@@ -952,7 +961,18 @@ public class PlayerMovement : LivingObject
 
 
     }
+    void ShootLaserGun()
+    {
+        BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Directional,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Laser", 0, 0, true);
 
+        // 사운드, 이펙트, 반동 등도 추가 가능
+        StartCoroutine(ShowMuzzleFlash(soulshotpoint));
+    }
 
     public void OpenSoulUnlockShop()
     {
