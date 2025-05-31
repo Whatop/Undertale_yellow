@@ -323,14 +323,14 @@ public class PlayerMovement : LivingObject
                     {
                         UIManager.Instance.SetAmmoUIVisible(false);
                         UIManager.Instance.laserAmmoSlider.gameObject.SetActive(true); // 레이저 슬라이더 표시
-                        UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, curweaponData.maxAmmo);
+                        UpdateLaserWeapon(); // ← 레이저 전용 로직 따로
                     }
                     else
                     {
                         UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
                         UIManager.Instance.SetAmmoUIVisible(true);
-                    }
                         ShootInput();
+                    }
                 }
                 else
                 {
@@ -665,7 +665,75 @@ public class PlayerMovement : LivingObject
             StartCoroutine(Reload());
         }
     }
-   
+
+    void UpdateLaserWeapon()
+    {
+        Weapon weapon = curweaponData; // 캐싱
+
+        if (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
+        {
+            if (!isLaserFiring)
+                StartLaser();
+
+            curweaponData.current_Ammo -= (40 * Time.deltaTime);
+            curweaponData.current_Ammo = Mathf.Clamp(curweaponData.current_Ammo, 0, weapon.maxAmmo);
+
+            UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, weapon.maxAmmo);
+        }
+        else
+        {
+            if (isLaserFiring)
+                StopLaser();
+        }
+    }
+    void StopLaser()
+    {
+        isLaserFiring = false;
+        laserCoreObject.SetActive(false);
+        if (currentLaser != null)
+        {
+            // 레이저 유지 루프 종료를 알려 주기
+            var bc = currentLaser.GetComponent<BulletController>();
+            if (bc != null)
+                bc.keepLaser = false;
+
+            // 부모에서 분리하고, 파괴 처리
+            currentLaser.transform.SetParent(null);
+            currentLaser.GetComponent<BulletController>()?.DestroyBullet();
+            currentLaser = null;
+        }
+    }
+
+
+
+    void StartLaser()
+    {
+        if (isLaserFiring) return;
+
+        isLaserFiring = true;
+        laserCoreObject.SetActive(true);
+
+        currentLaser = BattleManager.Instance.SpawnBulletAtPosition(
+            BulletType.Laser,
+            soulshotpoint.position,
+            WeaponTransform.rotation,
+            WeaponTransform.up,
+            "Laser", 0, 0, true,
+            curweaponData.maxRange,curweaponData.bulletSpeed,curweaponData.damage);
+
+        // 2) 빔을 플레이어(총구)에 붙이고
+        currentLaser.transform.SetParent(soulshotpoint);
+        currentLaser.transform.localPosition = Vector3.zero;
+        currentLaser.transform.localRotation = Quaternion.identity;
+
+        // 3) 초기 크기 세팅
+        currentLaser.transform.localScale = new Vector3(0.2f, 1f, 1f);
+
+        // 4) BulletController.keepLaser = true로 설정
+        var bc = currentLaser.GetComponent<BulletController>();
+        if (bc != null)
+            bc.keepLaser = true;
+    }
 
 
     void Shoot()
@@ -680,7 +748,8 @@ public class PlayerMovement : LivingObject
              shotpoint.position,
              WeaponTransform.rotation,
              WeaponTransform.up,
-             "Player_Normal",0,0,true);
+             "Player_Normal",0,0,true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
 
             // 총구 화염 이펙트 생성
             StartCoroutine(ShowMuzzleFlash(shotpoint));
@@ -836,9 +905,6 @@ public class PlayerMovement : LivingObject
             case WeaponType.Blaster:
                 ShootBlaster(); break;
 
-            case WeaponType.LaserGun:
-                if (!isPressFiring)
-                    pressFireCoroutine = StartCoroutine(PressFireLoop()); 
                 break; // ✅ 추가
         }
 
@@ -879,7 +945,8 @@ public class PlayerMovement : LivingObject
                 soulshotpoint.position,
                 rot,
                 dir,
-                "Player_Normal", 0, 0, true);
+                "Player_Normal", 0, 0, true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
         }
     }
 
@@ -890,7 +957,8 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Barrier", 0, 0, true);
+            "Barrier", 0, 0, true,
+            curweaponData.maxRange,curweaponData.bulletSpeed,curweaponData.damage);
     }
 
     void ShootHoming()
@@ -900,29 +968,10 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Homing", 0, 0, true);
+            "Homing", 0, 0, true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
     }
 
-    void StartLaser()
-    {
-        if (isLaserFiring) return;
-
-        isLaserFiring = true;
-
-        currentLaser = BattleManager.Instance.SpawnBulletAtPosition(
-            BulletType.Laser,
-            soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
-            "Laser", 0, 0, true);
-
-        currentLaser.transform.SetParent(soulshotpoint);
-        currentLaser.transform.localPosition = Vector3.zero;
-        currentLaser.transform.localRotation = Quaternion.identity;
-
-        // ✅ 초기 scale 설정 방지 (이미 커졌을 수 있음)
-        currentLaser.transform.localScale = new Vector3(0.2f, 1f, 1f); // 적당한 크기로 시작
-    }
     private IEnumerator PressFireLoop()
     {
         isPressFiring = true;
@@ -938,7 +987,8 @@ public class PlayerMovement : LivingObject
                 soulshotpoint.position,
                 WeaponTransform.rotation,
                 WeaponTransform.up,
-                "Laser", 0, 0, true, curweaponData.maxRange);
+                "Laser", 0, 0, true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
 
             curweaponData.current_Ammo -= 1;
             gameManager.SaveWeaponData(curweaponData);
@@ -960,18 +1010,6 @@ public class PlayerMovement : LivingObject
             "Blaster", 0, 0, true);
 
 
-    }
-    void ShootLaserGun()
-    {
-        BattleManager.Instance.SpawnBulletAtPosition(
-            BulletType.Directional,
-            soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
-            "Laser", 0, 0, true);
-
-        // 사운드, 이펙트, 반동 등도 추가 가능
-        StartCoroutine(ShowMuzzleFlash(soulshotpoint));
     }
 
     public void OpenSoulUnlockShop()
@@ -1183,23 +1221,25 @@ public class PlayerMovement : LivingObject
             id = 0,
             WeaponName = "노랑",
             weaponType = WeaponType.Revolver,
-            damage = 2,
+            damage = 3,
             magazine = 6,
             current_magazine = 6,
             maxAmmo = -1,
+            maxRange = 6f,
             current_Ammo = -1,
             bulletSpeed = 8f,
             accuracy = 1f,
             reloadTime = 1.5f
-        }); databaseWeapons.Add(new Weapon
+        });; databaseWeapons.Add(new Weapon
         {
             id = 1,
             WeaponName = "하늘",
             weaponType = WeaponType.NeedleGun,
-            damage = 1,
+            damage = 2,
             magazine = 15,
             current_magazine = 15,
             maxAmmo = 90,
+            maxRange = 8f,
             current_Ammo = 90,
             bulletSpeed = 9f,
             accuracy = 1.2f,
@@ -1210,10 +1250,11 @@ public class PlayerMovement : LivingObject
             id = 2,
             WeaponName = "주황",
             weaponType = WeaponType.Shotgun,
-            damage = 3,
+            damage = 4,
             magazine = 2,
-            current_magazine = 2,
+            current_magazine = 4,
             maxAmmo = 30,
+            maxRange = 4f,
             current_Ammo = 30,
             bulletSpeed = 6f,
             accuracy = 0.6f,
@@ -1225,11 +1266,12 @@ public class PlayerMovement : LivingObject
             WeaponName = "초록",
             weaponType = WeaponType.BarrierEmitter,
             damage = 0,
-            magazine = 3,
-            current_magazine = 3,
-            maxAmmo = 15,
-            current_Ammo = 15,
-            bulletSpeed = 0f,
+            magazine = 4,
+            current_magazine = 4,
+            maxAmmo = 16,
+            current_Ammo = 16,
+            bulletSpeed = 5f,
+            maxRange = 10f,
             accuracy = 1f,
             reloadTime = 3.0f
         });
@@ -1241,8 +1283,9 @@ public class PlayerMovement : LivingObject
             damage = 2,
             magazine = 3,
             current_magazine = 3,
-            maxAmmo = 20,
-            current_Ammo = 20,
+            maxAmmo = 50,
+            current_Ammo = 50,
+            maxRange = 20f,
             bulletSpeed = 5f,
             accuracy = 1f,
             reloadTime = 2.5f
@@ -1252,12 +1295,13 @@ public class PlayerMovement : LivingObject
             id = 5,
             WeaponName = "파랑",
             weaponType = WeaponType.LaserGun,
-            damage = 3,
+            damage = 1f,
             magazine = 700,
             current_magazine = 700,
-            maxAmmo = 500,
-            current_Ammo = 500,
-            bulletSpeed = 0f,
+            maxAmmo = 700,
+            current_Ammo = 700,
+            maxRange = 9f,
+            bulletSpeed = 7f,
             accuracy = 1f,
             reloadTime = 3.5f
         });
@@ -1269,7 +1313,8 @@ public class PlayerMovement : LivingObject
             damage = 7,
             magazine = 1,
             current_magazine = 1,
-            maxAmmo = 5,
+            maxAmmo = 10,
+            maxRange = 15f,
             current_Ammo = 5,
             bulletSpeed = 0f,
             accuracy = 1f,
@@ -1529,15 +1574,28 @@ public class PlayerMovement : LivingObject
         }
     }
 
-    // 마우스 각도 계산
     float CalculateMouseAngle()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = Camera.main.transform.position.z;
-        Vector3 targetPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        Vector3 direction = targetPosition - transform.position;
-        return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Vector3 mouseScreenPos = Input.mousePosition;
+
+        // 1) 카메라 위치가 -10이면, 절댓값 10을 넣어야
+        //    '카메라 → 화면' 평면이 월드 z = 0에 매핑된다.
+        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z);
+
+        // 2) 이제 ScreenToWorldPoint를 호출하면
+        //    항상 월드 z = 0 평면에서 올바른 (x,y) 좌표를 반환한다.
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        mouseWorldPos.z = 0f; // 2D 환경이므로 강제로 z = 0으로 고정
+
+        // 3) 플레이어 위치와의 방향 벡터 산출
+        Vector2 dir = (mouseWorldPos - gameManager.GetPlayerData().player.transform.position);
+
+        Debug.DrawLine(transform.position, mouseWorldPos, Color.red);
+        // 4) 방향 벡터로부터 방위 각(도)을 계산
+        return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
     }
+
+
 
     // 애니메이터의 모든 불린 값 초기화
     void SetAnimatorBooleansFalse()

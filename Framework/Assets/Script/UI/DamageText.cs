@@ -20,7 +20,7 @@ public class DamageText : MonoBehaviour
 
     }
 
-    public void Initialize(int damageAmount)
+    public void Initialize(float damageAmount)
     {
         if (!isObject)
         {

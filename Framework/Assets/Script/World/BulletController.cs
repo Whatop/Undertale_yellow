@@ -19,7 +19,7 @@ public enum BulletType
 public class BulletController : MonoBehaviour
 {
     public BulletType bulletType = BulletType.Normal; // 총알의 타입
-    public int damage;
+    public float damage;
     public float speed = 5;
     public float accuracy;
     public float maxrange = 10f;
@@ -56,6 +56,8 @@ public class BulletController : MonoBehaviour
     // 추가: 원하는 이동 시간(초)와 회전 속도 계수(배율)
     public float travelTime = 1.2f;      // 총 이동에 걸릴 시간(거리 무관) – 늘릴수록 느려짐
     public float rotationMultiplier = 0.8f; // 1 = 한 바퀴, 0.5 = 반 바퀴, 2 = 두 바퀴
+    [HideInInspector]
+    public bool keepLaser = false; // 플레이어가 버튼을 떼기 전까지 true로 유지
 
     private bool isBlockedByBarrier = false;
     private bool laserInitialized = false;
@@ -132,7 +134,7 @@ public class BulletController : MonoBehaviour
 
         }
     }
-    public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, int bulletDamage, float maxRange,
+    public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, float bulletDamage, float maxRange,
                                  float delay = 0, BulletType type = default, Transform target = null,int size = 0, bool isfreind = false)
     {  // 기존 값 설정 외에...
         isHoming = false;
@@ -195,28 +197,43 @@ public class BulletController : MonoBehaviour
     // Homing 탄환 매 프레임 추적
     private void UpdateHoming()
     {
-        float gravityEffect = 0.3f;  // 포물선을 만들 중력 효과
-        float maxTurnAngle = 50f;     // 한 프레임당 최대 회전 각도 제한 (값이 크면 급격히 회전)
+        float gravityEffect = 0.3f;
+        float maxTurnAngle = 50f;
         float timer = 0f;
 
         if (timer < homingDuration)
         {
-            if (rb != null && GameManager.Instance.GetPlayerData().player != null)
+            if (rb != null)
             {
                 Vector2 currentVelocity = rb.velocity;
-                Vector2 targetDirection = ((Vector2)GameManager.Instance.GetPlayerData().position - (Vector2)transform.position).normalized;
+                Vector2 targetDirection;
 
-                // 1. 포물선 효과: Y축 속도에 중력 적용
+                if (isFreind)
+                {
+                    // 아군 총알: 적 타겟팅
+                    Transform closestEnemy = GetClosestEnemy();
+                    if (closestEnemy != null)
+                        targetDirection = ((Vector2)closestEnemy.position - (Vector2)transform.position).normalized;
+                    else
+                        targetDirection = storedFireDirection.normalized;
+                }
+                else
+                {
+                    // 적 총알: 플레이어 타겟팅
+                    Transform player = GameManager.Instance.GetPlayerData().player?.transform;
+                    if (player != null)
+                        targetDirection = ((Vector2)player.position - (Vector2)transform.position).normalized;
+                    else
+                        targetDirection = storedFireDirection.normalized;
+                }
+
                 Vector2 gravity = new Vector2(0, -gravityEffect * Time.deltaTime);
                 currentVelocity += gravity;
 
-                // 2. 방향 제한을 두면서 부드럽게 회전
                 float currentAngle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg;
                 float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-                // 현재 각도를 목표 각도 방향으로 부드럽게 회전 (각도 제한)
                 float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, maxTurnAngle * Time.deltaTime);
 
-                // 새로운 방향으로 속도 재설정
                 Vector2 newVelocity = new Vector2(Mathf.Cos(newAngle * Mathf.Deg2Rad), Mathf.Sin(newAngle * Mathf.Deg2Rad)) * speed;
                 rb.velocity = newVelocity;
             }
@@ -224,10 +241,31 @@ public class BulletController : MonoBehaviour
         }
         else
         {
-            rb.velocity = rb.velocity.normalized * speed; // 마지막 방향으로 유지
+            rb.velocity = rb.velocity.normalized * speed;
             isHoming = false;
         }
     }
+    private Transform GetClosestEnemy()
+    {
+        float closestDistance = float.MaxValue;
+        Transform closest = null;
+
+        foreach (GameObject enemy in BattleManager.Instance.curEnemies)
+        {
+            if (enemy == null || !enemy.activeInHierarchy) continue;
+
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = enemy.transform;
+            }
+        }
+
+        return closest;
+    }
+
+
     private void UpdateSpiral()
     {
         if (rb == null) return;
@@ -347,7 +385,7 @@ public class BulletController : MonoBehaviour
                 StartCoroutine(BarrierMoveAndStay());
                 break;
             case BulletType.Laser:
-                StartCoroutine(MoveStraight());
+                StartCoroutine(LaserBullet());
                 break;
 
 
@@ -554,20 +592,182 @@ public class BulletController : MonoBehaviour
         // 5) 비활성화
         gameObject.SetActive(false);
     }
-    private IEnumerator MoveStraight()
-    {
-        Vector2 direction = storedFireDirection.normalized;
-        float traveledDistance = 0f;
 
-        while (traveledDistance < maxrange)
+    private IEnumerator LaserBullet()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+
+        // ① 스프라이트 월드 단위 바운드 계산 (scale=1일 때)
+        float spriteUnitWidth = sr.sprite.bounds.size.x; // 예: 0.25
+        float spriteUnitHeight = sr.sprite.bounds.size.y; // 예: 1
+
+        // 레이저를 왼쪽 방향으로 쏠 예정이라면 flipX=true
+        sr.flipX = true;
+        transform.rotation = Quaternion.identity;
+
+        // (1) 초기 두께 설정 (예: 0.1 유닛)
+        float initialThickness = 0.1f;
+        // **scaleY는 여기서 한 번만 선언**
+        float scaleY = initialThickness / spriteUnitHeight;
+        transform.localScale = new Vector3(0.01f, scaleY, 1f);
+        laserInitialized = true;
+
+        float growDuration = 0.15f;
+        float maxLaserLength = 20f;
+
+        float t = 0f;
+        bool didHitOnce = false;
+
+        // 선형 증가 속도 계산 (최대 길이 기준)
+        float finalScaleX = maxLaserLength / spriteUnitWidth;
+        float speedPerSecX = finalScaleX / growDuration;
+
+        while (t < growDuration)
         {
-            Vector2 movement = direction * speed * Time.deltaTime;
-            rb.MovePosition(rb.position + movement);
-            traveledDistance += movement.magnitude;
+            float deltaTime = Time.deltaTime;
+            t += deltaTime;
+
+            // 매 프레임 최신 startPos, laserDir 갱신
+            Vector2 startPos = transform.position;
+            Vector2 laserDir = transform.right; // flipX=true → (-1, 0)
+
+            // RaycastAll → 태그로만 필터링
+            RaycastHit2D[] hitsAll = Physics2D.RaycastAll(startPos, laserDir, maxLaserLength);
+
+            float nearestDist = maxLaserLength;
+            Vector2 nearestPoint = startPos + laserDir * maxLaserLength;
+            string nearestTag = "";
+
+            foreach (var h in hitsAll)
+            {
+                if (h.collider == null)
+                    continue;
+                if (h.collider == col)
+                    continue; // 자기 자신 무시
+
+                // 태그가 "Wall" 또는 "Barrier"인 경우에만 벽으로 취급
+                string tag = h.collider.tag;
+                if (tag == "Wall" || tag == "Barrier")
+                {
+                    if (h.distance < nearestDist)
+                    {
+                        nearestDist = h.distance;
+                        nearestPoint = h.point;
+                        nearestTag = tag;
+                    }
+                }
+            }
+
+            // (a) 목표 X 스케일 계산 (월드 거리 → 로컬 스케일)
+            float targetScaleX = nearestDist / spriteUnitWidth;
+            targetScaleX = -Mathf.Abs(targetScaleX); // 왼쪽(음수) 방향
+
+            // (b) 선형 증가: 이전 프레임 값 + 속도*deltaTime
+            float currentScaleX = transform.localScale.x;
+            float nextScaleX = currentScaleX + (speedPerSecX * deltaTime);
+            if (currentScaleX < 0f)
+                nextScaleX = Mathf.Max(nextScaleX, targetScaleX);
+            else
+                nextScaleX = Mathf.Min(nextScaleX, targetScaleX);
+
+            // (c) 높이(두께) 재활용된 scaleY 적용
+            transform.localScale = new Vector3(nextScaleX, scaleY, 1f);
+
+            // (d) Collider 적용
+            if (col != null)
+            {
+                col.size = new Vector2(spriteUnitWidth, spriteUnitHeight);
+                float signX = Mathf.Sign(transform.localScale.x);
+                col.offset = new Vector2((spriteUnitWidth / 2f) * signX, 0f);
+            }
+
+            // (e) 첫 충돌(벽) 이펙트
+            if (!didHitOnce && nearestTag != "")
+            {
+                didHitOnce = true;
+                EffectManager.Instance.SpawnEffect("barrier_flash", nearestPoint, Quaternion.identity);
+            }
+
             yield return null;
         }
 
-        gameObject.SetActive(false); // 혹은 오브젝트 풀에 반환
+        // ───────────────────────────────────────────────────────────────────────────
+        // (2) keepLaser 기간 동안 매 프레임 거리 & 데미지 갱신
+        didHitOnce = false;
+        while (keepLaser)
+        {
+            Vector2 startPos = transform.position;
+            Vector2 laserDir = transform.right;
+
+            // RaycastAll → 태그로만 필터링
+            RaycastHit2D[] hitsAll = Physics2D.RaycastAll(startPos, laserDir, maxLaserLength);
+
+            float nearestDist = maxLaserLength;
+            Vector2 nearestPoint = startPos + laserDir * maxLaserLength;
+            string nearestTag = "";
+
+            foreach (var h in hitsAll)
+            {
+                if (h.collider == null)
+                    continue;
+                if (h.collider == col)
+                    continue;
+
+                string tag = h.collider.tag;
+                if (tag == "Wall" || tag == "Barrier")
+                {
+                    if (h.distance < nearestDist)
+                    {
+                        nearestDist = h.distance;
+                        nearestPoint = h.point;
+                        nearestTag = tag;
+                    }
+                }
+            }
+
+            // (a) 유지 구간: 즉시 targetScaleX 적용
+            float targetScaleX = -Mathf.Abs(nearestDist / spriteUnitWidth);
+            transform.localScale = new Vector3(targetScaleX, scaleY, 1f);
+
+            if (col != null)
+            {
+                col.size = new Vector2(spriteUnitWidth, spriteUnitHeight);
+                float signX = Mathf.Sign(transform.localScale.x);
+                col.offset = new Vector2((spriteUnitWidth / 2f) * signX, 0f);
+            }
+
+            // (b) Enemy 관통 데미지 처리: 태그가 "Enemy"인 경우
+            if (nearestTag != "Wall" && nearestTag != "Barrier")
+            {
+                // 벽에 맞지 않은 상태라면, 레이저 앞쪽 거리 전체를 대상으로 적 태그 검사
+                RaycastHit2D[] enemyHits = Physics2D.RaycastAll(startPos, laserDir, nearestDist);
+                foreach (var eh in enemyHits)
+                {
+                    if (eh.collider == col)
+                        continue;
+
+                    if (eh.collider.tag == "Enemy")
+                    {
+                        var enemy = eh.collider.GetComponent<EnemyController>();
+                        if (enemy != null)
+                            enemy.TakeDamage(damage * Time.deltaTime);
+                    }
+                }
+            }
+
+            // (c) 첫 충돌(벽) 이펙트
+            if (!didHitOnce && nearestTag != "")
+            {
+                didHitOnce = true;
+                EffectManager.Instance.SpawnEffect("barrier_flash", nearestPoint, Quaternion.identity);
+            }
+
+            yield return null;
+        }
+
+        // (3) 레이저 종료
+        DestroyBullet();
     }
 
     public void OnHitByShield()

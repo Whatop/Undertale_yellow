@@ -140,7 +140,7 @@ public class LivingObject : MonoBehaviour
         healthBar.SetActive(false);
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(float damageAmount)
     {
         if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
         {
@@ -165,7 +165,7 @@ public class LivingObject : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damageAmount, Vector3 position)
+    public void TakeDamage(float damageAmount, Vector3 position)
     {
         if (!isInvincible ) // 무적 상태가 아닐 때만 데미지를 받음
         {

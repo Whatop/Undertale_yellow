@@ -713,7 +713,10 @@ public class BattleManager : MonoBehaviour
     int size = 0,
     float delay = 0f,
     bool isfriends = false,
-    float maxrange = 5f
+    float maxrange = 5f,
+    float bulletspeed = 5f,
+    float bulletaccuracy = 1f,
+    float bulletdamge = 1f
 )
     {
         if (prefab == "None") return null;
@@ -728,7 +731,7 @@ public class BattleManager : MonoBehaviour
         BulletController bc = bullet.GetComponent<BulletController>();
         if (bc != null)
         {
-            bc.InitializeBullet(dir, 5f, 0f, 1, maxrange, delay, type, null, size, isfriends);
+            bc.InitializeBullet(dir, bulletspeed, bulletaccuracy, bulletdamge, maxrange, delay, type, null, size, isfriends);
             activeBullets.Add(bullet);
         }
         return bullet;

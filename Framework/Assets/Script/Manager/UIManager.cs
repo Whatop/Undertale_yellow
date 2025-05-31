@@ -1338,7 +1338,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ShowDamageText(Vector3 worldPosition, int damageAmount)
+    public void ShowDamageText(Vector3 worldPosition, float damageAmount)
     { // 월드 좌표를 스크린 좌표로 변환
         Vector2 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 

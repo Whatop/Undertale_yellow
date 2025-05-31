@@ -22598,6 +22598,12 @@ MonoBehaviour:
   - bulletName: Barrier
     prefab: {fileID: 3895800555120272318, guid: 3f05af0fb5715cd4f9e99541930c16a5, type: 3}
     poolSize: 6
+  - bulletName: Homing
+    prefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
+    poolSize: 6
+  - bulletName: Blaster
+    prefab: {fileID: 5549927540565692596, guid: 8a2485ab878acd645ae2ece70276511e, type: 3}
+    poolSize: 6
   isTalking: 0
   isEvent: 0
   boss_id: 0
@@ -34593,7 +34599,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 864538576}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.3, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1815525590}
@@ -44395,6 +44401,9 @@ MonoBehaviour:
   - effectName: soul_rolleffect
     prefab: {fileID: 22627275028735740, guid: b9dd363db5a03ed4792a9b2158216448, type: 3}
     poolSize: 10
+  - effectName: barrier_flash
+    prefab: {fileID: 22627275028735740, guid: b9dd363db5a03ed4792a9b2158216448, type: 3}
+    poolSize: 10
 --- !u!1 &1325549912
 GameObject:
   m_ObjectHideFlags: 0
@@ -49966,6 +49975,7 @@ GameObject:
   - component: {fileID: 1575677074}
   - component: {fileID: 1575677072}
   - component: {fileID: 1575677075}
+  - component: {fileID: 1575677076}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -50161,6 +50171,38 @@ MonoBehaviour:
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
+--- !u!114 &1575677076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575677067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
 --- !u!1 &1576108548
 GameObject:
   m_ObjectHideFlags: 0
@@ -54966,14 +55008,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1815525589}
-  m_LocalRotation: {x: -0, y: -0, z: 0.7090838, w: 0.70512426}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: -0.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_Children:
   - {fileID: 864538577}
   m_Father: {fileID: 644007167}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &1822915393
 GameObject:
   m_ObjectHideFlags: 0
