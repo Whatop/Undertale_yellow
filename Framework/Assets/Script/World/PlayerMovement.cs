@@ -257,6 +257,7 @@ public class PlayerMovement : LivingObject
         InitializeWeapons();
         gameManager.SaveWeaponData(curweaponData);
         laserCoreObject.SetActive(false);
+        SelectWeapon(0);
 
     }
     protected override void Update()
@@ -1368,6 +1369,9 @@ public class PlayerMovement : LivingObject
     }
     public void SelectWeapon(int index)
     {
+        if (currentWeaponIndex == index)
+            return;
+
         currentWeaponIndex = index;
 
         // UI 업데이트

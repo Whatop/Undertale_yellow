@@ -1389,7 +1389,7 @@ public class UIManager : MonoBehaviour
     private void CreateAmmoUI(Weapon weapon)
     {
         // 현재 탄알 수량(남은 탄알)을 기준으로 아이콘을 만들려면 current_magazine 사용
-        int ammoCount = (int)weapon.current_magazine;
+        int ammoCount = (int)weapon.magazine;
         // 만약 “최대 용량”(Capacity)을 보여주려면 weapon.magazine으로 바꿔도 괜찮다
         Vector3 poss = ui_positions[0].transform.position;
         Vector3 posss = ui_positions[0].transform.position;
