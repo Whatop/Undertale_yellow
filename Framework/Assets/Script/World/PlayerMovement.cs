@@ -905,6 +905,8 @@ public class PlayerMovement : LivingObject
             case WeaponType.Blaster:
                 ShootBlaster(); break;
 
+            default:
+                Debug.Log("잘못된 무기 설정");
                 break; // ✅ 추가
         }
 
@@ -917,7 +919,8 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Player_Normal", 0, 0, true);
+            "Player_Normal", 0, 0, true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
     }
 
     IEnumerator ShootNeedleGun()
@@ -1373,6 +1376,9 @@ public class PlayerMovement : LivingObject
         Debug.Log($"Selected Weapon: {playerWeapons[currentWeaponIndex].WeaponName}");
         curweaponData = playerWeapons[currentWeaponIndex];
         gameManager.SaveWeaponData(curweaponData);
+        // 2) UIManager에 알리기
+        if(curweaponData.weaponType != WeaponType.LaserGun)
+        UIManager.Instance.OnWeaponChanged(curweaponData);
     }
     public void SetWeaponData(Weapon weapon)
     {
@@ -1580,7 +1586,7 @@ public class PlayerMovement : LivingObject
 
         // 1) 카메라 위치가 -10이면, 절댓값 10을 넣어야
         //    '카메라 → 화면' 평면이 월드 z = 0에 매핑된다.
-        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z);
+        mouseScreenPos.z = -10;
 
         // 2) 이제 ScreenToWorldPoint를 호출하면
         //    항상 월드 z = 0 평면에서 올바른 (x,y) 좌표를 반환한다.

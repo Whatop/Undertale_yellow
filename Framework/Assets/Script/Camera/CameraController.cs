@@ -39,11 +39,15 @@ public class CameraController : MonoBehaviour
     }
     private void Awake()
     {
-        gameManager = GameManager.Instance;
         cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>(); // 메인 카메라에 붙은 CinemachineBrain 가져오기
         pixelPerfectCamera = GetComponent<CinemachinePixelPerfect>(); // CinemachinePixelPerfect 컴포넌트 가져오기
     }
 
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+ 
+    }
     void Update()
     {
         if (shakeTimer > 0)

@@ -39,8 +39,8 @@ public class DamageText : MonoBehaviour
 
     private void Update()
     {
-        // 텍스트를 이동시킴
-        if(!isObject)
+
+        if (!isObject)
         transform.Translate(moveDirection * speed * Time.deltaTime);
         else
         {

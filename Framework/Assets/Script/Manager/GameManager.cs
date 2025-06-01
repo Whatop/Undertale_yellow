@@ -228,6 +228,7 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
+   
         RectTransform gameoverSoulRect = gameoverSoul.GetComponent<RectTransform>();
         Vector2 screenPosition = Camera.main.WorldToScreenPoint(GetPlayerData().position);
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.U2D;
+using UnityEngine.Experimental.Rendering.Universal;
 
 using UnityEngine.SceneManagement;
 using System;
@@ -71,6 +71,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private GameObject ammos_td;
+    [SerializeField]
     private GameObject[] ui_ammo;
     public GameObject[] pedestal;
     public TextMeshProUGUI ui_ammoText;
@@ -293,10 +294,10 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        gameManager = GameManager.Instance;
         soundManager = SoundManager.Instance;
         BattleManager = BattleManager.Instance;
         dialogueManager = DialogueManager.Instance;
+        gameManager = GameManager.Instance;
         gameover_Object.SetActive(false);
         LoadSettings();
         predefinedResolutions = new List<Resolution>
@@ -353,7 +354,6 @@ public class UIManager : MonoBehaviour
             AddEventTriggerListener(YNButtons[i].gameObject, EventTriggerType.PointerEnter, () => OnButtonHover(index));
         }
         InitHeart();
-        InitWeapon();
         ShowPanel("Game");
         OptionInput();
         UpdateUI();
@@ -1313,30 +1313,8 @@ public class UIManager : MonoBehaviour
         hpBar_text.text = ((int)currentHealth).ToString() + " / " + ((int)maxHealth).ToString();
     }
 
-    void InitWeapon() // 총 새팅
-    {
-        Weapon weapon = gameManager.GetWeaponData();
 
-        int ammo_count = ((int)weapon.magazine);
-        ui_ammo = new GameObject[ammo_count];
-
-        for (int i = 0; i < ammo_count; i++)
-        {
-            GameObject weaponPrefab = Resources.Load<GameObject>("Prefabs/Ammo");
-            GameObject instance = Instantiate(weaponPrefab, ui_positions[0].transform);
-
-            float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
-            Vector3 newPosition = instance.transform.position;
-            newPosition.x = ui_positions[0].transform.position.x + i * sizeY * 1.25f; // 세로 방향으로 위치 설정
-            instance.transform.position = newPosition;
-            if(ammo_count == i + 1)
-            {
-            newPosition.x *= 1.05f; // 세로 방향으로 위치 설정
-                top.transform.position = newPosition;
-            }
-            ui_ammo[i] = instance;
-        }
-    }
+  
 
     public void ShowDamageText(Vector3 worldPosition, float damageAmount)
     { // 월드 좌표를 스크린 좌표로 변환
@@ -1369,7 +1347,7 @@ public class UIManager : MonoBehaviour
         Weapon weapon = gameManager.GetWeaponData();
         float current_magazine = weapon.current_magazine;
 
-        // 총알 이미지 업데이트
+        // 총알 이미지 업데이트f
         for (int i = 0; i < ui_ammo.Length; i++)
         {
             int spriteIndex = (i < current_magazine) ? 0 : 1; // 총알 개수에 따른 스프라이트 인덱스 계산
@@ -1389,9 +1367,56 @@ public class UIManager : MonoBehaviour
 
         }
     }
+    // 1) 무기 교체 시 호출할 메서드
+    public void OnWeaponChanged(Weapon newWeapon)
+    {
+        // (1) 기존 UI 아이콘 정리
+        if (ui_ammo != null)
+        {
+            for (int i = 0; i < ui_ammo.Length; i++)
+            {
+                if (ui_ammo[i] != null)
+                    Destroy(ui_ammo[i]);
+            }
+        }
+        ui_ammo = null;  // 배열 크기를 0 또는 null로 초기화
 
-        // 체력, 무기 등의 UI를 끄는 함수
-        public void OffPlayerUI()
+        // (2) 새 무기의 current_magazine 개수에 맞춰 다시 생성
+        CreateAmmoUI(newWeapon);
+    }
+
+    // 2) 실제 아이콘 생성 로직을 분리해 둔다
+    private void CreateAmmoUI(Weapon weapon)
+    {
+        // 현재 탄알 수량(남은 탄알)을 기준으로 아이콘을 만들려면 current_magazine 사용
+        int ammoCount = (int)weapon.current_magazine;
+        // 만약 “최대 용량”(Capacity)을 보여주려면 weapon.magazine으로 바꿔도 괜찮다
+        Vector3 poss = ui_positions[0].transform.position;
+        Vector3 posss = ui_positions[0].transform.position;
+
+        ui_ammo = new GameObject[ammoCount];
+        for (int i = 0; i < ammoCount; i++)
+        {
+            // Resources/Prefabs/Ammo.prefab 경로에 프리팹이 있어야 한다
+            GameObject prefab = Resources.Load<GameObject>("Prefabs/Ammo");
+            GameObject instance = Instantiate(prefab, ui_positions[0].transform);
+
+            // 위치 세팅 (예시)
+            float sizeY = instance.GetComponent<RectTransform>().sizeDelta.y;
+            Vector3 pos = ui_positions[0].transform.position;
+            pos.x += i * sizeY * 1.25f;
+            instance.transform.position = pos;
+            poss.x = pos.x + 200;
+            posss.x = pos.x + 25;
+            ui_ammo[i] = instance;
+        }
+        ui_ammoText.gameObject.transform.position = poss;
+        top.gameObject.transform.position = posss;
+
+    }
+
+    // 체력, 무기 등의 UI를 끄는 함수
+    public void OffPlayerUI()
     {
         foreach (var ui in ui_ammo)
         {

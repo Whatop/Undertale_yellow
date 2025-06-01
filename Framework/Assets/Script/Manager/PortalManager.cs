@@ -49,11 +49,11 @@ public class PortalManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        gameManager = GameManager.Instance;
     }
 
     private void Start()
     {
+        gameManager = GameManager.Instance;
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>();
 
