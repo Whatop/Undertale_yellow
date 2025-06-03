@@ -1600,7 +1600,6 @@ public class PlayerMovement : LivingObject
         // 3) 플레이어 위치와의 방향 벡터 산출
         Vector2 dir = (mouseWorldPos - gameManager.GetPlayerData().player.transform.position);
 
-        Debug.DrawLine(transform.position, mouseWorldPos, Color.red);
         // 4) 방향 벡터로부터 방위 각(도)을 계산
         return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
     }

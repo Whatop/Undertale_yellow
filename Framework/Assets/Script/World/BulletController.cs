@@ -598,19 +598,21 @@ public class BulletController : MonoBehaviour
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         BoxCollider2D col = GetComponent<BoxCollider2D>();
 
-        // ① 스프라이트 월드 단위 바운드 계산 (scale=1일 때)
+        // ① 스프라이트 실제 월드 단위 크기 (스케일=1일 때)
         float spriteUnitWidth = sr.sprite.bounds.size.x; // 예: 0.25
         float spriteUnitHeight = sr.sprite.bounds.size.y; // 예: 1
 
-        // 레이저를 왼쪽 방향으로 쏠 예정이라면 flipX=true
-        sr.flipX = true;
-        transform.rotation = Quaternion.identity;
+        // ② 마우스 방향으로 레이저 회전
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dirToMouse = (mouseWorld - transform.position).normalized;
+        float angle = Mathf.Atan2(dirToMouse.y, dirToMouse.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // (1) 초기 두께 설정 (예: 0.1 유닛)
-        float initialThickness = 0.1f;
-        // **scaleY는 여기서 한 번만 선언**
+        // ③ 초기 두께(높이) 세팅
+        float initialThickness = 0.6f;
         float scaleY = initialThickness / spriteUnitHeight;
-        transform.localScale = new Vector3(0.01f, scaleY, 1f);
+        // 피벗이 오른쪽이므로, 고작 0.01만큼만 음수 스케일을 줘서 거의 보이지 않게 시작
+        transform.localScale = new Vector3(-0.01f, scaleY, 1f);
         laserInitialized = true;
 
         float growDuration = 0.15f;
@@ -619,34 +621,27 @@ public class BulletController : MonoBehaviour
         float t = 0f;
         bool didHitOnce = false;
 
-        // 선형 증가 속도 계산 (최대 길이 기준)
-        float finalScaleX = maxLaserLength / spriteUnitWidth;
-        float speedPerSecX = finalScaleX / growDuration;
-
+        // ────────────────────────────────────────────────────────
+        // (1) 성장 단계: growDuration 동안 “충돌 거리”를 매 프레임 계산하면서 스케일 보간
         while (t < growDuration)
         {
             float deltaTime = Time.deltaTime;
             t += deltaTime;
 
-            // 매 프레임 최신 startPos, laserDir 갱신
+            // (a) 매 프레임 RaycastAll: 벽/Barrier 충돌 거리 nearestDist 계산
             Vector2 startPos = transform.position;
-            Vector2 laserDir = transform.right; // flipX=true → (-1, 0)
+            Vector2 laserDir = transform.right; // (피벗이 오른쪽이므로 transform.right는 (-1,0)일 것)
 
-            // RaycastAll → 태그로만 필터링
             RaycastHit2D[] hitsAll = Physics2D.RaycastAll(startPos, laserDir, maxLaserLength);
-
             float nearestDist = maxLaserLength;
             Vector2 nearestPoint = startPos + laserDir * maxLaserLength;
             string nearestTag = "";
 
             foreach (var h in hitsAll)
             {
-                if (h.collider == null)
-                    continue;
-                if (h.collider == col)
-                    continue; // 자기 자신 무시
+                if (h.collider == null) continue;
+                if (h.collider == col) continue; // 자신 콜라이더 무시
 
-                // 태그가 "Wall" 또는 "Barrier"인 경우에만 벽으로 취급
                 string tag = h.collider.tag;
                 if (tag == "Wall" || tag == "Barrier")
                 {
@@ -659,30 +654,30 @@ public class BulletController : MonoBehaviour
                 }
             }
 
-            // (a) 목표 X 스케일 계산 (월드 거리 → 로컬 스케일)
-            float targetScaleX = nearestDist / spriteUnitWidth;
-            targetScaleX = -Mathf.Abs(targetScaleX); // 왼쪽(음수) 방향
+            // (b) “벽까지 충돌 거리” → 스케일 X로 환산 (피벗이 RIGHT이므로 음수 부호)
+            float desiredScaleX = -Mathf.Abs(nearestDist / spriteUnitWidth);
 
-            // (b) 선형 증가: 이전 프레임 값 + 속도*deltaTime
-            float currentScaleX = transform.localScale.x;
-            float nextScaleX = currentScaleX + (speedPerSecX * deltaTime);
-            if (currentScaleX < 0f)
-                nextScaleX = Mathf.Max(nextScaleX, targetScaleX);
-            else
-                nextScaleX = Mathf.Min(nextScaleX, targetScaleX);
+            // (c) 보간 (t: 0 → growDuration 구간)
+            // t == 0일 때 currentScaleX = -0.01 (초기값),
+            // t == growDuration 일 때 currentScaleX = desiredScaleX(벽 위치 딱 맞춤)
+            float lerpFactor = Mathf.Clamp01(t / growDuration);
+            float currentScaleX = Mathf.Lerp(-0.01f, desiredScaleX, lerpFactor);
 
-            // (c) 높이(두께) 재활용된 scaleY 적용
-            transform.localScale = new Vector3(nextScaleX, scaleY, 1f);
+            transform.localScale = new Vector3(currentScaleX, scaleY, 1f);
 
-            // (d) Collider 적용
+            // (d) Collider 업데이트
             if (col != null)
             {
+                // size는 스프라이트 1배 크기(언스케일 상태)로 설정
                 col.size = new Vector2(spriteUnitWidth, spriteUnitHeight);
-                float signX = Mathf.Sign(transform.localScale.x);
-                col.offset = new Vector2((spriteUnitWidth / 2f) * signX, 0f);
+
+                // pivot=Right이므로, offset.x 를 항상 “spriteUnitWidth / 2” 로 둠
+                // => 로컬 스케일이 음수일 때, 실제 Offset 위치는 (spriteUnitWidth/2 * localScale.x) 이 되어
+                //    “(spriteUnitWidth/2 * -abs) = -절반길이” 가 됨 → 콜라이더 중심이 스프라이트 중앙으로 이동
+                col.offset = new Vector2(spriteUnitWidth / 2f, 0f);
             }
 
-            // (e) 첫 충돌(벽) 이펙트
+            // (e) 첫 Wall/Barrier 충돌 이펙트(한 번만)
             if (!didHitOnce && nearestTag != "")
             {
                 didHitOnce = true;
@@ -692,27 +687,32 @@ public class BulletController : MonoBehaviour
             yield return null;
         }
 
-        // ───────────────────────────────────────────────────────────────────────────
-        // (2) keepLaser 기간 동안 매 프레임 거리 & 데미지 갱신
+        // ────────────────────────────────────────────────────────
+        // (2) 유지 구간: keepLaser == true 면, 매 프레임 충돌거리 기준으로 스케일 즉시 세팅
         didHitOnce = false;
         while (keepLaser)
         {
             Vector2 startPos = transform.position;
-            Vector2 laserDir = transform.right;
+            Vector2 laserDir = transform.right; // 여전히 (-1,0)
 
-            // RaycastAll → 태그로만 필터링
-            RaycastHit2D[] hitsAll = Physics2D.RaycastAll(startPos, laserDir, maxLaserLength);
+            float margin = 1.05f;
+            Vector2 origin = startPos + (laserDir * -margin);
 
-            float nearestDist = maxLaserLength;
-            Vector2 nearestPoint = startPos + laserDir * maxLaserLength;
+            RaycastHit2D[] hitsAll = Physics2D.RaycastAll(
+                origin,
+                laserDir,
+                maxLaserLength + margin,
+                LayerMask.GetMask("Wall", "Barrier", "Enemy")
+            );
+
+            float nearestDist = maxLaserLength + margin;
+            Vector2 nearestPoint = origin + laserDir * (maxLaserLength + margin);
             string nearestTag = "";
 
             foreach (var h in hitsAll)
             {
-                if (h.collider == null)
-                    continue;
-                if (h.collider == col)
-                    continue;
+                if (h.collider == null) continue;
+                if (h.collider == col) continue;
 
                 string tag = h.collider.tag;
                 if (tag == "Wall" || tag == "Barrier")
@@ -726,26 +726,24 @@ public class BulletController : MonoBehaviour
                 }
             }
 
-            // (a) 유지 구간: 즉시 targetScaleX 적용
+            // (a) 즉시 스케일 적용 (grow 단계와 달리 보간 없이 바로 적용)
             float targetScaleX = -Mathf.Abs(nearestDist / spriteUnitWidth);
             transform.localScale = new Vector3(targetScaleX, scaleY, 1f);
 
+            // (b) Collider 업데이트 (pivot=Right 이므로 offset.x = spriteUnitWidth/2 고정)
             if (col != null)
             {
                 col.size = new Vector2(spriteUnitWidth, spriteUnitHeight);
-                float signX = Mathf.Sign(transform.localScale.x);
-                col.offset = new Vector2((spriteUnitWidth / 2f) * signX, 0f);
+                col.offset = new Vector2(spriteUnitWidth / 2f, 0f);
             }
 
-            // (b) Enemy 관통 데미지 처리: 태그가 "Enemy"인 경우
+            // (c) 벽/Barrier에 안 닿았으면 적 관통
             if (nearestTag != "Wall" && nearestTag != "Barrier")
             {
-                // 벽에 맞지 않은 상태라면, 레이저 앞쪽 거리 전체를 대상으로 적 태그 검사
                 RaycastHit2D[] enemyHits = Physics2D.RaycastAll(startPos, laserDir, nearestDist);
                 foreach (var eh in enemyHits)
                 {
-                    if (eh.collider == col)
-                        continue;
+                    if (eh.collider == col) continue;
 
                     if (eh.collider.tag == "Enemy")
                     {
@@ -756,7 +754,7 @@ public class BulletController : MonoBehaviour
                 }
             }
 
-            // (c) 첫 충돌(벽) 이펙트
+            // (d) 한 번만 벽 충돌 이펙트
             if (!didHitOnce && nearestTag != "")
             {
                 didHitOnce = true;
@@ -769,6 +767,7 @@ public class BulletController : MonoBehaviour
         // (3) 레이저 종료
         DestroyBullet();
     }
+
 
     public void OnHitByShield()
     {

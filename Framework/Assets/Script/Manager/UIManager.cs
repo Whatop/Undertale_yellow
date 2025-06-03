@@ -1813,16 +1813,18 @@ public class UIManager : MonoBehaviour
     }
     void UpdateResolution(int width, int height)
     {
-        // Pixel Perfect 카메라 해상도 설정
-        pixelPerfectCamera.refResolutionX = width;
-        pixelPerfectCamera.refResolutionY = height;
 
-        // Canvas Scaler와 연동
         CanvasScaler scaler = uicanvas.GetComponent<CanvasScaler>();
-        if (scaler != null)
+        if (scaler != null && scaler.uiScaleMode == CanvasScaler.ScaleMode.ScaleWithScreenSize)
         {
             scaler.referenceResolution = new Vector2(width, height);
         }
+        else
+        {
+            Debug.LogWarning("CanvasScaler가 없거나 올바른 모드가 아닙니다.");
+        }
+
+        Screen.SetResolution(width, height, Screen.fullScreen); // 옵션
     }
 
     public void SetBGVolume()

@@ -48,7 +48,7 @@ public class GasterBlaster : MonoBehaviour
 
         GameObject laser = Instantiate(laserPrefab, laserSpawnPoint.position, laserSpawnPoint.rotation);
         laser.transform.SetParent(transform); // 부모로 붙여 연동
-        CameraController.Instance.ShakeCamera();
+       // CameraController.Instance.ShakeCamera();
         EndAttack();
     }
     public void EndAttack()
