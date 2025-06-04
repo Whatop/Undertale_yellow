@@ -23412,6 +23412,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e3f15f8e749b54f45af0b165cd0e52b0, type: 3}
   - {fileID: 8300000, guid: 41c965ead805d6a40b3a3a788521cff5, type: 3}
   - {fileID: 8300000, guid: d0282a764a68f5840b8a901ae03bfded, type: 3}
+  - {fileID: 8300000, guid: b351568613b1ff948888dcb8fbb5a3ca, type: 3}
   txtlist:
   - {fileID: 8300000, guid: a5fcf6f43cc911a42a2b19fe5901a30d, type: 3}
   - {fileID: 8300000, guid: 21278621334a6f6418a11cd6f426864b, type: 3}
@@ -42811,6 +42812,7 @@ MonoBehaviour:
   walkingSoundInterval: 0.3
   distanceThreshold: 1
   laserCoreObject: {fileID: 864538576}
+  laserPrefab: {fileID: 1175165634145871427, guid: 918ba68f6a4e1eb47b17c1119885753f, type: 3}
 --- !u!4 &1239929340
 Transform:
   m_ObjectHideFlags: 0
@@ -50170,6 +50172,7 @@ GameObject:
   - component: {fileID: 1575677072}
   - component: {fileID: 1575677076}
   - component: {fileID: 1575677075}
+  - component: {fileID: 1575677077}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -50387,7 +50390,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -50397,6 +50400,23 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &1575677077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575677067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 7a3551c6bc1af6143aad5c0ceb06cfc6, type: 2}
 --- !u!1 &1584533785
 GameObject:
   m_ObjectHideFlags: 0

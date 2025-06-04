@@ -197,8 +197,7 @@ public class PlayerMovement : LivingObject
 
     private Coroutine pressFireCoroutine;
     private bool isPressFiring = false;
-
-
+    public GameObject laserPrefab;        // 위에서 만든 “레이저 전용 프리팹”
     #region Test_code
 
     // Soul 모드 처리 테스트 용도입니다
@@ -274,11 +273,7 @@ public class PlayerMovement : LivingObject
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
         {
-            if (UIManager.Instance.reloadSlider != null)
-            {
-                UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
-            }
-
+           
             float angle = CalculateMouseAngle();
             Hands.gameObject.SetActive(true);
 
@@ -666,76 +661,96 @@ public class PlayerMovement : LivingObject
             StartCoroutine(Reload());
         }
     }
-
-    void UpdateLaserWeapon()
+    /// <summary>
+    /// 레이저 전용 업데이트 (마우스 눌러있는 동안 연속 발사)
+    /// </summary>
+    private void UpdateLaserWeapon()
     {
-        Weapon weapon = curweaponData; // 캐싱
+        Weapon weapon = curweaponData;
+        float currentAmmo = weapon.current_Ammo;
 
-        if (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
+        // 1) 마우스 왼쪽 버튼이 눌린 상태 && 남은 탄약이 있으면 StartLaser()
+        if (Input.GetMouseButton(0) && currentAmmo > 0f)
         {
             if (!isLaserFiring)
                 StartLaser();
 
-            curweaponData.current_Ammo -= (40 * Time.deltaTime);
-            curweaponData.current_Ammo = Mathf.Clamp(curweaponData.current_Ammo, 0, weapon.maxAmmo);
+            // 2) 레이저 중인 동안 탄약 소모 (초당 40 단위 예시)
+            weapon.current_Ammo -= (40f * Time.deltaTime);
+            weapon.current_Ammo = Mathf.Clamp(weapon.current_Ammo, 0f, weapon.maxAmmo);
 
-            UIManager.Instance.UpdateLaserSlider(curweaponData.current_Ammo, weapon.maxAmmo);
+            // 3) UI 슬라이더(레이저용) 업데이트
+            UIManager.Instance.UpdateLaserSlider(weapon.current_Ammo, weapon.maxAmmo);
         }
         else
         {
+            // 버튼을 뗐거나 탄약이 바닥났으면 StopLaser()
             if (isLaserFiring)
                 StopLaser();
         }
     }
-    void StopLaser()
+
+    private void StartLaser()
+    {
+        if (isLaserFiring) return;
+        isLaserFiring = true;
+
+        // 1) 차지(발사 준비) 사운드 재생
+        SoundManager.Instance.SFXPlay("se_gapower", 63);
+        if (laserCoreObject != null)
+            laserCoreObject.SetActive(true);
+
+        Vector3 spawnPos = soulshotpoint.position;
+        Quaternion spawnRot = GetMouseRotation();
+
+        currentLaser = Instantiate(laserPrefab, spawnPos, spawnRot);
+        currentLaser.transform.SetParent(soulshotpoint);
+        currentLaser.transform.localPosition = Vector3.zero;
+        currentLaser.transform.localRotation = Quaternion.identity;
+        currentLaser.transform.localScale = Vector3.one;
+
+        BulletController bc = currentLaser.GetComponent<BulletController>();
+        if (bc != null)
+        {
+            bc.damage = curweaponData.damage;
+            bc.FireLaser();  // ← 현재 BulletController에 없음! (컴파일 오류)
+        }
+        else
+        {
+            Debug.LogError("[PlayerMovement] 생성된 레이저 오브젝트에 BulletController가 없습니다.");
+        }
+    }
+
+    private void StopLaser()
     {
         isLaserFiring = false;
-        laserCoreObject.SetActive(false);
+
+        if (laserCoreObject != null)
+            laserCoreObject.SetActive(false);
+
         if (currentLaser != null)
         {
-            // 레이저 유지 루프 종료를 알려 주기
-            var bc = currentLaser.GetComponent<BulletController>();
+            BulletController bc = currentLaser.GetComponent<BulletController>();
             if (bc != null)
-                bc.keepLaser = false;
-
-            // 부모에서 분리하고, 파괴 처리
-            currentLaser.transform.SetParent(null);
-            currentLaser.GetComponent<BulletController>()?.DestroyBullet();
+            {
+                bc.StopLaser();  // ← 마찬가지로 BulletController에 없음
+            }
             currentLaser = null;
         }
     }
 
-
-
-    void StartLaser()
+    /// <summary>
+    /// 마우스 위치를 기준으로 “화면 우측”을 바라보게 만드는 회전값 계산
+    /// </summary>
+    private Quaternion GetMouseRotation()
     {
-        if (isLaserFiring) return;
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorld.z = 0f;
+        Vector3 dir = (mouseWorld - WeaponTransform.position).normalized;
 
-        isLaserFiring = true;
-        laserCoreObject.SetActive(true);
-
-        currentLaser = BattleManager.Instance.SpawnBulletAtPosition(
-            BulletType.Laser,
-            soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
-            "Laser", 0, 0, true,
-            curweaponData.maxRange,curweaponData.bulletSpeed,curweaponData.damage);
-
-        // 2) 빔을 플레이어(총구)에 붙이고
-        currentLaser.transform.SetParent(soulshotpoint);
-        currentLaser.transform.localPosition = Vector3.zero;
-        currentLaser.transform.localRotation = Quaternion.identity;
-
-        // 3) 초기 크기 세팅
-        currentLaser.transform.localScale = new Vector3(0.2f, 1f, 1f);
-
-        // 4) BulletController.keepLaser = true로 설정
-        var bc = currentLaser.GetComponent<BulletController>();
-        if (bc != null)
-            bc.keepLaser = true;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        return Quaternion.Euler(0f, 0f, angle);
     }
-
 
     void Shoot()
     {
@@ -1255,7 +1270,7 @@ public class PlayerMovement : LivingObject
             WeaponName = "주황",
             weaponType = WeaponType.Shotgun,
             damage = 4,
-            magazine = 2,
+            magazine = 4,
             current_magazine = 4,
             maxAmmo = 30,
             maxRange = 4f,
@@ -1299,7 +1314,7 @@ public class PlayerMovement : LivingObject
             id = 5,
             WeaponName = "파랑",
             weaponType = WeaponType.LaserGun,
-            damage = 1f,
+            damage = 100f,
             magazine = 700,
             current_magazine = 700,
             maxAmmo = 700,
