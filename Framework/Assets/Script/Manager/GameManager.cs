@@ -737,8 +737,8 @@ public class GameManager : MonoBehaviour
         playerData.position = new Vector3(posX, posY, posZ);
 
         // 체력 및 기타 플레이어 데이터 로드
-        playerData.health = PlayerPrefs.GetInt("PlayerHealth", 6); // 기본 값 6
-        playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 6);
+        playerData.health = PlayerPrefs.GetInt("PlayerHealth", 20); // 기본 값 6
+        playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 20);
         playerData.player_Name = PlayerPrefs.GetString("PlayerName", playerData.player_Name);
 
         // 인벤토리 아이템 로드

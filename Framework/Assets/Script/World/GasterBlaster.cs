@@ -30,12 +30,12 @@ public class GasterBlaster : MonoBehaviour
     public void Shot()
     {
         animator.SetTrigger("OpenMouth");
-         Vector2 targetPos = GameManager.Instance.GetPlayerData().player.transform.position;
-         Vector2 myPos = transform.position;
-         
-         Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
-         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-         transform.rotation = Quaternion.Euler(0, 0, angle +90); // Sprite의 위쪽이 forward면 -90 보정
+        Vector2 targetPos = GameManager.Instance.GetPlayerData().player.transform.position;
+        Vector2 myPos = transform.position;
+
+        Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle + 90); // Sprite의 위쪽이 forward면 -90 보정
 
         SoundManager.Instance.SFXPlay("gasterblaster", 225); // 충전/발사 사운드
     }
@@ -48,7 +48,7 @@ public class GasterBlaster : MonoBehaviour
 
         GameObject laser = Instantiate(laserPrefab, laserSpawnPoint.position, laserSpawnPoint.rotation);
         laser.transform.SetParent(transform); // 부모로 붙여 연동
-       // CameraController.Instance.ShakeCamera();
+        CameraController.Instance.ShakeCamera();
         EndAttack();
     }
     public void EndAttack()

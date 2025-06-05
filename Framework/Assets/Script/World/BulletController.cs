@@ -208,7 +208,8 @@ public class BulletController : MonoBehaviour
 
         // 거리 누적
         traveledDistance = Vector2.Distance(transform.position, initialPosition);
-        if (traveledDistance >= maxrange)
+        if (traveledDistance >= maxrange&&bulletType != BulletType.GasterBlaster 
+            && bulletType != BulletType.Homing )
         {
             DestroyBullet(); // 또는 gameObject.SetActive(false);
         }
@@ -498,45 +499,15 @@ public class BulletController : MonoBehaviour
         yield return null;
     }
 
+
     private IEnumerator LaserCheck()
     {
         isLaser = true;
-        // LineRenderer를 활성화하고, 충돌 데미지 처리를 위한 변수도 초기화
-        if (lineRenderer != null) lineRenderer.enabled = true;
+        //rb.velocity = storedFireDirection * speed;
 
-        // 레이저가 유지되는 동안(keepLaser == true)
-        while (keepLaser)
-        {
-            // 1) 발사 방향(혹은 실제 Ray) 갱신: 예를 들어
-            Vector3 startPos = transform.position;
-            Vector3 endPos = startPos + (transform.up * maxLaserDistance);
-            lineRenderer.SetPosition(0, startPos);
-            lineRenderer.SetPosition(1, endPos);
+        yield return null;
 
-            // 2) Raycast를 사용해 레이저가 충돌한 지점 찾기
-            RaycastHit2D hit = Physics2D.Raycast(startPos, transform.up, maxLaserDistance, hitMask);
-            if (hit.collider != null)
-            {
-                // 데미지 처리 (한번만 처리하려면 didHitOnce 플래그를 활용)
-                if (!didHitOnce && hit.collider.CompareTag("Enemy"))
-                {
-                    hit.collider.GetComponent<EnemyController>()?.TakeDamage(damage);
-                    didHitOnce = true;
-                }
-            }
-            else
-            {
-                didHitOnce = false; // 레이저가 아무것도 맞추지 않을 때는 플래그 해제
-            }
-
-            yield return null; // 다음 프레임까지 대기
-        }
-
-        // 레이저를 멈출 때 처리
         isLaser = false;
-        if (lineRenderer != null) lineRenderer.enabled = false;
-        didHitOnce = false;
-        Destroy(gameObject);
     }
 
     private IEnumerator SplitBullets(int splitCount)
@@ -600,7 +571,7 @@ public class BulletController : MonoBehaviour
                 }
             }
 
-            if(bulletType != BulletType.GasterBlaster)
+            if(bulletType != BulletType.GasterBlaster&& bulletType != BulletType.Barrier)
             DestroyBullet();
         }
         else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)

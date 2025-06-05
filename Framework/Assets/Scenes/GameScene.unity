@@ -22782,10 +22782,7 @@ MonoBehaviour:
     prefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
     poolSize: 6
   - bulletName: GasterBlaster
-    prefab: {fileID: 865015800}
-    poolSize: 6
-  - bulletName: Laser
-    prefab: {fileID: 1175165634145871427, guid: 918ba68f6a4e1eb47b17c1119885753f, type: 3}
+    prefab: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
     poolSize: 6
   - bulletName: Barrier
     prefab: {fileID: 3895800555120272318, guid: 3f05af0fb5715cd4f9e99541930c16a5, type: 3}
@@ -23433,6 +23430,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 495b0a053b3eadc4aa59e30ee625d385, type: 3}
   - {fileID: 8300000, guid: fcdf5a1d0cc7eba41bc7a4e5f2b826e1, type: 3}
   initialPoolSize: 10
+  sfxList: []
 --- !u!1 &643707716
 GameObject:
   m_ObjectHideFlags: 0
@@ -34838,7 +34836,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 6
   m_Sprite: {fileID: 21300000, guid: 6c0a46dd62c1ada45a03597d0f023fb2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -34850,11 +34848,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &865015800 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-  m_PrefabInstance: {fileID: 7197532938500246322}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &874688672
 GameObject:
   m_ObjectHideFlags: 0
@@ -62358,63 +62351,6 @@ MonoBehaviour:
   count: 10
   radius: 260
   faceOutward: 1
---- !u!1001 &7197532938500246322
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_RootOrder
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15.42
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.57
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_Name
-      value: GasterBlaster
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
 --- !u!4 &8525553241183183686
 Transform:
   m_ObjectHideFlags: 0

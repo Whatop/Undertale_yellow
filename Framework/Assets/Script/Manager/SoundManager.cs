@@ -15,6 +15,24 @@ public class SoundManager : MonoBehaviour
     private Queue<AudioSource> sfxPool = new Queue<AudioSource>(); // SFX 풀
     public int initialPoolSize = 10; // 초기 풀 크기
 
+    [System.Serializable]
+    public class SFXInfo
+    {
+        public int id;           // 예: 63, 226 등
+        public AudioClip clip;
+        // 생성자 추가 (있어도 되고 없어도 됩니다)
+        public SFXInfo(int _id, AudioClip _clip)
+        {
+            id = _id;
+            clip = _clip;
+        }
+    }
+    [SerializeField]
+    private SFXInfo[] sfxList;   // Inspector에서 사운드 ID별 AudioClip 연결
+
+    // 재생 중인 looping SFX를 ID별로 관리하기 위한 Dictionary
+    private Dictionary<int, AudioSource> loopingSources = new Dictionary<int, AudioSource>();
+
     private void Awake()
     {
         if (instance == null)
@@ -32,6 +50,13 @@ public class SoundManager : MonoBehaviour
                 go.transform.SetParent(transform);
                 go.SetActive(false);
                 sfxPool.Enqueue(audioSource);
+            }
+            // sfxList 길이를 sfxClips.Length만큼 잡고, 한 칸씩 초기화
+            sfxList = new SFXInfo[sfxlist.Length];
+            for (int i = 0; i < sfxlist.Length; i++)
+            {
+                // 방법1: 생성자 사용
+                sfxList[i] = new SFXInfo(i, sfxlist[i]);
             }
         }
         else
@@ -59,61 +84,132 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
+     private void InitializeSFXPool()
+    {
+        // 초기 풀 생성: AudioSource 오브젝트를 initialPoolSize만큼 만들어서 큐에 넣어둠
+        for (int i = 0; i < initialPoolSize; i++)
+        {
+            GameObject go = new GameObject("SFXSource");
+            go.transform.SetParent(transform);
+            AudioSource a = go.AddComponent<AudioSource>();
+            a.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
+            a.playOnAwake = false;
+            go.SetActive(false);
+            sfxPool.Enqueue(a);
+        }
+    }
 
-    // 사운드 이펙트(SFX) 재생
+    /// <summary>
+    /// 1회용 SFX 재생 (풀에서 AudioSource 꺼내서 Play → 끝나면 풀로 복귀)
+    /// </summary>
     public void SFXPlay(string sfxName, int sfxNum)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = sfxlist[sfxNum];
         audioSource.volume = 0.1f;
+        audioSource.loop = false;
+        audioSource.gameObject.SetActive(true);
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
-    }  
-    // 사운드 이펙트(SFX) 재생
+    }
+
+    /// <summary>
+    /// 1회용 SFX 재생(볼륨 지정 버전)
+    /// </summary>
     public void SFXPlay(string sfxName, int sfxNum, float volume)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = sfxlist[sfxNum];
         audioSource.volume = volume;
+        audioSource.loop = false;
+        audioSource.gameObject.SetActive(true);
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
 
-    // 텍스트 관련 SFX 재생
+    /// <summary>
+    /// 텍스트(나레이션 등) 재생할 때, 1회용으로 사용
+    /// </summary>
     public void SFXTextPlay(string textName, int textNum)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = txtlist[textNum];
         audioSource.volume = 0.1f;
+        audioSource.loop = false;
+        audioSource.gameObject.SetActive(true);
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
 
+    /// <summary>
+    /// 1회용 SFX용 AudioSource를 풀에서 꺼내거나, 풀에 남아있는 게 없으면 새로 생성
+    /// </summary>
     private AudioSource GetAudioSourceFromPool()
     {
         if (sfxPool.Count > 0)
         {
             AudioSource source = sfxPool.Dequeue();
-            source.gameObject.SetActive(true);
             return source;
         }
         else
         {
             GameObject go = new GameObject("SFXSource");
+            go.transform.SetParent(transform);
             AudioSource audioSource = go.AddComponent<AudioSource>();
             audioSource.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
-            go.transform.SetParent(transform);
+            audioSource.playOnAwake = false;
             return audioSource;
         }
     }
+    /// <summary>
+    /// 루프 사운드 재생 시작 (ID로 식별) 
+    /// 이미 재생 중이라면 무시
+    /// </summary>
+    public void SFXPlayLoop(int sfxNum, float volume = 1f)
+    {
+        // 이미 재생 중이면 중복 재생 금지
+        if (loopingSources.ContainsKey(sfxNum))
+            return;
 
+        // 풀에서 AudioSource 꺼내기
+        AudioSource source = GetAudioSourceFromPool();
+        source.clip = sfxlist[sfxNum];
+        source.volume = volume;
+        source.loop = true;
+        source.gameObject.SetActive(true);
+        source.Play();
+
+        loopingSources.Add(sfxNum, source);
+    }
+
+    /// <summary>
+    /// 루프 사운드 정지 (ID로 식별하여 해당 AudioSource를 풀로 반환)
+    /// </summary>
+    public void SFXStopLoop(int sfxNum)
+    {
+        if (!loopingSources.ContainsKey(sfxNum))
+            return;
+
+        AudioSource source = loopingSources[sfxNum];
+        source.Stop();
+        source.loop = false;
+        source.gameObject.SetActive(false);
+
+        // 풀에 되돌리기
+        sfxPool.Enqueue(source);
+        loopingSources.Remove(sfxNum);
+    }
+    /// <summary>
+    /// 클립이 끝나면 AudioSource를 꺼서 풀에 재등록
+    /// </summary>
     private IEnumerator DeactivateAfterPlay(AudioSource audioSource)
     {
+        // 클립 길이만큼 대기
         yield return new WaitForSeconds(audioSource.clip.length);
+        audioSource.Stop();
         audioSource.gameObject.SetActive(false);
         sfxPool.Enqueue(audioSource);
     }
-
     public void BGSoundSave(AudioClip clip)
     {
         bgSound.clip = clip;

@@ -273,7 +273,10 @@ public class PlayerMovement : LivingObject
 
         if (!UIManager.Instance.isUserInterface && !gameManager.GetPlayerData().isStop && !gameManager.GetPlayerData().isDie)
         {
-           
+            if (UIManager.Instance.reloadSlider != null)
+            {
+                UIManager.Instance.reloadSlider.transform.position = reloadPoint.transform.position;
+            }
             float angle = CalculateMouseAngle();
             Hands.gameObject.SetActive(true);
 
@@ -695,8 +698,11 @@ public class PlayerMovement : LivingObject
         if (isLaserFiring) return;
         isLaserFiring = true;
 
-        // 1) 차지(발사 준비) 사운드 재생
-        SoundManager.Instance.SFXPlay("se_gapower", 63);
+        // 1) 차지 사운드 (한 번만 재생)
+        SoundManager.Instance.SFXPlay("charge", 63);
+
+        // 2) 홀드 사운드 (루프 재생 시작)
+        SoundManager.Instance.SFXPlayLoop(226, 0.05f);
         if (laserCoreObject != null)
             laserCoreObject.SetActive(true);
 
@@ -708,12 +714,12 @@ public class PlayerMovement : LivingObject
         currentLaser.transform.localPosition = Vector3.zero;
         currentLaser.transform.localRotation = Quaternion.identity;
         currentLaser.transform.localScale = Vector3.one;
-
+        currentLaser.SetActive(true);
         BulletController bc = currentLaser.GetComponent<BulletController>();
         if (bc != null)
         {
             bc.damage = curweaponData.damage;
-            bc.FireLaser();  // ← 현재 BulletController에 없음! (컴파일 오류)
+            bc.FireLaser();  
         }
         else
         {
@@ -725,6 +731,9 @@ public class PlayerMovement : LivingObject
     {
         isLaserFiring = false;
 
+        // 1) 홀드 사운드 루프 정지
+        SoundManager.Instance.SFXStopLoop(226);
+
         if (laserCoreObject != null)
             laserCoreObject.SetActive(false);
 
@@ -735,8 +744,8 @@ public class PlayerMovement : LivingObject
             {
                 bc.StopLaser();  // ← 마찬가지로 BulletController에 없음
             }
-            currentLaser = null;
         }
+        currentLaser.SetActive(false);
     }
 
     /// <summary>
