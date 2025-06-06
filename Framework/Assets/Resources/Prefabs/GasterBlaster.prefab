@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7197532938389552711}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: spawnpoint
   m_TagString: Untagged
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -23,13 +23,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7197532938389552710}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -9.6, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7197532939296709833}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &7197532939296709834
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,3 +220,11 @@ MonoBehaviour:
   isFreind: 0
   isPiercing: 0
   dotInterval: 0.2
+  travelTime: 1.2
+  rotationMultiplier: 0.8
+  keepLaser: 0
+  maxLaserDistance: 20
+  lineRenderer: {fileID: 0}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 0

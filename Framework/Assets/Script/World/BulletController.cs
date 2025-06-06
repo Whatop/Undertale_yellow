@@ -577,6 +577,7 @@ public class BulletController : MonoBehaviour
         else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
         {
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
+            if(bulletType != BulletType.GasterBlaster&& bulletType != BulletType.Barrier)
             DestroyBullet();
         }
 
@@ -680,7 +681,11 @@ public class BulletController : MonoBehaviour
                     barrierFound = true;
                 }
             }
-            else if (h.collider.CompareTag("Enemy"))
+            else if (h.collider.CompareTag("Enemy") && !isFreind)
+            {
+                enemyHits.Add(h);
+            }
+            else if (h.collider.CompareTag("Player") && isFreind)
             {
                 enemyHits.Add(h);
             }
