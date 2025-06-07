@@ -504,89 +504,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -0.000015259, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1001 &17564998
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 7197532938389552711, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532938389552711, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532938389552711, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532938389552711, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_RootOrder
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 48
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709833, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_Name
-      value: GasterBlaster
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 7197532939296709834, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-      propertyPath: m_TagString
-      value: Barrier
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8176244936074266957, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-    - {fileID: 7197532939296709838, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
-  m_SourcePrefab: {fileID: 100100000, guid: 9a30dc101844da444a87083c86ebb024, type: 3}
 --- !u!1 &18503566
 GameObject:
   m_ObjectHideFlags: 0
@@ -9996,12 +9913,12 @@ GameObject:
   - component: {fileID: 152336989}
   - component: {fileID: 152336988}
   m_Layer: 7
-  m_Name: Enemy (1)
+  m_Name: Husuabi
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &152336987
 Transform:
   m_ObjectHideFlags: 0
@@ -10052,7 +9969,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
   hpBarPoint: {fileID: 1632580599}
-  bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
+  bulletPrefabName: Enemy_None
   bulletSpeed: 10
   weaponData:
     id: 0
@@ -10076,6 +9993,12 @@ MonoBehaviour:
   maxDistance: 6
   shootCoolTime: 2.67
   isMove: 0
+  attackType: 12
+  dir: 0
+  testhp: 10000
+  isTrapActive: 1
+  trapShootInterval: 2
+  laserPrefab: {fileID: 0}
 --- !u!61 &152336990
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -40620,7 +40543,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
   hpBarPoint: {fileID: 570970939}
-  bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
+  bulletPrefabName: Enemy_None
   bulletSpeed: 10
   weaponData:
     id: 0
@@ -40644,6 +40567,12 @@ MonoBehaviour:
   maxDistance: 6
   shootCoolTime: 2.67
   isMove: 0
+  attackType: 0
+  dir: 0
+  testhp: 10000
+  isTrapActive: 1
+  trapShootInterval: 2
+  laserPrefab: {fileID: 0}
 --- !u!61 &1167668280
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -46516,7 +46445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1424239335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46532,7 +46461,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 7643641767507173732, guid: b7ea3a8acbd361e40a58928c52945d5e, type: 3}
   worldCanvas: {fileID: 99301205}
   hpBarPoint: {fileID: 1504719794}
-  bulletPrefab: {fileID: 3331785166314683025, guid: 0683f301af29223419dbd41065c4a429, type: 3}
+  bulletPrefabName: Enemy_None
   bulletSpeed: 10
   weaponData:
     id: 0
@@ -46556,6 +46485,12 @@ MonoBehaviour:
   maxDistance: 6
   shootCoolTime: 2
   isMove: 0
+  attackType: 7
+  dir: 1
+  testhp: 10000
+  isTrapActive: 1
+  trapShootInterval: 1
+  laserPrefab: {fileID: 6174474790711311106, guid: 2ffba51eaeea2ca46809c7c4a8db7413, type: 3}
 --- !u!61 &1424239336
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -46662,7 +46597,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1424239334}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.02, y: 2.61, z: 0}
+  m_LocalPosition: {x: 48, y: 2.61, z: 0}
   m_LocalScale: {x: 1.3023939, y: 1.2851683, z: 1}
   m_Children:
   - {fileID: 1504719796}

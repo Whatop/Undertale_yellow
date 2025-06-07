@@ -35,7 +35,7 @@ public class GasterBlaster : MonoBehaviour
 
         Vector2 dir = targetPos - myPos; // 나 → 플레이어 방향
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle + 90); // Sprite의 위쪽이 forward면 -90 보정
+        transform.rotation = Quaternion.Euler(0, 0, angle+90); // Sprite의 위쪽이 forward면 -90 보정
 
         SoundManager.Instance.SFXPlay("gasterblaster", 225); // 충전/발사 사운드
     }

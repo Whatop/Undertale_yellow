@@ -16,7 +16,7 @@ public class PieceShooter : MonoBehaviour
     private List<Vector2> velocities = new List<Vector2>(); // 각 조각의 속도를 저장
     private List<float> maxVelocities = new List<float>(); // 각 조각의 최대 속도를 저장
 
-    public void ShootPieces(RectTransform sourceTransform)
+    public void ShootPieces(RectTransform sourceTransform, Color pieceColor)
     {
         for (int i = 0; i < pieceCount; i++)
         {
@@ -37,7 +37,11 @@ public class PieceShooter : MonoBehaviour
             // 각도에 따라 초기 속도 설정
             Vector2 launchDirection = Quaternion.Euler(0, 0, randomAngle) * Vector2.up;
             Vector2 initialVelocity = launchDirection * randomLaunchForce;
-
+            Image image = piece.GetComponent<Image>();
+            if (image != null)
+            {
+                image.color = pieceColor;
+            }
             // 조각을 리스트에 추가
             activePieces.Add(piece);
             velocities.Add(initialVelocity);

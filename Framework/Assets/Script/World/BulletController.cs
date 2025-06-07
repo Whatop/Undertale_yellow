@@ -681,11 +681,11 @@ public class BulletController : MonoBehaviour
                     barrierFound = true;
                 }
             }
-            else if (h.collider.CompareTag("Enemy") && !isFreind)
+            else if (h.collider.CompareTag("Enemy") && isFreind)
             {
                 enemyHits.Add(h);
             }
-            else if (h.collider.CompareTag("Player") && isFreind)
+            else if (h.collider.CompareTag("Player") && !isFreind)
             {
                 enemyHits.Add(h);
             }

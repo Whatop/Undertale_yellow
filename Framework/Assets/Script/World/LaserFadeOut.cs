@@ -34,7 +34,8 @@ public class LaserFadeOut : MonoBehaviour
 
     // LineRenderer 컴포넌트
     private LineRenderer lineRenderer;
-
+    [Header("자동 페이드 끄기")]
+    public bool autoFade = false;
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
@@ -69,7 +70,7 @@ public class LaserFadeOut : MonoBehaviour
     private void Update()
     {
         Vector2 originPos = laserOrigin.position;
-        Vector2 direction = laserOrigin.right.normalized;
+        Vector2 direction = laserOrigin.up.normalized;
 
         RaycastHit2D[] hits = Physics2D.RaycastAll(originPos, direction, maxDistance, obstacleMask);
         float nearestBarrierDist = maxDistance;
@@ -133,7 +134,7 @@ public class LaserFadeOut : MonoBehaviour
         lineRenderer.SetPosition(1, originPos + direction * actualDist);
 
         // 5. 페이드 트리거: Barrier에 닿았거나, maxDistance에 도달했을 때
-        if (hasHitBarrier || currentLength >= maxDistance)
+        if (!autoFade && (hasHitBarrier || currentLength >= maxDistance))
         {
             fadeTimer += Time.deltaTime;
             float fadePercent = Mathf.Clamp01(fadeTimer / fadeDuration);

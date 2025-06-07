@@ -388,7 +388,7 @@ public class UIManager : MonoBehaviour
             gameManager.ResumeGame();
         }
 
-        if (currentButtonIndex  > currentButtons.Length)
+        if (currentButtonIndex > currentButtons.Length)
         {
             OnButtonHover(0);
         }
@@ -407,12 +407,7 @@ public class UIManager : MonoBehaviour
         Vector2 mousePosition = Input.mousePosition;
         crosshairTransform.position = mousePosition;
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            RectTransform transform = gameover_soul.GetComponent<RectTransform>();
-            gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
 
-        }
         if (isSavePanel)
         {
             if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
@@ -480,11 +475,14 @@ public class UIManager : MonoBehaviour
         //if (Input.GetKeyUp(GetKeyCode(9)))
         //    ConfirmRadialSelectionAndClose();
 
-        // 소울 (Tab 키 홀드)
-        if (Input.GetKeyDown(GetKeyCode(8)))
-            ToggleRadialMenu(RadialMenuType.Soul);
-        if (Input.GetKeyUp(GetKeyCode(8)))
-            ConfirmRadialSelectionAndClose();
+        if (gameManager.GetPlayerData().player.GetComponent<PlayerMovement>().isSoulActive)
+        {
+            // 소울 (Tab 키 홀드)
+            if (Input.GetKeyDown(GetKeyCode(8)))
+                ToggleRadialMenu(RadialMenuType.Soul);
+            if (Input.GetKeyUp(GetKeyCode(8)))
+                ConfirmRadialSelectionAndClose();
+        }
 
         // 라디얼 메뉴가 열려 있을 때 마우스 선택 처리
         if (isRadialMenuActive)
@@ -924,6 +922,7 @@ public class UIManager : MonoBehaviour
             inventroy_panel.SetActive(false);
             isInventroy = false;
         }
+
     }
     void OnPanel(int i)
     {
@@ -1167,19 +1166,35 @@ public class UIManager : MonoBehaviour
     {
         var weapon = GameManager.Instance.GetWeaponData();
         Color soulColor = weapon.GetColor(weapon.weaponType);
-        var soul = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().soulObject.GetComponent<SpriteRenderer>();
 
+        // gameover_soul 색상 설정
         if (gameover_soul != null)
             gameover_soul.GetComponent<Image>().color = soulColor;
 
+        // 인벤토리 소울 색상 설정
         if (inventroy_soul != null)
             inventroy_soul.GetComponent<Image>().color = soulColor;
 
+        // 세이브 패널 소울 색상 설정
         if (savePanel_soul != null)
             savePanel_soul.GetComponent<Image>().color = soulColor;
 
-        soul.color = soulColor;
+        // soulObject가 존재하면 색상 적용
+        var player = GameManager.Instance.GetPlayerData().player;
+        if (player != null)
+        {
+            var pm = player.GetComponent<PlayerMovement>();
+            if (pm != null && pm.soulObject != null)
+            {
+                var soulRenderer = pm.soulObject.GetComponent<SpriteRenderer>();
+                if (soulRenderer != null)
+                {
+                    soulRenderer.color = soulColor;
+                }
+            }
+        }
     }
+
 
     public void UpdateLaserSlider(float current, float max)
     {
@@ -2138,11 +2153,11 @@ public class UIManager : MonoBehaviour
     private IEnumerator Okdso()
     {
         yield return new WaitForSeconds(1f);
-
+        Color breakon_color=gameover_soul.GetComponent<Image>().color;
         gameover_soul.GetComponent<Image>().color = new Color(1, 1, 1, 0);
         soundManager.SFXPlay("heartbreak2", 89);
         RectTransform transform = gameover_soul.GetComponent<RectTransform>();
-        gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform);
+        gameover_soul.GetComponent<PieceShooter>().ShootPieces(transform, breakon_color);
 
     }
 

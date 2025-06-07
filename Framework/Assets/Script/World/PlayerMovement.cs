@@ -177,8 +177,7 @@ public class PlayerMovement : LivingObject
     public GameObject shadowObject;     // Player의 스프라이트 (흐림 효과 적용)
     public float playerTransparency = 0f; // Player 투명도 값 (흐릿한 효과)
 
-    [SerializeField]
-    private bool isSoulActive = false; // Soul 모드 활성화 여부
+    public bool isSoulActive { get; private set; } // Soul 모드 활성화 여부
 
     public int walkingSoundStartIndex = 220; // 걷는 효과음 시작 인덱스
     public int walkingSoundCount = 3;       // 걷는 효과음 개수
@@ -257,6 +256,7 @@ public class PlayerMovement : LivingObject
         gameManager.SaveWeaponData(curweaponData);
         laserCoreObject.SetActive(false);
         SelectWeapon(0);
+
 
     }
     protected override void Update()
@@ -718,6 +718,7 @@ public class PlayerMovement : LivingObject
         BulletController bc = currentLaser.GetComponent<BulletController>();
         if (bc != null)
         {
+            bc.isFreind = true;
             bc.damage = curweaponData.damage;
             bc.FireLaser();  
         }
@@ -945,7 +946,7 @@ public class PlayerMovement : LivingObject
             WeaponTransform.rotation,
             WeaponTransform.up,
             "Player_Normal", 0, 0, true,
-            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
 
     IEnumerator ShootNeedleGun()
@@ -974,7 +975,7 @@ public class PlayerMovement : LivingObject
                 rot,
                 dir,
                 "Player_Normal", 0, 0, true,
-            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
         }
     }
 
@@ -986,7 +987,7 @@ public class PlayerMovement : LivingObject
             WeaponTransform.rotation,
             WeaponTransform.up,
             "Barrier", 0, 0, true,
-            curweaponData.maxRange,curweaponData.bulletSpeed,curweaponData.damage);
+            curweaponData.maxRange,curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
 
     void ShootHoming()
@@ -997,35 +998,7 @@ public class PlayerMovement : LivingObject
             WeaponTransform.rotation,
             WeaponTransform.up,
             "Homing", 0, 0, true,
-            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
-    }
-
-    private IEnumerator PressFireLoop()
-    {
-        isPressFiring = true;
-
-        // Core 활성화
-        laserCoreObject.SetActive(true);
-
-        while (Input.GetMouseButton(0) && curweaponData.current_Ammo > 0)
-        {
-
-            BattleManager.Instance.SpawnBulletAtPosition(
-                BulletType.Directional,
-                soulshotpoint.position,
-                WeaponTransform.rotation,
-                WeaponTransform.up,
-                "Laser", 0, 0, true,
-            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
-
-            curweaponData.current_Ammo -= 1;
-            gameManager.SaveWeaponData(curweaponData);
-
-            yield return new WaitForSeconds(0.01f); // 연사 간격 짧게
-        }
-
-        isPressFiring = false;
-        laserCoreObject.SetActive(false);
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
 
     void ShootBlaster()
@@ -1035,7 +1008,8 @@ public class PlayerMovement : LivingObject
             soulshotpoint.position,
             WeaponTransform.rotation,
             WeaponTransform.up,
-            "Blaster", 0, 0, true);
+            "Blaster", 0, 0, true,
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
 
 
     }

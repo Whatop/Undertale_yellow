@@ -1,8 +1,40 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+
+public enum EnemyAttackType
+{
+    Melee,       // 돌진형
+    Laser,       // 레이저 발사 (Gaster Blaster류)
+    Bullet,      // 일반 탄환
+    Sniper,      // 조준 후 강한 탄환
+    Shotgun,     // 산탄
+    Buff,        // 버프/자힐/강화
+    Predictive,  // 예측 사격
+    Trap_Laser,  // 설치형 함정
+    Trap_Bullet, 
+    Trap_Melee,
+    Undying,     // 죽지 않음 (불사형, 샌즈류)
+    Special,      // 기타 특수
+    None
+}
+public enum TrapDir { 
+    Left,
+    LeftUp,
+    LeftDown,
+    Right,
+    RightUp,
+    RightDown,
+    Up,
+    Down,
+    None
+}
 
 public class EnemyController : LivingObject
 {
-    public GameObject bulletPrefab; // 총알 프리팹
+    // 새롭게 사용할 프리팹 이름 (생략 가능, 내부에서 자동 처리)
+    [SerializeField] private string bulletPrefabName = "Enemy_None";
     public float bulletSpeed = 10f; // 총알 발사 속도
     public Weapon weaponData;          // 현재 사용 중인 총의 정보
     public Transform WeaponTransform;  // 총 모델의 Transform
@@ -14,6 +46,20 @@ public class EnemyController : LivingObject
     public float shootCoolTime = 4;
     float curTime = 0;
     public bool isMove;
+    public EnemyAttackType attackType;
+    public TrapDir dir;
+
+    [Header("임시 체력")]
+    public float testhp = 10000;
+
+
+    [Header("트랩 관련")]
+    public bool isTrapActive = true;     // 트랩 활성화 여부
+    public float trapShootInterval = 2f; // 트랩 발사 주기
+    private float trapTimer = 0f;        // 트랩용 타이머
+    [Header("레이저 관련")]
+    public GameObject laserPrefab; // LaserFadeOut 프리팹
+    private GameObject currentLaser; // 현재 생성된 레이저
 
     private bool undying = false;
 
@@ -26,9 +72,13 @@ public class EnemyController : LivingObject
 
      void Start()
     {
-        maxHealth = 10;
+        maxHealth = testhp;
         health = maxHealth;
         speed = 2;
+        if (IsTrapType())
+        {
+            RotateToTrapDirection(); // 트랩일 경우 방향 회전
+        }
     }
 
     protected override void Update()
@@ -36,43 +86,59 @@ public class EnemyController : LivingObject
         base.Update();
         if (!isDie)
         {
-            float distanceToPlayer = Vector2.Distance(gameManager.GetPlayerData().position, transform.position);
+            if (attackType == EnemyAttackType.None)
+                return;
+            // 트랩은 플레이어 추격하지 않음
+            if (!IsTrapType())
+            {
+                float distanceToPlayer = Vector2.Distance(gameManager.GetPlayerData().position, transform.position);
 
-            if (distanceToPlayer > maxDistance && isMove)
-            {
-                ChasePlayer();
-            }
-            else if (distanceToPlayer < minDistance)
-            {
-                MoveAwayFromPlayer();
+                if (distanceToPlayer > maxDistance && isMove)
+                    ChasePlayer();
+                else if (distanceToPlayer < minDistance)
+                    MoveAwayFromPlayer();
+                else
+                    StopMoving();
             }
             else
             {
-                StopMoving();
+                StopMoving(); // 트랩은 고정
             }
 
-            float curmagazine = weaponData.current_magazine;
-
-            Vector3 playerPosition = gameManager.GetPlayerData().position;
-            Vector2 direction = (playerPosition - WeaponTransform.position).normalized;
-            hand.up = direction;
-            curTime += Time.deltaTime;
-
-            if (curTime > shootCoolTime && bulletPrefab != null && curmagazine > 0)
+            if (IsTrapType())
             {
-                Shoot();
-                weaponData.current_magazine -= 1;
-                weaponData.current_Ammo -= 1;
-                curTime = 0;
-                SoundManager.Instance.SFXPlay("shotgun_shot_01", 218); // 총 사운드
+                if (!isTrapActive) return;
 
+                trapTimer += Time.deltaTime;
+                if (trapTimer >= trapShootInterval)
+                {
+                    trapTimer = 0f;
+                    Shoot(); // 트랩도 Shoot()을 이용함
+                }
             }
-
-            // 총알이 없으면 재장전
-            if (weaponData.current_Ammo < weaponData.maxAmmo &&
-                weaponData.current_magazine < weaponData.magazine)
+            else
             {
-                weaponData.current_magazine = weaponData.magazine;
+                float curmagazine = weaponData.current_magazine;
+                curTime += Time.deltaTime;
+
+                Vector3 playerPosition = gameManager.GetPlayerData().position;
+                Vector2 direction = (playerPosition - WeaponTransform.position).normalized;
+                hand.up = direction;
+
+                if (curTime > shootCoolTime && curmagazine > 0)
+                {
+                    Shoot();
+                    weaponData.current_magazine -= 1;
+                    weaponData.current_Ammo -= 1;
+                    curTime = 0;
+                }
+
+                // 탄약 재장전
+                if (weaponData.current_Ammo < weaponData.maxAmmo &&
+                    weaponData.current_magazine < weaponData.magazine)
+                {
+                    weaponData.current_magazine = weaponData.magazine;
+                }
             }
         }
         else
@@ -80,6 +146,12 @@ public class EnemyController : LivingObject
 
     }
 
+    bool IsTrapType()
+    {
+        return attackType == EnemyAttackType.Trap_Bullet ||
+               attackType == EnemyAttackType.Trap_Laser ||
+               attackType == EnemyAttackType.Trap_Melee;
+    }
     void ChasePlayer()
     {
         Vector2 direction = (gameManager.GetPlayerData().position - transform.position).normalized;
@@ -99,24 +171,155 @@ public class EnemyController : LivingObject
 
     void Shoot()
     {
-       weaponData.current_magazine = weaponData.magazine;
+        string prefabName = GetBulletPrefabName(); // 타입에 따라 프리팹명 가져오기
 
-        BattleManager.Instance.SpawnBulletAtPosition(
-      BulletType.Normal,
-      WeaponTransform.position,
-      WeaponTransform.rotation,
-      hand.up,
-      "Enemy_None"
-      ,0,0,false
-  );
+        Vector2 spawnPos = WeaponTransform.position;
+        Quaternion spawnRot = WeaponTransform.rotation;
+        Vector2 direction = hand.up;
 
-        // weaponData.current_magazine = weaponData.magazine;
-        //
-        // // 총알을 생성하고 초기 위치를 총의 위치로 설정합니다.
-        // GameObject bullet = Instantiate(bulletPrefab, WeaponTransform.position, WeaponTransform.rotation);
-        //
-        // // 총알에 속도를 적용하여 발사합니다.
-        // Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        // bulletRb.velocity = hand.up * bulletSpeed;
+        if (attackType != EnemyAttackType.Trap_Laser && attackType != EnemyAttackType.Laser)
+        {
+            BattleManager.Instance.SpawnBulletAtPosition(
+                GetBulletType(),          // 총알 종류 enum
+                spawnPos,
+                spawnRot,
+                direction,
+                prefabName,
+                0,      // size
+                0f,     // delay
+                false,  // isFriend
+                5f,     // maxRange
+                bulletSpeed,
+                1f,     // accuracy
+                1f      // damage
+            );
+                    SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
+            weaponData.current_magazine = weaponData.magazine;
+        }
+        else
+        {
+            FireLaser();
+        }
+
     }
+    void FireLaser()
+    {
+        if (currentLaser != null) return; // 이미 발사된 경우 중복 방지
+
+        currentLaser = Instantiate(laserPrefab, WeaponTransform.position, Quaternion.identity);
+        LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
+
+        if (laser != null)
+        {
+            laser.laserOrigin = WeaponTransform;
+            laser.obstacleMask = LayerMask.GetMask("Wall", "Barrier", "Player");
+            laser.thickness = 0.6f;
+            laser.growSpeed = 50f;
+            laser.fadeDuration = 0.5f;
+            laser.dotInterval = 0.2f;
+            laser.enabled = true;
+            laser.autoFade = false;
+        }
+        SoundManager.Instance.SFXPlay("charge", 63);
+
+        // currentLaser만 방향 회전
+        currentLaser.transform.up = GetDirectionFromTrapDir(dir);
+
+        // 일정 시간 뒤 제거
+        StartCoroutine(DisableLaserAfterSeconds(5f));
+    }
+
+    IEnumerator DisableLaserAfterSeconds(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        if (currentLaser != null)
+        {
+         LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
+            currentLaser = null;
+        }
+    }
+    public void DeactivateLaser()
+    {
+        if (currentLaser != null)
+        {
+            LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
+            currentLaser = null;
+        }
+    }
+
+    BulletType GetBulletType()
+    {
+        switch (attackType)
+        {
+            case EnemyAttackType.Bullet:
+                return BulletType.Normal;
+            case EnemyAttackType.Shotgun:
+                return BulletType.Normal;
+            case EnemyAttackType.Laser:
+            case EnemyAttackType.Trap_Laser:
+                return BulletType.Laser;
+            case EnemyAttackType.Predictive:
+                return BulletType.Speed;
+            case EnemyAttackType.Trap_Bullet:
+            case EnemyAttackType.Trap_Melee:
+                return BulletType.Directional;
+            default:
+                return BulletType.Normal;
+        }
+    }
+    string GetBulletPrefabName()
+    {
+        // 우선 무기에 이름이 지정되어 있으면 그걸 쓰고, 없으면 타입으로 분기
+
+        switch (attackType)
+        {
+            case EnemyAttackType.Laser:
+            case EnemyAttackType.Trap_Laser:
+                return "Laser_Enemy";
+
+            case EnemyAttackType.Trap_Bullet:
+            case EnemyAttackType.Bullet:
+                return "Enemy_None";
+
+            case EnemyAttackType.Shotgun:
+                return "Enemy_None";
+
+            case EnemyAttackType.Sniper:
+                return "Enemy_None";
+
+            default:
+                return "Enemy_None";
+        }
+    }
+    Vector2 GetDirectionFromTrapDir(TrapDir dir)
+    {
+        Vector2 direction;
+
+        switch (dir)
+        {
+            case TrapDir.Left: direction = Vector2.left; break;
+            case TrapDir.LeftUp: direction = new Vector2(-1, 1).normalized; break;
+            case TrapDir.LeftDown: direction = new Vector2(-1, -1).normalized; break;
+            case TrapDir.Right: direction = Vector2.right; break;
+            case TrapDir.RightUp: direction = new Vector2(1, 1).normalized; break;
+            case TrapDir.RightDown: direction = new Vector2(1, -1).normalized; break;
+            case TrapDir.Up: direction = Vector2.up; break;
+            case TrapDir.Down: direction = Vector2.down; break;
+            default: direction = Vector2.up; break;
+        }
+
+        return direction;
+    }
+
+    void RotateToTrapDirection()
+    {
+        Vector2 dirVector = GetDirectionFromTrapDir(dir);
+        if (dirVector == Vector2.zero) return;
+
+        // 원래는 Vector2.right → 이제는 Vector2.up 기준으로 회전 계산
+        float angle = Vector2.SignedAngle(Vector2.up, dirVector);
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+    }
+
 }

@@ -463,6 +463,7 @@ public class GameManager : MonoBehaviour
     public PlayerData GetPlayerData()
     {
         return playerData;
+
     }
 
     public void SavePlayerData(PlayerData newData)
