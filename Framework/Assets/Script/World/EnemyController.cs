@@ -60,13 +60,13 @@ public class EnemyController : LivingObject
     [Header("레이저 관련")]
     public GameObject laserPrefab; // LaserFadeOut 프리팹
     private GameObject currentLaser; // 현재 생성된 레이저
+    public bool iskeepLaser;
 
     private bool undying = false;
 
     protected override void Awake()
     {
         base.Awake(); // LivingObject의 Awake 메서드 호출
-        weaponData = new Weapon();
         //animator.GetComponent<Animator>();
     }
 
@@ -75,6 +75,7 @@ public class EnemyController : LivingObject
         maxHealth = testhp;
         health = maxHealth;
         speed = 2;
+        weaponData = new Weapon();
         if (IsTrapType())
         {
             RotateToTrapDirection(); // 트랩일 경우 방향 회전
@@ -204,7 +205,7 @@ public class EnemyController : LivingObject
     }
     void FireLaser()
     {
-        if (currentLaser != null) return; // 이미 발사된 경우 중복 방지
+        if (currentLaser != null) return;
 
         currentLaser = Instantiate(laserPrefab, WeaponTransform.position, Quaternion.identity);
         LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
@@ -217,17 +218,16 @@ public class EnemyController : LivingObject
             laser.growSpeed = 50f;
             laser.fadeDuration = 0.5f;
             laser.dotInterval = 0.2f;
+            laser.autoFade = iskeepLaser; //  자동 페이드 설정
             laser.enabled = true;
-            laser.autoFade = false;
         }
-        SoundManager.Instance.SFXPlay("charge", 63);
 
-        // currentLaser만 방향 회전
         currentLaser.transform.up = GetDirectionFromTrapDir(dir);
 
-        // 일정 시간 뒤 제거
-        StartCoroutine(DisableLaserAfterSeconds(5f));
+        SoundManager.Instance.SFXPlay("charge", 63);
+        SoundManager.Instance.SFXPlayLoop(226, 0.05f); //  반복 사운드 재생
     }
+
 
     IEnumerator DisableLaserAfterSeconds(float duration)
     {
@@ -235,7 +235,7 @@ public class EnemyController : LivingObject
 
         if (currentLaser != null)
         {
-         LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
+         //    LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
             currentLaser = null;
         }
     }
@@ -243,7 +243,7 @@ public class EnemyController : LivingObject
     {
         if (currentLaser != null)
         {
-            LaserFadeOut laser = currentLaser.GetComponent<LaserFadeOut>();
+            SoundManager.Instance.SFXStopLoop(226); //  반복 사운드 종료
             currentLaser = null;
         }
     }

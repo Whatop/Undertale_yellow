@@ -177,8 +177,6 @@ public class LaserFadeOut : MonoBehaviour
             hitTimer[soulObj] = Time.time;
             // 초당 dotDPS 피해량을 Time.deltaTime과 곱해서 프레임당 DoT
             GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1);
-
-
         }
     }
 
