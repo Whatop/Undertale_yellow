@@ -106,7 +106,7 @@ public class SoundManager : MonoBehaviour
     {
         AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = sfxlist[sfxNum];
-        audioSource.volume = 0.1f;
+        audioSource.volume = 1f;
         audioSource.loop = false;
         audioSource.gameObject.SetActive(true);
         audioSource.Play();
@@ -130,11 +130,11 @@ public class SoundManager : MonoBehaviour
     /// <summary>
     /// 텍스트(나레이션 등) 재생할 때, 1회용으로 사용
     /// </summary>
-    public void SFXTextPlay(string textName, int textNum)
+    public void SFXTextPlay(string textName, int textNum, float volume = 1)
     {
         AudioSource audioSource = GetAudioSourceFromPool();
         audioSource.clip = txtlist[textNum];
-        audioSource.volume = 0.1f;
+        audioSource.volume = volume;
         audioSource.loop = false;
         audioSource.gameObject.SetActive(true);
         audioSource.Play();
@@ -216,35 +216,35 @@ public class SoundManager : MonoBehaviour
     }
 
     // 배경 음악 재생
-    public void BGSoundPlay()
+    public void BGSoundPlay(float volume =0.6f)
     {
         if (bgSound.clip != null)
         {
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = 0.08f;
+            bgSound.volume = volume;
             bgSound.Play();
         }
     }
 
-    public void BGSoundPlay(int textNum)
+    public void BGSoundPlay(int textNum, float volume = 0.6f)
     {
         if (bgSound.clip != null)
         {
             bgSound.clip = bglist[textNum];
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = 0.08f;
+            bgSound.volume = volume;
             bgSound.Play();
         }
     }
 
-    public void BGSoundPlayDelayed(int bgNum, float delay)
+    public void BGSoundPlayDelayed(int bgNum, float delay, float volume = 0.6f)
     {
-        StartCoroutine(PlayBGAfterDelay(bgNum, delay));
+        StartCoroutine(PlayBGAfterDelay(bgNum, delay, volume));
     }
 
-    private IEnumerator PlayBGAfterDelay(int bgNum, float delay)
+    private IEnumerator PlayBGAfterDelay(int bgNum, float delay, float volume = 0.6f)
     {
         yield return new WaitForSeconds(delay);
 
@@ -253,7 +253,7 @@ public class SoundManager : MonoBehaviour
             bgSound.clip = bglist[bgNum];
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = 0.1f;
+            bgSound.volume = volume;
             bgSound.Play();
         }
     }

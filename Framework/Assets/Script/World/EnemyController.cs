@@ -225,7 +225,6 @@ public class EnemyController : LivingObject
         currentLaser.transform.up = GetDirectionFromTrapDir(dir);
 
         SoundManager.Instance.SFXPlay("charge", 63);
-        SoundManager.Instance.SFXPlayLoop(226, 0.05f); //  반복 사운드 재생
     }
 
 

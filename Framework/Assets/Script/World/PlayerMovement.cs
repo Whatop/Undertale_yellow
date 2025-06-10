@@ -669,30 +669,38 @@ public class PlayerMovement : LivingObject
     /// </summary>
     private void UpdateLaserWeapon()
     {
+        float minLaserDistance = 0.5f;
+        Vector2 rayDir = soulshotpoint.right; // ← 레이저가 발사되는 “앞” 방향
+        RaycastHit2D obstacle = Physics2D.Raycast(
+            soulshotpoint.position,
+            rayDir,
+            minLaserDistance,
+            LayerMask.GetMask("Wall", "Barrier", "Enemy")
+        );
+        if (obstacle.collider != null)
+        {
+            if (isLaserFiring)
+                StopLaser();
+            return;
+        }
+
         Weapon weapon = curweaponData;
         float currentAmmo = weapon.current_Ammo;
 
-        // 1) 마우스 왼쪽 버튼이 눌린 상태 && 남은 탄약이 있으면 StartLaser()
         if (Input.GetMouseButton(0) && currentAmmo > 0f)
         {
             if (!isLaserFiring)
                 StartLaser();
-
-            // 2) 레이저 중인 동안 탄약 소모 (초당 40 단위 예시)
             weapon.current_Ammo -= (40f * Time.deltaTime);
             weapon.current_Ammo = Mathf.Clamp(weapon.current_Ammo, 0f, weapon.maxAmmo);
-
-            // 3) UI 슬라이더(레이저용) 업데이트
             UIManager.Instance.UpdateLaserSlider(weapon.current_Ammo, weapon.maxAmmo);
         }
         else
         {
-            // 버튼을 뗐거나 탄약이 바닥났으면 StopLaser()
             if (isLaserFiring)
                 StopLaser();
         }
     }
-
     private void StartLaser()
     {
         if (isLaserFiring) return;
@@ -702,7 +710,7 @@ public class PlayerMovement : LivingObject
         SoundManager.Instance.SFXPlay("charge", 63);
 
         // 2) 홀드 사운드 (루프 재생 시작)
-        SoundManager.Instance.SFXPlayLoop(226, 0.05f);
+        SoundManager.Instance.SFXPlayLoop(226, 0.3f);
         if (laserCoreObject != null)
             laserCoreObject.SetActive(true);
 
@@ -1118,12 +1126,12 @@ public class PlayerMovement : LivingObject
         animator.SetTrigger("IsRoll");
         if (isSoulActive)
         {
-            SoundManager.Instance.SFXPlay("soul_roll_01", 157, 0.05f); // 구르기 사운드
+            SoundManager.Instance.SFXPlay("soul_roll_01", 157, 1f); // 구르기 사운드
             rollSpeed = 10f;
         }
         else
         {
-            SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 0.05f); // 구르기 사운드
+            SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 1f); // 구르기 사운드
             EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
             rollSpeed = 16f;
 
@@ -1297,7 +1305,7 @@ public class PlayerMovement : LivingObject
             id = 5,
             WeaponName = "파랑",
             weaponType = WeaponType.LaserGun,
-            damage = 100f,
+            damage = 1,
             magazine = 700,
             current_magazine = 700,
             maxAmmo = 700,

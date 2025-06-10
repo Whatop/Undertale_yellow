@@ -79,8 +79,10 @@ public class LaserFadeOut : MonoBehaviour
         foreach (var h in hits)
         {
             if (h.collider == null) continue;
+            if (h.distance < 0.1f)
+                continue;
 
-            if (h.collider != null && h.collider.CompareTag("Barrier") && h.distance < nearestBarrierDist)
+            if (h.collider.CompareTag("Barrier") && h.distance < nearestBarrierDist)
             {
                 nearestBarrierDist = h.distance;
                barrierFound = true;
@@ -174,9 +176,17 @@ public class LaserFadeOut : MonoBehaviour
     {
         if (!hitTimer.ContainsKey(soulObj) || Time.time - hitTimer[soulObj] >= dotInterval)
         {
+            var playerMove = soulObj.GetComponent<PlayerMovement>();
+            if (playerMove == null)
+                return;
+
+            // 구르기 중이면 데미지 안 줌
+            if (playerMove.objectState == ObjectState.Roll)
+                return;
+
             hitTimer[soulObj] = Time.time;
-            // 초당 dotDPS 피해량을 Time.deltaTime과 곱해서 프레임당 DoT
-            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1);
+
+            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
         }
     }
 

@@ -649,10 +649,8 @@ public class BulletController : MonoBehaviour
         Vector3 dirWorld = transform.right;         // 부모 회전(–90°)을 반영해 화면 우측을 가리킴
 
         // Raycast 시작점 살짝 앞으로 밀어 셀프 히트 방지
-        float margin = 0.05f;
-        Vector3 originWorld = startWorld + dirWorld * margin;
-        float rayLength = maxLaserDistance + margin;
-
+        Vector3 originWorld = startWorld + dirWorld ;
+        float rayLength = maxLaserDistance;
         RaycastHit2D[] hits = Physics2D.RaycastAll(originWorld, dirWorld, rayLength, hitMask);
 
         // 3) 가장 가까운 Barrier/Wall까지 거리 계산
@@ -668,6 +666,8 @@ public class BulletController : MonoBehaviour
             if (h.collider == null)
                 continue;
 
+            if (h.distance < 0.1f)
+                continue;
             // (Collider2D를 쓰지 않으므로) 자기 자신 무시
             if (h.collider.gameObject == this.gameObject)
                 continue;
@@ -742,7 +742,7 @@ public class BulletController : MonoBehaviour
             if (living != null)
             {
                 // damage를 “초당 데미지”로 가정할 경우
-                living.TakeDamage(damage * Time.deltaTime);
+                living.TakeDamage(damage);
                 // 만약 1회당 고정 데미지면 `damage`만 넘겨도 됩니다.
             }
         }
@@ -764,12 +764,15 @@ public class BulletController : MonoBehaviour
     public void StopLaser()
     {
         keepLaser = false;
-        lineRenderer.enabled = false;
-        // BulletPool 등으로 관리 중이면 SetActive(false)로, 아니라면 Destroy
+        if (lineRenderer != null)
+            lineRenderer.enabled = false;
+        // 풀링을 사용한다면 SetActive(false)로,
+        // 아니라면 Destroy(gameObject);
         Destroy(gameObject);
-    }
+    } 
 
-    public void OnHitByShield()
+
+public void OnHitByShield()
     {
         if (isBlockedByBarrier) return;
         isBlockedByBarrier = true;
