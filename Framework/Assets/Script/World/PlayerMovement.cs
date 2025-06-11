@@ -146,7 +146,7 @@ public class PlayerMovement : LivingObject
     public List<Weapon> playerWeapons = new List<Weapon>();
     public List<WeaponType> playerWeaponTypes = new List<WeaponType>();
 
-    private int currentWeaponIndex = 0;
+    private int currentWeaponIndex = -1;
 
     public Weapon curweaponData;
     public GameObject Weapons;
@@ -247,15 +247,15 @@ public class PlayerMovement : LivingObject
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
 
+        InitializeWeapons();
+        gameManager.SaveWeaponData(curweaponData);
+        laserCoreObject.SetActive(false);
+        SelectWeapon(0);
         curweaponData.weaponType = WeaponType.Revolver;
         curweaponData.UpdateColor();
         soulObject.GetComponent<SpriteRenderer>().color = curweaponData.weaponColor;
 
         originalWeaponPosition = WeaponTransform.localPosition; // 원래 위치 저장
-        InitializeWeapons();
-        gameManager.SaveWeaponData(curweaponData);
-        laserCoreObject.SetActive(false);
-        SelectWeapon(0);
 
 
     }
@@ -333,6 +333,8 @@ public class PlayerMovement : LivingObject
                 }
                 else
                 {
+                    UIManager.Instance.SetAmmoUIVisible(false);
+                    UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
                     Weapons.SetActive(false);
                     Hands.gameObject.SetActive(false);
                 }
@@ -517,7 +519,7 @@ public class PlayerMovement : LivingObject
         mousePosition.z = 0; // 2D 게임이므로 Z 축을 0으로 고정
 
         // 오브젝트와 마우스 좌표 간의 방향 벡터 계산
-        Vector3 direction = mousePosition - transform.position;
+        Vector3 direction = mousePosition - soulshotpoint.position;
 
         // 방향 벡터로부터 각도 계산 (라디안 -> 각도)
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -764,7 +766,7 @@ public class PlayerMovement : LivingObject
     {
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
-        Vector3 dir = (mouseWorld - WeaponTransform.position).normalized;
+        Vector3 dir = (mouseWorld - shotpoint.position).normalized;
 
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         return Quaternion.Euler(0f, 0f, angle);
@@ -1238,7 +1240,7 @@ public class PlayerMovement : LivingObject
             maxRange = 6f,
             current_Ammo = -1,
             bulletSpeed = 8f,
-            accuracy = 1f,
+            accuracy = 0f,
             reloadTime = 1.5f
         });; databaseWeapons.Add(new Weapon
         {
@@ -1252,7 +1254,7 @@ public class PlayerMovement : LivingObject
             maxRange = 8f,
             current_Ammo = 90,
             bulletSpeed = 9f,
-            accuracy = 1.2f,
+            accuracy = 4f,
             reloadTime = 1.2f
         })
             ; databaseWeapons.Add(new Weapon
@@ -1282,7 +1284,7 @@ public class PlayerMovement : LivingObject
             current_Ammo = 16,
             bulletSpeed = 5f,
             maxRange = 10f,
-            accuracy = 1f,
+            accuracy = 0,
             reloadTime = 3.0f
         });
         databaseWeapons.Add(new Weapon
@@ -1297,7 +1299,7 @@ public class PlayerMovement : LivingObject
             current_Ammo = 50,
             maxRange = 20f,
             bulletSpeed = 5f,
-            accuracy = 1f,
+            accuracy = 0,
             reloadTime = 2.5f
         });
         databaseWeapons.Add(new Weapon
@@ -1312,7 +1314,7 @@ public class PlayerMovement : LivingObject
             current_Ammo = 700,
             maxRange = 9f,
             bulletSpeed = 7f,
-            accuracy = 1f,
+            accuracy = 0,
             reloadTime = 3.5f
         });
         databaseWeapons.Add(new Weapon
@@ -1327,7 +1329,7 @@ public class PlayerMovement : LivingObject
             maxRange = 15f,
             current_Ammo = 5,
             bulletSpeed = 0f,
-            accuracy = 1f,
+            accuracy = 0,
             reloadTime = 4.0f
         });
         databaseWeapons.Add(new Weapon { WeaponName = "빨강", weaponType = WeaponType.Blaster, id = 6});

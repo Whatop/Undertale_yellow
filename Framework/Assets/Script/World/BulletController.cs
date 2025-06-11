@@ -173,8 +173,8 @@ public class BulletController : MonoBehaviour
         accuracy = bulletAccuracy;
         maxrange = maxRange;
         bulletType = type;
-        storedFireDirection = fireDirection;
-        bulletSize= size;
+        storedFireDirection = ApplyAccuracy(fireDirection);
+        bulletSize = size;
         isFreind = isfreind;
         initialPosition = transform.position;
 
@@ -338,9 +338,9 @@ public class BulletController : MonoBehaviour
     private Vector2 ApplyAccuracy(Vector2 direction)
     {
         float randomAngle = Random.Range(-accuracy, accuracy);
-        Quaternion rotation = Quaternion.AngleAxis(randomAngle, Vector3.forward);
-        return rotation * direction;
+        return Quaternion.AngleAxis(randomAngle, Vector3.forward) * direction;
     }
+
 
     // 특정 위치로 이동 후 패턴 실행
     private IEnumerator MoveAndNext(BulletType type = default, float delay = 0)
@@ -438,12 +438,14 @@ public class BulletController : MonoBehaviour
         target = GameManager.Instance.GetPlayerData().player.transform; // 플레이어를 타겟으로 설정
 
         Vector2 direction = ((Vector2)target.position - (Vector2)transform.position).normalized; // 플레이어 방향 계산
-        GetComponent<Rigidbody2D>().velocity = direction * speed; // 처음 속도 설정
+                                                                                                 // 원래 방향 계산
+        Vector2 rawDir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+        // 보정된 방향
+        Vector2 dir = ApplyAccuracy(rawDir);
 
-        yield return new WaitForSeconds(0.5f); // 0.5초 동안 플레이어 방향 유지
-
-        // 이후에는 해당 방향을 유지하면서 직진
-        GetComponent<Rigidbody2D>().velocity = direction * speed;
+        rb.velocity = dir * speed;
+        yield return new WaitForSeconds(0.5f);
+        rb.velocity = dir * speed;
 
     }
 

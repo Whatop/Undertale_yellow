@@ -139,13 +139,19 @@ MonoBehaviour:
   bulletType: 0
   damage: 1
   speed: 5
-  accuracy: 1
-  maxrange: 30
+  accuracy: 0
+  maxrange: 60
   isFreind: 0
   isPiercing: 0
   dotInterval: 0.2
   travelTime: 1.2
   rotationMultiplier: 0.8
+  keepLaser: 0
+  maxLaserDistance: 20
+  lineRenderer: {fileID: 0}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!111 &920763300628505677
 Animation:
   m_ObjectHideFlags: 0
