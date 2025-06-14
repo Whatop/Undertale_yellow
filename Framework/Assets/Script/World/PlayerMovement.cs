@@ -578,7 +578,7 @@ public class PlayerMovement : LivingObject
                                           Quaternion.identity);
 
         // 기본 방향: 플레이어 쪽으로
-        Vector2 dir = (soulpoint.position - shellEjectPoint.position).normalized;
+        Vector2 dir = (transform.position - shellEjectPoint.position).normalized;
 
         // 좌우로 튀도록 수직 벡터 추가 (Vector2.Perpendicular 활용)
         Vector2 perpendicular = Vector2.Perpendicular(dir); // 방향에 수직인 벡터
@@ -691,6 +691,8 @@ public class PlayerMovement : LivingObject
 
         if (Input.GetMouseButton(0) && currentAmmo > 0f)
         {
+            if (laserCoreObject != null)
+                laserCoreObject.SetActive(true);
             if (!isLaserFiring)
                 StartLaser();
             weapon.current_Ammo -= (40f * Time.deltaTime);
@@ -713,8 +715,6 @@ public class PlayerMovement : LivingObject
 
         // 2) 홀드 사운드 (루프 재생 시작)
         SoundManager.Instance.SFXPlayLoop(226, 0.3f);
-        if (laserCoreObject != null)
-            laserCoreObject.SetActive(true);
 
         Vector3 spawnPos = soulshotpoint.position;
         Quaternion spawnRot = GetMouseRotation();
@@ -953,8 +953,8 @@ public class PlayerMovement : LivingObject
         BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.Directional,
             soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
+            soulpoint.rotation,
+            -soulpoint.up,
             "Player_Normal", 0, 0, true,
             curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
@@ -981,7 +981,7 @@ public class PlayerMovement : LivingObject
 
             BattleManager.Instance.SpawnBulletAtPosition(
                 BulletType.Directional,
-                soulshotpoint.position,
+                soulpoint.position,
                 rot,
                 dir,
                 "Player_Normal", 0, 0, true,
@@ -994,8 +994,8 @@ public class PlayerMovement : LivingObject
         BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.Barrier, // 별도 타입 필요
             soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
+            soulpoint.rotation,
+            -soulpoint.up,
             "Barrier", 0, 0, true,
             curweaponData.maxRange,curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
@@ -1005,8 +1005,8 @@ public class PlayerMovement : LivingObject
         BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.Homing,
             soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
+            soulpoint.rotation,
+            -soulpoint.up,
             "Homing", 0, 0, true,
             curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
@@ -1016,8 +1016,8 @@ public class PlayerMovement : LivingObject
         BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.GasterBlaster,
             soulshotpoint.position,
-            WeaponTransform.rotation,
-            WeaponTransform.up,
+            soulpoint.rotation,
+            -soulpoint.up,
             "Blaster", 0, 0, true,
             curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
 
