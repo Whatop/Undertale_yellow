@@ -393,8 +393,8 @@ public class BulletController : MonoBehaviour
         switch (type)
         {
             case BulletType.Homing:
+                StartCoroutine(DirectionalMove(dir));
                 StartCoroutine(HomingMove());
-                StartCoroutine(MoveTargetPlayer());
                 break;
             case BulletType.Spiral:
                 StartCoroutine(SpiralBullets());
