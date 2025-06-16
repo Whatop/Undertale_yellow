@@ -106,7 +106,7 @@ public class Weapon
         weaponColor = GetColor(weaponType);
     }
 
-  
+
 }
 
 public class PlayerMovement : LivingObject
@@ -298,7 +298,7 @@ public class PlayerMovement : LivingObject
                 StartCoroutine(Roll());
             }
 
-          
+
             // 쿨다운 시간 감소
             if (isCooldown)
             {
@@ -329,6 +329,12 @@ public class PlayerMovement : LivingObject
                         UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
                         UIManager.Instance.SetAmmoUIVisible(true);
                         ShootInput();
+
+                    }
+                    if (!isSoulActive)
+                    {
+                        UIManager.Instance.laserAmmoSlider.gameObject.SetActive(false); // 레이저 슬라이더 숨김
+                        UIManager.Instance.SetAmmoUIVisible(false);
                     }
                 }
                 else
@@ -460,7 +466,7 @@ public class PlayerMovement : LivingObject
     #endregion
 
     #region soul_code
-  
+
     // Soul 모드 활성화: 투명도 끄기
     public void EnableSoul()
     {
@@ -622,28 +628,28 @@ public class PlayerMovement : LivingObject
 
                 case WeaponType.NeedleGun: // 인내 - 1발씩 연사지만 총 3발이므로 3 소모
                     if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 3;
+                        curweaponData.current_Ammo -= 3;
                     break;
 
                 case WeaponType.Shotgun: // 용기 - 산탄 다발 5발로 계산
                     if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 1;
+                        curweaponData.current_Ammo -= 1;
                     break;
 
                 case WeaponType.BarrierEmitter: // 친절 - 방어벽 1개 생성
                     if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 1;
+                        curweaponData.current_Ammo -= 1;
                     break;
 
                 case WeaponType.HomingMissile: // 끈기 - 1개 유도탄
                     if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 1;
+                        curweaponData.current_Ammo -= 1;
                     break;
 
 
                 case WeaponType.Blaster: // 의지 - 대형 강탄, 1소모
                     if (!curweaponData.IsInfiniteAmmo())
-                    curweaponData.current_Ammo -= 1;
+                        curweaponData.current_Ammo -= 1;
                     break;
 
                 default:
@@ -730,7 +736,7 @@ public class PlayerMovement : LivingObject
         {
             bc.isFreind = true;
             bc.damage = curweaponData.damage;
-            bc.FireLaser();  
+            bc.FireLaser();
         }
         else
         {
@@ -775,7 +781,7 @@ public class PlayerMovement : LivingObject
     void Shoot()
     {
         // 현재 Soul 모드인지 확인하여 적절한 총알을 생성
-     
+
         if (!isSoulActive)
         {
             // 총알 스폰
@@ -784,7 +790,7 @@ public class PlayerMovement : LivingObject
              shotpoint.position,
              WeaponTransform.rotation,
              WeaponTransform.up,
-             "Player_Normal",0,0,true,
+             "Player_Normal", 0, 0, true,
             curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.damage);
 
             // 총구 화염 이펙트 생성
@@ -990,14 +996,17 @@ public class PlayerMovement : LivingObject
     }
 
     void ShootBarrier()
-    {
+    { 
+        // 1) 원래 회전에 Z축 180°를 더해 뒤집기
+        Quaternion flippedRot = soulpoint.rotation * Quaternion.Euler(0f, 0f, 180f);
+
         BattleManager.Instance.SpawnBulletAtPosition(
             BulletType.Barrier, // 별도 타입 필요
             soulshotpoint.position,
-            soulpoint.rotation,
+            flippedRot,
             -soulpoint.up,
             "Barrier", 0, 0, true,
-            curweaponData.maxRange,curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
+            curweaponData.maxRange, curweaponData.bulletSpeed, curweaponData.accuracy, curweaponData.damage);
     }
 
     void ShootHoming()
@@ -1242,7 +1251,7 @@ public class PlayerMovement : LivingObject
             bulletSpeed = 8f,
             accuracy = 0f,
             reloadTime = 1.5f
-        });; databaseWeapons.Add(new Weapon
+        }); ; databaseWeapons.Add(new Weapon
         {
             id = 1,
             WeaponName = "하늘",
@@ -1257,21 +1266,21 @@ public class PlayerMovement : LivingObject
             accuracy = 4f,
             reloadTime = 1.2f
         })
-            ; databaseWeapons.Add(new Weapon
-        {
-            id = 2,
-            WeaponName = "주황",
-            weaponType = WeaponType.Shotgun,
-            damage = 4,
-            magazine = 4,
-            current_magazine = 4,
-            maxAmmo = 30,
-            maxRange = 4f,
-            current_Ammo = 30,
-            bulletSpeed = 6f,
-            accuracy = 0.6f,
-            reloadTime = 2.0f
-        }); 
+             ; databaseWeapons.Add(new Weapon
+             {
+                 id = 2,
+                 WeaponName = "주황",
+                 weaponType = WeaponType.Shotgun,
+                 damage = 4,
+                 magazine = 4,
+                 current_magazine = 4,
+                 maxAmmo = 30,
+                 maxRange = 4f,
+                 current_Ammo = 30,
+                 bulletSpeed = 6f,
+                 accuracy = 0.6f,
+                 reloadTime = 2.0f
+             });
         databaseWeapons.Add(new Weapon
         {
             id = 3,
@@ -1332,7 +1341,7 @@ public class PlayerMovement : LivingObject
             accuracy = 0,
             reloadTime = 4.0f
         });
-        databaseWeapons.Add(new Weapon { WeaponName = "빨강", weaponType = WeaponType.Blaster, id = 6});
+        databaseWeapons.Add(new Weapon { WeaponName = "빨강", weaponType = WeaponType.Blaster, id = 6 });
         AddWeapon(databaseWeapons[0]);
         AddWeapon(databaseWeapons[1]);
         AddWeapon(databaseWeapons[2]);
@@ -1372,7 +1381,7 @@ public class PlayerMovement : LivingObject
     }
     public void UpdateWeaponUI(Weapon currentWeapon)
     {
-       soulObject.GetComponent<SpriteRenderer>().color = currentWeapon.weaponColor;
+        soulObject.GetComponent<SpriteRenderer>().color = currentWeapon.weaponColor;
         // UIManager.Instance.weaponNameText.text = currentWeapon.WeaponName;
     }
     public void SelectWeapon(int index)
@@ -1389,8 +1398,8 @@ public class PlayerMovement : LivingObject
         curweaponData = playerWeapons[currentWeaponIndex];
         gameManager.SaveWeaponData(curweaponData);
         // 2) UIManager에 알리기
-        if(curweaponData.weaponType != WeaponType.LaserGun)
-        UIManager.Instance.OnWeaponChanged(curweaponData);
+        if (curweaponData.weaponType != WeaponType.LaserGun)
+            UIManager.Instance.OnWeaponChanged(curweaponData);
     }
     public void SetWeaponData(Weapon weapon)
     {

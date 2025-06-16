@@ -110,12 +110,11 @@ public class TypeEffect : MonoBehaviour
 
     private IEnumerator Effecting()
     {
-        bool isExpressionSet = false; // 표정 설정 여부를 추적
-        string currentText = "";      // 현재까지 출력된 텍스트
+        bool isExpressionSet = false;
+        string currentText = "";
 
         while (index < targetMsg.Length)
         {
-            // 새로운 단어나 문장이 시작될 때 표정 설정
             if (!isExpressionSet && (index == 0 || targetMsg[index - 1] == ' '))
             {
                 if (currentExpression != null && DialogueManager.Instance.currentNPC != null)
@@ -125,39 +124,42 @@ public class TypeEffect : MonoBehaviour
                 }
             }
 
-            // 태그 시작 감지 및 처리
             if (targetMsg[index] == '<')
             {
                 int closeIndex = targetMsg.IndexOf('>', index);
                 if (closeIndex != -1)
                 {
-                    // 태그를 전체적으로 처리
                     string tag = targetMsg.Substring(index, closeIndex - index + 1);
-                    currentText += tag; // 태그를 유지하며 추가
-                    msgText.text = currentText; // 텍스트 업데이트
+                    currentText += tag;
+                    msgText.text = currentText;
                     index = closeIndex + 1;
-                    continue; // 태그는 한 번에 처리되므로 다음 루프로 넘어감
+                    continue;
                 }
             }
 
-            // 일반 문자 출력
-            if (targetMsg[index].ToString() != " " && targetMsg[index].ToString() != "?" &&
-                targetMsg[index].ToString() != "." && targetMsg[index].ToString() != "*")
+            char currentChar = targetMsg[index];
+
+            // 사운드 재생
+            if (currentChar != ' ' && currentChar != '?' && currentChar != '.' && currentChar != '*')
             {
                 SoundManager.Instance.SFXTextPlay(txtsound, txtId);
             }
 
-            // 문자 추가
-            currentText += targetMsg[index];
-            msgText.text = currentText; // 텍스트 업데이트
+            currentText += currentChar;
+            msgText.text = currentText;
             index++;
 
-            // 지연 시간 적용
-            float delay = (index < targetMsg.Length && targetMsg[index - 1].ToString() == " ") ? 0.02f : 1f / CharPerSeconds;
-            yield return new WaitForSeconds(delay);
+            // 줄넘김 문자일 경우 약간의 추가 딜레이
+            if (currentChar == '\n')
+            {
+                yield return new WaitForSeconds(0.2f); // 줄넘김 딜레이 추가
+            }
+            else
+            {
+                yield return new WaitForSeconds(1f / CharPerSeconds);
+            }
         }
 
-        typingCoroutine = null; // 타이핑 완료 후 null로 설정
         EffectEnd();
     }
 

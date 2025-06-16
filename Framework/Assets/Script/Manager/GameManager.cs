@@ -231,7 +231,14 @@ public class GameManager : MonoBehaviour
    
         RectTransform gameoverSoulRect = gameoverSoul.GetComponent<RectTransform>();
         Vector2 screenPosition = Camera.main.WorldToScreenPoint(GetPlayerData().position);
-
+        if (!isBattle)
+        {
+            UIManager.Instance.OffPlayerUI();
+        }
+        else
+        {
+           UIManager.Instance.OnPlayerUI();
+        }
         // Canvas가 Screen Space - Overlay 모드인지 확인
         if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
         {
