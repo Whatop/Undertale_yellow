@@ -594,7 +594,7 @@ public class GameManager : MonoBehaviour
         Item itemToEquip = GetPlayerData().inventory[Id];
         ItemType itemType = itemToEquip.itemType;
         dialogueManager.StartItemDialogue(itemToEquip); // 이벤트 대사처럼 처리
-
+    
         switch (itemType)
         {
             case ItemType.None:
@@ -604,8 +604,6 @@ public class GameManager : MonoBehaviour
             case ItemType.HealingItem:
                 // 체력 증가 예시
                 GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1); 
-                        
-                        
                 GetPlayerData().inventory.RemoveAt(Id); 
                 break;
 
@@ -643,6 +641,66 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void QuickUseItem(int Id)
+    {
+        SoundManager.Instance.SFXPlay("select_sound", 173);
+
+        // 인벤토리에서 유효한 아이템 ID인지 확인
+        if (Id < 0 || Id >= GetPlayerData().inventory.Count)
+        {
+            Debug.LogWarning("Invalid item ID.");
+            return;
+        }
+
+        Item itemToEquip = GetPlayerData().inventory[Id];
+        string message = "";
+        switch (itemToEquip.itemType)
+        {
+            case ItemType.HealingItem:
+                GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1);
+                GetPlayerData().inventory.RemoveAt(Id);
+                message = $"* {itemToEquip.itemName}을 먹었다.";
+
+                // 회복 아이템 사용 시 체력 체크
+                if (GetPlayerData().health == GetPlayerData().Maxhealth)
+                {
+                    message += "\n* 당신의 HP가 가득 찼다.";
+                }
+                break;
+
+            case ItemType.Weapon:
+                Item currentWeapon = GetPlayerData().GetEquippedWeapon();
+                if (currentWeapon != null)
+                {
+                    // 기존에 착용한 무기를 인벤토리에 다시 추가
+                    GetPlayerData().inventory.Add(currentWeapon);
+                }
+                // 새로운 무기 착용
+                GetPlayerData().EquipWeapon(itemToEquip);
+                GetPlayerData().inventory.RemoveAt(Id);
+                message = $"* {itemToEquip.itemName}을(를) 장착했다.";
+                break;
+            case ItemType.Ammor:
+                Item currentAmmor = GetPlayerData().GetEquippedAmmor();
+                if (currentAmmor != null)
+                {
+                    // 기존에 착용한 방어구를 인벤토리에 다시 추가
+                    GetPlayerData().inventory.Add(currentAmmor);
+                }
+                // 새로운 방어구 착용
+                GetPlayerData().EquipAmmor(itemToEquip);
+                GetPlayerData().inventory.RemoveAt(Id);
+                message = $"* {itemToEquip.itemName}을(를) 장착했다.";
+                break;
+
+            default:
+                Debug.Log("Item does nothing.");
+                message = "* 아무 일도 일어나지 않았다.";
+
+                break;
+        }
+        UIManager.Instance.ShowQuickText(message);
+    }
 
 
     public void InfoItem(int Id)

@@ -25,7 +25,7 @@ public class RadialSegment
         segmentTransform.localScale = isOn ? highlightScale : defaultScale;
     }
 
-    public void ExecuteAction()
+    public void ExecuteAction(int index = 0)
     {
         switch (menuType)
         {
@@ -37,7 +37,7 @@ public class RadialSegment
 
             case RadialMenuType.Item:
                 Debug.Log($"[아이템] {segmentName} 사용 시도");
-                UIManager.Instance.UseQuickItem(segmentName);
+                UIManager.Instance.UseQuickItem(index);
                 break;
 
             case RadialMenuType.Soul:
@@ -259,6 +259,13 @@ public class UIManager : MonoBehaviour
     private int current_segment_Index = -1;          // 현재 하이라이트된 세그먼트 인덱스
 
     public int save_segment_index;
+
+    public QuickTextBar quickTextBar;
+    public void ShowQuickText(string message)
+    {
+        if (quickTextBar != null)
+            quickTextBar.ShowMessage(message);
+    }
 
     #region unity_code
     public static UIManager Instance
@@ -739,14 +746,9 @@ public class UIManager : MonoBehaviour
         Debug.Log($"[감정 표현] {emotionName} 애니메이션 실행");
     }
 
-    public void UseQuickItem(string itemName)
+    public void UseQuickItem(int id)
     {
-        var item = gameManager.GetPlayerData().inventory.Find(i => i.itemName == itemName);
-        if (item != null)
-        {
-            gameManager.UseItem(item.id);
-            Debug.Log($"[빠른 사용] {itemName} 아이템 사용 완료");
-        }
+            gameManager.QuickUseItem(id);
     }
 
     public void ChangeSoulType(string soulName)
@@ -853,7 +855,7 @@ public class UIManager : MonoBehaviour
         if (seg != null)
         {
             Debug.Log($"[{currentRadialMenu}] Segment {index} 선택됨 - {seg.segmentName}");
-            seg.ExecuteAction();
+            seg.ExecuteAction(index);
         }
 
         ToggleRadialMenu(currentRadialMenu); // 닫기
