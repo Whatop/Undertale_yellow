@@ -1,13 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using TMPro;
 using UnityEngine.Experimental.Rendering.Universal;
-
 using UnityEngine.SceneManagement;
-using System;
+using UnityEngine.UI;
 [System.Serializable]
 public class RadialSegment
 {
@@ -115,12 +114,12 @@ public class UIManager : MonoBehaviour
     public bool isFullScreen = true;
     public bool isVSyncOn = true;
     public bool isCursorVisible = true;
-    public bool isMouseShot= true;
-    public bool isMouseRoll= true;
+    public bool isMouseShot = true;
+    public bool isMouseRoll = true;
 
     [SerializeField]
-    private int currentButtonIndex  = 0;
-    
+    private int currentButtonIndex = 0;
+
     [SerializeField]
     private int currentRadialIndex = -1;
 
@@ -231,7 +230,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] call_points;
     public GameObject[] interaction_points;
     public Image inventroy_soul;
-    
+
     [Header("Radial Menu References")]
     public RadialMenuType currentRadialMenu = RadialMenuType.None;
     public GameObject emotionRadialPanel;
@@ -260,12 +259,31 @@ public class UIManager : MonoBehaviour
 
     public int save_segment_index;
 
-    public QuickTextBar quickTextBar;
-    public void ShowQuickText(string message)
+    public QuickTextBar[] quickTextBars;
+
+    private int nextBarIndex = 0;
+
+    public void ShowQuickText(string msg,string itemName = "아이템", int txtId = 0, float charPerSec = 10f)
     {
-        if (quickTextBar != null)
-            quickTextBar.ShowMessage(message);
+        // 사용 가능한 바 찾기
+        for (int i = 0; i < quickTextBars.Length; i++)
+        {
+            if (!quickTextBars[i].IsBusy)
+            {
+                quickTextBars[i].txtId = txtId;
+                quickTextBars[i].charPerSec = charPerSec;
+                quickTextBars[i].ShowMessage(msg);
+                return;
+            }
+        }
+
+        // 모두 바쁠 경우 경고 메시지 출력
+        quickTextBars[0].txtId = 5;
+        quickTextBars[0].charPerSec = 10f;
+        quickTextBars[0].ShowMessage("* 당신은 너무 빠르게 \"" + itemName + "\"을(를) 사용하려 했다.");
     }
+
+
 
     #region unity_code
     public static UIManager Instance
@@ -325,7 +343,7 @@ public class UIManager : MonoBehaviour
         keyBindings[4] = KeyCode.Mouse0;
         keyBindings[5] = KeyCode.Mouse1;
         keyBindings[6] = KeyCode.F;
-        keyBindings[7] = KeyCode.C; 
+        keyBindings[7] = KeyCode.C;
         keyBindings[8] = KeyCode.Tab;
         keyBindings[9] = KeyCode.E;
 
@@ -551,7 +569,7 @@ public class UIManager : MonoBehaviour
         saveNum = -1; //야메
         isSavePanel = false;
         isSaveDelay = true;
-       
+
         TextYellow();
         SoundManager.Instance.SFXPlay("save_sound", 171);
 
@@ -748,7 +766,7 @@ public class UIManager : MonoBehaviour
 
     public void UseQuickItem(int id)
     {
-            gameManager.QuickUseItem(id);
+        gameManager.QuickUseItem(id);
     }
 
     public void ChangeSoulType(string soulName)
@@ -1331,7 +1349,7 @@ public class UIManager : MonoBehaviour
     }
 
 
-  
+
 
     public void ShowDamageText(Vector3 worldPosition, float damageAmount)
     { // 월드 좌표를 스크린 좌표로 변환
@@ -1519,7 +1537,7 @@ public class UIManager : MonoBehaviour
         PlayerPrefs.SetInt("IsCursorVisible", isCursorVisible ? 1 : 0);
 
         // 마우스 조준 사용
-        PlayerPrefs.SetInt("IsMouseShot", isMouseShot? 1 : 0);
+        PlayerPrefs.SetInt("IsMouseShot", isMouseShot ? 1 : 0);
 
         // 마우스로 돌진
         PlayerPrefs.SetInt("isMouseRoll", isMouseRoll ? 1 : 0);
@@ -1647,7 +1665,7 @@ public class UIManager : MonoBehaviour
         cusorToggle.image.sprite = isCursorVisible ? onSprite : offSprite;
 
         mouseRollToggle.image.sprite = isMouseRoll ? onSprite : offSprite;
-        mouseShotToggle.image.sprite = isMouseShot? onSprite : offSprite;
+        mouseShotToggle.image.sprite = isMouseShot ? onSprite : offSprite;
         // 저장
         SaveSettings();
     }
@@ -1702,18 +1720,18 @@ public class UIManager : MonoBehaviour
                 keyChangePanel.SetActive(false);
                 break;
         }
-        currentButtonIndex  = 0; // 패널 변경 시 인덱스 초기화
+        currentButtonIndex = 0; // 패널 변경 시 인덱스 초기화
         UpdateSelection();
     }
     void Navigate(int direction)
     {
-        currentButtonIndex  = (currentButtonIndex  + direction + currentButtons.Length) % currentButtons.Length;
+        currentButtonIndex = (currentButtonIndex + direction + currentButtons.Length) % currentButtons.Length;
         UpdateSelection();
     }
 
     void OptionInput()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)&& !GameManager.Instance.GetPlayerData().isDie)
+        if (Input.GetKeyDown(KeyCode.Escape) && !GameManager.Instance.GetPlayerData().isDie)
         {
             if (currentPanel == "KeyChange")
             {
@@ -1755,21 +1773,21 @@ public class UIManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 Navigate(-1);
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 Navigate(1);
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
                 AdjustValue(-1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
-            soundManager.SFXPlay("move_sound", 185);
+                soundManager.SFXPlay("move_sound", 185);
                 AdjustValue(1);
             }
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Z))
@@ -1778,19 +1796,19 @@ public class UIManager : MonoBehaviour
                 {
                     if (currentPanel == "Option")
                     {
-                        if (currentButtonIndex  == 1 || currentButtonIndex  == 3 || currentButtonIndex  == 4)
+                        if (currentButtonIndex == 1 || currentButtonIndex == 3 || currentButtonIndex == 4)
                             ToggleValue();  // ToggleValue 호출
                         else
                         {
-                            currentButtons[currentButtonIndex ].onClick.Invoke();
-                            
-                         if(currentButtonIndex  != 2&& currentButtonIndex  != 5 && currentButtonIndex  != 6 && currentButtonIndex  != 7 && currentButtonIndex  != 8 && currentButtonIndex  != 0)
-                            soundManager.SFXPlay("select_sound", 173);
+                            currentButtons[currentButtonIndex].onClick.Invoke();
+
+                            if (currentButtonIndex != 2 && currentButtonIndex != 5 && currentButtonIndex != 6 && currentButtonIndex != 7 && currentButtonIndex != 8 && currentButtonIndex != 0)
+                                soundManager.SFXPlay("select_sound", 173);
                         }
                     }
                     else
                     {
-                        currentButtons[currentButtonIndex ].onClick.Invoke();
+                        currentButtons[currentButtonIndex].onClick.Invoke();
                         soundManager.SFXPlay("select_sound", 173);
                     }
                 }
@@ -1804,7 +1822,7 @@ public class UIManager : MonoBehaviour
     }
     public void AdjustValue(int direction)
     {
-        switch (currentButtonIndex )
+        switch (currentButtonIndex)
         {
             case 2: // 밝기 조절
                 brightnessScrollbar.value = Mathf.Clamp(brightnessScrollbar.value + direction * 0.1f, 0, 1);
@@ -1862,7 +1880,7 @@ public class UIManager : MonoBehaviour
     //
     public void ToggleValue()
     {
-        switch (currentButtonIndex )
+        switch (currentButtonIndex)
         {
             case 1: // 전체 화면 토글
                 ToggleFullScreen();
@@ -1879,8 +1897,8 @@ public class UIManager : MonoBehaviour
     }
     public void ToggleKeyValue()
     {
-       
-        switch (currentButtonIndex )
+
+        switch (currentButtonIndex)
         {
             case 11: // 활성화 : 마우스 조준, 비활성화 : 가장 가까운적 조준
                 ToggleMouseShot();
@@ -1947,7 +1965,7 @@ public class UIManager : MonoBehaviour
 
     void ToggleMouseRoll()
     {
-        isMouseRoll= !isMouseRoll;
+        isMouseRoll = !isMouseRoll;
         UpdateButtonState(mouseRollToggle, isMouseRoll);
     }
 
@@ -1955,7 +1973,7 @@ public class UIManager : MonoBehaviour
     {
         yield return null; // Wait for one frame
         EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(currentButtons[currentButtonIndex ].gameObject);
+        EventSystem.current.SetSelectedGameObject(currentButtons[currentButtonIndex].gameObject);
     }
     void UpdateSelection()
     {
@@ -1965,21 +1983,21 @@ public class UIManager : MonoBehaviour
             colors.normalColor = Color.white; // 기본 색상
             colors.highlightedColor = Color.white; // 강조 색상
             colors.pressedColor = Color.gray; // 클릭 시 색상
-            colors.selectedColor = (i == currentButtonIndex ) ? Color.white : Color.white; // 선택된 색상
+            colors.selectedColor = (i == currentButtonIndex) ? Color.white : Color.white; // 선택된 색상
             currentButtons[i].colors = colors;
 
             // 텍스트 색상 변경
             TextMeshProUGUI buttonText = currentButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = (i == currentButtonIndex ) ? Color.white : Color.gray; // 강조 색상
+                buttonText.color = (i == currentButtonIndex) ? Color.white : Color.gray; // 강조 색상
             }
         }
     }
 
     public void OnButtonClick(int index)
     {
-        currentButtonIndex  = index;
+        currentButtonIndex = index;
         UpdateSelection();
     }
     public void ChangeResolution(int direction)
@@ -2018,7 +2036,7 @@ public class UIManager : MonoBehaviour
 
     void OnButtonHover(int index)
     {
-        currentButtonIndex  = index;
+        currentButtonIndex = index;
         UpdateSelection();
     }
     #endregion
@@ -2155,7 +2173,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator Okdso()
     {
         yield return new WaitForSeconds(1f);
-        Color breakon_color=gameover_soul.GetComponent<Image>().color;
+        Color breakon_color = gameover_soul.GetComponent<Image>().color;
         gameover_soul.GetComponent<Image>().color = new Color(1, 1, 1, 0);
         soundManager.SFXPlay("heartbreak2", 89);
         RectTransform transform = gameover_soul.GetComponent<RectTransform>();

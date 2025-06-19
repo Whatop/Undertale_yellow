@@ -643,7 +643,6 @@ public class GameManager : MonoBehaviour
 
     public void QuickUseItem(int Id)
     {
-        SoundManager.Instance.SFXPlay("select_sound", 173);
 
         // 인벤토리에서 유효한 아이템 ID인지 확인
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
@@ -657,6 +656,7 @@ public class GameManager : MonoBehaviour
         switch (itemToEquip.itemType)
         {
             case ItemType.HealingItem:
+            SoundManager.Instance.SFXPlay("heal_sound", 123);
                 GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1);
                 GetPlayerData().inventory.RemoveAt(Id);
                 message = $"* {itemToEquip.itemName}을 먹었다.";
@@ -669,6 +669,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case ItemType.Weapon:
+                SoundManager.Instance.SFXPlay("select_sound", 173);
                 Item currentWeapon = GetPlayerData().GetEquippedWeapon();
                 if (currentWeapon != null)
                 {
@@ -681,6 +682,7 @@ public class GameManager : MonoBehaviour
                 message = $"* {itemToEquip.itemName}을(를) 장착했다.";
                 break;
             case ItemType.Ammor:
+                SoundManager.Instance.SFXPlay("select_sound", 173);
                 Item currentAmmor = GetPlayerData().GetEquippedAmmor();
                 if (currentAmmor != null)
                 {
@@ -694,12 +696,13 @@ public class GameManager : MonoBehaviour
                 break;
 
             default:
+                SoundManager.Instance.SFXPlay("select_sound", 166);
                 Debug.Log("Item does nothing.");
                 message = "* 아무 일도 일어나지 않았다.";
 
                 break;
         }
-        UIManager.Instance.ShowQuickText(message);
+        UIManager.Instance.ShowQuickText(message, itemToEquip.itemName);
     }
 
 

@@ -520,19 +520,19 @@ public class PlayerMovement : LivingObject
 
     void SoulRotateToMouse()
     {
-        // 마우스의 스크린 좌표를 월드 좌표로 변환
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0; // 2D 게임이므로 Z 축을 0으로 고정
+        mousePosition.z = 0;
 
-        // 오브젝트와 마우스 좌표 간의 방향 벡터 계산
-        Vector3 direction = mousePosition - soulshotpoint.position;
+        Vector3 direction = mousePosition - transform.position;
 
-        // 방향 벡터로부터 각도 계산 (라디안 -> 각도)
+        // 너무 가까우면 회전하지 않음
+        if (direction.sqrMagnitude < 0.001f)
+            return;
+
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        // 오브젝트 회전 적용
         soulObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
     }
+
     #endregion 
 
     #region shot_code
