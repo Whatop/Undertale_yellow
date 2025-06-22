@@ -262,9 +262,15 @@ public class UIManager : MonoBehaviour
     public QuickTextBar[] quickTextBars;
 
     private int nextBarIndex = 0;
+    private bool isQuickItemDelay = false;
 
-    public void ShowQuickText(string msg,string itemName = "아이템", int txtId = 0, float charPerSec = 10f)
+    public void ShowQuickText(string msg, string itemName = "아이템", int txtId = 0, float charPerSec = 10f)
     {
+        if (isQuickItemDelay)
+        {
+            Debug.Log("[ShowQuickText] 사용 제한 중입니다.");
+            return;
+        }
         // 사용 가능한 바 찾기
         for (int i = 0; i < quickTextBars.Length; i++)
         {
@@ -277,11 +283,21 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // 모두 바쁠 경우 경고 메시지 출력
-        quickTextBars[0].txtId = 5;
-        quickTextBars[0].charPerSec = 10f;
-        quickTextBars[0].ShowMessage("* 당신은 너무 빠르게 \"" + itemName + "\"을(를) 사용하려 했다.");
+            isQuickItemDelay = true;
+            quickTextBars[0].txtId = 1;
+            quickTextBars[0].charPerSec = 7; // 경고는 일부러 느리게
+            quickTextBars[0].ShowMessage($"<color=red><b>* 당신은 너무 빠르게 아이템을 사용하려 했다.");
+
+            // 제한 해제 타이머
+            StartCoroutine(ResetQuickItemDelay());
+        
     }
+    private IEnumerator ResetQuickItemDelay()
+    {
+        yield return new WaitForSeconds(5f); // 경고 메시지 출력 동안 제한
+        isQuickItemDelay = false;
+    }
+
 
 
 
@@ -766,8 +782,15 @@ public class UIManager : MonoBehaviour
 
     public void UseQuickItem(int id)
     {
+        if (isQuickItemDelay)
+        {
+            Debug.Log("[퀵아이템] 사용 지연 중입니다.");
+            return;
+        }
+
         gameManager.QuickUseItem(id);
     }
+
 
     public void ChangeSoulType(string soulName)
     {

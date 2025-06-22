@@ -122,6 +122,11 @@ public class BulletController : MonoBehaviour
         didHitBarrierOnce = false;
         if (lineRenderer != null)
             lineRenderer.enabled = false;
+        if (bulletColors.TryGetValue(bulletType, out Color color))
+        {
+            GetComponent<SpriteRenderer>().color = color;
+            Debug.Log($"[총알 색상 적용] 타입: {bulletType}, 색상: {color}");
+        }
     }
 
     private void StartPattern()
@@ -162,6 +167,7 @@ public class BulletController : MonoBehaviour
         isSpiral = false;
         isSplitted = false;
         rb.velocity = Vector2.zero;
+        bulletType = type;
 
         // 색상 다시 설정
         var renderer = GetComponent<SpriteRenderer>();
@@ -172,7 +178,6 @@ public class BulletController : MonoBehaviour
         damage = bulletDamage;
         accuracy = bulletAccuracy;
         maxrange = maxRange;
-        bulletType = type;
         storedFireDirection = ApplyAccuracy(fireDirection);
         bulletSize = size;
         isFreind = isfreind;
