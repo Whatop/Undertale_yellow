@@ -100,92 +100,56 @@
       "name": "플라위(튜토리얼)",
       "dialogues": [
         {
-          "text": "지금부터 새로운 세계의 규칙을 알려줄게.",
-          "expression": "Talking",
-          "attack": "Attack4"
-
-        },
-        {
-          "text": "이번엔 2D 슈팅게임처럼\n구르기, 쏘기, 재장전,\n그리고 T키로 <color=#FFFF00>자비</color>를 베푸는 법까지 배워볼 거야!",
+          "text": "* 하트 모양이 보이지?\n저게 네 영혼이야.\n네 존재의 정수지!",
           "expression": "Talking"
         },
         {
-          "text": "봐, 네 영혼(하트 모양)이\n움직이고 있지?\nWASD로 조종해봐!",
+          "text": "* 이런 . . . 너 많이 다쳤구나? 내가 치료해줄게.",
+          "expression": "Talking"
+        },
+        {
+          "text": "* 자! 받아 내  \n\"친절 알갱이\"", 
           "eventType": "ChangeSoul"
         },
         {
-          "text": "공격을 피하려면\n우클릭으로 굴러!\n짧게 무적이 될 수 있어.",
+          "text": "* 움직여!\n친절을 최대한\n많이 받는거야!", 
+          "expression": "Default",
+          "eventType": "Special",
+          "attack": "Attack2"
+        },
+        {
+          "text": "* 이봐 친구,\n놓쳐버렸잖아.",
+          "expression": "Sneer",
+          "music": "LowerTone",
+          "attack": "Attack3"
+        },
+        {
+          "text": "* 다시 해 보자고,\n알았지?",
+          "expression": "Default",
+          "attack": "Attack4"
+        },
+        {
+          "text": "* 좋아.. 내가 너를 나갈수있게 해줄게\n 대신에 내가 너의 여정에 함께해도 될까?",
           "expression": "Talking"
         },
         {
-          "text": "자, 이제 사격 연습!\n좌클릭을 눌러 탄환을\n발사해봐!",
+          "text": "피했어 . . ? 어떻게 . .",
+          "expression": "Talking"
+        },
+        {
+          "text": "내가 이걸 빌려줄게!",
           "expression": "Talking",
           "eventType": "tutorialShot"
         },
         {
-          "text": "탄환은 무한하지만,\n재장전은 필요해.\nR키로 탄창을 채워줘!",
-          "expression": "Talking"
-        },
-        {
-          "text": "그리고... T키로 상대에게\n표현을 할 수도 있어.\n싸우고 싶지 않을 때\n유용하겠지?",
-          "expression": "Talking"
-
-        },
-        {
-          "text": "누구에게나 자비를\n베푸는 게 좋을지는\n상황마다 다르겠지만...",
-          "expression": "Talking"
-
-        },
-        {
-          "text": "이 세계에선 선택의\n무게가 더 크게\n느껴질 거야.",
-          "expression": "Talking"
-
-        },
-        {
-          "text": "하지만 괜찮아.\n내가 있잖아?\n내가 널 '도와줄' 테니까.",
-          "expression": "Wink"
-        },
-        {
-          "text": "총알 생성",
-          "expression": "Wink",
-          "attack": "Attack1"
-        },
-        {
-          "text": "적한태 이동",
-          "expression": "Sneer",
-          "attack": "Attack2"
-        },
-        {
-          "text": "왼쪽 이동",
+          "text": "아! 이것도..! ",
           "expression": "Talking",
-          "attack": "Attack3"
+          "eventType": "Special"
         },
         {
-          "text": "유도탄 이동",
+          "text": "필요할때 이걸로 나를 불러줘! \n 그럼 이따봐",
           "expression": "Talking",
-          "attack": "Attack4"
-        },
-        {
-          "text": "회오리 ",
-          "expression": "Talking",
-          "attack": "Attack5"
-        },
-
-        {
-          "text": "분열",
-          "attack": "Attack6",
-          "expression": "Talking"
-        },
-        {
-          "text": "출발해볼까?\n이 지하세계에는\n이야깃거리가 잔뜩\n준비되어 있거든!",
-          "expression": "Smile",
-          "eventType": "EndDialogue",
-          "attack": "Attack4"
-        },
-        {
-          "text": "나만 믿고 따라와.\n절대 후회는...\n하지 않을 거야.",
-          "expression": "CreepFace",
-          "attack": "Attack5"
+          "eventType": "Special"
         }
       ]
     }
