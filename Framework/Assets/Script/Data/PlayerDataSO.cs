@@ -4,34 +4,34 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "PlayerDataSO", menuName = "GameData/PlayerDataSO", order = 1)]
 public class PlayerDataSO : ScriptableObject
 {
-    public GameObject player; // ÇÃ·¹ÀÌ¾î °´Ã¼ (Prefab µî)
-    public int Maxhealth = 6; // ÃÖ´ë Ã¼·Â
-    public int health = 6; // ÇöÀç Ã¼·Â
-    public Vector3 position = Vector3.zero; // ÃÊ±â À§Ä¡
-    public string player_Name = "frisk"; // ÇÃ·¹ÀÌ¾î ÀÌ¸§
+    public Item curArmor; //  î±¸
+        curArmor = null;
+    public int health = 6; // í˜„ì¬ ì²´ë ¥
+    public Vector3 position = Vector3.zero; // ì´ˆê¸° ìœ„ì¹˜
+    public string player_Name = "frisk"; // í”Œë ˆì´ì–´ ì´ë¦„
 
-    public List<Item> inventory = new List<Item>(); // ÃÊ±â ÀÎº¥Åä¸® ¼³Á¤
-    public GameState currentState = GameState.None; // ÃÊ±â »óÅÂ
-    public bool isStop = false; // ÇÃ·¹ÀÌ¾î µ¿ÀÛ Á¦¾î
-    public Animator playerAnimator; // ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌÅÍ
-    public bool isInvincible = false; // ¹«Àû ¿©ºÎ
-    public bool isDie = false; // »ç¸Á ¿©ºÎ
-    public bool isPhone = false; // Æ¯Á¤ »óÅÂ(Æù »ç¿ë ¿©ºÎ µî)
+    public List<Item> inventory = new List<Item>(); // ì´ˆê¸° ì¸ë²¤í† ë¦¬ ì„¤ì •
+    public GameState currentState = GameState.None; // ì´ˆê¸° ìƒíƒœ
+    public bool isStop = false; // í”Œë ˆì´ì–´ ë™ì‘ ì œì–´
+    public Animator playerAnimator; // í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´í„°
+    public bool isInvincible = false; // ë¬´ì  ì—¬ë¶€
+    public bool isDie = false; // ì‚¬ë§ ì—¬ë¶€
+    public bool isPhone = false; // íŠ¹ì • ìƒíƒœ(í° ì‚¬ìš© ì—¬ë¶€ ë“±)
 
-    public int LEVEL = 1; // ÃÊ±â ·¹º§
-    public int AT = 0; // °ø°İ·Â
-    public int DF = 0; // ¹æ¾î·Â
-    public int AT_level = 0; // °ø°İ·Â ·¹º§
-    public int DF_level = 0; // ¹æ¾î·Â ·¹º§
-    public int EXP = 10; // °æÇèÄ¡
-    public int NextEXP = 0; // ´ÙÀ½ ·¹º§±îÁö °æÇèÄ¡
-    public int GOLD = 0; // ÃÊ±â °ñµå
+    public int LEVEL = 1; // ì´ˆê¸° ë ˆë²¨
+    public int AT = 0; // ê³µê²©ë ¥
+    public int DF = 0; // ë°©ì–´ë ¥
+    public int AT_level = 0; // ê³µê²©ë ¥ ë ˆë²¨
+    public int DF_level = 0; // ë°©ì–´ë ¥ ë ˆë²¨
+    public int EXP = 10; // ê²½í—˜ì¹˜
+    public int NextEXP = 0; // ë‹¤ìŒ ë ˆë²¨ê¹Œì§€ ê²½í—˜ì¹˜
+    public int GOLD = 0; // ì´ˆê¸° ê³¨ë“œ
 
-    public Item curWeapon; // Âø¿ë ¹«±â
-    public Item curAmmor; // Âø¿ë ¹æ¾î±¸
+    public Item curWeapon; // ì°©ìš© ë¬´ê¸°
+    public Item curAmmor; // ì°©ìš© ë°©ì–´êµ¬
 
     /// <summary>
-    /// ÃÊ±â µ¥ÀÌÅÍ¸¦ ¼³Á¤ÇÏ´Â ¸Ş¼­µå (¿¡µğÅÍ¿¡¼­ È£Ãâ °¡´É)
+    /// ì´ˆê¸° ë°ì´í„°ë¥¼ ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ (ì—ë””í„°ì—ì„œ í˜¸ì¶œ ê°€ëŠ¥)
     /// </summary>
     public void ResetData()
     {
