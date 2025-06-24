@@ -93,28 +93,28 @@ public class DialogueManager : MonoBehaviour
     }
     public void LoadItemData()
     {
-        TextAsset jsonFile = Resources.Load<TextAsset>("items"); // 'items.json' íŒŒì¼ì„ ë¶ˆëŸ¬ì˜´
+        TextAsset jsonFile = Resources.Load<TextAsset>("items"); // 'items.json' ÆÄÀÏÀ» ºÒ·¯¿È
         if (jsonFile != null)
         {
             itemDatabase = JsonUtility.FromJson<ItemDatabase>(jsonFile.text);
 
             if (itemDatabase != null && itemDatabase.items != null)
             {
-                Debug.Log($"[LoadItemData] ì•„ì´í…œ {itemDatabase.items.Count}ê°œ ë¡œë“œ ì™„ë£Œ");
+                Debug.Log($"[LoadItemData] ¾ÆÀÌÅÛ {itemDatabase.items.Count}°³ ·Îµå ¿Ï·á");
 
                 foreach (var item in itemDatabase.items)
                 {
-                    Debug.Log($"[LoadItemData] id: {item.id}, ì´ë¦„: {item.itemName}, íƒ€ì…: {item.itemType}");
+                    Debug.Log($"[LoadItemData] id: {item.id}, ÀÌ¸§: {item.itemName}, Å¸ÀÔ: {item.itemType}");
                 }
             }
             else
             {
-                Debug.LogError("[LoadItemData] itemDatabaseë‚˜ itemDatabase.itemsê°€ nullì…ë‹ˆë‹¤.");
+                Debug.LogError("[LoadItemData] itemDatabase³ª itemDatabase.items°¡ nullÀÔ´Ï´Ù.");
             }
         }
         else
         {
-            Debug.LogError("[LoadItemData] items.json íŒŒì¼ ë¡œë“œ ì‹¤íŒ¨");
+            Debug.LogError("[LoadItemData] items.json ÆÄÀÏ ·Îµå ½ÇÆĞ");
         }
     }
 
@@ -144,39 +144,39 @@ public class DialogueManager : MonoBehaviour
     }
     private void ConfigureDialogueUI(bool isEvent = false, int eventID = -1)
     {
-        bool showFace = isEvent; // isEventê°€ trueì¼ ë•Œë§Œ ì–¼êµ´ ì´ë¯¸ì§€ë¥¼ ë³´ì´ê²Œ í•¨
+        bool showFace = isEvent; // isEvent°¡ trueÀÏ ¶§¸¸ ¾ó±¼ ÀÌ¹ÌÁö¸¦ º¸ÀÌ°Ô ÇÔ
         int faceIndex = -1;
         Vector2 textPosition = new Vector2(isEvent ? 160f : -160f, UIManager.Instance.text.gameObject.transform.localPosition.y);
 
-        // ì–¼êµ´ ì´ë¯¸ì§€ë¥¼ ë³´ì´ê²Œ í• ì§€ ì—¬ë¶€ë¥¼ ì„¤ì •
+        // ¾ó±¼ ÀÌ¹ÌÁö¸¦ º¸ÀÌ°Ô ÇÒÁö ¿©ºÎ¸¦ ¼³Á¤
         UIManager.Instance.npcFaceImage.gameObject.SetActive(showFace);
 
-        // isEventê°€ trueì¼ ë•Œë§Œ eventIDì— ë”°ë¼ ì–¼êµ´ ì´ë¯¸ì§€ ì„¤ì •
+        // isEvent°¡ trueÀÏ ¶§¸¸ eventID¿¡ µû¶ó ¾ó±¼ ÀÌ¹ÌÁö ¼³Á¤
         if (isEvent)
         {
             switch (eventID)
             {
                 case 100:
-                    faceIndex = 0; // ì˜ˆ: eventIDê°€ 100ì¼ ë•Œ 0ë²ˆ ì–¼êµ´ ì´ë¯¸ì§€ ì‚¬ìš©
+                    faceIndex = 0; // ¿¹: eventID°¡ 100ÀÏ ¶§ 0¹ø ¾ó±¼ ÀÌ¹ÌÁö »ç¿ë
                     SoundManager.Instance.StopBGSound();
                     SoundManager.Instance.BGSoundPlay(3);
                     break;
                 case 101:
-                    faceIndex = 1; // ì˜ˆ: eventIDê°€ 101ì¼ ë•Œ 1ë²ˆ ì–¼êµ´ ì´ë¯¸ì§€ ì‚¬ìš©
+                    faceIndex = 1; // ¿¹: eventID°¡ 101ÀÏ ¶§ 1¹ø ¾ó±¼ ÀÌ¹ÌÁö »ç¿ë
                     break;
                 case 1000:
                 case 1001:
                 case 1002:
-                    faceIndex = -1; // ì˜ˆ: eventIDê°€ 1001ì¼ ë•Œ 1ë²ˆ ì–¼êµ´ ì´ë¯¸ì§€ ì‚¬ìš©
+                    faceIndex = -1; // ¿¹: eventID°¡ 1001ÀÏ ¶§ 1¹ø ¾ó±¼ ÀÌ¹ÌÁö »ç¿ë
                     SoundManager.Instance.SFXPlay("heal_sound", 123);
                     break;
                 default:
-                    faceIndex = -1; // ê¸°ë³¸ê°’ (ì–¼êµ´ ì´ë¯¸ì§€ë¥¼ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+                    faceIndex = -1; // ±âº»°ª (¾ó±¼ ÀÌ¹ÌÁö¸¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
                     break;
             }
         }
 
-        // ì–¼êµ´ ì´ë¯¸ì§€ë¥¼ ë³´ì´ê²Œ ì„¤ì •í•˜ê³ , ìœ íš¨í•œ ì¸ë±ìŠ¤ì¼ ë•Œë§Œ ì„¤ì •
+        // ¾ó±¼ ÀÌ¹ÌÁö¸¦ º¸ÀÌ°Ô ¼³Á¤ÇÏ°í, À¯È¿ÇÑ ÀÎµ¦½ºÀÏ ¶§¸¸ ¼³Á¤
         if (showFace && faceIndex >= 0 && faceIndex < npcFaces.Length)
         {
             UIManager.Instance.npcFaceImage.sprite = npcFaces[faceIndex];
@@ -196,7 +196,7 @@ public class DialogueManager : MonoBehaviour
         currentNPC.isEvent = isEvent;
         DialogueData dialogue = FindDialogue(npcID, isEvent);
 
-        // ëŒ€í™” ë°ì´í„°ê°€ ì—†ëŠ” ê²½ìš° ë¡œê·¸ ì¶œë ¥
+        // ´ëÈ­ µ¥ÀÌÅÍ°¡ ¾ø´Â °æ¿ì ·Î±× Ãâ·Â
         if (dialogue == null)
         {
             Debug.LogWarning($"No dialogue found for NPC ID: {npcID}, isEvent: {isEvent}");
@@ -216,55 +216,55 @@ public class DialogueManager : MonoBehaviour
 
     public void StartItemDialogue(Item item)
     {
-            case ItemType.Armor:
+        // ´ëÈ­ Å¥ ÃÊ±âÈ­
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
-        SetUINPC(); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        SetUINPC(); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
 
         currentNPC.isEvent = true;
         string message = "";
         ConfigureDialogueUI(false, -1);
 
-        // ì•„ì´í…œ íƒ€ì…ì— ë”°ë¼ ë©”ì‹œì§€ ì„¤ì •
+        // ¾ÆÀÌÅÛ Å¸ÀÔ¿¡ µû¶ó ¸Ş½ÃÁö ¼³Á¤
         switch (item.itemType)
         {
             case ItemType.HealingItem:
-                message = $"* {item.itemName}ì„ ë¨¹ì—ˆë‹¤.";
+                message = $"* {item.itemName}À» ¸Ô¾ú´Ù.";
 
-                // íšŒë³µ ì•„ì´í…œ ì‚¬ìš© ì‹œ ì²´ë ¥ ì²´í¬
+                // È¸º¹ ¾ÆÀÌÅÛ »ç¿ë ½Ã Ã¼·Â Ã¼Å©
                 if (GameManager.Instance.GetPlayerData().health == GameManager.Instance.GetPlayerData().Maxhealth)
                 {
-                    message += "\n* ë‹¹ì‹ ì˜ HPê°€ ê°€ë“ ì°¼ë‹¤.";
+                    message += "\n* ´ç½ÅÀÇ HP°¡ °¡µæ Ã¡´Ù.";
                 }
                 break;
 
             case ItemType.Weapon:
             case ItemType.Ammor:
-                message = $"* {item.itemName}ì„(ë¥¼) ì¥ì°©í–ˆë‹¤.";
+                message = $"* {item.itemName}À»(¸¦) ÀåÂøÇß´Ù.";
                 break;
 
             default:
-                message = "* ì´ ì•„ì´í…œì€ ì‚¬ìš©í•´ë„ ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šì•˜ë‹¤.";
+                message = "* ÀÌ ¾ÆÀÌÅÛÀº »ç¿ëÇØµµ ¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾Ê¾Ò´Ù.";
                 break;
         }
 
-        // ëŒ€ì‚¬ë¥¼ íì— ì¶”ê°€
+        // ´ë»ç¸¦ Å¥¿¡ Ãß°¡
         sentences.Enqueue(new SentenceData
         {
             text = message,
             expression = "Default"
         });
 
-        // UI ì—´ê¸° ë° ì²« ë²ˆì§¸ ëŒ€ì‚¬ ì¶œë ¥
+        // UI ¿­±â ¹× Ã¹ ¹øÂ° ´ë»ç Ãâ·Â
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }
     public void StartInfoDialogue(Item item)
     {
-        // ëŒ€í™” í ì´ˆê¸°í™”
+        // ´ëÈ­ Å¥ ÃÊ±âÈ­
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
-        SetUINPC(); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        SetUINPC(); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
 
         currentNPC.isEvent = true;
         string message = "";
@@ -272,35 +272,35 @@ public class DialogueManager : MonoBehaviour
         string item_Description = item.description;
         message = item_Description;
 
-        // ëŒ€ì‚¬ë¥¼ íì— ì¶”ê°€
+        // ´ë»ç¸¦ Å¥¿¡ Ãß°¡
         sentences.Enqueue(new SentenceData
         {
             text = message,
             expression = "Default"
         });
 
-        // UI ì—´ê¸° ë° ì²« ë²ˆì§¸ ëŒ€ì‚¬ ì¶œë ¥
+        // UI ¿­±â ¹× Ã¹ ¹øÂ° ´ë»ç Ãâ·Â
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }public void StartDropDialogue(Item item)
     {
-        // ëŒ€í™” í ì´ˆê¸°í™”
+        // ´ëÈ­ Å¥ ÃÊ±âÈ­
         sentences.Clear();
         GameManager.Instance.GetPlayerData().isStop = true;
-        SetUINPC(); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
-        string message = $"* {item.itemName} ì€(ëŠ”)\n    ë²„ë ¤ì¡Œë‹¤.";
+        SetUINPC(); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
+        string message = $"* {item.itemName} Àº(´Â)\n    ¹ö·ÁÁ³´Ù.";
 
         currentNPC.isEvent = true;
         ConfigureDialogueUI(false, -1);
 
-        // ëŒ€ì‚¬ë¥¼ íì— ì¶”ê°€
+        // ´ë»ç¸¦ Å¥¿¡ Ãß°¡
         sentences.Enqueue(new SentenceData
         {
             text = message,
             expression = "Default"
         });
 
-        // UI ì—´ê¸° ë° ì²« ë²ˆì§¸ ëŒ€ì‚¬ ì¶œë ¥
+        // UI ¿­±â ¹× Ã¹ ¹øÂ° ´ë»ç Ãâ·Â
         UIManager.Instance.TextBarOpen();
         DisplayNextSentence();
     }
@@ -328,7 +328,7 @@ public class DialogueManager : MonoBehaviour
         {
             foreach (var sentence in gameOverDialogue.sentences)
             {
-                // ê²Œì„ ì˜¤ë²„ ëŒ€ì‚¬ì— ëŒ€í•´ í…ìŠ¤íŠ¸ì™€ í‘œì •ì„ ëª¨ë‘ íì— ì¶”ê°€
+                // °ÔÀÓ ¿À¹ö ´ë»ç¿¡ ´ëÇØ ÅØ½ºÆ®¿Í Ç¥Á¤À» ¸ğµÎ Å¥¿¡ Ãß°¡
                 gameover_sentences.Enqueue(new SentenceData
                 {
                     text = sentence.text.Replace("[PLAYER_NAME]", GameManager.Instance.GetPlayerData().player_Name),
@@ -359,9 +359,9 @@ public class DialogueManager : MonoBehaviour
 
     private void OnGameOverComplete()
     {
-        currentNPC.OnDialogueEffectComplete(); // í˜„ì¬ NPCì˜ ëŒ€í™” ì™„ë£Œ ì²˜ë¦¬ í˜¸ì¶œ
+        currentNPC.OnDialogueEffectComplete(); // ÇöÀç NPCÀÇ ´ëÈ­ ¿Ï·á Ã³¸® È£Ãâ
 
-        Debug.Log(" ê²Œì„ì˜¤ë²„ ëŒ€í™”");
+        Debug.Log(" °ÔÀÓ¿À¹ö ´ëÈ­");
     }
 
     #endregion
@@ -376,18 +376,18 @@ public class DialogueManager : MonoBehaviour
 
         SentenceData sentenceData = sentences.Dequeue();
 
-        // í…ìŠ¤íŠ¸ ì¶œë ¥
+        // ÅØ½ºÆ® Ãâ·Â
         typeEffect.SetMsg(sentenceData.text, OnSentenceComplete, eventNumber, sentenceData.expression);
     }
 
     private void OnSentenceComplete()
     {
-        Debug.Log("ë¬¸ì¥ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
+        Debug.Log("¹®ÀåÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.");
     }
 
     private void End_And_LoadComplete()
     {
-        Debug.Log("ê²Œì„ì˜¤ë²„ ë -> Saveë¡œ ë„˜ì–´ê°");
+        Debug.Log("°ÔÀÓ¿À¹ö ³¡ -> Save·Î ³Ñ¾î°¨");
         UIManager.Instance.End_And_Load();
     }
 
@@ -395,7 +395,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentNPC != null)
         {
-            currentNPC.ResetToDefaultExpression(); // ê¸°ë³¸ í‘œì •ìœ¼ë¡œ ë³µì›
+            currentNPC.ResetToDefaultExpression(); // ±âº» Ç¥Á¤À¸·Î º¹¿ø
             currentNPC.EndDialogue();
         }
         GameManager.Instance.GetPlayerData().isStop = false;
@@ -410,7 +410,7 @@ public class DialogueManager : MonoBehaviour
                 break;
         }
 
-        npcID = -1; // npcID ì´ˆê¸°í™”
+        npcID = -1; // npcID ÃÊ±âÈ­
     }
 
 

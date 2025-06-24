@@ -13,7 +13,7 @@ public enum ItemType
 {
     HealingItem,
     Weapon,
-    Armor,
+    Ammor,
     None
 }
 [System.Serializable]
@@ -25,11 +25,11 @@ public class PlayerData
     public Vector3 position;
     public string player_Name;
     public List<Item> inventory;
-    public Item curArmor;
-    public void EquipArmor(Item item)
-        curArmor = item;
-    public Item GetEquippedArmor()
-        return curArmor;
+    public GameState currentState; // ÇÃ·¹ÀÌ¾îÀÇ ÇöÀç °ÔÀÓ »óÅÂ Ãß°¡
+    public bool isStop = false;
+    public Animator playerAnimator;
+    public bool isInvincible;
+    public bool isDie;
     public bool isPhone; 
 
 
@@ -42,26 +42,26 @@ public class PlayerData
     public int NextEXP = 0;
     public int GOLD = 0;
 
-    // í”Œë ˆì´ì–´ ì°©ìš©ì¤‘ì¸ ë¬´ê¸°, ì¥ê°‘
+    // ÇÃ·¹ÀÌ¾î Âø¿ëÁßÀÎ ¹«±â, Àå°©
     public Item curWeapon;
     public Item curAmmor;
 
     public PlayerData()
     {
-        // ì´ˆê¸°í™” ë¡œì§ ì¶”ê°€ (ì˜ˆ: ê¸°ë³¸ê°’ ì„¤ì •)
+        // ÃÊ±âÈ­ ·ÎÁ÷ Ãß°¡ (¿¹: ±âº»°ª ¼³Á¤)
         Maxhealth = 20;
         health = 20;
         position = Vector3.zero;
         player_Name = "frisk";
         LEVEL = 1;
 
-        inventory = new List<Item>();// ë™ì ìœ¼ë¡œ í¬ê¸°ë¥¼ ì¡°ì ˆí•  ìˆ˜ ìˆë„ë¡ ê³ ë ¤ ê°€ëŠ¥
-        currentState = GameState.None; // ì´ˆê¸° ìƒíƒœ ì„¤ì •
+        inventory = new List<Item>();// µ¿ÀûÀ¸·Î Å©±â¸¦ Á¶ÀıÇÒ ¼ö ÀÖµµ·Ï °í·Á °¡´É
+        currentState = GameState.None; // ÃÊ±â »óÅÂ ¼³Á¤
         playerAnimator = null;
         isDie = false;
         isPhone = false; 
 
-        // ì¶”ê°€ ë°ì´í„° ì´ˆê¸°í™”
+        // Ãß°¡ µ¥ÀÌÅÍ ÃÊ±âÈ­
     }
 
     public void LevelUp()
@@ -90,9 +90,9 @@ public class PlayerData
 [System.Serializable]
 public class Item
 {
-    public int id;          // ì•„ì´í…œ ê³ ìœ  ID
-    public string itemName; // ì•„ì´í…œ ì´ë¦„
-    public string description; // ì•„ì´í…œ ì„¤ëª…
+    public int id;          // ¾ÆÀÌÅÛ °íÀ¯ ID
+    public string itemName; // ¾ÆÀÌÅÛ ÀÌ¸§
+    public string description; // ¾ÆÀÌÅÛ ¼³¸í
     public ItemType itemType = ItemType.None;
     public Item(int id, string name, string description)
     {
@@ -111,8 +111,8 @@ public class Item
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private PlayerDataSO playerDataSO; // ScriptableObject ì‚¬ìš©
-    private PlayerData runtimePlayerData; // ëŸ°íƒ€ì„ ì¤‘ ê´€ë¦¬í•  ë°ì´í„°
+    [SerializeField] private PlayerDataSO playerDataSO; // ScriptableObject »ç¿ë
+    private PlayerData runtimePlayerData; // ·±Å¸ÀÓ Áß °ü¸®ÇÒ µ¥ÀÌÅÍ
 
     [SerializeField] private GameConfigSO gameConfig;
 
@@ -125,27 +125,27 @@ public class GameManager : MonoBehaviour
 
     public Action<GameState> OnGameStateChanged;
     public GameObject savePrefab; // SavePoint Prefab
-    public Transform[] savePointTransforms; // SavePoint ìœ„ì¹˜ ë°°ì—´
-    private List<GameObject> instantiatedSavePoints = new List<GameObject>(); // ìƒì„±ëœ SavePoint ë¦¬ìŠ¤íŠ¸
+    public Transform[] savePointTransforms; // SavePoint À§Ä¡ ¹è¿­
+    private List<GameObject> instantiatedSavePoints = new List<GameObject>(); // »ı¼ºµÈ SavePoint ¸®½ºÆ®
 
 
-    // ê°ì • í‘œí˜„ì´ í•´ê¸ˆë˜ì—ˆëŠ”ì§€ í™•ì¸í•  ë¦¬ìŠ¤íŠ¸
-    private List<string> unlockedEmotions = new List<string>();  // ì˜ˆ: "ê¸°ì¨", "ìŠ¬í””", "ë¶„ë…¸" ë“±
+    // °¨Á¤ Ç¥ÇöÀÌ ÇØ±İµÇ¾ú´ÂÁö È®ÀÎÇÒ ¸®½ºÆ®
+    private List<string> unlockedEmotions = new List<string>();  // ¿¹: "±â»İ", "½½ÇÄ", "ºĞ³ë" µî
 
 
 
     /// <summary>
-    /// ì „íˆ¬ í™•ì¸ìš©
+    /// ÀüÅõ È®ÀÎ¿ë
     /// </summary>
     public bool isBattle;
     public int curportalNumber = 0;
-    private float startTime;   // ê²Œì„ ì‹œì‘ ì‹œê°„
-    public float savedTime;   // ì´ì „ì— ì €ì¥ëœ ì‹œê°„ (ëˆ„ì  ì‹œê°„)
+    private float startTime;   // °ÔÀÓ ½ÃÀÛ ½Ã°£
+    public float savedTime;   // ÀÌÀü¿¡ ÀúÀåµÈ ½Ã°£ (´©Àû ½Ã°£)
     private bool isSave;
     public GameObject gameoverSoul;
-    public Canvas canvas;          // UIê°€ í¬í•¨ëœ Canvas
+    public Canvas canvas;          // UI°¡ Æ÷ÇÔµÈ Canvas
 
-    string mapName = "í˜í—ˆ - ì ë¬´ë”ê¸° ";
+    string mapName = "ÆäÇã - ÀÙ ¹«´õ±â ";
     public bool isPortalTransition = false;
 
     private DialogueManager dialogueManager;
@@ -171,8 +171,8 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // ì”¬ ì „í™˜ ì‹œ ì‚­ì œë˜ì§€ ì•ŠìŒ
-            InitializePlayerData(); // ëŸ°íƒ€ì„ ë°ì´í„° ì´ˆê¸°í™”
+            DontDestroyOnLoad(gameObject); // ¾À ÀüÈ¯ ½Ã »èÁ¦µÇÁö ¾ÊÀ½
+            InitializePlayerData(); // ·±Å¸ÀÓ µ¥ÀÌÅÍ ÃÊ±âÈ­
         }
         else
         {
@@ -180,8 +180,8 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        LoadGameConfig(); // PlayerPrefsì—ì„œ ê²Œì„ ì„¤ì • ë¡œë“œ
-        // í”Œë ˆì´ì–´ ë°ì´í„° ì´ˆê¸°í™”
+        LoadGameConfig(); // PlayerPrefs¿¡¼­ °ÔÀÓ ¼³Á¤ ·Îµå
+        // ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ ÃÊ±âÈ­
         playerData = new PlayerData();
         weaponData = new Weapon();
     }
@@ -190,11 +190,11 @@ public class GameManager : MonoBehaviour
         dialogueManager = DialogueManager.Instance;
 
         savePrefab = gameConfig.savePrefab;
-           Item fristIArmor = new Item(48, "Ä«ìº¸ ", "*    Ú¿ Î¼  ï¸±Ùµ.", ItemType.Armor);
-           GetPlayerData().EquipArmor(fristIArmor);
+        // GameConfigSOÀÇ À§Ä¡ µ¥ÀÌÅÍ·Î SavePointTransforms ÃÊ±âÈ­
+        if (gameConfig != null && gameConfig.savePointPositions != null)
         {
-            //Item fristIArmor = new Item(48,"Ä«ìº¸ ", "*    Ú¿ \n    * Î¼  ï¸±Ùµ.", ItemType.Armor);
-            //GetPlayerData().EquipArmor(fristIArmor);
+            savePointTransforms = new Transform[gameConfig.savePointPositions.Length];
+            for (int i = 0; i < gameConfig.savePointPositions.Length; i++)
             {
                 GameObject tempObj = new GameObject($"SavePointTransform_{i}");
                 tempObj.transform.position = gameConfig.savePointPositions[i];
@@ -206,22 +206,22 @@ public class GameManager : MonoBehaviour
         startTime = Time.time;
         isSave = PlayerPrefs.GetInt("MyBoolValue", 0) == 1 ? true : false;
 
-        if (isSave) // ì €ì¥ë˜ìˆë‹¤ë©´
+        if (isSave) // ÀúÀåµÇÀÖ´Ù¸é
         {
             Load();
             LoadGameTime();
             PortalManager.Instance.LoadLastCamera();
             //UIManager.Instance.ResetSettings();
-            Item fristWaepon = new Item(49, "ë¦¬ë³¼ë²„", "* ê³¨ë™í’ˆ ë¦¬ë³¼ë²„ë‹¤.", ItemType.Weapon);
-           Item fristIAmmor = new Item(48, "ì¹´ìš°ë³´ì´ ëª¨ì", "* ì „íˆ¬ë¡œ ë‚¡ì€ ì´ ëª¨ìì—” í„±ìˆ˜ì—¼ì´ ë”± ì–´ìš¸ë¦´í…ë°.", ItemType.Ammor);
+            Item fristWaepon = new Item(49, "¸®º¼¹ö", "* °ñµ¿Ç° ¸®º¼¹ö´Ù.", ItemType.Weapon);
+           Item fristIAmmor = new Item(48, "Ä«¿ìº¸ÀÌ ¸ğÀÚ", "* ÀüÅõ·Î ³°Àº ÀÌ ¸ğÀÚ¿£ ÅÎ¼ö¿°ÀÌ µü ¾î¿ï¸±ÅÙµ¥.", ItemType.Ammor);
            GetPlayerData().EquipWeapon(fristWaepon);
            GetPlayerData().EquipAmmor(fristIAmmor);
       
         }
         else
         {
-            //Item fristWaepon = new Item(51, "ë¦¬ë³¼ë²„", "ê³¨ë™í’ˆ ë¦¬ë³¼ë²„ë‹¤.", ItemType.Weapon);
-            //Item fristIAmmor = new Item(48,"ì¹´ìš°ë³´ì´ ëª¨ì", "* ì „íˆ¬ë¡œ ë‚¡ì€ ì´ ëª¨ìì—” \n    * í„±ìˆ˜ì—¼ì´ ë”± ì–´ìš¸ë¦´í…ë°.", ItemType.Ammor);
+            //Item fristWaepon = new Item(51, "¸®º¼¹ö", "°ñµ¿Ç° ¸®º¼¹ö´Ù.", ItemType.Weapon);
+            //Item fristIAmmor = new Item(48,"Ä«¿ìº¸ÀÌ ¸ğÀÚ", "* ÀüÅõ·Î ³°Àº ÀÌ ¸ğÀÚ¿£ \n    * ÅÎ¼ö¿°ÀÌ µü ¾î¿ï¸±ÅÙµ¥.", ItemType.Ammor);
             //GetPlayerData().EquipWeapon(fristWaepon);
             //GetPlayerData().EquipAmmor(fristIAmmor);
         }
@@ -239,15 +239,15 @@ public class GameManager : MonoBehaviour
         {
            UIManager.Instance.OnPlayerUI();
         }
-        // Canvasê°€ Screen Space - Overlay ëª¨ë“œì¸ì§€ í™•ì¸
+        // Canvas°¡ Screen Space - Overlay ¸ğµåÀÎÁö È®ÀÎ
         if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
         {
-            // í™”ë©´ ì¢Œí‘œë¥¼ ê·¸ëŒ€ë¡œ UIì˜ localPositionìœ¼ë¡œ ë³€í™˜
+            // È­¸é ÁÂÇ¥¸¦ ±×´ë·Î UIÀÇ localPositionÀ¸·Î º¯È¯
             gameoverSoul.transform.position = screenPosition;
         }
         else if (canvas.renderMode == RenderMode.ScreenSpaceCamera || canvas.renderMode == RenderMode.WorldSpace)
         {
-            // Screen Space - Camera ë˜ëŠ” World Space ëª¨ë“œì—ì„œëŠ” RectTransformUtilityë¥¼ ì‚¬ìš©
+            // Screen Space - Camera ¶Ç´Â World Space ¸ğµå¿¡¼­´Â RectTransformUtility¸¦ »ç¿ë
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvas.GetComponent<RectTransform>(),
                 screenPosition,
@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour
                 out Vector2 localPosition
             );
 
-            // ë³€í™˜ëœ ì¢Œí‘œë¥¼ gameoverSoulì˜ localPositionìœ¼ë¡œ ì„¤ì •
+            // º¯È¯µÈ ÁÂÇ¥¸¦ gameoverSoulÀÇ localPositionÀ¸·Î ¼³Á¤
             gameoverSoul.GetComponent<RectTransform>().localPosition = localPosition;
         }
         if (Input.GetKeyDown(KeyCode.U))
@@ -268,7 +268,7 @@ public class GameManager : MonoBehaviour
 }
     #region RadialMenuType_method
 
-    /// ì•„ì´í…œ ë³´ìœ  ì—¬ë¶€ í™•ì¸ (Linq ì—†ì´ ìˆ˜ë™ ë£¨í”„)
+    /// ¾ÆÀÌÅÛ º¸À¯ ¿©ºÎ È®ÀÎ (Linq ¾øÀÌ ¼öµ¿ ·çÇÁ)
     public bool HasItem(string itemName)
     {
         foreach (Item item in playerData.inventory)
@@ -279,10 +279,10 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    /// ì˜í˜¼ ë³´ìœ  ì—¬ë¶€ í™•ì¸ - PlayerMovementì—ì„œ curWeaponTypeê³¼ ë¹„êµ
+    /// ¿µÈ¥ º¸À¯ ¿©ºÎ È®ÀÎ - PlayerMovement¿¡¼­ curWeaponType°ú ºñ±³
     public bool HasSoul(string soulName)
     {
-        // ë¬¸ìì—´ â†’ WeaponType ë³€í™˜ ì‹œë„
+        // ¹®ÀÚ¿­ ¡æ WeaponType º¯È¯ ½Ãµµ
        //if (Enum.TryParse<WeaponType>(soulName, out var parsed))
        //{
        //    var current = playerData.player.GetComponent<PlayerMovement>().playerWeapons;
@@ -292,13 +292,13 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    /// ê°ì • í‘œí˜„ í•´ê¸ˆ ì—¬ë¶€ í™•ì¸
+    /// °¨Á¤ Ç¥Çö ÇØ±İ ¿©ºÎ È®ÀÎ
     public bool CheckEmotionUnlocked(string emotionName)
     {
         return unlockedEmotions.Contains(emotionName);
     }
 
-    /// ê°ì • í•´ê¸ˆ í•¨ìˆ˜ (ì˜ˆ: ì´ë²¤íŠ¸ í´ë¦¬ì–´ ì‹œ í˜¸ì¶œ)
+    /// °¨Á¤ ÇØ±İ ÇÔ¼ö (¿¹: ÀÌº¥Æ® Å¬¸®¾î ½Ã È£Ãâ)
     public void UnlockEmotion(string emotionName)
     {
         if (!unlockedEmotions.Contains(emotionName))
@@ -319,7 +319,7 @@ public class GameManager : MonoBehaviour
                 health = playerDataSO.health,
                 position = playerDataSO.position,
                 player_Name = playerDataSO.player_Name,
-                curArmor = playerDataSO.curArmor
+                inventory = new List<Item>(playerDataSO.inventory), // ±íÀº º¹»ç
                 currentState = playerDataSO.currentState,
                 isStop = playerDataSO.isStop,
                 playerAnimator = playerDataSO.playerAnimator,
@@ -340,7 +340,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("PlayerDataSOê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+            Debug.LogError("PlayerDataSO°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
         }
     }
 
@@ -358,14 +358,14 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // SavePrefab ê²½ë¡œ ì €ì¥
+        // SavePrefab °æ·Î ÀúÀå
         if (savePrefab != null)
         {
             PlayerPrefs.SetString("SavePrefabPath", savePrefab.name);
         }
 
         PlayerPrefs.Save();
-        Debug.Log("SaveGameConfig: ê²Œì„ ì„¤ì •ì´ ì €ì¥ë˜ì—ˆìŠµë‹ˆë‹¤.");
+        Debug.Log("SaveGameConfig: °ÔÀÓ ¼³Á¤ÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù.");
     }
     void LoadGameConfig()
     {
@@ -381,7 +381,7 @@ public class GameManager : MonoBehaviour
                 float y = PlayerPrefs.GetFloat($"SavePoint_{i}_Y", 0f);
                 float z = PlayerPrefs.GetFloat($"SavePoint_{i}_Z", 0f);
 
-                // Transform ìƒì„± ë° ìœ„ì¹˜ ì„¤ì • (ì„ì‹œ GameObject)
+                // Transform »ı¼º ¹× À§Ä¡ ¼³Á¤ (ÀÓ½Ã GameObject)
                 GameObject tempObj = new GameObject($"SavePoint_{i}");
                 tempObj.transform.position = new Vector3(x, y, z);
                 savePointTransforms[i] = tempObj.transform;
@@ -390,11 +390,11 @@ public class GameManager : MonoBehaviour
 
           
 
-        Debug.Log("LoadGameConfig: ê²Œì„ ì„¤ì •ì´ ë¡œë“œë˜ì—ˆìŠµë‹ˆë‹¤.");
+        Debug.Log("LoadGameConfig: °ÔÀÓ ¼³Á¤ÀÌ ·ÎµåµÇ¾ú½À´Ï´Ù.");
     }
     private void OnApplicationQuit()
     {
-        SaveGameConfig(); // ê²Œì„ ì¢…ë£Œ ì‹œ ê²Œì„ ì„¤ì • ì €ì¥
+        SaveGameConfig(); // °ÔÀÓ Á¾·á ½Ã °ÔÀÓ ¼³Á¤ ÀúÀå
     }
     void InitializeSavePoints()
     {
@@ -408,25 +408,25 @@ public class GameManager : MonoBehaviour
             CreateSavePoint(savePointTransforms[i].position, 1000 + i);
         }
     }
-    // SavePoint ìƒì„± ë©”ì„œë“œ
-    // SavePoint ìƒì„± ë©”ì„œë“œ
+    // SavePoint »ı¼º ¸Ş¼­µå
+    // SavePoint »ı¼º ¸Ş¼­µå
     public void CreateSavePoint(Vector3 position, int id)
     {
-        // SavePoint ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
+        // SavePoint ÀÎ½ºÅÏ½º »ı¼º
         GameObject savePoint = Instantiate(savePrefab, position, Quaternion.identity);
         instantiatedSavePoints.Add(savePoint);
 
-        // SavePoint ì´ˆê¸° ì„¤ì •
+        // SavePoint ÃÊ±â ¼³Á¤
         NPC savePointNPC = savePoint.GetComponent<NPC>();
         if (savePointNPC != null)
         {
             savePointNPC.npcID = id;
         }
 
-        Debug.Log($"SavePoint ìƒì„±: ID={id}, ìœ„ì¹˜={position}");
+        Debug.Log($"SavePoint »ı¼º: ID={id}, À§Ä¡={position}");
     }
 
-    // ëª¨ë“  SavePoint ì‚­ì œ (í•„ìš”í•  ê²½ìš°)
+    // ¸ğµç SavePoint »èÁ¦ (ÇÊ¿äÇÒ °æ¿ì)
     public void ClearSavePoints()
     {
         foreach (var savePoint in instantiatedSavePoints)
@@ -440,28 +440,28 @@ public class GameManager : MonoBehaviour
     #endregion
     public void SaveGameTime()
     {
-        // í˜„ì¬ê¹Œì§€ì˜ ê²½ê³¼ ì‹œê°„ì„ ì €ì¥ (ì´ˆ ë‹¨ìœ„)
+        // ÇöÀç±îÁöÀÇ °æ°ú ½Ã°£À» ÀúÀå (ÃÊ ´ÜÀ§)
         savedTime += Time.time - startTime;
 
-        // ì €ì¥ì„ ì›í•œë‹¤ë©´ PlayerPrefs ì‚¬ìš© (ê°„ë‹¨í•œ ì˜ˆë¡œ)
+        // ÀúÀåÀ» ¿øÇÑ´Ù¸é PlayerPrefs »ç¿ë (°£´ÜÇÑ ¿¹·Î)
         PlayerPrefs.SetFloat("SavedGameTime", savedTime);
 
-        // ê²Œì„ì„ ë‹¤ì‹œ ì‹œì‘í•  ë•Œ ì‹œê°„ì„ ì¬ì„¤ì •
+        // °ÔÀÓÀ» ´Ù½Ã ½ÃÀÛÇÒ ¶§ ½Ã°£À» Àç¼³Á¤
         startTime = Time.time;
     }
     private void LoadGameTime()
     {
-        // ì €ì¥ëœ ì‹œê°„ì´ ìˆìœ¼ë©´ ë¡œë“œ, ì—†ìœ¼ë©´ 0ìœ¼ë¡œ ì„¤ì •
+        // ÀúÀåµÈ ½Ã°£ÀÌ ÀÖÀ¸¸é ·Îµå, ¾øÀ¸¸é 0À¸·Î ¼³Á¤
         savedTime = PlayerPrefs.GetFloat("SavedGameTime", 0f);
     }
     public string GetElapsedTimeInMinutes()
-    { // í˜„ì¬ ê²½ê³¼ëœ ì‹œê°„ ê³„ì‚° (ì´ˆ ë‹¨ìœ„)
+    { // ÇöÀç °æ°úµÈ ½Ã°£ °è»ê (ÃÊ ´ÜÀ§)
         float elapsedTime = (Time.time - startTime) + savedTime;
 
-        // ë¶„ê³¼ ì´ˆë¥¼ ë¶„ë¦¬í•˜ì—¬ ë‘ ìë¦¬ë¡œ í‘œì‹œ
+        // ºĞ°ú ÃÊ¸¦ ºĞ¸®ÇÏ¿© µÎ ÀÚ¸®·Î Ç¥½Ã
         string minutes = Mathf.Floor(elapsedTime / 60).ToString("00");
         string seconds = (elapsedTime % 60).ToString("00");
-        return  (minutes+":"+seconds); // ë¶„ ë‹¨ìœ„ë¡œ ë°˜í™˜
+        return  (minutes+":"+seconds); // ºĞ ´ÜÀ§·Î ¹İÈ¯
     }
     public string GetMapName()
     {
@@ -475,7 +475,7 @@ public class GameManager : MonoBehaviour
 
     public void SavePlayerData(PlayerData newData)
     {
-        // í”Œë ˆì´ì–´ ë°ì´í„° ì €ì¥
+        // ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ ÀúÀå
         playerData = newData;
     }
 
@@ -486,14 +486,14 @@ public class GameManager : MonoBehaviour
 
     public void SaveWeaponData(Weapon newData)
     {
-        // ë¬´ê¸° ë°ì´í„° ì €ì¥, ì¼ë¶€ ë¬´ê¸°ëŠ” ì‚¬ìš©í• ìˆ˜ë„?
+        // ¹«±â µ¥ÀÌÅÍ ÀúÀå, ÀÏºÎ ¹«±â´Â »ç¿ëÇÒ¼öµµ?
         weaponData = newData;
     }
 
     public void ChangeGameState(GameState newState)
     {
         playerData.currentState = newState;
-        isBattle = (newState == GameState.Fight); // ì „íˆ¬ ìƒíƒœì™€ ì—°ë™
+        isBattle = (newState == GameState.Fight); // ÀüÅõ »óÅÂ¿Í ¿¬µ¿
         OnGameStateChanged?.Invoke(newState);
     }
     public void ResumeGame()
@@ -528,34 +528,34 @@ public class GameManager : MonoBehaviour
     {
         if (DialogueManager.Instance == null)
         {
-            Debug.LogError("DialogueManager.Instanceê°€ nullì…ë‹ˆë‹¤.");
+            Debug.LogError("DialogueManager.Instance°¡ nullÀÔ´Ï´Ù.");
             return;
         }
         if (DialogueManager.Instance.itemDatabase == null)
         {
-            Debug.LogError("itemDatabaseê°€ nullì…ë‹ˆë‹¤.");
+            Debug.LogError("itemDatabase°¡ nullÀÔ´Ï´Ù.");
             return;
         }
         if (DialogueManager.Instance.itemDatabase.items == null)
         {
-            Debug.LogError("itemDatabase.itemsê°€ nullì…ë‹ˆë‹¤.");
+            Debug.LogError("itemDatabase.items°¡ nullÀÔ´Ï´Ù.");
             return;
         }
-                case ItemType.Armor:
-                    copiedItem.itemType = ItemType.Armor;
+        // ÀÎº¥Åä¸®°¡ °¡µæ Â÷Áö ¾Ê¾Ò´ÂÁö È®ÀÎ
+        if (GetPlayerData().inventory.Count >= 9)
         {
-            Debug.Log("ì¸ë²¤í† ë¦¬ê°€ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤.");
+            Debug.Log("ÀÎº¥Åä¸®°¡ °¡µæ Ã¡½À´Ï´Ù.");
             return;
         }
 
-        // JSON ë°ì´í„°ì—ì„œ í•´ë‹¹ idì˜ ì•„ì´í…œì„ ì°¾ê¸°
+        // JSON µ¥ÀÌÅÍ¿¡¼­ ÇØ´ç idÀÇ ¾ÆÀÌÅÛÀ» Ã£±â
         Item originItem = DialogueManager.Instance.itemDatabase.items.Find(item => item.id == id);
         if (originItem != null)
         {
-            // â˜… ì—¬ê¸° ì¶”ê°€ â˜… ë³µì œë³¸ ìƒì„±
+            // ¡Ú ¿©±â Ãß°¡ ¡Ú º¹Á¦º» »ı¼º
             Item copiedItem = new Item(originItem.id, originItem.itemName, originItem.description);
 
-            // íƒ€ì… ì„¤ì •
+            // Å¸ÀÔ ¼³Á¤
             switch (originItem.itemType)
             {
                 case ItemType.HealingItem:
@@ -576,7 +576,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"ID {id}ì— í•´ë‹¹í•˜ëŠ” ì•„ì´í…œì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
+            Debug.LogWarning($"ID {id}¿¡ ÇØ´çÇÏ´Â ¾ÆÀÌÅÛÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
         }
     }
 
@@ -584,7 +584,7 @@ public class GameManager : MonoBehaviour
     {
         SoundManager.Instance.SFXPlay("select_sound", 173);
 
-        // ì¸ë²¤í† ë¦¬ì—ì„œ ìœ íš¨í•œ ì•„ì´í…œ IDì¸ì§€ í™•ì¸
+        // ÀÎº¥Åä¸®¿¡¼­ À¯È¿ÇÑ ¾ÆÀÌÅÛ IDÀÎÁö È®ÀÎ
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
         {
             Debug.LogWarning("Invalid item ID.");
@@ -593,7 +593,7 @@ public class GameManager : MonoBehaviour
 
         Item itemToEquip = GetPlayerData().inventory[Id];
         ItemType itemType = itemToEquip.itemType;
-        dialogueManager.StartItemDialogue(itemToEquip); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        dialogueManager.StartItemDialogue(itemToEquip); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
     
         switch (itemType)
         {
@@ -602,39 +602,39 @@ public class GameManager : MonoBehaviour
                 break;
 
             case ItemType.HealingItem:
-            case ItemType.Armor:
-                Item currentArmor = GetPlayerData().GetEquippedArmor();
-                if (currentArmor != null)
-                    GetPlayerData().inventory.Add(currentArmor);
-                GetPlayerData().EquipArmor(itemToEquip);
+                // Ã¼·Â Áõ°¡ ¿¹½Ã
+                GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1); 
+                GetPlayerData().inventory.RemoveAt(Id); 
+                break;
+
             case ItemType.Weapon:
-                // ë¬´ê¸° ì°©ìš© ë° êµì²´
+                // ¹«±â Âø¿ë ¹× ±³Ã¼
                 Item currentWeapon = GetPlayerData().GetEquippedWeapon();
                 if (currentWeapon != null)
                 {
-                    // ê¸°ì¡´ì— ì°©ìš©í•œ ë¬´ê¸°ë¥¼ ì¸ë²¤í† ë¦¬ì— ë‹¤ì‹œ ì¶”ê°€
+                    // ±âÁ¸¿¡ Âø¿ëÇÑ ¹«±â¸¦ ÀÎº¥Åä¸®¿¡ ´Ù½Ã Ãß°¡
                     GetPlayerData().inventory.Add(currentWeapon);
                 }
-                // ìƒˆë¡œìš´ ë¬´ê¸° ì°©ìš©
+                // »õ·Î¿î ¹«±â Âø¿ë
                 GetPlayerData().EquipWeapon(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id); 
                 break;
 
             case ItemType.Ammor:
-                // ë°©ì–´êµ¬ ì°©ìš© ë° êµì²´
+                // ¹æ¾î±¸ Âø¿ë ¹× ±³Ã¼
                 Item currentAmmor = GetPlayerData().GetEquippedAmmor();
                 if (currentAmmor != null)
                 {
-                    // ê¸°ì¡´ì— ì°©ìš©í•œ ë°©ì–´êµ¬ë¥¼ ì¸ë²¤í† ë¦¬ì— ë‹¤ì‹œ ì¶”ê°€
+                    // ±âÁ¸¿¡ Âø¿ëÇÑ ¹æ¾î±¸¸¦ ÀÎº¥Åä¸®¿¡ ´Ù½Ã Ãß°¡
                     GetPlayerData().inventory.Add(currentAmmor);
                 }
-                // ìƒˆë¡œìš´ ë°©ì–´êµ¬ ì°©ìš©
+                // »õ·Î¿î ¹æ¾î±¸ Âø¿ë
                 GetPlayerData().EquipAmmor(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id); 
-                // ìƒˆë¡­ê²Œ ì°©ìš©ëœ ë°©ì–´êµ¬ë¥¼ ì¸ë²¤í† ë¦¬ì—ì„œ ì œê±°
+                // »õ·Ó°Ô Âø¿ëµÈ ¹æ¾î±¸¸¦ ÀÎº¥Åä¸®¿¡¼­ Á¦°Å
                 break;
 
-            // ì¶”ê°€ì ì¸ ì•„ì´í…œ íš¨ê³¼ëŠ” ì—¬ê¸°ì„œ ì¶”ê°€ ê°€ëŠ¥
+            // Ãß°¡ÀûÀÎ ¾ÆÀÌÅÛ È¿°ú´Â ¿©±â¼­ Ãß°¡ °¡´É
             default:
                 Debug.Log("Unknown item.");
                 break;
@@ -644,7 +644,7 @@ public class GameManager : MonoBehaviour
     public void QuickUseItem(int Id)
     {
 
-        // ì¸ë²¤í† ë¦¬ì—ì„œ ìœ íš¨í•œ ì•„ì´í…œ IDì¸ì§€ í™•ì¸
+        // ÀÎº¥Åä¸®¿¡¼­ À¯È¿ÇÑ ¾ÆÀÌÅÛ IDÀÎÁö È®ÀÎ
         if (Id < 0 || Id >= GetPlayerData().inventory.Count)
         {
             Debug.LogWarning("Invalid item ID.");
@@ -659,12 +659,12 @@ public class GameManager : MonoBehaviour
             SoundManager.Instance.SFXPlay("heal_sound", 123);
                 GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(1);
                 GetPlayerData().inventory.RemoveAt(Id);
-            case ItemType.Armor:
-                Item currentArmor = GetPlayerData().GetEquippedArmor();
-                if (currentArmor != null)
-                    GetPlayerData().inventory.Add(currentArmor);
-                GetPlayerData().EquipArmor(itemToEquip);
-                    message += "\n* ë‹¹ì‹ ì˜ HPê°€ ê°€ë“ ì°¼ë‹¤.";
+                message = $"* {itemToEquip.itemName}À» ¸Ô¾ú´Ù.";
+
+                // È¸º¹ ¾ÆÀÌÅÛ »ç¿ë ½Ã Ã¼·Â Ã¼Å©
+                if (GetPlayerData().health == GetPlayerData().Maxhealth)
+                {
+                    message += "\n* ´ç½ÅÀÇ HP°¡ °¡µæ Ã¡´Ù.";
                 }
                 break;
 
@@ -673,32 +673,32 @@ public class GameManager : MonoBehaviour
                 Item currentWeapon = GetPlayerData().GetEquippedWeapon();
                 if (currentWeapon != null)
                 {
-                    // ê¸°ì¡´ì— ì°©ìš©í•œ ë¬´ê¸°ë¥¼ ì¸ë²¤í† ë¦¬ì— ë‹¤ì‹œ ì¶”ê°€
+                    // ±âÁ¸¿¡ Âø¿ëÇÑ ¹«±â¸¦ ÀÎº¥Åä¸®¿¡ ´Ù½Ã Ãß°¡
                     GetPlayerData().inventory.Add(currentWeapon);
                 }
-                // ìƒˆë¡œìš´ ë¬´ê¸° ì°©ìš©
+                // »õ·Î¿î ¹«±â Âø¿ë
                 GetPlayerData().EquipWeapon(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id);
-                message = $"* {itemToEquip.itemName}ì„(ë¥¼) ì¥ì°©í–ˆë‹¤.";
+                message = $"* {itemToEquip.itemName}À»(¸¦) ÀåÂøÇß´Ù.";
                 break;
             case ItemType.Ammor:
                 SoundManager.Instance.SFXPlay("select_sound", 173);
                 Item currentAmmor = GetPlayerData().GetEquippedAmmor();
                 if (currentAmmor != null)
                 {
-                    // ê¸°ì¡´ì— ì°©ìš©í•œ ë°©ì–´êµ¬ë¥¼ ì¸ë²¤í† ë¦¬ì— ë‹¤ì‹œ ì¶”ê°€
+                    // ±âÁ¸¿¡ Âø¿ëÇÑ ¹æ¾î±¸¸¦ ÀÎº¥Åä¸®¿¡ ´Ù½Ã Ãß°¡
                     GetPlayerData().inventory.Add(currentAmmor);
                 }
-                // ìƒˆë¡œìš´ ë°©ì–´êµ¬ ì°©ìš©
+                // »õ·Î¿î ¹æ¾î±¸ Âø¿ë
                 GetPlayerData().EquipAmmor(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id);
-                message = $"* {itemToEquip.itemName}ì„(ë¥¼) ì¥ì°©í–ˆë‹¤.";
+                message = $"* {itemToEquip.itemName}À»(¸¦) ÀåÂøÇß´Ù.";
                 break;
 
             default:
                 SoundManager.Instance.SFXPlay("select_sound", 166);
                 Debug.Log("Item does nothing.");
-                message = "* ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šì•˜ë‹¤.";
+                message = "* ¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾Ê¾Ò´Ù.";
 
                 break;
         }
@@ -716,7 +716,7 @@ public class GameManager : MonoBehaviour
         }
         Item itemToEquip = GetPlayerData().inventory[Id];
 
-        dialogueManager.StartInfoDialogue(itemToEquip); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        dialogueManager.StartInfoDialogue(itemToEquip); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
 
     }
 
@@ -729,12 +729,12 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        GetPlayerData().inventory.RemoveAt(Id); // ì¸ë±ìŠ¤ë¥¼ ê·¸ëŒ€ë¡œ ì‚¬ìš©
+        GetPlayerData().inventory.RemoveAt(Id); // ÀÎµ¦½º¸¦ ±×´ë·Î »ç¿ë
 
-        // ì•„ì´í…œ ë²„ë¦¼ ëŒ€ì‚¬
-                dialogueManager.SetUINPC(); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        // ¾ÆÀÌÅÛ ¹ö¸² ´ë»ç
+                dialogueManager.SetUINPC(); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
         Item itemToEquip = GetPlayerData().inventory[Id];
-        dialogueManager.StartDropDialogue(itemToEquip); // ì´ë²¤íŠ¸ ëŒ€ì‚¬ì²˜ëŸ¼ ì²˜ë¦¬
+        dialogueManager.StartDropDialogue(itemToEquip); // ÀÌº¥Æ® ´ë»çÃ³·³ Ã³¸®
     }
 
 
@@ -744,32 +744,32 @@ public class GameManager : MonoBehaviour
         GetPlayerData().player.GetComponent<LivingObject>().IncreaseHealth(99);
         isSave = true;
 
-        // í”Œë ˆì´ì–´ ìœ„ì¹˜ ì €ì¥
+        // ÇÃ·¹ÀÌ¾î À§Ä¡ ÀúÀå
         PlayerPrefs.SetFloat("PlayerPosX", playerData.position.x);
         PlayerPrefs.SetFloat("PlayerPosY", playerData.position.y);
         PlayerPrefs.SetFloat("PlayerPosZ", playerData.position.z);
 
-        // ì²´ë ¥ ë° ê¸°íƒ€ í”Œë ˆì´ì–´ ë°ì´í„° ì €ì¥
-        PlayerPrefs.SetFloat("PlayerHealth", playerData.Maxhealth);  // ìµœëŒ€ ì²´ë ¥ìœ¼ë¡œ íšŒë³µ
+        // Ã¼·Â ¹× ±âÅ¸ ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ ÀúÀå
+        PlayerPrefs.SetFloat("PlayerHealth", playerData.Maxhealth);  // ÃÖ´ë Ã¼·ÂÀ¸·Î È¸º¹
         PlayerPrefs.SetFloat("PlayerMaxHealth", playerData.Maxhealth);
         PlayerPrefs.SetString("PlayerName", playerData.player_Name);
 
         PlayerPrefs.SetInt("MyBoolValue", isSave ? 1 : 0);
 
-        if (playerData.curArmor != null)
-            PlayerPrefs.SetInt("CurArmor_ID", playerData.curArmor.id);
-            PlayerPrefs.SetString("CurArmor_Name", playerData.curArmor.itemName);
-            PlayerPrefs.SetString("CurArmor_Description", playerData.curArmor.description);
-            PlayerPrefs.SetInt("CurArmor_Type", (int)playerData.curArmor.itemType);
+        // ÀÎº¥Åä¸® ¾ÆÀÌÅÛ ÀúÀå
+        List<Item> inventory = playerData.inventory;
+        PlayerPrefs.SetInt("InventoryCount", inventory.Count);
+
+        for (int i = 0; i < inventory.Count; i++)
         {
-            // ê° ì•„ì´í…œì˜ ê°œë³„ ì†ì„± ì €ì¥ (ID, ì´ë¦„, ì„¤ëª…, íƒ€ì…)
+            // °¢ ¾ÆÀÌÅÛÀÇ °³º° ¼Ó¼º ÀúÀå (ID, ÀÌ¸§, ¼³¸í, Å¸ÀÔ)
             PlayerPrefs.SetInt($"Item_{i}_ID", inventory[i].id);
             PlayerPrefs.SetString($"Item_{i}_Name", inventory[i].itemName);
             PlayerPrefs.SetString($"Item_{i}_Description", inventory[i].description);
             PlayerPrefs.SetInt($"Item_{i}_Type", (int)inventory[i].itemType);
         }
 
-        // í˜„ì¬ ë¬´ê¸° ì €ì¥
+        // ÇöÀç ¹«±â ÀúÀå
         if (playerData.curWeapon != null)
         {
             PlayerPrefs.SetInt("CurWeapon_ID", playerData.curWeapon.id);
@@ -778,7 +778,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("CurWeapon_Type", (int)playerData.curWeapon.itemType);
         }
 
-        // í˜„ì¬ ê°‘ì˜· ì €ì¥
+        // ÇöÀç °©¿Ê ÀúÀå
         if (playerData.curAmmor != null)
         {
             PlayerPrefs.SetInt("CurAmmor_ID", playerData.curAmmor.id);
@@ -787,11 +787,11 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("CurAmmor_Type", (int)playerData.curAmmor.itemType);
         }
 
-        // ë§ˆì§€ë§‰ í¬íƒˆ ë²ˆí˜¸
+        // ¸¶Áö¸· Æ÷Å» ¹øÈ£
         PlayerPrefs.SetInt("LastPortalNumber", PortalManager.Instance.lastPortalNumber);
 
         PlayerPrefs.Save();
-        Debug.Log("ê²Œì„ì´ ì €ì¥ë˜ì—ˆìŠµë‹ˆë‹¤.");
+        Debug.Log("°ÔÀÓÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù.");
     }
 
 
@@ -799,36 +799,36 @@ public class GameManager : MonoBehaviour
     // Load Method
     public void Load()
     {
-        // í”Œë ˆì´ì–´ ìœ„ì¹˜ ë¡œë“œ
+        // ÇÃ·¹ÀÌ¾î À§Ä¡ ·Îµå
         float posX = PlayerPrefs.GetFloat("PlayerPosX", 0f);
         float posY = PlayerPrefs.GetFloat("PlayerPosY", 0f);
         float posZ = PlayerPrefs.GetFloat("PlayerPosZ", 0f);
         playerData.position = new Vector3(posX, posY, posZ);
 
-        // ì²´ë ¥ ë° ê¸°íƒ€ í”Œë ˆì´ì–´ ë°ì´í„° ë¡œë“œ
-        playerData.health = PlayerPrefs.GetInt("PlayerHealth", 20); // ê¸°ë³¸ ê°’ 6
+        // Ã¼·Â ¹× ±âÅ¸ ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ ·Îµå
+        playerData.health = PlayerPrefs.GetInt("PlayerHealth", 20); // ±âº» °ª 6
         playerData.Maxhealth = PlayerPrefs.GetInt("PlayerMaxHealth", 20);
         playerData.player_Name = PlayerPrefs.GetString("PlayerName", playerData.player_Name);
 
-        // ì¸ë²¤í† ë¦¬ ì•„ì´í…œ ë¡œë“œ
+        // ÀÎº¥Åä¸® ¾ÆÀÌÅÛ ·Îµå
         int inventoryCount = PlayerPrefs.GetInt("InventoryCount", 0);
         List<Item> loadedInventory = new List<Item>();
 
         for (int i = 0; i < inventoryCount; i++)
         {
-        if (PlayerPrefs.HasKey("CurArmor_ID"))
-            int armorId = PlayerPrefs.GetInt("CurArmor_ID");
-            string armorName = PlayerPrefs.GetString("CurArmor_Name");
-            string armorDescription = PlayerPrefs.GetString("CurArmor_Description");
-            ItemType armorType = (ItemType)PlayerPrefs.GetInt("CurArmor_Type");
+            // °³º° ¼Ó¼º °¡Á®¿À±â
+            int id = PlayerPrefs.GetInt($"Item_{i}_ID");
+            string name = PlayerPrefs.GetString($"Item_{i}_Name");
+            string description = PlayerPrefs.GetString($"Item_{i}_Description");
+            ItemType itemType = (ItemType)PlayerPrefs.GetInt($"Item_{i}_Type");
 
-            playerData.curArmor = new Item(armorId, armorName, armorDescription, armorType);
+            // ¾ÆÀÌÅÛ °´Ã¼¸¦ »ı¼ºÇÏ¿© ¸®½ºÆ®¿¡ Ãß°¡
             Item newItem = new Item(id, name, description, itemType);
             loadedInventory.Add(newItem);
         }
         playerData.inventory = loadedInventory;
 
-        // í˜„ì¬ ë¬´ê¸° ë¡œë“œ
+        // ÇöÀç ¹«±â ·Îµå
         if (PlayerPrefs.HasKey("CurWeapon_ID"))
         {
             int weaponId = PlayerPrefs.GetInt("CurWeapon_ID");
@@ -836,11 +836,11 @@ public class GameManager : MonoBehaviour
             string weaponDescription = PlayerPrefs.GetString("CurWeapon_Description");
             ItemType weaponType = (ItemType)PlayerPrefs.GetInt("CurWeapon_Type");
 
-            // í˜„ì¬ ë¬´ê¸° ì•„ì´í…œ ìƒì„±
+            // ÇöÀç ¹«±â ¾ÆÀÌÅÛ »ı¼º
             playerData.curWeapon = new Item(weaponId, weaponName, weaponDescription, weaponType);
         }
 
-        // í˜„ì¬ ê°‘ì˜· ë¡œë“œ
+        // ÇöÀç °©¿Ê ·Îµå
         if (PlayerPrefs.HasKey("CurAmmor_ID"))
         {
             int armorId = PlayerPrefs.GetInt("CurAmmor_ID");
@@ -848,23 +848,23 @@ public class GameManager : MonoBehaviour
             string armorDescription = PlayerPrefs.GetString("CurAmmor_Description");
             ItemType armorType = (ItemType)PlayerPrefs.GetInt("CurAmmor_Type");
 
-            // í˜„ì¬ ê°‘ì˜· ì•„ì´í…œ ìƒì„±
+            // ÇöÀç °©¿Ê ¾ÆÀÌÅÛ »ı¼º
             playerData.curAmmor = new Item(armorId, armorName, armorDescription, armorType);
         }
-        // ë§ˆì§€ë§‰ í¬íƒˆ Â“ï¿½ ë¡œë“œë¨
-        PortalManager.Instance.lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // ê¸°ë³¸ê°’ -1
+        // ¸¶Áö¸· Æ÷Å» “­·Î ·ÎµåµÊ
+        PortalManager.Instance.lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // ±âº»°ª -1
 
-        Debug.Log("ê²Œì„ì´ ë¡œë“œë˜ì—ˆìŠµë‹ˆë‹¤.");
+        Debug.Log("°ÔÀÓÀÌ ·ÎµåµÇ¾ú½À´Ï´Ù.");
         if (GetPlayerData().player !=null)
         GetPlayerData().player.GetComponent<PlayerMovement>().updateLoad();
     }
-    // ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ì— ì—°ê²°í•  ë©”ì„œë“œ
+    // ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¿¡ ¿¬°áÇÒ ¸Ş¼­µå
     public void ClearPlayerPrefs()
     {
-        // PlayerPrefs ì „ì²´ ì‚­ì œ
+        // PlayerPrefs ÀüÃ¼ »èÁ¦
         PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save(); // ë³€ê²½ ì‚¬í•­ ì €ì¥
-        Debug.Log("ëª¨ë“  PlayerPrefs ë°ì´í„°ê°€ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤.");
+        PlayerPrefs.Save(); // º¯°æ »çÇ× ÀúÀå
+        Debug.Log("¸ğµç PlayerPrefs µ¥ÀÌÅÍ°¡ »èÁ¦µÇ¾ú½À´Ï´Ù.");
     }
 }
 
