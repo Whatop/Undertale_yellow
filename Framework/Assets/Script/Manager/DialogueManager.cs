@@ -239,7 +239,7 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case ItemType.Weapon:
-            case ItemType.Ammor:
+            case ItemType.Armor:
                 message = $"* {item.itemName}을(를) 장착했다.";
                 break;
 

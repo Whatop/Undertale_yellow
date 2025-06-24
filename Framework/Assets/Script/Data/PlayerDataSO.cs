@@ -28,7 +28,7 @@ public class PlayerDataSO : ScriptableObject
     public int GOLD = 0; // 초기 골드
 
     public Item curWeapon; // 착용 무기
-    public Item curAmmor; // 착용 방어구
+    public Item curArmor; // 착용 방어구
 
     /// <summary>
     /// 초기 데이터를 설정하는 메서드 (에디터에서 호출 가능)
@@ -55,6 +55,6 @@ public class PlayerDataSO : ScriptableObject
         NextEXP = 0;
         GOLD = 0;
         curWeapon = null;
-        curAmmor = null;
+        curArmor = null;
     }
 }

@@ -13,7 +13,7 @@ public enum ItemType
 {
     HealingItem,
     Weapon,
-    Ammor,
+    Armor,
     None
 }
 [System.Serializable]
@@ -44,7 +44,7 @@ public class PlayerData
 
     // 플레이어 착용중인 무기, 장갑
     public Item curWeapon;
-    public Item curAmmor;
+    public Item curArmor;
 
     public PlayerData()
     {
@@ -74,17 +74,17 @@ public class PlayerData
     {
         curWeapon = item;
     }
-    public void EquipAmmor(Item item)
+    public void EquipArmor(Item item)
     {
-        curAmmor = item;
+        curArmor = item;
     }
     public Item GetEquippedWeapon()
     {
         return curWeapon;
     }
-    public Item GetEquippedAmmor()
+    public Item GetEquippedArmor()
     {
-        return curAmmor;
+        return curArmor;
     }
 }
 [System.Serializable]
@@ -213,17 +213,17 @@ public class GameManager : MonoBehaviour
             PortalManager.Instance.LoadLastCamera();
             //UIManager.Instance.ResetSettings();
             Item fristWaepon = new Item(49, "리볼버", "* 골동품 리볼버다.", ItemType.Weapon);
-           Item fristIAmmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+           Item fristIArmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Armor);
            GetPlayerData().EquipWeapon(fristWaepon);
-           GetPlayerData().EquipAmmor(fristIAmmor);
+           GetPlayerData().EquipArmor(fristIArmor);
       
         }
         else
         {
             //Item fristWaepon = new Item(51, "리볼버", "골동품 리볼버다.", ItemType.Weapon);
-            //Item fristIAmmor = new Item(48,"카우보이 모자", "* 전투로 낡은 이 모자엔 \n    * 턱수염이 딱 어울릴텐데.", ItemType.Ammor);
+            //Item fristIArmor = new Item(48,"카우보이 모자", "* 전투로 낡은 이 모자엔 \n    * 턱수염이 딱 어울릴텐데.", ItemType.Armor);
             //GetPlayerData().EquipWeapon(fristWaepon);
-            //GetPlayerData().EquipAmmor(fristIAmmor);
+            //GetPlayerData().EquipArmor(fristIArmor);
         }
     }
     private void Update()
@@ -335,7 +335,7 @@ public class GameManager : MonoBehaviour
                 NextEXP = playerDataSO.NextEXP,
                 GOLD = playerDataSO.GOLD,
                 curWeapon = playerDataSO.curWeapon,
-                curAmmor = playerDataSO.curAmmor
+                curArmor = playerDataSO.curArmor
             };
         }
         else
@@ -564,8 +564,8 @@ public class GameManager : MonoBehaviour
                 case ItemType.Weapon:
                     copiedItem.itemType = ItemType.Weapon;
                     break;
-                case ItemType.Ammor:
-                    copiedItem.itemType = ItemType.Ammor;
+                case ItemType.Armor:
+                    copiedItem.itemType = ItemType.Armor;
                     break;
                 default:
                     copiedItem.itemType = ItemType.None;
@@ -620,16 +620,16 @@ public class GameManager : MonoBehaviour
                 GetPlayerData().inventory.RemoveAt(Id); 
                 break;
 
-            case ItemType.Ammor:
+            case ItemType.Armor:
                 // 방어구 착용 및 교체
-                Item currentAmmor = GetPlayerData().GetEquippedAmmor();
-                if (currentAmmor != null)
+                Item currentArmor = GetPlayerData().GetEquippedArmor();
+                if (currentArmor != null)
                 {
                     // 기존에 착용한 방어구를 인벤토리에 다시 추가
-                    GetPlayerData().inventory.Add(currentAmmor);
+                    GetPlayerData().inventory.Add(currentArmor);
                 }
                 // 새로운 방어구 착용
-                GetPlayerData().EquipAmmor(itemToEquip);
+                GetPlayerData().EquipArmor(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id); 
                 // 새롭게 착용된 방어구를 인벤토리에서 제거
                 break;
@@ -681,16 +681,16 @@ public class GameManager : MonoBehaviour
                 GetPlayerData().inventory.RemoveAt(Id);
                 message = $"* {itemToEquip.itemName}을(를) 장착했다.";
                 break;
-            case ItemType.Ammor:
+            case ItemType.Armor:
                 SoundManager.Instance.SFXPlay("select_sound", 173);
-                Item currentAmmor = GetPlayerData().GetEquippedAmmor();
-                if (currentAmmor != null)
+                Item currentArmor = GetPlayerData().GetEquippedArmor();
+                if (currentArmor != null)
                 {
                     // 기존에 착용한 방어구를 인벤토리에 다시 추가
-                    GetPlayerData().inventory.Add(currentAmmor);
+                    GetPlayerData().inventory.Add(currentArmor);
                 }
                 // 새로운 방어구 착용
-                GetPlayerData().EquipAmmor(itemToEquip);
+                GetPlayerData().EquipArmor(itemToEquip);
                 GetPlayerData().inventory.RemoveAt(Id);
                 message = $"* {itemToEquip.itemName}을(를) 장착했다.";
                 break;
@@ -729,12 +729,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
-
         // 아이템 버림 대사
-                dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
+        dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
         Item itemToEquip = GetPlayerData().inventory[Id];
         dialogueManager.StartDropDialogue(itemToEquip); // 이벤트 대사처럼 처리
+        
+        GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
+
     }
 
 
@@ -779,12 +780,12 @@ public class GameManager : MonoBehaviour
         }
 
         // 현재 갑옷 저장
-        if (playerData.curAmmor != null)
+        if (playerData.curArmor != null)
         {
-            PlayerPrefs.SetInt("CurAmmor_ID", playerData.curAmmor.id);
-            PlayerPrefs.SetString("CurAmmor_Name", playerData.curAmmor.itemName);
-            PlayerPrefs.SetString("CurAmmor_Description", playerData.curAmmor.description);
-            PlayerPrefs.SetInt("CurAmmor_Type", (int)playerData.curAmmor.itemType);
+            PlayerPrefs.SetInt("CurArmor_ID", playerData.curArmor.id);
+            PlayerPrefs.SetString("CurArmor_Name", playerData.curArmor.itemName);
+            PlayerPrefs.SetString("CurArmor_Description", playerData.curArmor.description);
+            PlayerPrefs.SetInt("CurArmor_Type", (int)playerData.curArmor.itemType);
         }
 
         // 마지막 포탈 번호
@@ -841,15 +842,15 @@ public class GameManager : MonoBehaviour
         }
 
         // 현재 갑옷 로드
-        if (PlayerPrefs.HasKey("CurAmmor_ID"))
+        if (PlayerPrefs.HasKey("CurArmor_ID"))
         {
-            int armorId = PlayerPrefs.GetInt("CurAmmor_ID");
-            string armorName = PlayerPrefs.GetString("CurAmmor_Name");
-            string armorDescription = PlayerPrefs.GetString("CurAmmor_Description");
-            ItemType armorType = (ItemType)PlayerPrefs.GetInt("CurAmmor_Type");
+            int armorId = PlayerPrefs.GetInt("CurArmor_ID");
+            string armorName = PlayerPrefs.GetString("CurArmor_Name");
+            string armorDescription = PlayerPrefs.GetString("CurArmor_Description");
+            ItemType armorType = (ItemType)PlayerPrefs.GetInt("CurArmor_Type");
 
             // 현재 갑옷 아이템 생성
-            playerData.curAmmor = new Item(armorId, armorName, armorDescription, armorType);
+            playerData.curArmor = new Item(armorId, armorName, armorDescription, armorType);
         }
         // 마지막 포탈 벊로 로드됨
         PortalManager.Instance.lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // 기본값 -1

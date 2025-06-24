@@ -124,8 +124,11 @@ public class BulletController : MonoBehaviour
             lineRenderer.enabled = false;
         if (bulletColors.TryGetValue(bulletType, out Color color))
         {
-            GetComponent<SpriteRenderer>().color = color;
-            Debug.Log($"[총알 색상 적용] 타입: {bulletType}, 색상: {color}");
+            if (GetComponent<SpriteRenderer>() != null)
+            {
+                GetComponent<SpriteRenderer>().color = color;
+                Debug.Log($"[총알 색상 적용] 타입: {bulletType}, 색상: {color}");
+            }
         }
     }
 

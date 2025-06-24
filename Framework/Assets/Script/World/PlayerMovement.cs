@@ -1389,6 +1389,9 @@ public class PlayerMovement : LivingObject
         if (currentWeaponIndex == index)
             return;
 
+            if (isLaserFiring)
+                StopLaser();
+
         currentWeaponIndex = index;
 
         // UI 업데이트

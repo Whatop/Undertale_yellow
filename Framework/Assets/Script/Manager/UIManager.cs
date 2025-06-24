@@ -1039,7 +1039,7 @@ public class UIManager : MonoBehaviour
         stat_texts[5].text = "EXP: " + gameManager.GetPlayerData().EXP;
         stat_texts[6].text = "NEXT: " + gameManager.GetPlayerData().NextEXP;
         stat_texts[7].text = "무기: " + gameManager.GetPlayerData().curWeapon.itemName;
-        stat_texts[8].text = "갑옷: " + gameManager.GetPlayerData().curAmmor.itemName;
+        stat_texts[8].text = "갑옷: " + gameManager.GetPlayerData().curArmor.itemName;
         stat_texts[9].text = "GOLD: " + gameManager.GetPlayerData().GOLD;
 
     }
@@ -1109,27 +1109,27 @@ public class UIManager : MonoBehaviour
             else if (inventroy_panelNum == 4)
             {
                 // 아이템 사용
-                switch (inventroy_curNum)
+                if (inventroy_curNum >= 0 && inventroy_curNum < 3) // 또는 interaction_texts.Length
                 {
-                    case 0:
-                        //사용
-                        gameManager.UseItem(item_prevNum);
-                        OnPanel(-1);
-                        break;
-
-                    case 1:
-                        // 정보
-                        gameManager.InfoItem(item_prevNum);
-                        OnPanel(-1);
-                        break;
-                    case 2:
-                        //버리기
-                        Debug.Log(inventroy_curNum);
-                        gameManager.DropItem(item_prevNum);
-                        OnPanel(-1);
-                        break;
+                    switch (inventroy_curNum)
+                    {
+                        case 0:
+                            gameManager.UseItem(item_prevNum);
+                            break;
+                        case 1:
+                            gameManager.InfoItem(item_prevNum);
+                            break;
+                        case 2:
+                            gameManager.DropItem(item_prevNum);
+                            break;
+                    }
+                    OnPanel(-1);
                 }
-                // gameManager.GetPlayerData().inventory[0].id = 
+                else
+                {
+                    Debug.LogWarning($"잘못된 inventroy_curNum 값: {inventroy_curNum}");
+                }
+
             }
 
 
