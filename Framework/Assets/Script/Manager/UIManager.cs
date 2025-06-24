@@ -1039,7 +1039,7 @@ public class UIManager : MonoBehaviour
         stat_texts[5].text = "EXP: " + gameManager.GetPlayerData().EXP;
         stat_texts[6].text = "NEXT: " + gameManager.GetPlayerData().NextEXP;
         stat_texts[7].text = "무기: " + gameManager.GetPlayerData().curWeapon.itemName;
-        stat_texts[8].text = "갑옷: " + gameManager.GetPlayerData().curAmmor.itemName;
+        stat_texts[8].text = "갑옷: " + gameManager.GetPlayerData().curArmor.itemName;
         stat_texts[9].text = "GOLD: " + gameManager.GetPlayerData().GOLD;
 
     }
