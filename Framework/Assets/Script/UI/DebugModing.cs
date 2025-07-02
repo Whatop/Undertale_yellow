@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class DebugModing : MonoBehaviour
 {
     [SerializeField]
     bool isDebugMode = true; // 디버그 모드 활성화 여부
     int debugMode = 0;
+
+    public TextMeshProUGUI debug_text;
 
     public GameObject[] hideObjects;
 
@@ -45,23 +48,42 @@ public class DebugModing : MonoBehaviour
         switch (debugMode)
         {
             case 1:
-                LoadScene("IntroScene");
+                //LoadScene("IntroScene");
+                GameManager.Instance.ClearPlayerPrefs();
+                LoadScene("TestScene");
+                Debug.Log("초기화 후 다시 불러오기");
                 break;
             case 2:
-                LoadScene("ProduceScene");
+                GameManager.Instance.ClearPlayerPrefs();
+                LoadScene("GameScene");
+                //LoadScene("ProduceScene");
+
                 break;
             case 3:
-                LoadScene("GameScene");
+                // LoadScene("GameScene");
+                // Soul 모드 처리 테스트 용도입니다
+                bool issoulactive = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().isSoulActive;
+                issoulactive = !issoulactive; // Soul 모드 전환
+
+                if (issoulactive)
+                {
+                    GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().tutorialDontShot = false;
+                    GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().EnableSoul();
+                }
+                else
+                {
+                    GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().DisableSoul();
+                }
+                Debug.Log("모드 변경 ");
+                debugMode = 0;
                 break;
             case 4:
-                if (SceneManager.GetActiveScene().name == "GameScene")
-                {
-                    // UI_Item_Event_Manager.Instance.Init();
-                    // UI_Item_Event_Manager.Instance.IngameStart();
-                }
+                SoundManager.Instance.BGSoundPlay(5, 0.6f);
+
                 debugMode = 0;
                 break;
             case 5:
+                SoundManager.Instance.BGSoundPlay(2, 0.6f);
                 // 추후 확장 가능
                 debugMode = 0;
                 break;
@@ -70,11 +92,11 @@ public class DebugModing : MonoBehaviour
         }
     }
 
-    private void LoadScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
-        debugMode = 0;
-    }
+   private void LoadScene(string sceneName)
+   {
+       SceneManager.LoadScene(sceneName);
+       debugMode = 0;
+   }
 
     private void HideObjects()
     {

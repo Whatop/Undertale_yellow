@@ -248,7 +248,7 @@ public class IntroMaker : MonoBehaviour
                 if (count != EngImagePage)
                 {
                     isIntroStart = true;
-                    soundManager.BGSoundPlay();
+                    soundManager.BGSoundPlay(0);
                     NextSprite();
                 }
                 else

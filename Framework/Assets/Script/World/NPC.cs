@@ -38,8 +38,13 @@ public class NPC : MonoBehaviour
 
         Debug.Log($"NPC {npcID} 초기화 완료: isFirstInteraction={isFirstInteraction}, isTalking={isTalking}");   
     }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 3f);
+    }
 
-    
+
     void Update()
     {
         HandleInteraction();

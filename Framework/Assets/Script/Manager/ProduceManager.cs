@@ -72,7 +72,7 @@ public class ProduceManager : MonoBehaviour
     void Start()
     {
         soundManager = SoundManager.Instance;
-        soundManager.BGSoundPlay();
+        soundManager.BGSoundPlay(1);
         CurName.text = "";
         CurDecudeName.text = "";
         index = 0;

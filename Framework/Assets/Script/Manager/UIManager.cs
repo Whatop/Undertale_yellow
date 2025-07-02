@@ -1390,7 +1390,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        PlayerData player = gameManager.GetPlayerData();
+        PlayerData player = GameManager.Instance.GetPlayerData();
         float currentHealth = player.health;
         float maxHealth = player.Maxhealth;
 
@@ -1402,7 +1402,7 @@ public class UIManager : MonoBehaviour
         hpBar_text.text = currentHealth.ToString() + " / " + maxHealth.ToString();
 
         // 무기 데이터 가져오기 및 총알 이미지 업데이트
-        Weapon weapon = gameManager.GetWeaponData();
+        Weapon weapon = GameManager.Instance.GetWeaponData();
         float current_magazine = weapon.current_magazine;
 
         // 총알 이미지 업데이트f

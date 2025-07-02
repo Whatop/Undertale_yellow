@@ -39,7 +39,6 @@ public class SoundManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
 
             // 초기 SFX 풀 생성
             for (int i = 0; i < initialPoolSize; i++)
@@ -73,17 +72,6 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
-    {
-        // 씬에 맞는 배경 음악 재생
-        for (int i = 0; i < bglist.Length; i++)
-        {
-            if (scene.name == bglist[i].name)
-            {
-                BGSoundSave(bglist[i]);
-            }
-        }
-    }
      private void InitializeSFXPool()
     {
         // 초기 풀 생성: AudioSource 오브젝트를 initialPoolSize만큼 만들어서 큐에 넣어둠
@@ -216,22 +204,33 @@ public class SoundManager : MonoBehaviour
     }
 
     // 배경 음악 재생
-    public void BGSoundPlay(float volume =0.6f)
+    public void BGSoundPlay(int bgNum)
     {
+        if (bgNum < 0 || bgNum >= bglist.Length)
+        {
+            Debug.LogWarning("[SoundManager] 잘못된 bgNum 인덱스입니다: " + bgNum);
+            return;
+        }
+        bgSound.clip = bglist[bgNum];
         if (bgSound.clip != null)
         {
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
-            bgSound.volume = volume;
+            bgSound.volume = 0.6f;
             bgSound.Play();
         }
     }
 
-    public void BGSoundPlay(int textNum, float volume = 0.6f)
+    public void BGSoundPlay(int bgNum, float volume = 0.6f)
     {
+        if (bgNum < 0 || bgNum >= bglist.Length)
+        {
+            Debug.LogWarning("[SoundManager] 잘못된 bgNum 인덱스입니다: " + bgNum);
+            return;
+        }
+        bgSound.clip = bglist[bgNum];
         if (bgSound.clip != null)
         {
-            bgSound.clip = bglist[textNum];
             bgSound.outputAudioMixerGroup = mixer.FindMatchingGroups("BG")[0];
             bgSound.loop = true;
             bgSound.volume = volume;
@@ -262,6 +261,7 @@ public class SoundManager : MonoBehaviour
     {
         if (bgSound.clip != null)
             bgSound.Stop();
+        Debug.Log("여기서 멈춘다!!!!!!!!!!!!!");
     }
 
     // 배경음 볼륨 조절

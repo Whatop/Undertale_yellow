@@ -199,24 +199,7 @@ public class PlayerMovement : LivingObject
     public GameObject laserPrefab;        // 위에서 만든 “레이저 전용 프리팹”
     #region Test_code
 
-    // Soul 모드 처리 테스트 용도입니다
-    private void HandleSoulMode()
-    {
-        if (Input.GetKeyDown(KeyCode.E)) // E 키로 Soul 모드 활성화/비활성화 전환
-        {
-            isSoulActive = !isSoulActive; // Soul 모드 전환
-
-            if (isSoulActive)
-            {
-                tutorialDontShot = false;
-                EnableSoul();
-            }
-            else
-            {
-                DisableSoul();
-            }
-        }
-    }
+ 
 
     #endregion 
 
@@ -242,7 +225,6 @@ public class PlayerMovement : LivingObject
         playerData.isInvincible = isInvincible;
         health = maxHealth; // 현재 체력을 최대 체력으로 초기화
 
-        SoundManager.Instance.BGSoundPlay(); // 배경음악 재생
         OffHpbar();
         transform.position = playerData.position;
         playerData.player = transform.gameObject;
@@ -261,7 +243,6 @@ public class PlayerMovement : LivingObject
     }
     protected override void Update()
     {
-        HandleSoulMode();//테스트 용도 @@
 
         if (isDie)
             return;
@@ -491,7 +472,7 @@ public class PlayerMovement : LivingObject
     }
 
     // Soul 모드 비활성화: 투명도 원상복귀
-    private void DisableSoul()
+    public void DisableSoul()
     {
         soulObject.SetActive(false); // Soul 비활성화
         shadowObject.SetActive(true);
@@ -1454,7 +1435,6 @@ public class PlayerMovement : LivingObject
         gameManager.GetPlayerData().isDie = false;
         isDie = false;
         //그 방에 맞는 배경음악을 불러온다.
-        SoundManager.Instance.BGSoundPlayDelayed(0, 1f);
         playerData = gameManager.GetPlayerData();
         maxHealth = gameManager.GetPlayerData().Maxhealth; // 최대 체력 설정
         health = gameManager.GetPlayerData().health;       // 최대 체력 설정

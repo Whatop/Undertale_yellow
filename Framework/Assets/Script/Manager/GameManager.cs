@@ -147,8 +147,6 @@ public class GameManager : MonoBehaviour
 
     string mapName = "페허 - 잎 무더기 ";
     public bool isPortalTransition = false;
-
-    private DialogueManager dialogueManager;
     public static GameManager Instance
     {
         get
@@ -187,7 +185,6 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        dialogueManager = DialogueManager.Instance;
 
         savePrefab = gameConfig.savePrefab;
         // GameConfigSO의 위치 데이터로 SavePointTransforms 초기화
@@ -593,7 +590,7 @@ public class GameManager : MonoBehaviour
 
         Item itemToEquip = GetPlayerData().inventory[Id];
         ItemType itemType = itemToEquip.itemType;
-        dialogueManager.StartItemDialogue(itemToEquip); // 이벤트 대사처럼 처리
+        DialogueManager.Instance.StartItemDialogue(itemToEquip); // 이벤트 대사처럼 처리
     
         switch (itemType)
         {
@@ -716,7 +713,7 @@ public class GameManager : MonoBehaviour
         }
         Item itemToEquip = GetPlayerData().inventory[Id];
 
-        dialogueManager.StartInfoDialogue(itemToEquip); // 이벤트 대사처럼 처리
+        DialogueManager.Instance.StartInfoDialogue(itemToEquip); // 이벤트 대사처럼 처리
 
     }
 
@@ -730,9 +727,9 @@ public class GameManager : MonoBehaviour
         }
 
         // 아이템 버림 대사
-        dialogueManager.SetUINPC(); // 이벤트 대사처럼 처리
+        DialogueManager.Instance.SetUINPC(); // 이벤트 대사처럼 처리
         Item itemToEquip = GetPlayerData().inventory[Id];
-        dialogueManager.StartDropDialogue(itemToEquip); // 이벤트 대사처럼 처리
+        DialogueManager.Instance.StartDropDialogue(itemToEquip); // 이벤트 대사처럼 처리
         
         GetPlayerData().inventory.RemoveAt(Id); // 인덱스를 그대로 사용
 
