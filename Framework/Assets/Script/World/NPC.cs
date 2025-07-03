@@ -117,7 +117,7 @@ public class NPC : MonoBehaviour
     
         if(npcID == 100)
         {
-            PortalManager.Instance.SwitchCamera(999);
+            PortalManager.Instance.OnPortalTeleport(999);
             BattleManager.Instance.BattleStart(2);
         }
     }

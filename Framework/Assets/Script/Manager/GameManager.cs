@@ -207,7 +207,7 @@ public class GameManager : MonoBehaviour
         {
             Load();
             LoadGameTime();
-            PortalManager.Instance.LoadLastCamera();
+            PortalManager.Instance.LoadLastPortal();
             //UIManager.Instance.ResetSettings();
             Item fristWaepon = new Item(49, "리볼버", "* 골동품 리볼버다.", ItemType.Weapon);
            Item fristIArmor = new Item(48, "카우보이 모자", "* 전투로 낡은 이 모자엔 턱수염이 딱 어울릴텐데.", ItemType.Armor);
@@ -786,7 +786,7 @@ public class GameManager : MonoBehaviour
         }
 
         // 마지막 포탈 번호
-        PlayerPrefs.SetInt("LastPortalNumber", PortalManager.Instance.lastPortalNumber);
+        PlayerPrefs.SetInt("LastPortalNumber", curportalNumber);
 
         PlayerPrefs.Save();
         Debug.Log("게임이 저장되었습니다.");
@@ -850,7 +850,7 @@ public class GameManager : MonoBehaviour
             playerData.curArmor = new Item(armorId, armorName, armorDescription, armorType);
         }
         // 마지막 포탈 벊로 로드됨
-        PortalManager.Instance.lastPortalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // 기본값 -1
+        curportalNumber = PlayerPrefs.GetInt("LastPortalNumber", -1); // 기본값 -1
 
         Debug.Log("게임이 로드되었습니다.");
         if (GetPlayerData().player !=null)

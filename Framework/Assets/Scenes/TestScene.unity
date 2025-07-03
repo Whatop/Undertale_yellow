@@ -10817,46 +10817,8 @@ MonoBehaviour:
   - {fileID: 688315285}
   - {fileID: 1463309506}
   - {fileID: 175417828}
-  lastPortalNumber: -1
-  defaultPoint: {fileID: 1333293533}
-  defaultvirtualCamera: {fileID: 368613645}
   fadeImage: {fileID: 717479357}
   fadeDuration: 1
-  virtualCameras:
-  - {fileID: 700920611}
-  - {fileID: 1538937220}
-  - {fileID: 475052845}
-  - {fileID: 463016560}
-  - {fileID: 1700002235}
-  mainsCamera: {fileID: 1839580956}
-  portalDataList:
-  - portalNumber: 0
-    portalPoint: {fileID: 2002279649}
-    virtualCamera: {fileID: 700920611}
-  - portalNumber: 1
-    portalPoint: {fileID: 946454178}
-    virtualCamera: {fileID: 1538937220}
-  - portalNumber: 2
-    portalPoint: {fileID: 226037515}
-    virtualCamera: {fileID: 475052845}
-  - portalNumber: 3
-    portalPoint: {fileID: 135183976}
-    virtualCamera: {fileID: 700920611}
-  - portalNumber: 3
-    portalPoint: {fileID: 1956554083}
-    virtualCamera: {fileID: 700920611}
-  - portalNumber: 4
-    portalPoint: {fileID: 1956554083}
-    virtualCamera: {fileID: 463016560}
-  - portalNumber: 999
-    portalPoint: {fileID: 507531249}
-    virtualCamera: {fileID: 1700002235}
-  Rooms:
-  - {fileID: 1278432910}
-  - {fileID: 772475033}
-  - {fileID: 1553046750}
-  - {fileID: 954031248}
-  - {fileID: 1264470978}
 --- !u!1 &83877910
 GameObject:
   m_ObjectHideFlags: 0
@@ -19777,8 +19739,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 489676701}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.2391, y: -3.6049, z: 0}
-  m_LocalScale: {x: 18.940695, y: 15.344028, z: 1}
+  m_LocalPosition: {x: 15.4194, y: -5.1065, z: 0}
+  m_LocalScale: {x: 33.37919, y: 20.15745, z: 1}
   m_Children: []
   m_Father: {fileID: 1278432911}
   m_RootOrder: 0
@@ -56978,13 +56940,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09ba41c49392686419c2c5628e8ffa0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  virtualCameras:
-  - {fileID: 368613645}
-  - {fileID: 1538937220}
-  - {fileID: 700920611}
-  - {fileID: 475052845}
-  - {fileID: 463016560}
-  virtualBattleCamera: {fileID: 1700002235}
+  mainCamera: {fileID: 1839580952}
+  battleCamera: {fileID: 1839580952}
+  confiner: {fileID: 368613644}
+  roomBounds: []
+  player: {fileID: 1761398944}
   shakeAmount: 0.1
   shakeDuration: 0.5
 --- !u!81 &1839580954

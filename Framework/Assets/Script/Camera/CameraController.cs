@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
@@ -6,112 +5,114 @@ using Cinemachine;
 [RequireComponent(typeof(CinemachinePixelPerfect))]
 public class CameraController : MonoBehaviour
 {
+    public static CameraController Instance { get; private set; }
+
+    [Header("Virtual Cameras")]
+    [SerializeField] private CinemachineVirtualCamera mainCamera;
+    [SerializeField] private CinemachineVirtualCamera battleCamera;
+
+    [Header("Confiner Settings")]
+    // 변경: CinemachineConfiner2D → CinemachineConfiner
+    [SerializeField] private CinemachineConfiner confiner;
+    [SerializeField] private List<PolygonCollider2D> roomBounds;
+    [SerializeField] private Transform player;
+
+    [Header("Shake Settings")]
+    public float shakeAmount = 0.1f;
+    public float shakeDuration = 0.5f;
+
     private GameManager gameManager;
     private CinemachineBrain cinemachineBrain;
-    private CinemachinePixelPerfect pixelPerfectCamera; // Pixel Perfect Camera
+    private CinemachinePixelPerfect pixelPerfectCamera;
+    private float shakeTimer;
+    private Vector3 originalPosition;
 
-    public CinemachineVirtualCamera[] virtualCameras;
-    public CinemachineVirtualCamera virtualBattleCamera;
-
-    public float shakeAmount = 0.1f;  // 흔들림 강도
-    public float shakeDuration = 0.5f;  // 흔들림 지속 시간
-    private float shakeTimer = 0f;  // 흔들림 타이머
-    private Vector3 originalPosition;  // 원래 카메라 위치
-
-    private static CameraController instance;
-
-    // 싱글톤 패턴을 위한 프로퍼티
-    public static CameraController Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<CameraController>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject("CameraController");
-                    instance = obj.AddComponent<CameraController>();
-                }
-            }
-            return instance;
-        }
-    }
     private void Awake()
     {
-        cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>(); // 메인 카메라에 붙은 CinemachineBrain 가져오기
-        pixelPerfectCamera = GetComponent<CinemachinePixelPerfect>(); // CinemachinePixelPerfect 컴포넌트 가져오기
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+
+        cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>();
+        pixelPerfectCamera = GetComponent<CinemachinePixelPerfect>();
     }
 
     private void Start()
     {
         gameManager = GameManager.Instance;
- 
+
+        if (mainCamera != null && player != null)
+            mainCamera.Follow = player;
     }
-    void Update()
+
+    private void Update()
     {
-        if (shakeTimer > 0)
+        HandleShake();
+        UpdateCameraSettings();
+    }
+
+    private void HandleShake()
+    {
+        if (shakeTimer > 0f)
         {
-            // 흔들림이 남아 있을 경우
             transform.position = originalPosition + Random.insideUnitSphere * shakeAmount;
-            shakeTimer -= Time.deltaTime;
+            shakeTimer -= Time.unscaledDeltaTime;
         }
         else
         {
-            // 흔들림이 끝났으면 원래 위치로 돌아가도록
             transform.position = originalPosition;
         }
-
-        UpdateCameraSize();
     }
 
-
-    void UpdateCameraSize()
+    private void UpdateCameraSettings()
     {
-        // 현재 활성화된 가상 카메라 가져오기
-        CinemachineVirtualCamera activeVirtualCamera = cinemachineBrain.ActiveVirtualCamera as CinemachineVirtualCamera;
+        bool isBattle = gameManager.isBattle;
 
-        if (activeVirtualCamera != null)
+        // Pixel Perfect 활성/비활성
+        if (pixelPerfectCamera != null)
+            pixelPerfectCamera.enabled = isBattle;
+
+        // Orthographic Size 보간
+        var activeCam = cinemachineBrain.ActiveVirtualCamera as CinemachineVirtualCamera;
+        if (activeCam != null && (pixelPerfectCamera == null || !pixelPerfectCamera.enabled))
         {
-            // 배틀 여부에 따라 Pixel Perfect 활성화 여부를 설정
-            if (pixelPerfectCamera != null)
+            float targetSize = isBattle ? 6f : 6f; // 필요 시 값 조정
+            if (Mathf.Abs(activeCam.m_Lens.OrthographicSize - targetSize) > 0.01f)
             {
-                pixelPerfectCamera.enabled = gameManager.isBattle; // 배틀 중에만 Pixel Perfect 활성화
-            }
-
-            // Pixel Perfect가 비활성화된 경우에만 카메라 크기 조정
-            if (pixelPerfectCamera == null || !pixelPerfectCamera.enabled)
-            {
-                float targetCameraSize = gameManager.isBattle ? 6 : 6; // 필요한 경우 크기를 조정
-                if (Mathf.Abs(activeVirtualCamera.m_Lens.OrthographicSize - targetCameraSize) > 0.01f)
-                {
-                    activeVirtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(
-                        activeVirtualCamera.m_Lens.OrthographicSize,
-                        targetCameraSize,
-                        8f * Time.deltaTime
-                    );
-                }
+                activeCam.m_Lens.OrthographicSize = Mathf.Lerp(
+                    activeCam.m_Lens.OrthographicSize,
+                    targetSize,
+                    8f * Time.deltaTime
+                );
             }
         }
-        else
-        {
-            Debug.LogWarning("활성화된 CinemachineVirtualCamera가 없습니다.");
-        }
 
-        // 카메라 우선순위 설정
-        if (gameManager.isBattle)
-        {
-            virtualBattleCamera.Priority = 11;
-        }
-        else
-        {
-            virtualBattleCamera.Priority = 6;
-        }
+        // 배틀 카메라 우선순위 전환
+        if (battleCamera != null && mainCamera != null)
+            battleCamera.Priority = isBattle ? mainCamera.Priority + 1 : mainCamera.Priority - 1;
     }
-    public void ShakeCamera()
+
+    /// <summary>
+    /// 방 전환 시 Confiner 교체
+    /// </summary>
+    public void SwitchRoomConfiner(int roomIndex)
     {
-        originalPosition = transform.position;  // 원래 위치 저장
-        shakeTimer = shakeDuration;  // 흔들림 지속 시간 설정
+        if (confiner == null || roomIndex < 0 || roomIndex >= roomBounds.Count)
+        {
+            Debug.LogWarning($"SwitchRoomConfiner: 잘못된 인덱스 {roomIndex}");
+            return;
+        }
+
+        // 변경: CinemachineConfiner 사용법은 동일하게 BoundingShape에 Collider2D 할당
+        confiner.m_BoundingShape2D = roomBounds[roomIndex];
+        confiner.InvalidatePathCache();
     }
 
+    /// <summary>
+    /// 카메라 흔들기 트리거
+    /// </summary>
+    public void ShakeCamera(float duration = -1f)
+    {
+        originalPosition = transform.position;
+        shakeTimer = duration > 0f ? duration : shakeDuration;
+    }
 }

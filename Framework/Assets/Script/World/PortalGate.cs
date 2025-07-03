@@ -8,7 +8,7 @@ public class PortalGate : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PortalManager.Instance.OnPortalEnter(this); // 포탈 진입 이벤트 호출
+            PortalManager.Instance.OnPortalTeleport(portalNumber);
         }
     }
 }
