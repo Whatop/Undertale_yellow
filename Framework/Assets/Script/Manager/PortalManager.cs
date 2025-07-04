@@ -57,6 +57,11 @@ public class PortalManager : MonoBehaviour
             player.transform.position = portalPoints[portalIndex].transform.position;
             CameraController.Instance.SwitchRoomConfiner(portalIndex);
         }
+        else if(portalIndex==999)
+        {
+            player.transform.position = portalPoints[portalPoints.Length-1].transform.position;
+            CameraController.Instance.SwitchRoomConfiner(portalIndex);
+        }
         else
         {
             Debug.LogWarning($"PortalManager: Àß¸øµÈ Æ÷Å» ÀÎµ¦½º {portalIndex}");

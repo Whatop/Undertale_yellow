@@ -125,6 +125,7 @@ public class PlayerMovement : LivingObject
     public GameObject Hands;
     public GameObject reloadPoint;
     public ObjectState objectState;
+    
 
     GameObject scanObject;
 
