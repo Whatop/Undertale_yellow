@@ -158,7 +158,7 @@ public class PlayerMovement : LivingObject
     // 반동 관련 변수 추가
     public float recoilDistance = 0.15f;  // 반동 거리 (총이 뒤로 밀리는 정도)
     public float recoilDuration = 0.1f;   // 반동 지속 시간
-    public float recoilVerticalOffset = 0.05f; // 반동 시 위쪽으로 밀리는 정도
+    public float recoilVerticalOffset = 0.1f; // 반동 시 위쪽으로 밀리는 정도
     private Vector3 originalWeaponPosition; // 원래 총의 위치
 
 
@@ -266,9 +266,9 @@ public class PlayerMovement : LivingObject
             if (Input.GetKeyDown(KeyCode.R) && !isReloading && curweaponData.current_magazine != curweaponData.magazine && !UIManager.Instance.isInventroy)
             {
                 if (isSoulActive)
-                    SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+                    SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.2f); // 재장전 사운드
                 else
-                    SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+                    SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.2f); // 재장전 사운드
 
                 StartCoroutine(Reload());
             }
@@ -475,6 +475,7 @@ public class PlayerMovement : LivingObject
     // Soul 모드 비활성화: 투명도 원상복귀
     public void DisableSoul()
     {
+        isSoulActive = false;
         soulObject.SetActive(false); // Soul 비활성화
         shadowObject.SetActive(true);
         SetTransparency(playerSprite, 1f); // 플레이어 투명도 복원
@@ -540,9 +541,9 @@ public class PlayerMovement : LivingObject
 
         // 사운드 및 애니메이션 실행  
         if (isSoulActive)
-            SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+            SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.3f); // 재장전 사운드
         else
-            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+            SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.3f); // 재장전 사운드
         float reloadProgress = 0f;
         while (reloadProgress < curweaponData.reloadTime)
         {
@@ -647,9 +648,9 @@ public class PlayerMovement : LivingObject
         {
 
             if (isSoulActive)
-                SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.05f); // 재장전 사운드
+                SoundManager.Instance.SFXPlay("soul_reload_01", 47, 0.3f); // 재장전 사운드
             else
-                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.05f); // 재장전 사운드
+                SoundManager.Instance.SFXPlay("shotgun_reload_01", 217, 0.3f); // 재장전 사운드
 
             StartCoroutine(Reload());
         }
@@ -699,10 +700,10 @@ public class PlayerMovement : LivingObject
         isLaserFiring = true;
 
         // 1) 차지 사운드 (한 번만 재생)
-        SoundManager.Instance.SFXPlay("charge", 63);
+        SoundManager.Instance.SFXPlay("charge", 63, 0.5f);
 
         // 2) 홀드 사운드 (루프 재생 시작)
-        SoundManager.Instance.SFXPlayLoop(226, 0.3f);
+        SoundManager.Instance.SFXPlayLoop(226, 0.2f);
 
         Vector3 spawnPos = soulshotpoint.position;
         Quaternion spawnRot = GetMouseRotation();
@@ -868,41 +869,41 @@ public class PlayerMovement : LivingObject
     void ShotSounds()
     {
         if (!isSoulActive)
-            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218, 0.3f);
         else
         {
             switch (curweaponData.weaponType)
             {
                 case WeaponType.Revolver:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.Blaster:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.NeedleGun:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.Shotgun:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.LaserGun:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.HomingMissile:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 case WeaponType.BarrierEmitter:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
 
                 default:
-                    SoundManager.Instance.SFXPlay("soul_shot_01", 124);
+                    SoundManager.Instance.SFXPlay("soul_shot_01", 124, 0.3f);
                     break;
             }
         }
@@ -1119,12 +1120,12 @@ public class PlayerMovement : LivingObject
         animator.SetTrigger("IsRoll");
         if (isSoulActive)
         {
-            SoundManager.Instance.SFXPlay("soul_roll_01", 157, 1f); // 구르기 사운드
+            SoundManager.Instance.SFXPlay("soul_roll_01", 157, 0.3f); // 구르기 사운드
             rollSpeed = 10f;
         }
         else
         {
-            SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 1f); // 구르기 사운드
+            SoundManager.Instance.SFXPlay("dodge_roll_01", 219, 0.3f); // 구르기 사운드
             EffectManager.Instance.SpawnEffect("rolleffect1", feetPoint.transform.position, Quaternion.identity);
             rollSpeed = 16f;
 
@@ -1465,7 +1466,7 @@ public class PlayerMovement : LivingObject
     {
         // 걷는 소리 재생
         int soundIndex = walkingSoundStartIndex + currentSoundIndex;
-        SoundManager.Instance.SFXPlay($"footstep_{soundIndex}", soundIndex, 0.1f);
+        SoundManager.Instance.SFXPlay($"footstep_{soundIndex}", soundIndex, 0.3f);
 
         // 다음 효과음 인덱스로 이동
         currentSoundIndex = (currentSoundIndex + 1) % walkingSoundCount;
@@ -1509,7 +1510,7 @@ public class PlayerMovement : LivingObject
         else
         {
             UpdateAnimatorMovement();
-            speed = 4f;
+            speed = 4f * gameManager.debuffSpeed;
         }
 
 

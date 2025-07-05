@@ -106,6 +106,7 @@ public class CameraController : MonoBehaviour
                 pixelPerfectCamera.refResolutionY = 180;
                 mainCamera.m_Lens.OrthographicSize = 6f;
                 confiner.m_BoundingShape2D = roomBounds[0];
+                gameManager.ApplySpeedDebuff(1, 0);
                 break;
 
             case 0: // 방1: 첫 위쪽 방
@@ -114,6 +115,7 @@ public class CameraController : MonoBehaviour
                 pixelPerfectCamera.refResolutionY = 90;
                 mainCamera.m_Lens.OrthographicSize = 4.5f;
                 confiner.m_BoundingShape2D = roomBounds[1];
+                gameManager.ApplySpeedDebuff(0.3f, 100);
                 break;
 
             case 2: // 방2: 2번째 위쪽 방
@@ -122,6 +124,7 @@ public class CameraController : MonoBehaviour
                 pixelPerfectCamera.refResolutionY = 45;
                 mainCamera.m_Lens.OrthographicSize = 3f;
                 confiner.m_BoundingShape2D = roomBounds[2];
+                gameManager.ApplySpeedDebuff(0.1f, 100);
                 break;
 
             case 4: // 방3: 보스방 전
@@ -129,6 +132,8 @@ public class CameraController : MonoBehaviour
                 pixelPerfectCamera.refResolutionY = 90;
                 mainCamera.m_Lens.OrthographicSize = 7f;
                 confiner.m_BoundingShape2D = roomBounds[3];
+                gameManager.ApplySpeedDebuff(0.4f, 100);
+                gameManager.ApplySpeedDebuff(1, 0);
                 break;
             case 999: // 보스방 : 전투
                 pixelPerfectCamera.refResolutionX = 320;

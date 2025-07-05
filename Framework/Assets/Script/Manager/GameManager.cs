@@ -132,8 +132,6 @@ public class GameManager : MonoBehaviour
     // 감정 표현이 해금되었는지 확인할 리스트
     private List<string> unlockedEmotions = new List<string>();  // 예: "기쁨", "슬픔", "분노" 등
 
-
-
     /// <summary>
     /// 전투 확인용
     /// </summary>
@@ -144,6 +142,7 @@ public class GameManager : MonoBehaviour
     private bool isSave;
     public GameObject gameoverSoul;
     public Canvas canvas;          // UI가 포함된 Canvas
+    public float debuffSpeed { get; private set; } = 1f;
 
     string mapName = "페허 - 잎 무더기 ";
     public bool isPortalTransition = false;
@@ -257,12 +256,23 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
-               AddItem(0);
+           AddItem(0);
            AddItem(0);
            AddItem(52);
            AddItem(61);
         }
 }
+    public void ApplySpeedDebuff(float multiplier, float duration)
+    {
+        debuffSpeed = multiplier;
+        StartCoroutine(RemoveDebuffAfter(duration));
+    }
+
+    private IEnumerator RemoveDebuffAfter(float t)
+    {
+        yield return new WaitForSeconds(t);
+        debuffSpeed = 1f;
+    }
     #region RadialMenuType_method
 
     /// 아이템 보유 여부 확인 (Linq 없이 수동 루프)
