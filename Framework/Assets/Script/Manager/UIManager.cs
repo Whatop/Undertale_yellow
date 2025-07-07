@@ -777,7 +777,23 @@ public class UIManager : MonoBehaviour
     public void PlayEmotionAnimation(string emotionName)
     {
         // 애니메이터 트리거나 이펙트 실행 등
-        Debug.Log($"[감정 표현] {emotionName} 애니메이션 실행");
+        GameObject player = gameManager.GetPlayerData().player;
+        switch (emotionName)
+        {
+            case "분노":
+                EffectManager.Instance.SpawnEffect("angry_effect", player.transform.position, Quaternion.identity);
+                break;
+            case "자비":
+                EffectManager.Instance.SpawnEffect("mercy_effect", player.transform.position, Quaternion.identity);
+                break;
+            case "긍정":
+                EffectManager.Instance.SpawnEffect("yes_effect", player.transform.position, Quaternion.identity);
+                break;
+            // 필요 시 애니메이션 트리거도 포함
+            default:
+                Debug.Log($"[감정표현] '{emotionName}' 효과 없음");
+                break;
+        }
     }
 
     public void UseQuickItem(int id)
