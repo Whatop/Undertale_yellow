@@ -16,6 +16,7 @@ public class TypeEffect : MonoBehaviour
     // 기존 코드 유지
     private string currentExpression; // 현재 표정 정보 저장
 
+    public bool isTextSfxEnable = true; // 텍스트 SFX on/off 제어
     private void Awake()
     {
         msgText = GetComponent<TextMeshProUGUI>();
@@ -140,10 +141,16 @@ public class TypeEffect : MonoBehaviour
             char currentChar = targetMsg[index];
 
             // 사운드 재생
-            if (currentChar != ' ' && currentChar != '?' && currentChar != '.' && currentChar != '*')
+            if ( currentChar != ' ' && currentChar != '?' && currentChar != '.' && currentChar != '*')
             {
-                SoundManager.Instance.SFXTextPlay(txtsound, txtId);
+                if(isTextSfxEnable)
+                    SoundManager.Instance.SFXTextPlay(txtsound, txtId);
+                else
+                    SoundManager.Instance.SFXErrorTextPlay(txtsound, txtId);
+                
+
             }
+            
 
             currentText += currentChar;
             msgText.text = currentText;

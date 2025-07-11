@@ -72,7 +72,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-     private void InitializeSFXPool()
+    private void InitializeSFXPool()
     {
         // 초기 풀 생성: AudioSource 오브젝트를 initialPoolSize만큼 만들어서 큐에 넣어둠
         for (int i = 0; i < initialPoolSize; i++)
@@ -97,6 +97,7 @@ public class SoundManager : MonoBehaviour
         audioSource.volume = 1f;
         audioSource.loop = false;
         audioSource.gameObject.SetActive(true);
+        audioSource.priority = 130;
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
@@ -111,6 +112,7 @@ public class SoundManager : MonoBehaviour
         audioSource.volume = volume;
         audioSource.loop = false;
         audioSource.gameObject.SetActive(true);
+        audioSource.priority = 130;
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
@@ -125,10 +127,21 @@ public class SoundManager : MonoBehaviour
         audioSource.volume = volume;
         audioSource.loop = false;
         audioSource.gameObject.SetActive(true);
+        audioSource.priority = 150;
         audioSource.Play();
         StartCoroutine(DeactivateAfterPlay(audioSource));
     }
-
+    public void SFXErrorTextPlay(string textName, int textNum, float volume = 1)
+    {
+        AudioSource audioSource = GetAudioSourceFromPool();
+        audioSource.clip = txtlist[textNum];
+        audioSource.volume = volume;
+        audioSource.loop = false;
+        audioSource.gameObject.SetActive(true);
+        audioSource.priority = 130;
+        audioSource.Play();
+        StartCoroutine(DeactivateAfterPlay(audioSource));
+    }
     /// <summary>
     /// 1회용 SFX용 AudioSource를 풀에서 꺼내거나, 풀에 남아있는 게 없으면 새로 생성
     /// </summary>
@@ -164,6 +177,7 @@ public class SoundManager : MonoBehaviour
         source.clip = sfxlist[sfxNum];
         source.volume = volume;
         source.loop = true;
+        source.priority = 130;
         source.gameObject.SetActive(true);
         source.Play();
 

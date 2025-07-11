@@ -26,7 +26,7 @@ public class QuickTextBar : MonoBehaviour
         }
     }
 
-    public void ShowMessage(string msg)
+    public void ShowMessage(string msg, float delay = 0f)
     {
         gameObject.SetActive(true);
         IsBusy = true;
@@ -36,14 +36,43 @@ public class QuickTextBar : MonoBehaviour
 
         typeEffect.SetMsg(msg, () =>
         {
-            gameObject.SetActive(false);
-            IsBusy = false;
+            if (delay > 0f)
+                StartCoroutine(HideAfterDelay(delay));
+            else
+            {
+                gameObject.SetActive(false);
+                IsBusy = false;
+            }
         });
     }
+    public void ShowErrorMessage(string msg, float delay = 0f)
+    {
+        gameObject.SetActive(true);
+        IsBusy = true;
+
+        typeEffect.CharPerSeconds = charPerSec;
+        typeEffect.txtId = txtId;
+
+        // [1] 일반 텍스트 SFX OFF
+        typeEffect.isTextSfxEnable = false;
+
+        typeEffect.SetMsg(msg, () =>
+        {
+            if (delay > 0f)
+                StartCoroutine(HideAfterDelay(delay));
+            else
+            {
+                gameObject.SetActive(false);
+                IsBusy = false;
+            }
+        });
+    }
+
 
     private IEnumerator HideAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
+         IsBusy = false;
     }
 }

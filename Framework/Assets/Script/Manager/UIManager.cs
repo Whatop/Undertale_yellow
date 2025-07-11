@@ -260,9 +260,11 @@ public class UIManager : MonoBehaviour
     public int save_segment_index;
 
     public QuickTextBar[] quickTextBars;
+    public QuickTextBar[] quickEmotionBars;
 
     private int nextBarIndex = 0;
     private bool isQuickItemDelay = false;
+    private bool isQuickEmotionDelay = false;
 
     public void ShowQuickText(string msg, string itemName = "아이템", int txtId = 0, float charPerSec = 10f)
     {
@@ -278,7 +280,7 @@ public class UIManager : MonoBehaviour
             {
                 quickTextBars[i].txtId = txtId;
                 quickTextBars[i].charPerSec = charPerSec;
-                quickTextBars[i].ShowMessage(msg);
+                quickTextBars[i].ShowMessage(msg, 0.2f);
                 return;
             }
         }
@@ -286,7 +288,7 @@ public class UIManager : MonoBehaviour
             isQuickItemDelay = true;
             quickTextBars[0].txtId = 1;
             quickTextBars[0].charPerSec = 7; // 경고는 일부러 느리게
-            quickTextBars[0].ShowMessage($"<color=red><b>* 당신은 너무 빠르게 아이템을 사용하려 했다.");
+            quickTextBars[0].ShowErrorMessage($"<color=red><b>* 당신은 너무 빠르게 아이템을 사용하려 했다.");
 
             // 제한 해제 타이머
             StartCoroutine(ResetQuickItemDelay());
@@ -297,7 +299,41 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(5f); // 경고 메시지 출력 동안 제한
         isQuickItemDelay = false;
     }
+    
+    private IEnumerator ResetQuickEmotionDelay()
+    {
+        yield return new WaitForSeconds(5f); // 경고 메시지 출력 동안 제한
+        isQuickEmotionDelay = false;
+    }
 
+    public void ShowQuickEmotion(string msg, string emotion = "감정표현", int txtId = 0, float charPerSec = 10f)
+    {
+        if (isQuickEmotionDelay)
+        {
+            Debug.Log("[ShowQuickEmotion] 사용 제한 중입니다.");
+            return;
+        }
+        // 사용 가능한 바 찾기
+        for (int i = 0; i < quickEmotionBars.Length; i++)
+        {
+            if (!quickEmotionBars[i].IsBusy)
+            {
+                quickEmotionBars[i].txtId = txtId;
+                quickEmotionBars[i].charPerSec = charPerSec;
+                quickEmotionBars[i].ShowMessage(msg,0.2f);
+                return;
+            }
+        }
+
+        isQuickEmotionDelay = true;
+        quickEmotionBars[0].txtId = 1;
+        quickEmotionBars[0].charPerSec = 7;
+        quickEmotionBars[0].ShowErrorMessage($"<color=yellow><b>* 당신은 열정적으로 표현하려 했다.",1f);
+
+        // 제한 해제 타이머
+        StartCoroutine(ResetQuickEmotionDelay());
+
+    }
 
 
 
@@ -776,25 +812,112 @@ public class UIManager : MonoBehaviour
     }
     public void PlayEmotionAnimation(string emotionName)
     {
-        // 애니메이터 트리거나 이펙트 실행 등
         GameObject player = gameManager.GetPlayerData().player;
+        // 감정 표현 후 메시지 표시
         switch (emotionName)
         {
             case "분노":
-                EffectManager.Instance.SpawnEffect("angry_effect", player.transform.position, Quaternion.identity);
+            case "Anger":
+                ShowQuickEmotion("* 당신은 분노에 가득 찼다.", emotionName);
                 break;
             case "자비":
-                EffectManager.Instance.SpawnEffect("mercy_effect", player.transform.position, Quaternion.identity);
+            case "Mercy":
+                ShowQuickEmotion("* 당신은 자비로운 마음을 전했다.", emotionName);
                 break;
             case "긍정":
-                EffectManager.Instance.SpawnEffect("yes_effect", player.transform.position, Quaternion.identity);
+            case "Affirm":
+                ShowQuickEmotion("* 당신은 긍정적으로 대답했다.", emotionName);
                 break;
-            // 필요 시 애니메이션 트리거도 포함
+            case "부정":
+            case "Deny":
+                ShowQuickEmotion("* 당신은 부정적으로 대답했다.", emotionName);
+                break;
+            case "사랑":
+            case "Love":
+                ShowQuickEmotion("* 당신은 따뜻한 마음을 보였다.", emotionName);
+                break;
+            case "반감":
+            case "Disgust":
+                ShowQuickEmotion("* 당신은 강한 반감을 드러냈다.", emotionName);
+                break;
+            case "유혹":
+            case "Flirt":
+                ShowQuickEmotion("* 당신은 살짝 유혹적인 모습을 보였다.", emotionName);
+                break;
+            case "무시":
+            case "Ignore":
+                ShowQuickEmotion("* 당신은 무관심한 태도를 취했다.", emotionName);
+                break;
+            case "존중":
+            case "Respect":
+                ShowQuickEmotion("* 당신은 상대를 존중했다.", emotionName);
+                break;
+            case "냉소":
+            case "Sarcasm":
+                ShowQuickEmotion("* 당신은 비꼬는 말을 했다.", emotionName);
+                break;
+            case "행복":
+            case "Joy":
+                ShowQuickEmotion("* 당신은 기쁨을 표현했다.", emotionName);
+                break;
+            case "슬픔":
+            case "Sorrow":
+                ShowQuickEmotion("* 당신은 슬픈 표정을 지었다.", emotionName);
+                break;
+            case "기도":
+            case "Pray":
+                ShowQuickEmotion("* 당신은 진심으로 기도했다.", emotionName);
+                break;
+            case "당황":
+            case "Flustered":
+                ShowQuickEmotion("* 당신은 당황했다.", emotionName);
+                break;
+            case "혼란":
+            case "Confused":
+                ShowQuickEmotion("* 당신은 혼란스러워했다.", emotionName);
+                break;
+            case "공포":
+            case "Fear":
+                ShowQuickEmotion("* 당신은 공포에 떨었다.", emotionName);
+                break;
+            case "진실":
+            case "Truth":
+                ShowQuickEmotion("* 당신은 진실을 말했다.", emotionName);
+                break;
+            case "용기":
+            case "Bravery":
+                ShowQuickEmotion("* 당신은 용기를 냈다.", emotionName);
+                break;
+            case "친절":
+            case "Kindness":
+                ShowQuickEmotion("* 당신은 친절을 베풀었다.", emotionName);
+                break;
+            case "고결":
+            case "Integrity":
+                ShowQuickEmotion("* 당신은 고결한 행동을 보였다.", emotionName);
+                break;
+            case "인내":
+            case "Patience":
+                ShowQuickEmotion("* 당신은 인내심을 발휘했다.", emotionName);
+                break;
+            case "끈기":
+            case "Perseverance":
+                ShowQuickEmotion("* 당신은 끝까지 끈기 있게 버텼다.", emotionName);
+                break;
+            case "의지":
+            case "Determination":
+                ShowQuickEmotion("* 당신의 눈에 의지가 빛났다.", emotionName);
+                break;
+            case "정의":
+            case "Justice":
+                ShowQuickEmotion("* 당신은 정의를 외쳤다.", emotionName);
+                break;
             default:
-                Debug.Log($"[감정표현] '{emotionName}' 효과 없음");
+                ShowQuickEmotion("* 당신의 감정이 명확하지 않다.", emotionName);
                 break;
         }
     }
+
 
     public void UseQuickItem(int id)
     {
