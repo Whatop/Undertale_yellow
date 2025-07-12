@@ -1664,21 +1664,5 @@ public class PlayerMovement : LivingObject
         StartCoroutine(FadeOutSprite(playerSprite, 1.0f));
     }
 
-    private List<string> unlockedEmotions = new List<string>
-{
-    "자비", "긍정", "무시", "유혹", "분노", "부정"
-};
 
-    // 외부에서 조회할 수 있도록 공개 메서드 제공
-    public List<string> GetUnlockedEmotions()
-    {
-        return unlockedEmotions;
-    }
-    public void UnlockEmotion(string emotionName)
-    {
-        if (!unlockedEmotions.Contains(emotionName))
-        {
-            unlockedEmotions.Add(emotionName);
-        }
-    }
 }

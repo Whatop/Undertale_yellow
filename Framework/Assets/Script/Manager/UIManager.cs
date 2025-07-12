@@ -328,7 +328,7 @@ public class UIManager : MonoBehaviour
         isQuickEmotionDelay = true;
         quickEmotionBars[0].txtId = 1;
         quickEmotionBars[0].charPerSec = 7;
-        quickEmotionBars[0].ShowErrorMessage($"<color=yellow><b>* 당신은 열정적으로 표현하려 했다.",1f);
+        quickEmotionBars[0].ShowErrorMessage($"<color=yellow><b>* 당신은 당황했다.",1f);
 
         // 제한 해제 타이머
         StartCoroutine(ResetQuickEmotionDelay());
@@ -746,6 +746,87 @@ public class UIManager : MonoBehaviour
         };
     }
 
+   
+    private void UpdateSegmentValues(RadialMenuType type)
+    {
+        var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
+        switch (type)
+        {
+            case RadialMenuType.Item:
+                var inventory = GameManager.Instance.GetPlayerData().inventory;
+                for (int i = 0; i < itemSegments.Count; i++)
+                {
+                    string label = i < inventory.Count ? inventory[i].itemName : "";
+                    BindSegment(itemSegments[i], label);
+                }
+                break;
+
+            case RadialMenuType.Soul:
+                playerMovement = gameManager.GetPlayerData().player.GetComponent<PlayerMovement>();
+                var playerWeapons = playerMovement.playerWeapons;
+                for (int i = 0; i < soulSegments.Count; i++)
+                {
+                    string label = i < playerWeapons.Count ? playerWeapons[i].WeaponName.ToString() : "";
+                    BindSegment(soulSegments[i], label);
+                }
+                break;
+
+            case RadialMenuType.Emotion:
+                var emotionDataList = GameManager.Instance.GetCurrentSituationEmotions();
+
+                for (int i = 0; i < emotionSegments.Count; i++)
+                {
+                    var segment = emotionSegments[i];
+
+                    if (i < emotionDataList.Count)
+                    {
+                        // 활성 슬롯: 이름·아이콘 세팅, 버튼 활성화
+                        var info = emotionDataList[i];
+                        emotionSegments[i].segmentName = info.name; 
+                        BindSegment(segment, info.name, info.icon);
+                        SetSegmentInteractable(segment, true);
+                    }
+                    else
+                    {
+                        // 비활성 슬롯
+                        emotionSegments[i].segmentName = ""; 
+                        BindSegment(segment, "", null);
+                        SetSegmentInteractable(segment, false);
+                    }
+                }
+                break;
+        }
+    }
+    private void BindSegment(RadialSegment segment, string label, Sprite icon)
+    {
+        // Text 세팅
+        var textComp = segment.segmentTransform.GetComponentInChildren<TextMeshProUGUI>();
+        if (textComp != null)
+            textComp.text = label;
+
+        // Icon 세팅
+        var iconImage = segment.segmentTransform.Find("IconImage")?.GetComponent<Image>();
+        if (iconImage != null)
+        {
+            if (!string.IsNullOrEmpty(label) && icon != null)
+            {
+                iconImage.sprite = icon;
+                iconImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                iconImage.gameObject.SetActive(false);
+            }
+        }
+    }
+    private void SetSegmentInteractable(RadialSegment segment, bool isInteractable)
+    {
+        // 버튼 컴포넌트 활성/비활성
+        var btn = segment.segmentTransform.GetComponent<Button>();
+        if (btn != null)
+            btn.interactable = isInteractable;
+
+    }
     private void BindSegment(RadialSegment segment, string label)
     {
         // 텍스트 설정
@@ -765,41 +846,6 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-    private void UpdateSegmentValues(RadialMenuType type)
-    {
-        var playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
-        switch (type)
-        {
-            case RadialMenuType.Item:
-                var inventory = GameManager.Instance.GetPlayerData().inventory;
-                for (int i = 0; i < itemSegments.Count; i++)
-                {
-                    string label = i < inventory.Count ? inventory[i].itemName : "";
-                    BindSegment(itemSegments[i], label);
-                }
-                break;
-
-            case RadialMenuType.Soul:
-                playerMovement = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>();
-                var playerWeapons = playerMovement.playerWeapons;
-                for (int i = 0; i < soulSegments.Count; i++)
-                {
-                    string label = i < playerWeapons.Count ? playerWeapons[i].WeaponName.ToString() : "";
-                    BindSegment(soulSegments[i], label);
-                }
-                break;
-
-            case RadialMenuType.Emotion:
-                var emotions = playerMovement.GetUnlockedEmotions();
-                for (int i = 0; i < emotionSegments.Count; i++)
-                {
-                    string label = i < emotions.Count ? emotions[i] : "";
-                    BindSegment(emotionSegments[i], label);
-                }
-                break;
-        }
-    }
-
 
     private void CloseAllRadialMenus()
     {
@@ -1035,7 +1081,8 @@ public class UIManager : MonoBehaviour
         if (seg != null)
         {
             Debug.Log($"[{currentRadialMenu}] Segment {index} 선택됨 - {seg.segmentName}");
-            seg.ExecuteAction(index);
+            if(seg.segmentName != "")
+                seg.ExecuteAction(index);
         }
 
         ToggleRadialMenu(currentRadialMenu); // 닫기
