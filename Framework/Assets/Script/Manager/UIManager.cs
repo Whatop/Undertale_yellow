@@ -288,7 +288,7 @@ public class UIManager : MonoBehaviour
             isQuickItemDelay = true;
             quickTextBars[0].txtId = 1;
             quickTextBars[0].charPerSec = 7; // 경고는 일부러 느리게
-            quickTextBars[0].ShowErrorMessage($"<color=red><b>* 당신은 너무 빠르게 아이템을 사용하려 했다.");
+            quickTextBars[0].ShowErrorMessage($"<color=red><b>* 빠르게 아이템을 사용하려 했지만 실패했다.");
 
             // 제한 해제 타이머
             StartCoroutine(ResetQuickItemDelay());
@@ -328,7 +328,7 @@ public class UIManager : MonoBehaviour
         isQuickEmotionDelay = true;
         quickEmotionBars[0].txtId = 1;
         quickEmotionBars[0].charPerSec = 7;
-        quickEmotionBars[0].ShowErrorMessage($"<color=yellow><b>* 당신은 당황했다.",1f);
+        quickEmotionBars[0].ShowErrorMessage("<color=yellow><b>* 감정이 너무 많아… \n정신이 혼란스럽다..</b></color>", 1f);
 
         // 제한 해제 타이머
         StartCoroutine(ResetQuickEmotionDelay());
