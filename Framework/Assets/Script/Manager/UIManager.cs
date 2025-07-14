@@ -483,7 +483,12 @@ public class UIManager : MonoBehaviour
         //MouseCusor
         Vector2 mousePosition = Input.mousePosition;
         crosshairTransform.position = mousePosition;
-
+        // 감정표현 가까운 적
+        if (isRadialMenuActive && currentRadialMenu == RadialMenuType.Emotion)
+        {
+            Debug.Log("wkre");
+            BattleManager.Instance.HighlightClosestEnemyIndicator();
+        }
 
         if (isSavePanel)
         {

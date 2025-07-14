@@ -49,6 +49,14 @@ public class EnemyController : LivingObject
     public EnemyAttackType attackType;
     public TrapDir dir;
 
+    [Header("Target Indicator")]
+    [Tooltip("가장 가까운 적 표시용 프리팹 (아웃라인 + 하트)")]
+    private GameObject outlineObject;
+    [SerializeField] private GameObject outlineHeart;
+    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer outlineSpriteRenderer;
+    public Material outlineMaterial; // 외곽선 Material
+
     [Header("임시 체력")]
     public float testhp = 10000;
 
@@ -67,19 +75,59 @@ public class EnemyController : LivingObject
     protected override void Awake()
     {
         base.Awake(); // LivingObject의 Awake 메서드 호출
-        //animator.GetComponent<Animator>();
-    }
+                      //animator.GetComponent<Animator>();
+                      //
 
-     void Start()
+    }
+    void Start()
     {
         maxHealth = testhp;
         health = maxHealth;
         speed = 2;
+        spriteRenderer = GetComponent<SpriteRenderer>();
         weaponData = new Weapon();
+        CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
         if (IsTrapType())
         {
             RotateToTrapDirection(); // 트랩일 경우 방향 회전
         }
+    }
+    // 외곽선 오브젝트 생성
+    void CreateOutline()
+    {
+        outlineObject = new GameObject("Outline");
+        outlineObject.transform.SetParent(transform);
+        outlineObject.transform.localPosition = Vector3.zero;
+        outlineObject.transform.localScale = Vector3.one * 1.1f; // 원래 크기보다 약간 크게 설정
+
+        outlineSpriteRenderer = outlineObject.AddComponent<SpriteRenderer>();
+        outlineSpriteRenderer.color = Color.yellow;
+        outlineSpriteRenderer.sprite = spriteRenderer.sprite;
+        outlineSpriteRenderer.material = outlineMaterial; // Material을 외곽선 Material로 설정
+        outlineSpriteRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
+        outlineSpriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 1; // NPC보다 뒤에 표시되도록 정렬 순서 조정
+
+        outlineObject.SetActive(false); // 처음에는 비활성화
+    }
+
+    // 하이라이트 효과 관리
+    void Highlight(bool isHighlighted)
+    {
+        if (outlineObject != null)
+        {
+            outlineObject.SetActive(isHighlighted);
+        }
+    }
+
+    /// <summary>
+    /// BattleManager에서 가장 가까운 적일 때 호출
+    /// </summary>
+    public void SetTargetingSprite(bool on)
+    {
+        if (outlineObject != null)
+            outlineObject.SetActive(on);
+        if (outlineHeart != null)
+            outlineHeart.SetActive(on);
     }
 
     protected override void Update()

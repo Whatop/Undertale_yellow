@@ -141,6 +141,41 @@ public class BattleManager : MonoBehaviour
         GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 12);
         LoadBossData();
     }
+    public void HighlightClosestEnemyIndicator()
+    {
+
+        // 플레이어 위치
+        Vector3 playerPos = GameManager.Instance.GetPlayerData().player.transform.position;
+
+        EnemyController closestEC = null;
+        float closestDistSq = float.MaxValue;
+
+        // 1) 모든 적 인디케이터 끄기
+        foreach (var go in curEnemies)
+        {
+            var ec = go.GetComponent<EnemyController>();
+            if (ec == null) continue;
+            ec.SetTargetingSprite(false);
+
+        }
+
+        // 2) 가장 가까운 적 찾기
+        foreach (var go in curEnemies)
+        {
+            var ec = go.GetComponent<EnemyController>();
+            if (ec == null) continue;
+            float distSq = (go.transform.position - playerPos).sqrMagnitude;
+            if (distSq < closestDistSq)
+            {
+                closestDistSq = distSq;
+                closestEC = ec;
+            }
+        }
+
+        // 3) 가장 가까운 적에 타겟 인디케이터 켜기
+        if (closestEC != null)
+            closestEC.SetTargetingSprite(true);
+    }
 
     #region ObjectPool
     private void InitializeBulletPools()
