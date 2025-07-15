@@ -60,7 +60,7 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         HandleShake();
-        UpdateCameraSettings();
+        //UpdateCameraSettings();
     }
 
     private void HandleShake()

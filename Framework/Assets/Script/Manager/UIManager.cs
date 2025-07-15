@@ -483,12 +483,7 @@ public class UIManager : MonoBehaviour
         //MouseCusor
         Vector2 mousePosition = Input.mousePosition;
         crosshairTransform.position = mousePosition;
-        // 감정표현 가까운 적
-        if (isRadialMenuActive && currentRadialMenu == RadialMenuType.Emotion)
-        {
-            Debug.Log("wkre");
-            BattleManager.Instance.HighlightClosestEnemyIndicator();
-        }
+    
 
         if (isSavePanel)
         {
@@ -553,7 +548,7 @@ public class UIManager : MonoBehaviour
 
         //// 아이템 (Q 키 홀드)
         //if (Input.GetKeyDown(GetKeyCode(9)))
-        //    ToggleRadialMenu(RadialMenuType.Item);
+        //    `(RadialMenuType.Item);
         //if (Input.GetKeyUp(GetKeyCode(9)))
         //    ConfirmRadialSelectionAndClose();
 
@@ -717,7 +712,11 @@ public class UIManager : MonoBehaviour
         if (targetPanel != null)
         {
             targetPanel.SetActive(true);
-            StartCoroutine(ScaleIn(targetPanel.transform));
+            StartCoroutine(ScaleIn(targetPanel.transform)); 
+            // **이모션 메뉴 열 때 한 번만 호출**
+            if (type == RadialMenuType.Emotion)
+                BattleManager.Instance.HighlightClosestEnemyIndicator();
+
         }
 
         isRadialMenuActive = true;
@@ -857,6 +856,9 @@ public class UIManager : MonoBehaviour
         emotionRadialPanel.SetActive(false);
         itemRadialPanel.SetActive(false);
         soulRadialPanel.SetActive(false);
+
+        // **메뉴 닫힐 때 전체 끄기**
+        BattleManager.Instance.ClearAllEnemyIndicators();
 
         isRadialMenuActive = false;
         currentRadialMenu = RadialMenuType.None;

@@ -48,8 +48,13 @@ public class LivingObject : MonoBehaviour
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
         GameObject cameraObject = GameObject.FindGameObjectWithTag("MainCamera");
-        mainCamera = cameraObject.GetComponent<Camera>();
-        spriteRenderer = GameObject.FindGameObjectWithTag("Soul").GetComponent<SpriteRenderer>();
+        mainCamera = cameraObject.GetComponent<Camera>(); 
+        // 자식 중에 "Soul" 이름을 가진 오브젝트에서 SpriteRenderer를 가져옴
+        Transform soulTf = transform.Find("Soul");
+        if (soulTf != null)
+            spriteRenderer = soulTf.GetComponent<SpriteRenderer>();
+        else
+            Debug.LogWarning("자식에 'Soul' 오브젝트가 없습니다!");
         // 체력바 초기화
         InitializeHealthBar();
     }

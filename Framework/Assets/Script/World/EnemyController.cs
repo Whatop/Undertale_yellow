@@ -58,7 +58,7 @@ public class EnemyController : LivingObject
     public Material outlineMaterial; // 외곽선 Material
 
     [Header("임시 체력")]
-    public float testhp = 10000;
+    public float testhp = 100;
 
 
     [Header("트랩 관련")]
@@ -77,7 +77,6 @@ public class EnemyController : LivingObject
         base.Awake(); // LivingObject의 Awake 메서드 호출
                       //animator.GetComponent<Animator>();
                       //
-
     }
     void Start()
     {
@@ -110,14 +109,6 @@ public class EnemyController : LivingObject
         outlineObject.SetActive(false); // 처음에는 비활성화
     }
 
-    // 하이라이트 효과 관리
-    void Highlight(bool isHighlighted)
-    {
-        if (outlineObject != null)
-        {
-            outlineObject.SetActive(isHighlighted);
-        }
-    }
 
     /// <summary>
     /// BattleManager에서 가장 가까운 적일 때 호출

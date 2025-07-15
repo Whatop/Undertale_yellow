@@ -39,6 +39,8 @@ public class DebugModing : MonoBehaviour
             debugMode = 4;
         else if (Input.GetKeyDown(KeyCode.F5))
             debugMode = 5;
+        else if (Input.GetKeyDown(KeyCode.F6))
+            debugMode = 6;
 
         HandleDebugMode();
     }
@@ -85,6 +87,12 @@ public class DebugModing : MonoBehaviour
             case 5:
                 SoundManager.Instance.BGSoundPlay(2, 0.6f);
                 // 추후 확장 가능
+                debugMode = 0;
+                break;
+            case 6:
+                SoundManager.Instance.BGSoundPlay(2, 0.6f);
+                // 추후 확장 가능
+                BattleManager.Instance.BattleStart(1);
                 debugMode = 0;
                 break;
             default:

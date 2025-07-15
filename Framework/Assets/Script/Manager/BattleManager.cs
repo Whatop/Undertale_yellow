@@ -120,6 +120,7 @@ public class BattleManager : MonoBehaviour
     public bool isEvent = false;
     public int boss_id;
 
+    #region unity_code
     private void Awake()
     {
         gameManager = GameManager.Instance;
@@ -140,30 +141,120 @@ public class BattleManager : MonoBehaviour
         test_curboss = 0;
         GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 12);
         LoadBossData();
+
+
+
     }
+
+    void Update()
+    {
+        HandleInteraction();
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            //SetAttack("Split", 0, 1f);//분열
+            int value = UnityEngine.Random.Range(0, 59);
+            SetAttack("GasterBlaster", value);//회오리
+
+
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SetAttack("Spiral_S", 10, 1f);//회오리
+            SetAttack("Spiral_S", 24, 1f);//회오리
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SetAttack("Homing", 0, 1f);//유도
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            for (int i = 0; 12 > i; i++)
+                SetAttack("Right", i, 1f);
+
+            for (int i = 48; 60 > i; i++)
+                SetAttack("Left", i, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            for (int i = 0; 12 > i; i++)
+                SetAttack("None", i, 1f);
+
+            for (int i = 48; 60 > i; i++)
+                SetAttack("None", i, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            SetAttack("Normal", 29, 1f);
+            SetAttack("Normal", 30, 1f);
+            SetAttack("Normal", 31, 1f);
+            SetAttack("Normal", 32, 1f);
+            SetAttack("Normal", 33, 1f);
+            SetAttack("Normal", 34, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            SetAttack("Speed", 0, 1f);
+            SetAttack("Speed", 1, 1f);
+            SetAttack("Speed", 2, 1f);
+            SetAttack("Speed", 3, 1f);
+            SetAttack("Speed", 4, 1f);
+            SetAttack("Speed", 5, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            SetAttack("Spiral_M", 10, 1f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            SetAttack("Spiral_R", 24, 1f);
+        }
+    }
+    private void LateUpdate()
+    {
+        // 비활성화된 총알 제거
+        activeBullets.RemoveAll(b => b == null || !b.activeInHierarchy);
+    }
+
+    #endregion
+    #region Indicators
+
+    /// <summary>
+    /// 모든 적의 타겟 인디케이터 끄기
+    /// </summary>
+    public void ClearAllEnemyIndicators()
+    {
+        foreach (var go in curEnemies)
+        {
+            var ec = go.GetComponent<EnemyController>();
+            if (ec != null)
+                ec.SetTargetingSprite(false);
+        }
+    }
+    /// <summary>
+    /// 현재 전투 중인 적들 중 플레이어와 가장 가까운 적만 인디케이터를 켭니다.
+    /// </summary>
     public void HighlightClosestEnemyIndicator()
     {
-
-        // 플레이어 위치
+        // 1) 플레이어 위치
         Vector3 playerPos = GameManager.Instance.GetPlayerData().player.transform.position;
 
         EnemyController closestEC = null;
         float closestDistSq = float.MaxValue;
 
-        // 1) 모든 적 인디케이터 끄기
+        // 2) 모든 적 인디케이터 끄기
         foreach (var go in curEnemies)
         {
             var ec = go.GetComponent<EnemyController>();
-            if (ec == null) continue;
-            ec.SetTargetingSprite(false);
-
+            if (ec != null)
+                ec.SetTargetingSprite(false);
         }
 
-        // 2) 가장 가까운 적 찾기
+        // 3) 가장 가까운 적 찾기
         foreach (var go in curEnemies)
         {
             var ec = go.GetComponent<EnemyController>();
             if (ec == null) continue;
+
             float distSq = (go.transform.position - playerPos).sqrMagnitude;
             if (distSq < closestDistSq)
             {
@@ -172,11 +263,12 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        // 3) 가장 가까운 적에 타겟 인디케이터 켜기
+        // 4) 가장 가까운 적에 인디케이터 켜기
         if (closestEC != null)
             closestEC.SetTargetingSprite(true);
     }
 
+    #endregion
     #region ObjectPool
     private void InitializeBulletPools()
     {
@@ -281,75 +373,6 @@ public class BattleManager : MonoBehaviour
         EndDialogue();
     }
 
-    void Update()
-    {
-        HandleInteraction();
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            //SetAttack("Split", 0, 1f);//분열
-            int value = UnityEngine.Random.Range(0, 59);
-            SetAttack("GasterBlaster", value);//회오리
-            
-
-        }
-       if (Input.GetKeyDown(KeyCode.Alpha1))
-       {
-           SetAttack("Spiral_S", 10, 1f);//회오리
-           SetAttack("Spiral_S", 24, 1f);//회오리
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha2))
-       {
-           SetAttack("Homing", 0, 1f);//유도
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha3))
-       {
-           for(int i =0; 12>i; i++)
-               SetAttack("Right", i, 1f);
-
-           for (int i = 48; 60 > i; i++)
-               SetAttack("Left", i, 1f);
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha8))
-       {
-           for (int i = 0; 12 > i; i++)
-               SetAttack("None", i, 1f);
-
-           for (int i = 48; 60 > i; i++)
-               SetAttack("None", i, 1f);
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha4))
-       {
-           SetAttack("Normal", 29, 1f);
-           SetAttack("Normal", 30, 1f);
-           SetAttack("Normal", 31, 1f);
-           SetAttack("Normal", 32, 1f);
-           SetAttack("Normal", 33, 1f);
-           SetAttack("Normal", 34, 1f);
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha5))
-       {
-           SetAttack("Speed", 0, 1f);
-           SetAttack("Speed", 1, 1f);
-           SetAttack("Speed", 2, 1f);
-           SetAttack("Speed", 3, 1f);
-           SetAttack("Speed", 4, 1f);
-           SetAttack("Speed", 5, 1f);
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha6))
-       {
-           SetAttack("Spiral_M", 10, 1f);
-       }
-       if (Input.GetKeyDown(KeyCode.Alpha7))
-       {
-           SetAttack("Spiral_R", 24, 1f);
-       }
-    }
-    private void LateUpdate()
-    {
-        // 비활성화된 총알 제거
-        activeBullets.RemoveAll(b => b == null || !b.activeInHierarchy);
-    }
-
     public void DestroyActiveBullets()
     {
         foreach (var a in activeBullets)
@@ -368,7 +391,7 @@ public class BattleManager : MonoBehaviour
 
         // 코루틴으로 전투를 지연시켜 시작
         prevPos = player.transform.position;
-
+        if(eventNumber == 2)
         player.TeleportPlayer(battlePoint.transform.position);
         StartCoroutine(StartBattleAfterDelay(eventNumber, 1.5f));
     }
@@ -879,8 +902,8 @@ public class BattleManager : MonoBehaviour
         gameManager.ChangeGameState(GameState.Fight);
 
         // 랜덤으로 방을 생성
-        //int randomRoomIndex = Random.Range(0, roomPrefabs.Length);
-        //currentRoom = Instantiate(roomPrefabs[randomRoomIndex], roomSpawnPoint.position, Quaternion.identity).GetComponent<Room>();
+        int randomRoomIndex = Random.Range(0, roomPrefabs.Length);
+        currentRoom = roomPrefabs[randomRoomIndex].GetComponent<Room>();
 
         // 적을 스폰
         SpawnEnemies();

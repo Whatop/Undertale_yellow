@@ -12,10 +12,15 @@ public class Room : MonoBehaviour
     {
         foreach (var spawnPoint in enemySpawnPoints)
         {
-            // 적 프리팹을 랜덤으로 선택
             int randomIndex = Random.Range(0, enemyPrefabs.Length);
-            // 선택된 프리팹을 스폰 위치에 생성
-            Instantiate(enemyPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+            // 인스턴스 생성
+            GameObject enemyInstance = Instantiate(
+                enemyPrefabs[randomIndex],
+                spawnPoint.position,
+                Quaternion.identity
+            );
+            // 인스턴스를 curEnemies에 추가
+            BattleManager.Instance.curEnemies.Add(enemyInstance);
         }
     }
 
