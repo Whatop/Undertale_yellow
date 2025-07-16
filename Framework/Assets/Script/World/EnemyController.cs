@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Animations;  // AnimatorControllerParameterType 사용을 위해
 
 
 public enum EnemyAttackType
@@ -77,6 +78,7 @@ public class EnemyController : LivingObject
         base.Awake(); // LivingObject의 Awake 메서드 호출
                       //animator.GetComponent<Animator>();
                       //
+        animator = GetComponent<Animator>();
     }
     void Start()
     {
@@ -108,8 +110,42 @@ public class EnemyController : LivingObject
 
         outlineObject.SetActive(false); // 처음에는 비활성화
     }
+    /// <summary>
+    /// 플레이어가 선택한 감정 표현을 받았을 때 호출
+    /// </summary>
+    /// <param name="emotion">감정 키워드 (예: "Mercy", "Anger" 등)</param>
+    public void ReceiveEmotion(string emotion)
+    {
+        // 1) 반응 이펙트 재생
+        Vector3 effectPos = transform.position + Vector3.up * 1.5f;
+        // 이펙트 풀에 "Emotion_Mercy", "Emotion_Anger" 등 이름으로 미리 등록해 두세요
+        EffectManager.Instance.SpawnEffect($"Emotion_{emotion}", effectPos, Quaternion.identity); :contentReference[oaicite: 1]{ index = 1}
 
+        // 2) 애니메이터 트리거 설정
+        if (animator != null && HasTrigger(animator, emotion))
+            animator.SetTrigger(emotion);
 
+        // 3) 추가 로직: 예를 들어 감정에 따라 체력 증가/감소, 상태 이상 적용 등 구현
+    }
+
+    // Animator에 해당 트리거가 있는지 확인 (NPC.cs의 HasTrigger 참고) :contentReference[oaicite:2]{index=2}
+    private bool HasTrigger(Animator anim, string triggerName)
+    {
+        foreach (var param in anim.parameters)
+        {
+            if (param.type == AnimatorControllerParameterType.Trigger && param.name == triggerName)
+                return true;
+        }
+        return false;
+    }
+    /// <summary>
+    /// BattleManager 에서 호출하는 통합 감정 상호작용 메서드
+    /// </summary>
+    /// <param name="emotion">예: "SpeedUp", "DamageDown", "Mercy", "Flee"</param>
+    public void ProcessEmotion(string emotion)
+    {
+     
+    }
     /// <summary>
     /// BattleManager에서 가장 가까운 적일 때 호출
     /// </summary>
