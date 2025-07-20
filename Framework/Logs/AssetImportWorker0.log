@@ -11,19 +11,19 @@ C:\Program Files\Unity\Hub\Editor\2020.3.6f1\Editor\Unity.exe
 -name
 AssetImportWorker0
 -projectPath
-C:/Users/MSI/Documents/GitHub/Undertale_yellow/Framework
+C:/Users/MSI/Pictures/내 친구들/헛소리/새 폴더/Undertale_yellow/Framework
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-50555
-Successfully changed project path to: C:/Users/MSI/Documents/GitHub/Undertale_yellow/Framework
-C:/Users/MSI/Documents/GitHub/Undertale_yellow/Framework
+61171
+Successfully changed project path to: C:/Users/MSI/Pictures/내 친구들/헛소리/새 폴더/Undertale_yellow/Framework
+C:/Users/MSI/Pictures/내 친구들/헛소리/새 폴더/Undertale_yellow/Framework
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 68.13 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 59.94 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.6f1 (338bb68529b2)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path C:/Users/MSI/Documents/GitHub/Undertale_yellow/Framework/Assets
+[Subsystems] Discovering subsystems at path C:/Users/MSI/Pictures/내 친구들/헛소리/새 폴더/Undertale_yellow/Framework/Assets
 GfxDevice: creating device client; threaded=0
 Direct3D:
     Version:  Direct3D 11.0 [level 11.1]
@@ -36,145 +36,100 @@ Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56412
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56996
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.6f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.001158 seconds.
+Registered in 0.001098 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 67.52 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 63.49 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.922 seconds
+- Completed reload, in  2.064 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.003701 seconds.
+Registered in 0.003430 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 65.77 ms, found 1 plugins.
+Refreshing native plugins compatible for Editor in 61.30 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.913 seconds
+- Completed reload, in  0.878 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.04 seconds
-Refreshing native plugins compatible for Editor in 1.04 ms, found 1 plugins.
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
+Refreshing native plugins compatible for Editor in 0.77 ms, found 1 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Unloading 3414 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 167.7 MB.
-System memory in use after: 167.9 MB.
+System memory in use before: 154.3 MB.
+System memory in use after: 154.6 MB.
 
-Unloading 29 unused Assets to reduce memory usage. Loaded Objects now: 3887.
-Total: 3.845200 ms (FindLiveObjects: 0.360900 ms CreateObjectMapping: 0.117600 ms MarkObjects: 3.314600 ms  DeleteObjects: 0.050400 ms)
-
-========================================================================
-Received Import Request.
-  path: Assets/Script/Manager/UIManager.cs
-  artifactKey: Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/Manager/UIManager.cs using Guid(a0675774d63b1ff44b429d263df94d6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '204710be147d6622b8ac7db229c6fe24') in 0.093734 seconds
-  Import took 0.102064 seconds .
+Unloading 30 unused Assets to reduce memory usage. Loaded Objects now: 3863.
+Total: 2.669000 ms (FindLiveObjects: 0.389200 ms CreateObjectMapping: 0.117400 ms MarkObjects: 2.044500 ms  DeleteObjects: 0.115700 ms)
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000405 seconds.
-  path: Assets/Script/Manager/BattleManager.cs
-  artifactKey: Guid(175b2321e11728b4ebc29b0724ed0df5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/Manager/BattleManager.cs using Guid(175b2321e11728b4ebc29b0724ed0df5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f4d10c98a621ce22cea662ef27cbb57d') in 0.020446 seconds
-  Import took 0.028684 seconds .
+  path: Assets/PlayerData.asset
+  artifactKey: Guid(c02694be969d6e64c8dd91bb31a92a69) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/PlayerData.asset using Guid(c02694be969d6e64c8dd91bb31a92a69) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '749e4cc6882306f00fe59221ba166a61') in 0.034251 seconds
+  Import took 0.041256 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 9.945886 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b130fd12700cea6fc2fa8cae4270c194') in 0.012024 seconds
-  Import took 0.018409 seconds .
+  Time since last request: 0.000337 seconds.
+  path: Assets/UniversalRenderPipelineAsset.asset
+  artifactKey: Guid(fa4410325abe40c4995cdf0db106ad05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UniversalRenderPipelineAsset.asset using Guid(fa4410325abe40c4995cdf0db106ad05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '90c2864f1bbdda6138d2a79355aafdd4') in 0.025974 seconds
+  Import took 0.034589 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000318 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b130fd12700cea6fc2fa8cae4270c194') in 0.002463 seconds
-  Import took 0.008224 seconds .
+  Time since last request: 0.000218 seconds.
+  path: Assets/BlurMaterial.mat
+  artifactKey: Guid(63812be7d52a2cf4d86d8fd21834ce98) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/BlurMaterial.mat using Guid(63812be7d52a2cf4d86d8fd21834ce98) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a740762ababb0ac47d62cfeb5070d6f2') in 0.235160 seconds
+  Import took 0.241738 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 2184.185786 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '63360f11b84b904c031828469705e00e') in 0.033346 seconds
-  Import took 0.132767 seconds .
+  Time since last request: 0.000240 seconds.
+  path: Assets/Main.mixer
+  artifactKey: Guid(3ee27a4b627d70a488617721e3d2ff55) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Main.mixer using Guid(3ee27a4b627d70a488617721e3d2ff55) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd7dab5572fb87345e759ccff55925e6a') in 0.013564 seconds
+  Import took 0.018789 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.025982 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '63360f11b84b904c031828469705e00e') in 0.044188 seconds
-  Import took 0.060197 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.013361 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 1.41 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  1.279 seconds
-Platform modules already initialized, skipping
-Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
-Refreshing native plugins compatible for Editor in 1.22 ms, found 1 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 3258 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 156.3 MB.
-System memory in use after: 156.5 MB.
-
-Unloading 18 unused Assets to reduce memory usage. Loaded Objects now: 3890.
-Total: 43.211000 ms (FindLiveObjects: 0.752200 ms CreateObjectMapping: 0.161600 ms MarkObjects: 42.268600 ms  DeleteObjects: 0.027000 ms)
+  Time since last request: 0.000154 seconds.
+  path: Assets/UniversalRenderPipelineAsset_Renderer.asset
+  artifactKey: Guid(bef5adb1cb007894d9b47345a09c0997) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UniversalRenderPipelineAsset_Renderer.asset using Guid(bef5adb1cb007894d9b47345a09c0997) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '47f0a7465789d742b305cd38db6a41d1') in 0.012907 seconds
+  Import took 0.018116 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 11.933236 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'dc47684df10e5028512d9af360c4c147') in 0.286610 seconds
-  Import took 0.429426 seconds .
+  Time since last request: 0.000198 seconds.
+  path: Assets/GameConfig.asset
+  artifactKey: Guid(3f4334cfa43328642b8c9cf2c36cbbc0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/GameConfig.asset using Guid(3f4334cfa43328642b8c9cf2c36cbbc0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c8d1579b62e74ccf18123c457c97fd6e') in 0.012120 seconds
+  Import took 0.018821 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.111198 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'dc47684df10e5028512d9af360c4c147') in 0.571102 seconds
-  Import took 0.576417 seconds .
+  Time since last request: 97.700399 seconds.
+  path: Assets/Scenes/GameScene/Main Camera Profile 1.asset
+  artifactKey: Guid(7a3551c6bc1af6143aad5c0ceb06cfc6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/GameScene/Main Camera Profile 1.asset using Guid(7a3551c6bc1af6143aad5c0ceb06cfc6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3a2cd028c7b23fb10feac33535b50426') in 0.012384 seconds
+  Import took 0.018849 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 9.809262 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'dd61416245910218b612374c19d9066e') in 0.006498 seconds
-  Import took 0.014079 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 528.349050 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '51a9d0946cdc1c2228ccbf1d102bf181') in 0.061949 seconds
-  Import took 0.110209 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.086931 seconds.
-  path: Assets/Script/World/EnemyController.cs
-  artifactKey: Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Script/World/EnemyController.cs using Guid(033dc374c67d5be41b231cfad51eae23) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '51a9d0946cdc1c2228ccbf1d102bf181') in 0.102865 seconds
-  Import took 0.206350 seconds .
+  Time since last request: 0.000236 seconds.
+  path: Assets/Scenes/GameScene/Main Camera Profile.asset
+  artifactKey: Guid(586d7222b380f4e448e4e23bb568110e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/GameScene/Main Camera Profile.asset using Guid(586d7222b380f4e448e4e23bb568110e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7f8d7ebb64c0b025b1ee21dc43510217') in 0.012541 seconds
+  Import took 0.017848 seconds .
 
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file
