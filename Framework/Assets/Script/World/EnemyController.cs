@@ -119,7 +119,7 @@ public class EnemyController : LivingObject
         // 1) 반응 이펙트 재생
         Vector3 effectPos = transform.position + Vector3.up * 1.5f;
         // 이펙트 풀에 "Emotion_Mercy", "Emotion_Anger" 등 이름으로 미리 등록해 두세요
-        EffectManager.Instance.SpawnEffect($"Emotion_{emotion}", effectPos, Quaternion.identity); :contentReference[oaicite: 1]{ index = 1}
+       // EffectManager.Instance.SpawnEffect($"Emotion_{emotion}", effectPos, Quaternion.identity); :contentReference[oaicite: 1]{ index = 1}
 
         // 2) 애니메이터 트리거 설정
         if (animator != null && HasTrigger(animator, emotion))

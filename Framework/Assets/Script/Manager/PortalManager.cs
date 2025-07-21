@@ -49,7 +49,6 @@ public class PortalManager : MonoBehaviour
         playerMovement.SetAnimatorEnabled(false);
         Time.timeScale = 0f;
 
-        yield return StartCoroutine(Fade(1f));
 
         // 이동 처리
         if (portalIndex >= 0 && portalIndex < portalPoints.Length)
@@ -59,13 +58,13 @@ public class PortalManager : MonoBehaviour
         }
         else if(portalIndex==999)
         {
-            player.transform.position = portalPoints[portalPoints.Length-1].transform.position;
             CameraController.Instance.SwitchRoomConfiner(portalIndex);
         }
         else
         {
             Debug.LogWarning($"PortalManager: 잘못된 포탈 인덱스 {portalIndex}");
         }
+        yield return StartCoroutine(Fade(1f));
 
         yield return StartCoroutine(Fade(0f));
 

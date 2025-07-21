@@ -351,28 +351,25 @@ public class BattleManager : MonoBehaviour
         return positions;
     }
     #endregion
-    public void BattleSetting()
+    public void BossBattleSetting()
     {
         Boss_AllObject.SetActive(true);
-        prevPos = player.transform.position;
         player.TeleportPlayer(battlePoint.transform.position);
         Boss_Face.gameObject.SetActive(true);
         Boss_Text.gameObject.SetActive(true);
         gameManager.ChangeGameState(GameState.Fight);
         isTalking = true;
 
-
     }
-    public void BattleReSetting()
+    public void BossBattleEnd()
     {
+        player.TeleportPlayer(prevPos);
         Boss_AllObject.SetActive(false);
-        // player.TeleportPlayer(prevPos);
         Boss_Text.gameObject.SetActive(false);
         gameManager.ChangeGameState(GameState.None);
         Boss_Textbar.SetActive(false);
         EndDialogue();
     }
-
     public void DestroyActiveBullets()
     {
         foreach (var a in activeBullets)
@@ -382,7 +379,6 @@ public class BattleManager : MonoBehaviour
     }
     public void BattleStart(int eventNumber)
     {
-
         gameManager.isBattle = true;
         // 사운드 재생
         SoundManager.Instance.SFXPlay("BattleStart", 0);
@@ -391,9 +387,11 @@ public class BattleManager : MonoBehaviour
 
         // 코루틴으로 전투를 지연시켜 시작
         prevPos = player.transform.position;
-        if(eventNumber == 2)
-        player.TeleportPlayer(battlePoint.transform.position);
+        if(eventNumber==2) // switch 로 변경해정
+        BossBattleSetting();
+
         StartCoroutine(StartBattleAfterDelay(eventNumber, 1.5f));
+        Debug.Log("전투 시작");
     }
     private void LoadBossData()
     {
@@ -883,7 +881,6 @@ public class BattleManager : MonoBehaviour
         else if (eventNumber == 2)
         {
             StartBossBattle();
-            BattleSetting();
             StartCoroutine(DelayDialogue(2, 1f));
         }
         UIManager.Instance.OnPlayerUI(); // 전투 상태에서는 UI를 보여줌

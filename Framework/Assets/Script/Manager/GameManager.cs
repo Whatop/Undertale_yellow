@@ -545,7 +545,7 @@ public class GameManager : MonoBehaviour
         playerData.isDie = true;
         playerData.playerAnimator.SetBool("isDie",true);
         UIManager.Instance.playGameover();
-        BattleManager.Instance.BattleReSetting();
+        BattleManager.Instance.BossBattleEnd();
         DestroyAllEnemies();
 
     }
