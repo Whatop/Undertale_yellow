@@ -269,7 +269,11 @@ public class EnemyController : LivingObject
                 1f,     // accuracy
                 1f      // damage
             );
-                    SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
+
+            if(bulletPrefabName == "BARK")
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 102);
+            else
+            SoundManager.Instance.SFXPlay("shotgun_shot_01", 218);
             weaponData.current_magazine = weaponData.magazine;
         }
         else
@@ -324,6 +328,7 @@ public class EnemyController : LivingObject
 
     BulletType GetBulletType()
     {
+
         switch (attackType)
         {
             case EnemyAttackType.Bullet:
@@ -345,6 +350,8 @@ public class EnemyController : LivingObject
     string GetBulletPrefabName()
     {
         // 우선 무기에 이름이 지정되어 있으면 그걸 쓰고, 없으면 타입으로 분기
+        if(bulletPrefabName == "BARK")
+            return "BARK";
 
         switch (attackType)
         {
