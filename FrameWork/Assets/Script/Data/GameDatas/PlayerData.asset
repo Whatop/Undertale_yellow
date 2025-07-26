@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 993e0c43f7083b948bd88df8a188ab9c, type: 3}
+  m_Name: PlayerData
+  m_EditorClassIdentifier: 
+  maxHealth: 6
+  health: 6
+  position: {x: 0, y: 0, z: 0}
+  playerName: frisk
+  inventory: []
+  currentState: 3
+  isStop: 0
+  isInvincible: 0
+  isDie: 0
+  isPhone: 0
+  level: 1
+  attack: 0
+  defense: 0
+  attackLevel: 0
+  defenseLevel: 0
+  exp: 10
+  nextExp: 0
+  gold: 0
+  currentWeapon:
+    id: 0
+    itemName: 
+    description: 
+    itemType: 0
+  currentArmor:
+    id: 0
+    itemName: 
+    description: 
+    itemType: 0

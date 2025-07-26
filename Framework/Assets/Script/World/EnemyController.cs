@@ -3,6 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Animations;  // AnimatorControllerParameterType 사용을 위해
 
+public enum VirtueType
+{
+    Bravery,       // 용기
+    Justice,       // 정의
+    Integrity,     // 고결
+    Kindness,      // 친절
+    Perseverance,  // 끈기
+    Patience,      // 인내
+    Determination  // 의지
+}
 
 public enum EnemyAttackType
 {
@@ -49,6 +59,13 @@ public class EnemyController : LivingObject
     public bool isMove;
     public EnemyAttackType attackType;
     public TrapDir dir;
+    [Header("데이터")]
+    [SerializeField] private EnemyData enemyData;  // 인스펙터에서 할당
+    public VirtueType virtue; // 각 몬스터에 하나씩 할당
+    [SerializeField]
+    private List<string> reactableEmotions = new List<string>();
+
+
 
     [Header("Target Indicator")]
     [Tooltip("가장 가까운 적 표시용 프리팹 (아웃라인 + 하트)")]
@@ -82,11 +99,34 @@ public class EnemyController : LivingObject
     }
     void Start()
     {
-        maxHealth = testhp;
-        health = maxHealth;
-        speed = 2;
         spriteRenderer = GetComponent<SpriteRenderer>();
         weaponData = new Weapon();
+        if (enemyData != null)
+        {
+            // 기본 정보 적용
+            virtue = enemyData.virtue;
+            reactableEmotions = new List<string>(enemyData.reactableEmotions);
+
+            maxHealth = enemyData.maxHealth;
+            health = maxHealth;
+            speed = enemyData.moveSpeed;
+            shootCoolTime = enemyData.shootCooldown;
+            bulletPrefabName = enemyData.bulletPrefabName;
+
+            // 트랩 관련
+            isTrapActive = enemyData.isTrapActive;
+            trapShootInterval = enemyData.trapShootInterval;
+
+            // 거리 유지
+            minDistance = enemyData.minDistance;
+            maxDistance = enemyData.maxDistance;
+
+            Debug.Log($"[{gameObject.name}] EnemyData 적용 완료");
+        }
+        else
+        {
+            Debug.LogWarning("EnemyData가 할당되지 않았습니다.");
+        }
         CreateOutline(); // 하이라이트용 외곽선 오브젝트 생성
         if (IsTrapType())
         {

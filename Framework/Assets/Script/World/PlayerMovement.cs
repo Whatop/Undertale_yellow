@@ -1258,9 +1258,9 @@ public class PlayerMovement : LivingObject
                  magazine = 4,
                  current_magazine = 4,
                  maxAmmo = 30,
-                 maxRange = 4f,
+                 maxRange = 4.5f,
                  current_Ammo = 30,
-                 bulletSpeed = 6f,
+                 bulletSpeed = 10f,
                  accuracy = 0.6f,
                  reloadTime = 2.0f
              });
