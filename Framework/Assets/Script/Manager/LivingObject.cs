@@ -39,7 +39,7 @@ public class LivingObject : MonoBehaviour
     public Canvas worldCanvas; // 월드 캔버스
     private Camera mainCamera;
     public GameObject hpBarPoint;
-    private SpriteRenderer spriteRenderer; // SpriteRenderer 참조
+    protected SpriteRenderer spriteRenderer; // SpriteRenderer 참조
     private Color originalColor; // 원래 색상 저장
 
     protected virtual void Awake()
@@ -145,7 +145,7 @@ public class LivingObject : MonoBehaviour
         healthBar.SetActive(false);
     }
 
-    public void TakeDamage(float damageAmount)
+    public virtual void TakeDamage(float damageAmount)
     {
         if (!isInvincible) // 무적 상태가 아닐 때만 데미지를 받음
         {
@@ -170,31 +170,11 @@ public class LivingObject : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damageAmount, Vector3 position)
+    public virtual void Heal(float amount)
     {
-        if (!isInvincible ) // 무적 상태가 아닐 때만 데미지를 받음
-        {
-            UIManager.Instance.ShowDamageText(position, damageAmount);
-            health -= damageAmount;
-
-            // 체력바 업데이트
-            if (healthSlider != null)
-            {
-                healthSlider.value = health;
-            }
-
-            if (health <= 0 && !isDie)
-            {
-                Die();
-            }
-            else
-            {
-                SoundManager.Instance.SFXPlay("HitSound", 128);
-                StartCoroutine(StartInvincibility()); // 무적 상태로 전환
-            }
-        }
+        health = Mathf.Min(health + amount, maxHealth);
+        // 필요하면 힐 이펙트, 사운드 등 추가
     }
-
     private IEnumerator StartInvincibility()
     {
         if (transform.tag == "Player")

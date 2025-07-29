@@ -84,22 +84,21 @@ public class GasterBlaster : MonoBehaviour
     {
         if (other.CompareTag("Soul"))
         {
-            GameObject player = other.gameObject;
-
-            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
-
-
+            LivingObject player = other.GetComponent<LivingObject>();
+            ObjectState state = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState;
+            if (player != null && state != ObjectState.Roll)
+                player.TakeDamage(1);
         }
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Soul"))
+       if (other.CompareTag("Soul"))
         {
-            GameObject player = other.gameObject;
-
-            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(1, GameManager.Instance.GetPlayerData().player.transform.position);
-
-
+            LivingObject player = other.GetComponent<LivingObject>();
+            ObjectState state = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState;
+            if (player != null && state != ObjectState.Roll)
+                player.TakeDamage(1);
         }
+
     }
 }

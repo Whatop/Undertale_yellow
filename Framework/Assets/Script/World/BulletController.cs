@@ -68,7 +68,9 @@ public class BulletController : MonoBehaviour
     private bool laserInitialized = false;
     private float traveledDistance = 0f;
     private bool didHitBarrierOnce = false;
+    private Coroutine lifeTimeRoutine;
 
+    private bool isHeal = false;
 
     private static readonly Dictionary<BulletType, Color> bulletColors = new Dictionary<BulletType, Color>
     {
@@ -108,7 +110,6 @@ public class BulletController : MonoBehaviour
         {
             GetComponent<SpriteRenderer>().color = bulletColors[bulletType];
         }
-        StartCoroutine(LifeTime());
     }
     private void OnEnable()
     {
@@ -130,7 +131,25 @@ public class BulletController : MonoBehaviour
             }
         }
     }
+    private void OnDisable()
+    {
+        if (lifeTimeRoutine != null)
+            StopCoroutine(lifeTimeRoutine);
+        lifeTimeRoutine = null;
+    }
+    public void StartBulletLife(float duration)
+    {
+        if (lifeTimeRoutine != null)
+            StopCoroutine(lifeTimeRoutine);
 
+        lifeTimeRoutine = StartCoroutine(LifeTime(duration));
+    }
+
+    IEnumerator LifeTime(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        DestroyBullet(); // SetActive(false)
+    }
     private void StartPattern()
     {
 
@@ -163,28 +182,44 @@ public class BulletController : MonoBehaviour
         }
     }
     public void InitializeBullet(Vector2 fireDirection, float bulletSpeed, float bulletAccuracy, float bulletDamage, float maxRange,
-                                 float delay = 0, BulletType type = default, Transform target = null,int size = 0, bool isfreind = false)
+                                 float delay = 0, BulletType type = default, Transform target = null, int size = 0, bool isfreind = false, bool isheal = false)
     {  // 기존 값 설정 외에...
-        isHoming = false;
-        isSpiral = false;
-        isSplitted = false;
-        rb.velocity = Vector2.zero;
-        bulletType = type;
+        this.isHoming = false;
+        this.isSpiral = false;
+        this.isSplitted = false;
+        this.rb.velocity = Vector2.zero;
+        this.bulletType = type;
+        this.isHeal = false;
 
         // 색상 다시 설정
         var renderer = GetComponent<SpriteRenderer>();
         if (renderer != null)
             renderer.color = bulletColors[bulletType];
 
-        speed = bulletSpeed;
-        damage = bulletDamage;
-        accuracy = bulletAccuracy;
-        maxrange = maxRange;
-        storedFireDirection = ApplyAccuracy(fireDirection);
-        bulletSize = size;
-        isFreind = isfreind;
+        this.speed = bulletSpeed;
+        this.damage = bulletDamage;
+        this.accuracy = bulletAccuracy;
+        this.maxrange = maxRange;
+        this.storedFireDirection = ApplyAccuracy(fireDirection);
+        this.bulletSize = size;
+        this.isFreind = isfreind;
+        this.isHeal = isheal;
         initialPosition = transform.position;
+       
+        // 총알 색상 재설정
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null && bulletColors.TryGetValue(bulletType, out Color baseColor))
+        {
+            sr.color = baseColor;
+            if (this.isHeal)
+                sr.color = Color.green;  // 회복 탄환은 항상 초록색
+        }
 
+        // ✅ 기존 코루틴 정리 후 새로 시작
+        if (lifeTimeRoutine != null)
+            StopCoroutine(lifeTimeRoutine);
+
+        lifeTimeRoutine = StartCoroutine(LifeTime(lifeTime));
         if (target != null)
         {
             targetPosition = target.position;
@@ -561,43 +596,47 @@ public class BulletController : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log($"총알이 {other.gameObject.name}과 충돌");
-        if (other.CompareTag("Enemy") && isFreind)
+        // **회복 탄환 처리**: 플레이어나 적에게 닿으면 체력 회복
+        if (isHeal)
         {
-            GameObject enemy = other.gameObject;
-
-            if (!hitTimer.ContainsKey(enemy))
+            if (other.CompareTag("Enemy") || other.CompareTag("Soul"))
             {
-                hitTimer[enemy] = Time.time;
-                enemy.GetComponent<EnemyController>().TakeDamage(damage);
-            }
-            else
-            {
-                if (Time.time - hitTimer[enemy] >= dotInterval)
+                LivingObject target = other.GetComponent<LivingObject>();
+                if (target != null)
                 {
-                    hitTimer[enemy] = Time.time;
-                    enemy.GetComponent<EnemyController>().TakeDamage(damage);
+                    target.Heal(damage);  // 데미지 대신 해당 값만큼 체력 회복
                 }
             }
-
-            if(bulletType != BulletType.GasterBlaster&& bulletType != BulletType.Barrier)
             DestroyBullet();
+            return;  // 회복 탄환은 다른 충돌 로직 처리하지 않음
         }
-        else if (other.CompareTag("Soul") && !isFreind && GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState != ObjectState.Roll)
+
+        // **일반 탄환 처리**: 아군 탄환 -> 적에게 데미지 / 적 탄환 -> 플레이어에게 데미지
+        if (other.CompareTag("Enemy") && isFreind)
         {
-            GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().TakeDamage(damage, GameManager.Instance.GetPlayerData().player.transform.position);
-            if(bulletType != BulletType.GasterBlaster&& bulletType != BulletType.Barrier)
-            DestroyBullet();
+            LivingObject enemy = other.GetComponent<LivingObject>();
+            if (enemy != null)
+                enemy.TakeDamage(damage);
+            if (bulletType != BulletType.GasterBlaster && bulletType != BulletType.Barrier)
+                DestroyBullet();
+        }
+        else if (other.CompareTag("Soul") && !isFreind)
+        {
+            LivingObject player = other.GetComponent<LivingObject>();
+            ObjectState state = GameManager.Instance.GetPlayerData().player.GetComponent<PlayerMovement>().objectState;
+            if (player != null && state != ObjectState.Roll)
+                player.TakeDamage(damage);
+            if (bulletType != BulletType.GasterBlaster && bulletType != BulletType.Barrier)
+                DestroyBullet();
         }
 
+        // **방어막 탄환 처리**: 적 탄환을 막고 반사
         if (other.CompareTag("Bullet") && bulletType == BulletType.Barrier)
         {
-            var bullet = other.GetComponent<BulletController>();
+            BulletController bullet = other.GetComponent<BulletController>();
             if (bullet != null && !bullet.isFreind)
             {
-                bullet.OnHitByShield(); // laser 포함
-
-                // 충돌 지점 계산: 이 방어막 오브젝트 기준 가장 가까운 위치
+                bullet.OnHitByShield();  // 레이저 포함한 탄환 소멸/반사 처리
                 Vector2 hitPoint = other.ClosestPoint(transform.position);
                 EffectManager.Instance.SpawnEffect("barrier_block_flash", hitPoint, Quaternion.identity);
             }
@@ -608,11 +647,6 @@ public class BulletController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private IEnumerator LifeTime()
-    {
-        yield return new WaitForSeconds(lifeTime);
-        DestroyBullet();
-    }
     private IEnumerator BarrierMoveAndStay()
     {
         // 1) 초기 속도 설정

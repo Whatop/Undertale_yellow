@@ -71,7 +71,6 @@ public class EnemyController : LivingObject
     [Tooltip("가장 가까운 적 표시용 프리팹 (아웃라인 + 하트)")]
     private GameObject outlineObject;
     [SerializeField] private GameObject outlineHeart;
-    private SpriteRenderer spriteRenderer;
     private SpriteRenderer outlineSpriteRenderer;
     public Material outlineMaterial; // 외곽선 Material
 

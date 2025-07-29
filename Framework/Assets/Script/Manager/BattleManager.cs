@@ -141,9 +141,6 @@ public class BattleManager : MonoBehaviour
         test_curboss = 0;
         GenerateGrid(40.60f, 59.54f, 5, 6.00f, -4.05f, 12);
         LoadBossData();
-
-
-
     }
 
     void Update()
