@@ -264,6 +264,30 @@ public class BattleManager : MonoBehaviour
         if (closestEC != null)
             closestEC.SetTargetingSprite(true);
     }
+    public void ApplyEmotionToClosestEnemy(string emotion)
+    {
+        EnemyController closest = null;
+        float minDist = float.MaxValue;
+        Vector3 playerPos = GameManager.Instance.GetPlayerData().player.transform.position;
+
+        foreach (var go in curEnemies)
+        {
+            var ec = go.GetComponent<EnemyController>();
+            if (ec == null) continue;
+
+            float dist = (ec.transform.position - playerPos).sqrMagnitude;
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = ec;
+            }
+        }
+
+        if (closest != null)
+        {
+            closest.ProcessEmotion(emotion);
+        }
+    }
 
     #endregion
     #region ObjectPool
@@ -657,8 +681,6 @@ public class BattleManager : MonoBehaviour
                 break;
         }
     }
-
-    
     void SetAttack(string attack, int bulletpoint = 0, float delay = 0f)
     {
         switch (attack)

@@ -970,7 +970,7 @@ public class PlayerMovement : LivingObject
 
             BattleManager.Instance.SpawnBulletAtPosition(
                 BulletType.Directional,
-                soulpoint.position,
+                soulshotpoint.position,
                 rot,
                 dir,
                 "Player_Normal", 0, 0, true,

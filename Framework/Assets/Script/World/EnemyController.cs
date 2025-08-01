@@ -183,8 +183,109 @@ public class EnemyController : LivingObject
     /// <param name="emotion">예: "SpeedUp", "DamageDown", "Mercy", "Flee"</param>
     public void ProcessEmotion(string emotion)
     {
-     
+        // 지정된 감정이 반응 리스트에 없다면 무시
+        if (!reactableEmotions.Contains(emotion)) return;
+
+        Debug.Log($"[{gameObject.name}] {emotion} 감정 수신됨 / 미덕: {virtue}");
+
+        switch (virtue)
+        {
+            case VirtueType.Bravery: // 용기
+                if (emotion == "Flirt" || emotion == "Anger")
+                {
+                    ReceiveEmotion(emotion);
+                    // 일시적으로 이동속도 증가
+                    StartCoroutine(TempSpeedUp(1.5f, 2f));
+                }
+                break;
+
+            case VirtueType.Justice: // 정의
+                if (emotion == "Respect" || emotion == "Disgust")
+                {
+                    ReceiveEmotion(emotion);
+                    // 탄속 증가
+                    bulletSpeed += 2f;
+                    Invoke(nameof(ResetBulletSpeed), 2f);
+                }
+                break;
+
+            case VirtueType.Integrity: // 고결
+                if (emotion == "Affirm" || emotion == "Deny")
+                {
+                    ReceiveEmotion(emotion);
+                    // 일정시간 무적 (예: 피해 무시)
+                }
+                break;
+
+            case VirtueType.Kindness: // 친절
+                if (emotion == "Mercy" || emotion == "Pray")
+                {
+                    ReceiveEmotion(emotion);
+                    // 체력 소폭 회복
+                    Heal(10f);
+                }
+                break;
+
+            case VirtueType.Perseverance: // 끈기
+                if (emotion == "Sorrow" || emotion == "Fear")
+                {
+                    ReceiveEmotion(emotion);
+                    // 죽었을 경우 1회 부활
+                    if (health <= 0 && !undying)
+                    {
+                        undying = true;
+                        health = maxHealth * 0.3f;
+                        Debug.Log($"{gameObject.name}이 끈기로 다시 일어섰습니다.");
+                    }
+                }
+                break;
+
+            case VirtueType.Patience: // 인내
+                if (emotion == "Ignore" || emotion == "Truth")
+                {
+                    ReceiveEmotion(emotion);
+                    // 2초간 공격 정지
+                    StopAllCoroutines();
+                    StartCoroutine(DelayAttack(2f));
+                }
+                break;
+
+            case VirtueType.Determination: // 의지
+                if (emotion == "Love" || emotion == "Respect")
+                {
+                    ReceiveEmotion(emotion);
+                    // 체력 50% 이하일 경우 모든 능력 강화
+                    if (health < maxHealth * 0.5f)
+                    {
+                        speed *= 1.5f;
+                        bulletSpeed += 3f;
+                        shootCoolTime *= 0.8f;
+                        Debug.Log($"{gameObject.name} 의지가 불타오른다!");
+                    }
+                }
+                break;
+        }
     }
+    IEnumerator TempSpeedUp(float multiplier, float duration)
+    {
+        speed *= multiplier;
+        yield return new WaitForSeconds(duration);
+        speed /= multiplier;
+    }
+     
+    IEnumerator DelayAttack(float delay)
+    {
+        float originalCool = shootCoolTime;
+        shootCoolTime = 999f; // 매우 길게 설정해서 잠시 정지
+        yield return new WaitForSeconds(delay);
+        shootCoolTime = originalCool;
+    }
+
+    void ResetBulletSpeed()
+    {
+        bulletSpeed = 10f; // 기본값으로 되돌림
+    }
+
     /// <summary>
     /// BattleManager에서 가장 가까운 적일 때 호출
     /// </summary>
