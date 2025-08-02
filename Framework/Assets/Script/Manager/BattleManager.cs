@@ -264,6 +264,26 @@ public class BattleManager : MonoBehaviour
         if (closestEC != null)
             closestEC.SetTargetingSprite(true);
     }
+    public EnemyController GetClosestEnemy()
+    {
+        Vector3 playerPos = GameManager.Instance.GetPlayerData().player.transform.position;
+        EnemyController closest = null;
+        float closestDist = float.MaxValue;
+
+        foreach (var go in curEnemies)
+        {
+            var ec = go.GetComponent<EnemyController>();
+            if (ec == null || ec.IsDead()) continue;
+            float dist = (go.transform.position - playerPos).sqrMagnitude;
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = ec;
+            }
+        }
+        return closest;
+    }
+
     public void ApplyEmotionToClosestEnemy(string emotion)
     {
         EnemyController closest = null;

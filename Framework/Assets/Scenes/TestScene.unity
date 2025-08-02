@@ -55873,7 +55873,8 @@ MonoBehaviour:
   activeBullets: []
   currentTypeEffect: {fileID: 162684846}
   player: {fileID: 1761398945}
-  curEnemies: []
+  curEnemies:
+  - {fileID: 4962832956991049452}
   bulletSpawnTransforms: []
   bulletPointPrefab: {fileID: 2475700955202721965, guid: c1dcf219eaed4734bae2d9c21506b5a2, type: 3}
   bulletspawnPoint:
@@ -63589,12 +63590,12 @@ MonoBehaviour:
   isMove: 0
   attackType: 0
   dir: 0
-  enemyData: {fileID: 0}
+  enemyData: {fileID: 11400000, guid: c19077dfe1e7fd449a209d3a931e8b2d, type: 2}
   virtue: 0
   reactableEmotions: []
   outlineHeart: {fileID: 4962832956044078626}
   outlineMaterial: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
-  testhp: 10000
+  testhp: 100
   isTrapActive: 1
   trapShootInterval: 2
   laserPrefab: {fileID: 0}

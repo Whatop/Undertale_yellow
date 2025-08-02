@@ -698,6 +698,22 @@ public class UIManager : MonoBehaviour
 
         CloseAllRadialMenus();
         currentRadialMenu = type;
+        // 1. 가장 가까운 적의 감정 리스트 확보
+        var closestEnemy = BattleManager.Instance.GetClosestEnemy();
+        var emotions = (closestEnemy != null) ? closestEnemy.GetReactableEmotions() : new List<string>();
+
+        // 2. EmotionInfo로 변환 (아이콘 포함)
+        var emotionInfoList = new List<EmotionInfo>();
+        foreach (var e in emotions)
+        {
+            emotionInfoList.Add(new EmotionInfo
+            {
+                name = e,
+                icon = GameManager.Instance.GetEmotionSprite(e)
+            });
+        }
+        // 3. 상황별 감정 세팅
+        GameManager.Instance.SetCurrentSituationEmotions(emotionInfoList);
 
         UpdateSegmentValues(type); // **여기 추가**
 
@@ -721,6 +737,7 @@ public class UIManager : MonoBehaviour
 
         isRadialMenuActive = true;
     }
+   
 
     private IEnumerator ScaleIn(Transform panelTransform)
     {

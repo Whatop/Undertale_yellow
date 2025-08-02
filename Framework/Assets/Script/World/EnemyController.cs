@@ -64,6 +64,7 @@ public class EnemyController : LivingObject
     public VirtueType virtue; // 각 몬스터에 하나씩 할당
     [SerializeField]
     private List<string> reactableEmotions = new List<string>();
+    public List<string> GetReactableEmotions() => reactableEmotions;
 
 
 
@@ -88,6 +89,7 @@ public class EnemyController : LivingObject
     public bool iskeepLaser;
 
     private bool undying = false;
+    public bool IsDead() { return isDie; }
 
     protected override void Awake()
     {
@@ -392,6 +394,8 @@ public class EnemyController : LivingObject
         Vector2 spawnPos = WeaponTransform.position;
         Quaternion spawnRot = WeaponTransform.rotation;
         Vector2 direction = hand.up;
+
+        animator.SetTrigger("Attack");
 
         if (attackType != EnemyAttackType.Trap_Laser && attackType != EnemyAttackType.Laser)
         {
