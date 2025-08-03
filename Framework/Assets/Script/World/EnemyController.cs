@@ -362,6 +362,7 @@ public class EnemyController : LivingObject
         else
             StopMoving();
 
+        animator.SetBool("isMove", isMove);
     }
 
     bool IsTrapType()
@@ -378,12 +379,15 @@ public class EnemyController : LivingObject
 
     void MoveAwayFromPlayer()
     {
+        isMove = true;
+        animator.SetBool("isMove", isMove);
         Vector2 direction = (transform.position - gameManager.GetPlayerData().position).normalized;
         rigid.velocity = direction * speed;
     }
 
     void StopMoving()
     {
+        isMove = false;
         rigid.velocity = Vector2.zero;
     }
 
