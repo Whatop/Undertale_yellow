@@ -58,7 +58,8 @@ public class EnemyController : LivingObject
     float curTime = 0;
     public bool isMove;
     public EnemyAttackType attackType;
-    public TrapDir dir;
+    public TrapDir dir; 
+    private Collider2D myCollider;
     [Header("데이터")]
     [SerializeField] private EnemyData enemyData;  // 인스펙터에서 할당
     public VirtueType virtue; // 각 몬스터에 하나씩 할당
@@ -96,6 +97,7 @@ public class EnemyController : LivingObject
         base.Awake(); // LivingObject의 Awake 메서드 호출
                       //animator.GetComponent<Animator>();
                       //
+        myCollider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
     }
     void Start()
@@ -151,6 +153,23 @@ public class EnemyController : LivingObject
 
         outlineObject.SetActive(false); // 처음에는 비활성화
     }
+    void UpdateOutline()
+    {
+        if (outlineObject == null || outlineSpriteRenderer == null || spriteRenderer == null)
+            return;
+
+        // 1. 외곽선 위치 동기화 (자식이라면 자동이지만 안전하게)
+        outlineObject.transform.localPosition = Vector3.zero;
+        outlineObject.transform.localScale = Vector3.one * 1.1f;
+
+        // 2. 외곽선 Sprite 동기화 (애니메이션, Sprite 교체 등)
+        outlineSpriteRenderer.sprite = spriteRenderer.sprite;
+
+        // 3. 외곽선 정렬 순서 동기화 (스프라이트 레이어 변경시)
+        outlineSpriteRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
+        outlineSpriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
+    }
+
     /// <summary>
     /// 플레이어가 선택한 감정 표현을 받았을 때 호출
     /// </summary>
@@ -363,6 +382,13 @@ public class EnemyController : LivingObject
             StopMoving();
 
         animator.SetBool("isMove", isMove);
+        if (isDie)
+        {
+            animator.SetTrigger("Die");
+            if (myCollider != null)
+                myCollider.enabled = false; // 충돌 비활성화
+            UpdateOutline();
+        }
     }
 
     bool IsTrapType()
