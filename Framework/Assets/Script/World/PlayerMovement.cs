@@ -865,6 +865,11 @@ public class PlayerMovement : LivingObject
             playerWeapons.Add(weapon);
             Debug.Log($"무기 추가됨: {weapon.WeaponName}");
         }
+        // 무기 타입 리스트에 해당 무기 타입이 없으면 추가
+        if (!playerWeaponTypes.Contains(weapon.weaponType))
+        {
+            playerWeaponTypes.Add(weapon.weaponType);
+        }
     }
     void ShotSounds()
     {
