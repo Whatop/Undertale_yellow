@@ -88,6 +88,11 @@ public class EnemyController : LivingObject
     public GameObject laserPrefab; // LaserFadeOut 프리팹
     private GameObject currentLaser; // 현재 생성된 레이저
     public bool iskeepLaser;
+    
+    //[Header("AI")]
+    private bool isTouchingHorizontal = false;
+    private bool isTouchingVertical = false;
+
 
     private bool undying = false;
     public bool IsDead() { return isDie; }
@@ -98,7 +103,6 @@ public class EnemyController : LivingObject
                       //animator.GetComponent<Animator>();
                       //
         myCollider = GetComponent<Collider2D>();
-        animator = GetComponent<Animator>();
     }
     void Start()
     {
@@ -136,6 +140,92 @@ public class EnemyController : LivingObject
             RotateToTrapDirection(); // 트랩일 경우 방향 회전
         }
     }
+    protected override void Update()
+    {
+        base.Update();
+        if (isDie)
+        {
+            StopMoving();
+            animator.SetTrigger("Die");
+            if (myCollider != null)
+                myCollider.enabled = false;
+            UpdateOutline();
+            return;
+        }
+        if (attackType == EnemyAttackType.None)
+                return;
+            // 트랩은 플레이어 추격하지 않음
+            if (!IsTrapType())
+        {
+            UpdateMoveAndRotate();
+     
+            }
+            else
+            {
+                StopMoving(); // 트랩은 고정
+            }
+
+            if (IsTrapType())
+            {
+                if (!isTrapActive) return;
+
+                trapTimer += Time.deltaTime;
+                if (trapTimer >= trapShootInterval)
+                {
+                    trapTimer = 0f;
+                    Shoot(); // 트랩도 Shoot()을 이용함
+                }
+            }
+            else
+            {
+                float curmagazine = weaponData.current_magazine;
+                curTime += Time.deltaTime;
+
+                Vector3 playerPosition = gameManager.GetPlayerData().position;
+                Vector2 direction = (playerPosition - WeaponTransform.position).normalized;
+                hand.up = direction;
+
+                if (curTime > shootCoolTime && curmagazine > 0)
+                {
+                    Shoot();
+                    weaponData.current_magazine -= 1;
+                    weaponData.current_Ammo -= 1;
+                    curTime = 0;
+                }
+
+                // 탄약 재장전
+                if (weaponData.current_Ammo < weaponData.maxAmmo &&
+                    weaponData.current_magazine < weaponData.magazine)
+                {
+                    weaponData.current_magazine = weaponData.magazine;
+                }
+            }
+
+        animator.SetBool("isMove", isMove);
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Vector2 normal = contact.normal;
+                if (Mathf.Abs(normal.x) > Mathf.Abs(normal.y)) // 수평 충돌
+                    isTouchingHorizontal = true;
+                else if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) // 수직 충돌
+                    isTouchingVertical = true;
+            }
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            isTouchingHorizontal = false;
+            isTouchingVertical = false;
+        }
+    }
     // 외곽선 오브젝트 생성
     void CreateOutline()
     {
@@ -168,6 +258,32 @@ public class EnemyController : LivingObject
         // 3. 외곽선 정렬 순서 동기화 (스프라이트 레이어 변경시)
         outlineSpriteRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
         outlineSpriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
+    }
+    void UpdateMoveAndRotate()
+    {
+        // 플레이어 위치 계산
+        Vector2 playerPos = GameManager.Instance.GetPlayerData().position;
+        float distanceToPlayer = Vector2.Distance(playerPos, transform.position);
+
+        // 1. 움직임
+        if (distanceToPlayer >= maxDistance)
+            MoveTowardsPlayer(playerPos);
+        else if (distanceToPlayer < minDistance)
+            MoveAwayFromPlayer();
+        else
+            StopMoving();
+
+        // 2. 바라보는 방향 자동 조정
+        RotateToPlayer(playerPos);
+
+    }
+
+    void RotateToPlayer(Vector2 playerPos)
+    {
+        Vector2 dir = (playerPos - (Vector2)transform.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle); 
+        hand.up = dir; // 총은 따로 따라감
     }
 
     /// <summary>
@@ -318,91 +434,12 @@ public class EnemyController : LivingObject
             outlineHeart.SetActive(on);
     }
 
-    protected override void Update()
-    {
-        base.Update();
-        if (!isDie)
-        {
-            if (attackType == EnemyAttackType.None)
-                return;
-            // 트랩은 플레이어 추격하지 않음
-            if (!IsTrapType())
-            {
-                float distanceToPlayer = Vector2.Distance(gameManager.GetPlayerData().position, transform.position);
-
-                if (distanceToPlayer > maxDistance && isMove)
-                    ChasePlayer();
-                else if (distanceToPlayer < minDistance)
-                    MoveAwayFromPlayer();
-                else
-                    StopMoving();
-            }
-            else
-            {
-                StopMoving(); // 트랩은 고정
-            }
-
-            if (IsTrapType())
-            {
-                if (!isTrapActive) return;
-
-                trapTimer += Time.deltaTime;
-                if (trapTimer >= trapShootInterval)
-                {
-                    trapTimer = 0f;
-                    Shoot(); // 트랩도 Shoot()을 이용함
-                }
-            }
-            else
-            {
-                float curmagazine = weaponData.current_magazine;
-                curTime += Time.deltaTime;
-
-                Vector3 playerPosition = gameManager.GetPlayerData().position;
-                Vector2 direction = (playerPosition - WeaponTransform.position).normalized;
-                hand.up = direction;
-
-                if (curTime > shootCoolTime && curmagazine > 0)
-                {
-                    Shoot();
-                    weaponData.current_magazine -= 1;
-                    weaponData.current_Ammo -= 1;
-                    curTime = 0;
-                }
-
-                // 탄약 재장전
-                if (weaponData.current_Ammo < weaponData.maxAmmo &&
-                    weaponData.current_magazine < weaponData.magazine)
-                {
-                    weaponData.current_magazine = weaponData.magazine;
-                }
-            }
-        }
-        else
-            StopMoving();
-
-        animator.SetBool("isMove", isMove);
-        if (isDie)
-        {
-            animator.SetTrigger("Die");
-            if (myCollider != null)
-                myCollider.enabled = false; // 충돌 비활성화
-            UpdateOutline();
-        }
-    }
-
     bool IsTrapType()
     {
         return attackType == EnemyAttackType.Trap_Bullet ||
                attackType == EnemyAttackType.Trap_Laser ||
                attackType == EnemyAttackType.Trap_Melee;
     }
-    void ChasePlayer()
-    {
-        Vector2 direction = (gameManager.GetPlayerData().position - transform.position).normalized;
-        rigid.velocity = direction * speed;
-    }
-
     void MoveAwayFromPlayer()
     {
         isMove = true;
@@ -410,6 +447,18 @@ public class EnemyController : LivingObject
         Vector2 direction = (transform.position - gameManager.GetPlayerData().position).normalized;
         rigid.velocity = direction * speed;
     }
+
+    void MoveTowardsPlayer(Vector2 playerPos)
+    {
+        Vector2 direction = (playerPos - (Vector2)transform.position).normalized;
+        Vector2 velocity = direction * speed;
+
+        rigid.velocity = velocity;
+
+        isMove = true;
+        animator.SetBool("isMove", isMove);
+    }
+
 
     void StopMoving()
     {
