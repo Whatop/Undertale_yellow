@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.AI; // NavMeshAgent
 using UnityEngine.Animations;  // AnimatorControllerParameterType 사용을 위해
 
 public enum VirtueType
@@ -68,6 +69,9 @@ public class EnemyController : LivingObject
     public List<string> GetReactableEmotions() => reactableEmotions;
 
 
+    [Header("NavMeshAgent")]
+    public NavMeshAgent agent; // NavMeshAgent 2D (NavMeshSurface2d 필요)
+    public bool useNavMesh = true; // NavMesh 사용 여부
 
     [Header("Target Indicator")]
     [Tooltip("가장 가까운 적 표시용 프리팹 (아웃라인 + 하트)")]
@@ -102,7 +106,12 @@ public class EnemyController : LivingObject
         base.Awake(); // LivingObject의 Awake 메서드 호출
                       //animator.GetComponent<Animator>();
                       //
-        myCollider = GetComponent<Collider2D>();
+        myCollider = GetComponent<Collider2D>(); 
+        if (agent != null)
+        {
+            agent.updateUpAxis = false;
+            agent.updateRotation = false; // 2D에서는 회전 비활성화
+        }
     }
     void Start()
     {
@@ -139,6 +148,14 @@ public class EnemyController : LivingObject
         {
             RotateToTrapDirection(); // 트랩일 경우 방향 회전
         }
+        if (useNavMesh && agent == null)
+        {
+            agent = gameObject.AddComponent<NavMeshAgent>();
+            agent.updateUpAxis = false;
+            agent.updateRotation = false;
+        }
+        if (IsTrapType() && agent != null)
+            agent.enabled = false;
     }
     protected override void Update()
     {
@@ -150,22 +167,30 @@ public class EnemyController : LivingObject
             if (myCollider != null)
                 myCollider.enabled = false;
             UpdateOutline();
+            if (agent) agent.isStopped = true;
             return;
         }
         if (attackType == EnemyAttackType.None)
                 return;
-            // 트랩은 플레이어 추격하지 않음
-            if (!IsTrapType())
+        // 트랩은 플레이어 추격하지 않음
+        if (!IsTrapType())
         {
-            UpdateMoveAndRotate();
-     
+            if (useNavMesh && agent != null)
+            {
+                NavMeshVirtueMove();
             }
             else
             {
-                StopMoving(); // 트랩은 고정
+                UpdateMoveAndRotate(); // fallback
             }
+        }
+        else
+        {
+            StopMoving();
+            if (agent) agent.enabled = false;
+        }
 
-            if (IsTrapType())
+        if (IsTrapType())
             {
                 if (!isTrapActive) return;
 
@@ -225,7 +250,119 @@ public class EnemyController : LivingObject
             isTouchingHorizontal = false;
             isTouchingVertical = false;
         }
+    } // ==========================
+    // NavMeshAgent 미덕별 이동/공격
+    // ==========================
+    void NavMeshVirtueMove()
+    {
+        Vector3 playerPos = GameManager.Instance.GetPlayerData().position;
+        float dist = Vector3.Distance(playerPos, transform.position);
+
+        switch (virtue)
+        {
+            case VirtueType.Bravery:
+                if (dist > minDistance)
+                {
+                    agent.isStopped = false;
+                    agent.SetDestination(playerPos);
+                    isMove = true;
+                }
+                else
+                {
+                    agent.isStopped = true;
+                    isMove = false;
+                }
+                RotateToPlayer(playerPos);
+                break;
+
+            case VirtueType.Justice:
+                // 일정 거리 유지, 가까우면 후퇴, 멀면 추적
+                if (dist < minDistance)
+                {
+                    Vector3 away = (transform.position - playerPos).normalized;
+                    agent.isStopped = false;
+                    agent.SetDestination(transform.position + away * (minDistance + 1f));
+                }
+                else if (dist > maxDistance)
+                {
+                    agent.isStopped = false;
+                    agent.SetDestination(playerPos);
+                }
+                else
+                {
+                    agent.isStopped = true;
+                }
+                RotateToPlayer(playerPos);
+                isMove = !agent.isStopped;
+                break;
+
+            case VirtueType.Integrity:
+                // 장애물 우회 우선(빠른 경로), 레이저 공격 등
+                if (dist > minDistance)
+                {
+                    agent.speed = speed * 1.2f;
+                    agent.isStopped = false;
+                    agent.SetDestination(playerPos);
+                    isMove = true;
+                }
+                else
+                {
+                    agent.isStopped = true;
+                    isMove = false;
+                }
+                RotateToPlayer(playerPos);
+                break;
+
+            case VirtueType.Kindness:
+                // 플레이어 주변을 원형 회전(지원/치유 행동)
+                Vector3 orbit = playerPos + Quaternion.Euler(0, 0, Time.time * 60f) * Vector3.right * minDistance;
+                agent.isStopped = false;
+                agent.SetDestination(orbit);
+                RotateToPlayer(playerPos);
+                isMove = true;
+                break;
+
+            case VirtueType.Perseverance:
+                // 집요하게 따라감(거리 무시)
+                agent.speed = speed * 1.1f;
+                agent.isStopped = false;
+                agent.SetDestination(playerPos);
+                RotateToPlayer(playerPos);
+                isMove = true;
+                break;
+
+            case VirtueType.Patience:
+                // 원래 위치 대기, 플레이어 가까우면 반격
+                float attackTrigger = 4f;
+                if (dist < attackTrigger)
+                {
+                    agent.isStopped = false;
+                    agent.SetDestination(playerPos);
+                    isMove = true;
+                }
+                else
+                {
+                    agent.isStopped = true;
+                    isMove = false;
+                }
+                RotateToPlayer(playerPos);
+                break;
+
+            case VirtueType.Determination:
+                // 체력 50% 이하 때 이동·공격 강화
+                if (health < maxHealth * 0.5f)
+                {
+                    agent.speed = speed * 1.5f;
+                    shootCoolTime *= 0.7f;
+                }
+                agent.isStopped = false;
+                agent.SetDestination(playerPos);
+                RotateToPlayer(playerPos);
+                isMove = true;
+                break;
+        }
     }
+
     // 외곽선 오브젝트 생성
     void CreateOutline()
     {

@@ -1080,6 +1080,14 @@
       <Project>{EDACEDE5-300D-2F62-02E4-F53AEB6D75B8}</Project>
       <Name>Febucci.TextAnimator.Runtime</Name>
     </ProjectReference>
+    <ProjectReference Include="NavMeshPlusEditor.csproj">
+      <Project>{E8506A49-D0C0-ABC8-447C-E9BAF2D22AAC}</Project>
+      <Name>NavMeshPlusEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="NavMeshPlus.csproj">
+      <Project>{264180D2-C4F3-EE46-E5A8-83B512198301}</Project>
+      <Name>NavMeshPlus</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
