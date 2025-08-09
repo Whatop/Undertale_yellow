@@ -96,6 +96,13 @@ public class EnemyController : LivingObject
     //[Header("AI")]
     private bool isTouchingHorizontal = false;
     private bool isTouchingVertical = false;
+    [SerializeField] private QuickTextBar quickTextBar; 
+    
+    // 상태 플래그
+    private bool isStunned = false;
+    private bool canAttack = true;  
+    // 감정 반응의 onlyOnce 처리를 위한 추적
+    private readonly HashSet<string> usedEmotionKeys = new HashSet<string>();
 
 
     private bool undying = false;
@@ -112,6 +119,8 @@ public class EnemyController : LivingObject
             agent.updateUpAxis = false;
             agent.updateRotation = false; // 2D에서는 회전 비활성화
         }
+        if (quickTextBar == null)
+            quickTextBar = GetComponentInChildren<QuickTextBar>();
     }
     void Start()
     {
@@ -121,7 +130,7 @@ public class EnemyController : LivingObject
         {
             // 기본 정보 적용
             virtue = enemyData.virtue;
-            reactableEmotions = new List<string>(enemyData.reactableEmotions);
+            reactableEmotions = new List<string>(enemyData.emotionKeys);
 
             maxHealth = enemyData.maxHealth;
             health = maxHealth;
@@ -432,7 +441,8 @@ public class EnemyController : LivingObject
         // 1) 반응 이펙트 재생
         Vector3 effectPos = transform.position + Vector3.up * 1.5f;
         // 이펙트 풀에 "Emotion_Mercy", "Emotion_Anger" 등 이름으로 미리 등록해 두세요
-       // EffectManager.Instance.SpawnEffect($"Emotion_{emotion}", effectPos, Quaternion.identity); :contentReference[oaicite: 1]{ index = 1}
+        // EffectManager.Instance.SpawnEffect($"Emotion_{emotion}", effectPos, Quaternion.identity); :contentReference[oaicite: 1]{ index = 1}
+
 
         // 2) 애니메이터 트리거 설정
         if (animator != null && HasTrigger(animator, emotion))
@@ -457,11 +467,15 @@ public class EnemyController : LivingObject
     /// <param name="emotion">예: "SpeedUp", "DamageDown", "Mercy", "Flee"</param>
     public void ProcessEmotion(string emotion)
     {
-        // 지정된 감정이 반응 리스트에 없다면 무시
-        if (!reactableEmotions.Contains(emotion)) return;
 
         Debug.Log($"[{gameObject.name}] {emotion} 감정 수신됨 / 미덕: {virtue}");
 
+        string reaction = enemyData.GetReaction(emotion);
+        if (!string.IsNullOrEmpty(reaction) && quickTextBar != null)
+        {
+            // QuickTextBar가 존재하면 텍스트를 출력합니다.
+            quickTextBar.ShowMessage(reaction);
+        }
         switch (virtue)
         {
             case VirtueType.Bravery: // 용기

@@ -305,7 +305,38 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(5f); // 경고 메시지 출력 동안 제한
         isQuickEmotionDelay = false;
     }
-
+    private string CanonicalEmotion(string name)
+    {
+        switch (name)
+        {
+            case "자비": return "Mercy";
+            case "긍정": return "Affirm";
+            case "부정": return "Deny";
+            case "사랑": return "Love";
+            case "반감": return "Disgust";
+            case "유혹": return "Flirt";
+            case "무시": return "Ignore";
+            case "존중": return "Respect";
+            case "냉소": return "Sarcasm";
+            case "행복": return "Joy";
+            case "슬픔": return "Sorrow";
+            case "기도": return "Pray";
+            case "당황": return "Flustered";
+            case "혼란": return "Confused";
+            case "공포": return "Fear";
+            case "진실": return "Truth";
+            case "용기": return "Bravery";
+            case "친절": return "Kindness";
+            case "고결": return "Integrity";
+            case "인내": return "Patience";
+            case "끈기": return "Perseverance";
+            case "의지": return "Determination";
+            case "정의": return "Justice";
+            case "분노": return "Anger";
+            // 이미 영문이면 그대로 사용
+            default: return name;
+        }
+    }
     public void ShowQuickEmotion(string msg, string emotion = "감정표현", int txtId = 0, float charPerSec = 10f)
     {
         if (isQuickEmotionDelay)

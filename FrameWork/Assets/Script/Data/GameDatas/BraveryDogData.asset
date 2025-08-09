@@ -16,8 +16,25 @@ MonoBehaviour:
   maxDistance: 6
   virtue: 0
   reactableEmotions:
-  - Flirt
-  - Anger
+  - emotionKey: Love
+    action: 0
+    amount: 0
+    duration: 0
+    reactionText: 
+    animTrigger: 
+    effectName: 
+    onlyOnce: 0
+  - emotionKey: 
+    action: 0
+    amount: 0
+    duration: 0
+    reactionText: 
+    animTrigger: 
+    effectName: 
+    onlyOnce: 0
+  emotionKeys:
+  - Love
+  - Sad
   maxHealth: 50
   moveSpeed: 2
   shootCooldown: 4

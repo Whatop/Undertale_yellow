@@ -141,7 +141,7 @@ public class TypeEffect : MonoBehaviour
             char currentChar = targetMsg[index];
 
             // 사운드 재생
-            if ( currentChar != ' ' && currentChar != '?' && currentChar != '.' && currentChar != '*')
+            if (isTextSfxEnable && currentChar != ' ' && currentChar != '?' && currentChar != '.' && currentChar != '*')
             {
                 if(isTextSfxEnable)
                     SoundManager.Instance.SFXTextPlay(txtsound, txtId);
@@ -180,6 +180,7 @@ public class TypeEffect : MonoBehaviour
         {
             DialogueManager.Instance.currentNPC.SetExpression("Default");
         }
+        isTextSfxEnable = true;
     }
     private void OnDisable()
     {

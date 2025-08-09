@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: feb3622779c47154093085a157ded05c, type: 3}
+  m_Name: NewEnemyData
+  m_EditorClassIdentifier: 
+  minDistance: 3
+  maxDistance: 6
+  virtue: 0
+  reactableEmotions:
+  - action: 0
+    amount: 0
+    duration: 0
+    reactionText: 
+    animTrigger: 
+    effectName: 
+    onlyOnce: 0
+  emotionKey:
+  - 
+  - 
+  maxHealth: 100
+  moveSpeed: 2
+  shootCooldown: 4
+  isTrapActive: 0
+  trapShootInterval: 2
+  bulletPrefabName: Enemy_None
