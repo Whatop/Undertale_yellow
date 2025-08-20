@@ -1,1 +1,3 @@
-Undertale shooting
+Undertale: Soulgun
+정의(Justice) 소울의 힘을 기반으로, 탄막 슈팅과 감정 선택을 결합한 팬게임입니다.
+Flowey가 엔터테인먼트를 위해 정의 소울을 플레이어에게 강제로 주입하고, 감정을 통해 전투와 서사를 바꾸어 나가는 구조입니다.
